@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+	<!-- DEFINITION FOR THE ROOT SETUP ELEMENT ******************************************************** -->
+	<xs:element name="SetupBuild">
+		
+		<xs:annotation>
+			<xs:documentation>Contains all the parameters that are used with the build process of the current project</xs:documentation>
+		</xs:annotation>
+		
+		<xs:complexType>		
+		
+			<xs:sequence>		
+		
+				<!-- The BuildOptions setup part -->
+				<xs:element name="BuildOptions" minOccurs="1" maxOccurs="1">
+		
+					<xs:annotation>
+						<xs:documentation>Contains the general options related to the project build process</xs:documentation>
+					</xs:annotation>
+					
+					<xs:complexType>
+					
+						<xs:sequence>
+			
+							<!-- EnableReleaseBuild property -->
+							<xs:element name="EnableReleaseBuild" minOccurs="1" maxOccurs="1">
+								<xs:annotation>
+									<xs:documentation>Generate a fully optimized project version ready for production. Build process will perform optimizations like source minification and obfuscation, images optimization, etc.. and the build result will be placed under target/ProjectName-buildnumber/. If phar file generation is enabled, a phar with the same name will also be available on the same location.</xs:documentation>
+								</xs:annotation>								
+								<xs:complexType>
+									<xs:attribute name="value" default="false" type="xs:boolean" />
+								</xs:complexType>
+							</xs:element>
+							
+							<!-- KeepTargetFiles property -->
+							<xs:element name="KeepTargetFiles" minOccurs="0" maxOccurs="1">
+								<xs:annotation>
+									<xs:documentation>If set to false, all the files that are copied to the target/ProjectName/ folder will be removed. Otherwise they will be kept on the folder.</xs:documentation>
+								</xs:annotation>								
+								<xs:complexType>
+									<xs:attribute name="value" default="false" type="xs:boolean" />
+								</xs:complexType>
+							</xs:element>
+							
+							<!-- CreatePhars property -->
+							<xs:element name="CreatePhars" minOccurs="0" maxOccurs="1">
+								<xs:annotation>
+									<xs:documentation>Specifies if the files generated on the target folder by the build process must be packed on a phar file or not.</xs:documentation>
+								</xs:annotation>								
+								<xs:complexType>
+									<xs:attribute name="value" default="true" type="xs:boolean" />
+								</xs:complexType>
+							</xs:element>
+							
+							<!-- ExecuteUnitTests property -->
+							<xs:element name="ExecuteUnitTests" minOccurs="0" maxOccurs="1">
+								<xs:annotation>
+									<xs:documentation>Specifies if unit tests located on the src/test folder must be executed as part of the build process or not.</xs:documentation>
+								</xs:annotation>								
+								<xs:complexType>
+									<xs:attribute name="value" default="true" type="xs:boolean" />
+								</xs:complexType>
+							</xs:element>
+										
+						</xs:sequence>
+					
+					</xs:complexType>
+					
+				</xs:element>
+				
+				
+				<!-- Tools setup part -->
+				<xs:element name="Tools" minOccurs="0" maxOccurs="1">
+		
+					<xs:annotation>
+						<xs:documentation>Contains the general options related to the project build process</xs:documentation>
+					</xs:annotation>
+					
+					<xs:complexType>
+					
+						<xs:sequence>
+						
+						<!-- MinifierPath build property -->
+							<xs:element name="MinifierPath" minOccurs="0" maxOccurs="1">
+								<xs:annotation>
+									<xs:documentation>Path where the minifier tool is located on this computer. It will take care of compressing js and css files when EnableReleaseBuild is true</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:attribute name="value" default="C:/BuildTools/yuicompressor-2.4.7/build/yuicompressor-2.4.7.jar" type="xs:string" />
+								</xs:complexType>
+							</xs:element>
+							
+							<!-- HtmlCompressorPath build property -->
+							<xs:element name="HtmlCompressorPath" minOccurs="0" maxOccurs="1">
+								<xs:annotation>
+									<xs:documentation>Path where the html compressor tool is located on this computer. It will take care of compressing php and html files when EnableReleaseBuild is true</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:attribute name="value" default="C:/BuildTools/htmlcompressor/htmlcompressor-1.5.3.jar" type="xs:string" />
+								</xs:complexType>
+							</xs:element>
+							
+							<!-- PngQuantPath build property -->
+							<xs:element name="PngQuantPath" minOccurs="0" maxOccurs="1">
+								<xs:annotation>
+									<xs:documentation>Path where the pngquant tool is located on this computer. It will take care of compressing png files when EnableReleaseBuild is true</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:attribute name="value" default="C:/BuildTools/pngquant-windows/pngquant.exe" type="xs:string" />
+								</xs:complexType>
+							</xs:element>
+							
+							<!-- PngOptimizerPath build property -->
+							<xs:element name="PngOptimizerPath" minOccurs="0" maxOccurs="1">
+								<xs:annotation>
+									<xs:documentation>Path where the optipng tool is located on this computer. It will take care of compressing png files when EnableReleaseBuild is true</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:attribute name="value" default="C:/BuildTools/optipng-0.7.4-win32/optipng.exe" type="xs:string" />
+								</xs:complexType>
+							</xs:element>
+							
+							<!-- JpgOptimizerPath build property -->
+							<xs:element name="JpgOptimizerPath" minOccurs="0" maxOccurs="1">
+								<xs:annotation>
+									<xs:documentation>Path where the jpegtran tool is located on this computer. It will take care of compressing jpg files when EnableReleaseBuild is true</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:attribute name="value" default="C:/BuildTools/jpegtran/jpegtran.exe" type="xs:string" />
+								</xs:complexType>
+							</xs:element>
+							
+							<!-- MysqlPath build property -->
+							<xs:element name="MysqlPath" minOccurs="0" maxOccurs="1">
+								<xs:annotation>
+									<xs:documentation>Path where the mysql.exe tool is located on this computer. It is used to automate database operations like create and delete</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:attribute name="value" default="C:/xampp/mysql/bin/mysql.exe" type="xs:string" />
+								</xs:complexType>
+							</xs:element>
+							
+							<!-- PhpPath build property -->
+							<xs:element name="PhpPath" minOccurs="0" maxOccurs="1">
+								<xs:annotation>
+									<xs:documentation>Path where the php.exe tool is located on this computer. It is used to compress php files, generate phar files and other operations</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:attribute name="value" default="C:/xampp/php/php.exe" type="xs:string" />
+								</xs:complexType>
+							</xs:element>
+						
+						</xs:sequence>
+					
+					</xs:complexType>
+					
+				</xs:element>				
+				
+			</xs:sequence>
+		
+		</xs:complexType>
+		
+	</xs:element>
+
+</xs:schema>

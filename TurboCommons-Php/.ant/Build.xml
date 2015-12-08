@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project>
+<project name="Build" basedir=".">
+
+
+	<description>
+	
+		Turbo Framework PHP ant project builder.
+		Used to automatize the most common development build operations related to turbo framework projects.
+			
+		VERY IMPORTANT !! 
+		An extra library is required to execute FTP operations with ant. Download it here:	http://commons.apache.org/net/index.html
+		and copy it to:	C:\Program Files\eclipse\plugins\org.apache.ant_1.8.2.v20110505-1300\lib
+		Then go to "Window/Preferences/Ant/Runtime/ClassPath" and add this lib as an external jar to "Ant home entries" (Say yes to ignore possible problem if prompted)
+	
+	</description>
+		
+	
+	<!-- Create a property containing the current project name, based on the root project folder -->
+	<basename property="projectBaseName" file="../" />
+	
+	<!-- The location for the project source folder -->
+	<property name="srcFolderPath" location="../src" />
+
+	<!-- The loaction for the project main folder -->
+	<property name="mainFolderPath" location="../src/main" />
+
+	<!-- The location for the target folder -->
+	<property name="targetFolderPath" location="../target" />
+
+	<!-- The location for the cache file, which contains modified files since last build. This path can be overwritten by external builds that want to execute this project build but track the cache externally -->
+	<property name="cacheFilePath" location="cache.properties" />
+	
+	
+	<!-- Load the build configuration from the Setup-build.xml file -->
+	<target name="loadSetupProperties" >
+	
+		<fail message="Setup-Build.xml not found">
+		    <condition>
+		    	<not>
+		    		<available file="${mainFolderPath}/Setup-Build.xml" />
+		    	</not>
+		    </condition>
+		</fail>
+		
+		<xmlproperty file="${mainFolderPath}/Setup-Build.xml" keepRoot="false" semanticattributes="true" />
+		
+		<!-- Set default values for some properties in case they are not specified on the Setup-build.xml -->
+		<property name="BuildOptions.EnableReleaseBuild" value="false" />
+		<property name="BuildOptions.KeepTargetFiles" value="false" />
+		<property name="BuildOptions.CreatePhars" value="true" />
+		<property name="BuildOptions.ExecuteUnitTests" value="true" />
+		
+		<property name="Tools.MinifierPath" value="C:/BuildTools/yuicompressor-2.4.7/build/yuicompressor-2.4.7.jar" />
+		<property name="Tools.HtmlCompressorPath" value="C:/BuildTools/htmlcompressor/htmlcompressor-1.5.3.jar" />
+		<property name="Tools.PngQuantPath" value="C:/BuildTools/pngquant-windows/pngquant.exe" />
+		<property name="Tools.PngOptimizerPath" value="C:/BuildTools/optipng-0.7.4-win32/optipng.exe" />
+		<property name="Tools.JpgOptimizerPath" value="C:/BuildTools/jpegtran/jpegtran.exe" />
+		<property name="Tools.MysqlPath" value="C:/xampp/mysql/bin/mysql.exe" />			
+		<property name="Tools.PhpPath" value="C:/xampp/php/php.exe" />
+				
+	</target>
+	
+	
+	<!-- Execute all the build tasks as defined on the setup-build.xml file -->
+	<target name="build" depends="loadSetupProperties">
+
+		<antcall target="copyMainFiles" />
+		<antcall target="generatePhar" />
+		<antcall target="removeTargetFiles" />
+		
+	</target>
+	
+	
+	<!-- Copy all the project src/main files to the target folder. Any unwanted files/folders are excluded -->
+	<target name="copyMainFiles">
+
+		<copy todir="${targetFolderPath}/${projectBaseName}" overwrite="true">
+			
+			<fileset dir="${mainFolderPath}" excludes="${BuildSetup.ExcludeFolders}" casesensitive="false">
+				<modified cache="propertyfile">
+					<param name="cache.cachefile" value="${cacheFilePath}" />
+				</modified>
+				<exclude name="Setup-Build.xml" />
+				<exclude name="**/thumbs.db**" />
+				<exclude name="**/.svn/**" />
+				<exclude name="**/.git**" />
+			</fileset>
+			
+		</copy>
+
+	</target>
+	
+	
+	<!-- Generate the phar file from the files on the target folder if phar generation is enabled on setup build xml -->
+	<target name="generatePhar" if="${BuildOptions.CreatePhars}">
+
+		<!-- Create target folder if it does not exist -->
+		<mkdir dir="${targetFolderPath}" />
+		
+		<!--Define the contents for the stub file that will be autoexecuted when the phar file is included -->
+		<property name="phpStubFile" value="&lt;?php Phar::mapPhar(); include \'phar://${projectBaseName}.phar/AutoLoader.php\'; __HALT_COMPILER(); ?>"/>
+		
+		<!-- Create the phar using the current project name and version -->
+		<exec executable="${Tools.PhpPath}" failonerror="true">
+			<arg value="-d display_errors" />
+			<arg value="-r" />
+			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}.phar'); $p->startBuffering(); $p->setStub('${phpStubFile}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}'); $p->stopBuffering();" />
+		</exec>
+		
+	</target>
+	
+	
+	<!-- Removes anything from the target folder except the phar files, if this is specified on the setup build xml file -->
+	<target name="removeTargetFiles" unless="${BuildOptions.KeepTargetFiles}">
+		<delete dir="${targetFolderPath}/${projectBaseName}" failonerror="true" />
+	</target>
+	
+	
+	<!-- Clean the project by removing the target folder -->
+	<target name="clean" depends="loadSetupProperties">
+		<antcall target="cleanTargets" />
+	</target>
+
+
+	<!-- Delete the cache.properties file and the target or target-release folders if they exist -->
+	<target name="cleanTargets">
+		<delete file="cache.properties" failonerror="true" />
+		<delete dir="${targetFolderPath}" failonerror="true" />
+		<delete dir="${releaseFolderPath}" failonerror="true" />
+	</target>
+
+</project>
