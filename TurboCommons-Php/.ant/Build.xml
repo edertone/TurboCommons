@@ -38,7 +38,7 @@
 		<fail message="Setup-Build.xml not found">
 		    <condition>
 		    	<not>
-		    		<available file="${mainFolderPath}/Setup-Build.xml" />
+		    		<available file="${srcFolderPath}/../Setup-Build.xml" />
 		    	</not>
 		    </condition>
 		</fail>

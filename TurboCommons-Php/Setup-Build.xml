@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <SetupBuild xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-			xsi:noNamespaceSchemaLocation="../../.ant/Setup-Build.xsd">
+			xsi:noNamespaceSchemaLocation=".ant/Setup-Build.xsd">
 
 	<BuildOptions>
 	
