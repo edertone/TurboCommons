@@ -21,31 +21,37 @@
 					
 					<xs:complexType>
 					
-						<xs:attribute name="generateProductionBuild" use="required" type="xs:boolean">
+						<xs:attribute name="createReleaseVersion" use="required" type="xs:boolean">
 							<xs:annotation>
-								<xs:documentation>Generate a fully optimized project version ready for production. Build process will perform optimizations like source minification and obfuscation, images optimization, etc.. and the build result will be placed under target/ProjectName-buildnumber/. If phar file generation is enabled, a phar with the same name will also be available on the same location.</xs:documentation>
+								<xs:documentation>Generate a fully optimized project version ready for production. Build process will perform optimizations like source minification and obfuscation, images optimization, etc.. and the build result will be placed under target/ProjectName-buildnumber/. If phar or merged js file generation is enabled, a phar and / or js files will also be available on the same location with the same name.</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
 						
+						<xs:attribute name="createPhars" default="true" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Specifies if the files generated on the target folder by the build process must be packed on a phar file or not.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>	
+						
+						<xs:attribute name="createMergedJs" default="false" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Generate a .js file on the target folder containing all the project javascript files merged so it can be easily included on other projects.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>									
+					
 						<xs:attribute name="keepTargetFiles" default="false" type="xs:boolean">
 							<xs:annotation>
 								<xs:documentation>If set to false, all the files that are copied to the target/ProjectName/ folder will be removed. Otherwise they will be kept on the folder.</xs:documentation>
 							</xs:annotation>
-						</xs:attribute>
+						</xs:attribute>						
 						
-						<xs:attribute name="generatePhars" default="true" type="xs:boolean">
-							<xs:annotation>
-								<xs:documentation>Specifies if the files generated on the target folder by the build process must be packed on a phar file or not.</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>									
-					
 					</xs:complexType>
 					
 				</xs:element>
 				
 				
-				<!-- The Tests setup part -->
-				<xs:element name="Tests" minOccurs="0" maxOccurs="1">
+				<!-- The Analyse setup part -->
+				<xs:element name="Analyse" minOccurs="0" maxOccurs="1">
 		
 					<xs:annotation>
 						<xs:documentation>Parameters related to project automated testing</xs:documentation>
@@ -53,13 +59,33 @@
 					
 					<xs:complexType>
 					
-						<xs:attribute name="runUnitTests" use="required" type="xs:boolean">
+						<xs:attribute name="checkProjectStructure" default="true" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Validate that current project folders and files meet the framework specifications</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>		
+						
+					</xs:complexType>
+					
+				</xs:element>
+				
+				
+				<!-- The Tests setup part -->
+				<xs:element name="Test" minOccurs="0" maxOccurs="1">
+		
+					<xs:annotation>
+						<xs:documentation>Parameters related to project automated testing</xs:documentation>
+					</xs:annotation>
+					
+					<xs:complexType>
+					
+						<xs:attribute name="runTests" use="required" type="xs:boolean">
 							<xs:annotation>
 								<xs:documentation>Specifies if unit tests located on the src/test folder must be executed as part of the build process or not.</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>	
 						
-						<xs:attribute name="localHostTestsPath" use="required" type="xs:string">
+						<xs:attribute name="localHostTestPath" use="required" type="xs:string">
 							<xs:annotation>
 								<xs:documentation>Specifies the path where the localhost server http root folder is located, or a subfolder of it where the unit tests will be copied. The unit tests require a local server to run, and will be copied to the specified path under a folder named ProjectName-unitTests</xs:documentation>
 							</xs:annotation>
@@ -81,31 +107,31 @@
 					
 						<xs:attribute name="minifierPath" default="C:/BuildTools/yuicompressor-2.4.7/build/yuicompressor-2.4.7.jar" type="xs:string">
 							<xs:annotation>
-								<xs:documentation>Path where the minifier tool is located on this computer. It will take care of compressing js and css files when generateProductionBuild is true</xs:documentation>
+								<xs:documentation>Path where the minifier tool is located on this computer. It will take care of compressing js and css files when createReleaseVersion is true</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
 						
 						<xs:attribute name="htmlCompressorPath" default="C:/BuildTools/htmlcompressor/htmlcompressor-1.5.3.jar" type="xs:string">
 							<xs:annotation>
-								<xs:documentation>Path where the html compressor tool is located on this computer. It will take care of compressing php and html files when generateProductionBuild is true</xs:documentation>
+								<xs:documentation>Path where the html compressor tool is located on this computer. It will take care of compressing php and html files when createReleaseVersion is true</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
 						
 						<xs:attribute name="pngQuantPath" default="C:/BuildTools/pngquant-windows/pngquant.exe" type="xs:string">
 							<xs:annotation>
-								<xs:documentation>Path where the pngquant tool is located on this computer. It will take care of compressing png files when generateProductionBuild is true</xs:documentation>
+								<xs:documentation>Path where the pngquant tool is located on this computer. It will take care of compressing png files when createReleaseVersion is true</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
 						
 						<xs:attribute name="pngOptimizerPath" default="C:/BuildTools/optipng-0.7.4-win32/optipng.exe" type="xs:string">
 							<xs:annotation>
-								<xs:documentation>Path where the optipng tool is located on this computer. It will take care of compressing png files when generateProductionBuild is true</xs:documentation>
+								<xs:documentation>Path where the optipng tool is located on this computer. It will take care of compressing png files when createReleaseVersion is true</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
 						
 						<xs:attribute name="jpgOptimizerPath" default="C:/BuildTools/jpegtran/jpegtran.exe" type="xs:string">
 							<xs:annotation>
-								<xs:documentation>Path where the jpegtran tool is located on this computer. It will take care of compressing jpg files when generateProductionBuild is true</xs:documentation>
+								<xs:documentation>Path where the jpegtran tool is located on this computer. It will take care of compressing jpg files when createReleaseVersion is true</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
 						

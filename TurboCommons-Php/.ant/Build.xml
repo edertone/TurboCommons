@@ -46,11 +46,11 @@
 		<xmlproperty file="${srcFolderPath}/../Setup-Build.xml" keepRoot="false" semanticattributes="true" />
 		
 		<!-- Set default values for some properties in case they are not specified on the Setup-build.xml -->
-		<property name="Build.generateProductionBuild" value="false" />
+		<property name="Build.createReleaseVersion" value="false" />
 		<property name="Build.keepTargetFiles" value="false" />
-		<property name="Build.generatePhars" value="true" />
+		<property name="Build.createPhars" value="true" />
 
-		<property name="Tests.runUnitTests" value="false" />
+		<property name="Test.runTests" value="false" />
 		
 		<property name="Tools.minifierPath" value="C:/BuildTools/yuicompressor-2.4.7/build/yuicompressor-2.4.7.jar" />
 		<property name="Tools.htmlCompressorPath" value="C:/BuildTools/htmlcompressor/htmlcompressor-1.5.3.jar" />
@@ -67,8 +67,8 @@
 	<target name="build" depends="loadSetupProperties">
 
 		<antcall target="copyMainFiles" />
-		<antcall target="runUnitTests" />
-		<antcall target="generatePhars" />
+		<antcall target="runTests" />
+		<antcall target="createPhars" />
 		<antcall target="removeTargetFiles" />
 		<antcall target="removePhars" />
 		
@@ -90,7 +90,7 @@
 	
 	
 	<!-- Generate the phar file from the files on the target folder if phar generation is enabled on setup build xml -->
-	<target name="generatePhars" if="${Build.generatePhars}">
+	<target name="createPhars" if="${Build.createPhars}">
 
 		<!-- Create target folder if it does not exist -->
 		<mkdir dir="${targetFolderPath}" />
@@ -118,36 +118,36 @@
 	
 	
 	<!-- Launch the unit tests on console only if autorun property is set -->
-	<target name="runUnitTests" if="${Tests.runUnitTests}">
+	<target name="runTests" if="${Test.runTests}">
 
-		<!-- Tests.localHostTestsPath must exist -->
-		<fail message="Tests.localHostTestsPath not found. A local server folder is required to run unit tests.">
+		<!-- Test.localHostTestPath must exist -->
+		<fail message="Test.localHostTestPath not found. A local server folder is required to run unit tests.">
 		    <condition>
 		    	<not>
-		    		<available file="${Tests.localHostTestsPath}" />
+		    		<available file="${Test.localHostTestPath}" />
 		    	</not>
 		    </condition>
 		</fail>
 
-		<copy todir="${Tests.localHostTestsPath}/${projectBaseName}-unitTests/main" overwrite="true">
+		<copy todir="${Test.localHostTestPath}/${projectBaseName}-unitTests/main" overwrite="true">
 			<fileset dir="${targetFolderPath}/${projectBaseName}" casesensitive="false" />
 		</copy>
 		
-		<copy todir="${Tests.localHostTestsPath}/${projectBaseName}-unitTests/test" overwrite="true">
+		<copy todir="${Test.localHostTestPath}/${projectBaseName}-unitTests/test" overwrite="true">
 			<fileset dir="${srcFolderPath}/test" casesensitive="false" />
 		</copy>
 		
 		<exec executable="${Tools.phpPath}" failonerror="true" >
-			<arg value="${Tests.localHostTestsPath}/${projectBaseName}-unitTests/test/index.php" />
+			<arg value="${Test.localHostTestPath}/${projectBaseName}-unitTests/test/index.php" />
 		</exec>
 
-		<delete dir="${Tests.localHostTestsPath}/${projectBaseName}-unitTests" failonerror="true" />
+		<delete dir="${Test.localHostTestPath}/${projectBaseName}-unitTests" failonerror="true" />
 
 	</target>
 	
 	
 	<!-- Removes all the phar files on the target folder -->
-	<target name="removePhars" unless="${Build.generatePhars}">
+	<target name="removePhars" unless="${Build.createPhars}">
 		
 		<!-- TODO: borrar tots els arxius phar de la carpeta target -->
 		

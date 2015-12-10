@@ -8,9 +8,19 @@ use PHPUnit_Framework_TestCase;
 use com\edertone\turboCommons\src\main\php\utils\StringUtils;
 
 
+/**
+ * Stringutils tests
+ *
+ * @return void
+ */
 class StringUtilsTest extends PHPUnit_Framework_TestCase {
 
 
+	/**
+	 * TestisEmpty
+	 *
+	 * @return void
+	 */
 	public function testIsEmpty(){
 
 		$this->assertTrue(StringUtils::isEmpty(''));
