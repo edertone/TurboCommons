@@ -2,10 +2,19 @@
 <SetupBuild xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 			xsi:noNamespaceSchemaLocation=".ant/Setup-Build.xsd">
 
-	<BuildOptions>
-	
-		<EnableReleaseBuild value="false" />
-		
-	</BuildOptions>
+	<Build generateProductionBuild="false" />
 
+	<Tests runUnitTests="true"
+		   localHostTestsPath="C:\xampp\htdocs\unitTests" />
+	
+	<Publish localHostPublish="true"
+			 localHostPath="C:\xampp\htdocs\" 
+			 ftpPublish="false"
+			 ftpFolder="/"
+			 ftpServer="www.edertone.com"
+			 ftpUser="preview@edertone.com"
+			 ftpPsw="754dCcdfeexcGVcdgvBHY" />
+				
+	<DataBase />
+		
 </SetupBuild>

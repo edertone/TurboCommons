@@ -43,21 +43,22 @@
 		    </condition>
 		</fail>
 		
-		<xmlproperty file="${mainFolderPath}/Setup-Build.xml" keepRoot="false" semanticattributes="true" />
+		<xmlproperty file="${srcFolderPath}/../Setup-Build.xml" keepRoot="false" semanticattributes="true" />
 		
 		<!-- Set default values for some properties in case they are not specified on the Setup-build.xml -->
-		<property name="BuildOptions.EnableReleaseBuild" value="false" />
-		<property name="BuildOptions.KeepTargetFiles" value="false" />
-		<property name="BuildOptions.CreatePhars" value="true" />
-		<property name="BuildOptions.ExecuteUnitTests" value="true" />
+		<property name="Build.generateProductionBuild" value="false" />
+		<property name="Build.keepTargetFiles" value="false" />
+		<property name="Build.generatePhars" value="true" />
+
+		<property name="Tests.runUnitTests" value="false" />
 		
-		<property name="Tools.MinifierPath" value="C:/BuildTools/yuicompressor-2.4.7/build/yuicompressor-2.4.7.jar" />
-		<property name="Tools.HtmlCompressorPath" value="C:/BuildTools/htmlcompressor/htmlcompressor-1.5.3.jar" />
-		<property name="Tools.PngQuantPath" value="C:/BuildTools/pngquant-windows/pngquant.exe" />
-		<property name="Tools.PngOptimizerPath" value="C:/BuildTools/optipng-0.7.4-win32/optipng.exe" />
-		<property name="Tools.JpgOptimizerPath" value="C:/BuildTools/jpegtran/jpegtran.exe" />
-		<property name="Tools.MysqlPath" value="C:/xampp/mysql/bin/mysql.exe" />			
-		<property name="Tools.PhpPath" value="C:/xampp/php/php.exe" />
+		<property name="Tools.minifierPath" value="C:/BuildTools/yuicompressor-2.4.7/build/yuicompressor-2.4.7.jar" />
+		<property name="Tools.htmlCompressorPath" value="C:/BuildTools/htmlcompressor/htmlcompressor-1.5.3.jar" />
+		<property name="Tools.pngQuantPath" value="C:/BuildTools/pngquant-windows/pngquant.exe" />
+		<property name="Tools.pngOptimizerPath" value="C:/BuildTools/optipng-0.7.4-win32/optipng.exe" />
+		<property name="Tools.jpgOptimizerPath" value="C:/BuildTools/jpegtran/jpegtran.exe" />
+		<property name="Tools.mysqlPath" value="C:/xampp/mysql/bin/mysql.exe" />			
+		<property name="Tools.phpPath" value="C:/xampp/php/php.exe" />
 				
 	</target>
 	
@@ -66,43 +67,48 @@
 	<target name="build" depends="loadSetupProperties">
 
 		<antcall target="copyMainFiles" />
-		<antcall target="generatePhar" />
+		<antcall target="runUnitTests" />
+		<antcall target="generatePhars" />
 		<antcall target="removeTargetFiles" />
+		<antcall target="removePhars" />
 		
 	</target>
 	
 	
 	<!-- Copy all the project src/main files to the target folder. Any unwanted files/folders are excluded -->
 	<target name="copyMainFiles">
-
-		<copy todir="${targetFolderPath}/${projectBaseName}" overwrite="true">
-			
-			<fileset dir="${mainFolderPath}" excludes="${BuildSetup.ExcludeFolders}" casesensitive="false">
-				<modified cache="propertyfile">
-					<param name="cache.cachefile" value="${cacheFilePath}" />
-				</modified>
-				<exclude name="Setup-Build.xml" />
+		
+		<sync todir="${targetFolderPath}/${projectBaseName}" overwrite="true">
+			<fileset dir="${mainFolderPath}" casesensitive="false">
 				<exclude name="**/thumbs.db**" />
 				<exclude name="**/.svn/**" />
 				<exclude name="**/.git**" />
 			</fileset>
-			
-		</copy>
-
+		</sync>
+		
 	</target>
 	
 	
 	<!-- Generate the phar file from the files on the target folder if phar generation is enabled on setup build xml -->
-	<target name="generatePhar" if="${BuildOptions.CreatePhars}">
+	<target name="generatePhars" if="${Build.generatePhars}">
 
 		<!-- Create target folder if it does not exist -->
 		<mkdir dir="${targetFolderPath}" />
 		
+		<!-- Autoloader.php must exist on src/main/php/ for the phar to be correctly generated -->
+		<fail message="src/main/php/AutoLoader.php not found. This is required to create a phar that loads classes automatically">
+		    <condition>
+		    	<not>
+		    		<available file="${mainFolderPath}/php/AutoLoader.php" />
+		    	</not>
+		    </condition>
+		</fail>
+		
 		<!--Define the contents for the stub file that will be autoexecuted when the phar file is included -->
-		<property name="phpStubFile" value="&lt;?php Phar::mapPhar(); include \'phar://${projectBaseName}.phar/AutoLoader.php\'; __HALT_COMPILER(); ?>"/>
+		<property name="phpStubFile" value="&lt;?php Phar::mapPhar(); include \'phar://${projectBaseName}.phar/php/AutoLoader.php\'; __HALT_COMPILER(); ?>"/>
 		
 		<!-- Create the phar using the current project name and version -->
-		<exec executable="${Tools.PhpPath}" failonerror="true">
+		<exec executable="${Tools.phpPath}" failonerror="true">
 			<arg value="-d display_errors" />
 			<arg value="-r" />
 			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}.phar'); $p->startBuffering(); $p->setStub('${phpStubFile}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}'); $p->stopBuffering();" />
@@ -111,23 +117,53 @@
 	</target>
 	
 	
-	<!-- Removes anything from the target folder except the phar files, if this is specified on the setup build xml file -->
-	<target name="removeTargetFiles" unless="${BuildOptions.KeepTargetFiles}">
+	<!-- Launch the unit tests on console only if autorun property is set -->
+	<target name="runUnitTests" if="${Tests.runUnitTests}">
+
+		<!-- Tests.localHostTestsPath must exist -->
+		<fail message="Tests.localHostTestsPath not found. A local server folder is required to run unit tests.">
+		    <condition>
+		    	<not>
+		    		<available file="${Tests.localHostTestsPath}" />
+		    	</not>
+		    </condition>
+		</fail>
+
+		<copy todir="${Tests.localHostTestsPath}/${projectBaseName}-unitTests/main" overwrite="true">
+			<fileset dir="${targetFolderPath}/${projectBaseName}" casesensitive="false" />
+		</copy>
+		
+		<copy todir="${Tests.localHostTestsPath}/${projectBaseName}-unitTests/test" overwrite="true">
+			<fileset dir="${srcFolderPath}/test" casesensitive="false" />
+		</copy>
+		
+		<exec executable="${Tools.phpPath}" failonerror="true" >
+			<arg value="${Tests.localHostTestsPath}/${projectBaseName}-unitTests/test/index.php" />
+		</exec>
+
+		<delete dir="${Tests.localHostTestsPath}/${projectBaseName}-unitTests" failonerror="true" />
+
+	</target>
+	
+	
+	<!-- Removes all the phar files on the target folder -->
+	<target name="removePhars" unless="${Build.generatePhars}">
+		
+		<!-- TODO: borrar tots els arxius phar de la carpeta target -->
+		
+	</target>
+	
+	
+	<!-- Removes anything from the target folder except the phar files -->
+	<target name="removeTargetFiles" unless="${Build.keepTargetFiles}">
 		<delete dir="${targetFolderPath}/${projectBaseName}" failonerror="true" />
 	</target>
 	
 	
 	<!-- Clean the project by removing the target folder -->
 	<target name="clean" depends="loadSetupProperties">
-		<antcall target="cleanTargets" />
-	</target>
-
-
-	<!-- Delete the cache.properties file and the target or target-release folders if they exist -->
-	<target name="cleanTargets">
-		<delete file="cache.properties" failonerror="true" />
+		<delete file="${cacheFilePath}" failonerror="true" />
 		<delete dir="${targetFolderPath}" failonerror="true" />
-		<delete dir="${releaseFolderPath}" failonerror="true" />
 	</target>
 
 </project>

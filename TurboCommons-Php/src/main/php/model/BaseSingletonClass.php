@@ -1,6 +1,6 @@
 <?php
 
-namespace com\edertone\libTurboPhp\src\main\php\model;
+namespace com\edertone\turboCommons\src\main\php\model;
 
 
 /**
