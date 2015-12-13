@@ -16,24 +16,23 @@
 	</description>
 		
 	
-	<!-- Create a property containing the current project name, based on the root project folder -->
-	<basename property="projectBaseName" file="../" />
+	<!-- Define all the build global properties and load the build configuration from the Setup-build.xml file -->
+	<target name="defineGlobalProperties" >
 	
-	<!-- The location for the project source folder -->
-	<property name="srcFolderPath" location="../src" />
+		<!-- Create a property containing the current project name, based on the root project folder -->
+		<basename property="projectBaseName" file="../" />
+		
+		<!-- The location for the project source folder -->
+		<property name="srcFolderPath" location="../src" />
 
-	<!-- The loaction for the project main folder -->
-	<property name="mainFolderPath" location="../src/main" />
+		<!-- The loaction for the project main folder -->
+		<property name="mainFolderPath" location="../src/main" />
 
-	<!-- The location for the target folder -->
-	<property name="targetFolderPath" location="../target" />
+		<!-- The location for the target folder -->
+		<property name="targetFolderPath" location="../target" />
 
-	<!-- The location for the cache file, which contains modified files since last build. This path can be overwritten by external builds that want to execute this project build but track the cache externally -->
-	<property name="cacheFilePath" location="cache.properties" />
-	
-	
-	<!-- Load the build configuration from the Setup-build.xml file -->
-	<target name="loadSetupProperties" >
+		<!-- The location for the cache file, which contains modified files since last build. This path can be overwritten by external builds that want to execute this project build but track the cache externally -->
+		<property name="cacheFilePath" location="cache.properties" />
 	
 		<fail message="Setup-Build.xml not found">
 		    <condition>
@@ -47,10 +46,21 @@
 		
 		<!-- Set default values for some properties in case they are not specified on the Setup-build.xml -->
 		<property name="Build.createReleaseVersion" value="false" />
-		<property name="Build.keepTargetFiles" value="false" />
+		<property name="Build.versionNumber" value="0.0" />
+		<property name="Build.keepUnPackedFiles" value="false" />
 		<property name="Build.createPhars" value="true" />
 
 		<property name="Test.runTests" value="false" />
+		
+		<property name="Deploy.localHostDeploy" value="false" />
+		<property name="Deploy.localHostPath" value="C:\xampp\htdocs\" />
+		<property name="Deploy.localHostIgnore" value="" />
+		<property name="Deploy.ftpDeploy" value="false" />
+		<property name="Deploy.ftpFolder" value="/" />
+		<property name="Deploy.ftpIgnore" value="" />
+		<property name="Deploy.ftpServer" value="" />
+		<property name="Deploy.ftpUser" value="" />
+		<property name="Deploy.ftpPsw" value="" />
 		
 		<property name="Tools.minifierPath" value="C:/BuildTools/yuicompressor-2.4.7/build/yuicompressor-2.4.7.jar" />
 		<property name="Tools.htmlCompressorPath" value="C:/BuildTools/htmlcompressor/htmlcompressor-1.5.3.jar" />
@@ -63,20 +73,33 @@
 	</target>
 	
 	
-	<!-- Execute all the build tasks as defined on the setup-build.xml file -->
-	<target name="build" depends="loadSetupProperties">
+	<!-- The main build task that executes all the build tasks as defined on the setup-build.xml file -->
+	<target name="build" depends="defineGlobalProperties">
 
+		<!-- Get the current build number from the build.number file and store it on the ${build.number} property -->
+		<loadproperties srcFile="build.number"/>
+			
 		<antcall target="copyMainFiles" />
 		<antcall target="runTests" />
+		<antcall target="createReleaseVersion" />
 		<antcall target="createPhars" />
-		<antcall target="removeTargetFiles" />
-		<antcall target="removePhars" />
+		<antcall target="removeUnpackedFiles" />
 		
+		<!-- Increase the project build number if all finished ok -->
+		<buildnumber/>
+				
 	</target>
 	
 	
 	<!-- Copy all the project src/main files to the target folder. Any unwanted files/folders are excluded -->
 	<target name="copyMainFiles">
+		
+		<!-- Delete all files on the target folder that are named like the project. This is to clean generated phars and other files in case setup is defined to aviod creating them -->
+		<delete failonerror="false" includeemptydirs="true">
+			<fileset dir="${targetFolderPath}" casesensitive="false">
+				<include name="${projectBaseName}.*" />
+			</fileset>			
+		</delete>
 		
 		<sync todir="${targetFolderPath}/${projectBaseName}" overwrite="true">
 			<fileset dir="${mainFolderPath}" casesensitive="false">
@@ -85,34 +108,6 @@
 				<exclude name="**/.git**" />
 			</fileset>
 		</sync>
-		
-	</target>
-	
-	
-	<!-- Generate the phar file from the files on the target folder if phar generation is enabled on setup build xml -->
-	<target name="createPhars" if="${Build.createPhars}">
-
-		<!-- Create target folder if it does not exist -->
-		<mkdir dir="${targetFolderPath}" />
-		
-		<!-- Autoloader.php must exist on src/main/php/ for the phar to be correctly generated -->
-		<fail message="src/main/php/AutoLoader.php not found. This is required to create a phar that loads classes automatically">
-		    <condition>
-		    	<not>
-		    		<available file="${mainFolderPath}/php/AutoLoader.php" />
-		    	</not>
-		    </condition>
-		</fail>
-		
-		<!--Define the contents for the stub file that will be autoexecuted when the phar file is included -->
-		<property name="phpStubFile" value="&lt;?php Phar::mapPhar(); include \'phar://${projectBaseName}.phar/php/AutoLoader.php\'; __HALT_COMPILER(); ?>"/>
-		
-		<!-- Create the phar using the current project name and version -->
-		<exec executable="${Tools.phpPath}" failonerror="true">
-			<arg value="-d display_errors" />
-			<arg value="-r" />
-			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}.phar'); $p->startBuffering(); $p->setStub('${phpStubFile}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}'); $p->stopBuffering();" />
-		</exec>
 		
 	</target>
 	
@@ -132,7 +127,7 @@
 		<copy todir="${Test.localHostTestPath}/${projectBaseName}-unitTests/main" overwrite="true">
 			<fileset dir="${targetFolderPath}/${projectBaseName}" casesensitive="false" />
 		</copy>
-		
+			
 		<copy todir="${Test.localHostTestPath}/${projectBaseName}-unitTests/test" overwrite="true">
 			<fileset dir="${srcFolderPath}/test" casesensitive="false" />
 		</copy>
@@ -146,22 +141,76 @@
 	</target>
 	
 	
-	<!-- Removes all the phar files on the target folder -->
-	<target name="removePhars" unless="${Build.createPhars}">
+	<!-- Create the optimized release version and tag it with the current version and build number -->
+	<target name="createReleaseVersion" if="${Build.createReleaseVersion}">
+
+		<copy todir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}" overwrite="true">
+			<fileset dir="${mainFolderPath}" casesensitive="false">
+				<exclude name="**/thumbs.db**" />
+				<exclude name="**/.svn/**" />
+				<exclude name="**/.git**" />
+			</fileset>
+		</copy>
+
+		<!--<antcall target="minifyPNG" />
+		<antcall target="minifyJPG" />
+		<antcall target="minifyPHP" />
+		<antcall target="minifyHTML" />
+		<antcall target="minifyJS" />
+		<antcall target="minifyCSS" />-->
+
+	</target>
+	
 		
-		<!-- TODO: borrar tots els arxius phar de la carpeta target -->
+	<!-- Generate the phar file from the files on the target folder if phar generation is enabled on setup build xml -->
+	<target name="createPhars" if="${Build.createPhars}">
+
+		<!-- Autoloader.php must exist on src/main/php/ for the phar to be correctly generated -->
+		<fail message="src/main/php/AutoLoader.php not found. This is required to create a phar that loads classes automatically">
+		    <condition>
+		    	<not>
+		    		<available file="${mainFolderPath}/php/AutoLoader.php" />
+		    	</not>
+		    </condition>
+		</fail>
+		
+		<!--Define the contents for the stub file that will be autoexecuted when the phar file is included -->
+		<property name="phpStubFile" value="&lt;?php Phar::mapPhar(); include \'phar://${projectBaseName}.phar/php/AutoLoader.php\'; __HALT_COMPILER(); ?>"/>
+		
+		<!-- Create the phar using the current project name and version -->
+		<exec executable="${Tools.phpPath}" failonerror="true">
+			<arg value="-d display_errors" />
+			<arg value="-r" />
+			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}.phar'); $p->startBuffering(); $p->setStub('${phpStubFile}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}'); $p->stopBuffering();" />
+		</exec>
+		
+		<antcall target="createPharsRelease" />
 		
 	</target>
 	
 	
-	<!-- Removes anything from the target folder except the phar files -->
-	<target name="removeTargetFiles" unless="${Build.keepTargetFiles}">
+	<!-- Generate the release version phars -->
+	<target name="createPharsRelease" if="${Build.createReleaseVersion}">
+
+		<!-- Create the phar using the current project name and version -->
+		<exec executable="${Tools.phpPath}" failonerror="true">
+			<arg value="-d display_errors" />
+			<arg value="-r" />
+			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}-${Build.versionNumber}.${build.number}.phar'); $p->startBuffering(); $p->setStub('${phpStubFile}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}'); $p->stopBuffering();" />
+		</exec>
+			
+	</target>
+	
+	
+	<!-- Removes all the unpacked files on the target folder -->
+	<target name="removeUnpackedFiles" unless="${Build.keepUnPackedFiles}">		
 		<delete dir="${targetFolderPath}/${projectBaseName}" failonerror="true" />
+		<delete dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}" failonerror="false" />
 	</target>
 	
 	
 	<!-- Clean the project by removing the target folder -->
-	<target name="clean" depends="loadSetupProperties">
+	<target name="clean" depends="defineGlobalProperties">
 		<delete file="${cacheFilePath}" failonerror="true" />
 		<delete dir="${targetFolderPath}" failonerror="true" />
 	</target>

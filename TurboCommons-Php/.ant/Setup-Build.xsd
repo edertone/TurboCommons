@@ -27,6 +27,13 @@
 							</xs:annotation>
 						</xs:attribute>
 						
+						<xs:attribute name="versionNumber" use="required" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>Specify the project version number. Unlike the build number that is incremented every time a build is performed, this value is not automatically updated and needs to be changed manually. So you should specify here the major version like 1.0, 2.0, 3.2... &lt;br&gt;&lt;br&gt;
+									Do not specify build number here, as it will be automatically added if necessary when generating the release version files</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						
 						<xs:attribute name="createPhars" default="true" type="xs:boolean">
 							<xs:annotation>
 								<xs:documentation>Specifies if the files generated on the target folder by the build process must be packed on a phar file or not.</xs:documentation>
@@ -37,9 +44,9 @@
 							<xs:annotation>
 								<xs:documentation>Generate a .js file on the target folder containing all the project javascript files merged so it can be easily included on other projects.</xs:documentation>
 							</xs:annotation>
-						</xs:attribute>									
+						</xs:attribute>							
 					
-						<xs:attribute name="keepTargetFiles" default="false" type="xs:boolean">
+						<xs:attribute name="keepUnPackedFiles" default="false" type="xs:boolean">
 							<xs:annotation>
 								<xs:documentation>If set to false, all the files that are copied to the target/ProjectName/ folder will be removed. Otherwise they will be kept on the folder.</xs:documentation>
 							</xs:annotation>
@@ -94,6 +101,90 @@
 					</xs:complexType>
 					
 				</xs:element>
+				
+				
+				<!-- The Deploy setup part -->
+				<xs:element name="Deploy" minOccurs="0" maxOccurs="1">
+		
+					<xs:annotation>
+						<xs:documentation>Parameters related to deploying the built project files to other locations, like localhost or remote ftp folders</xs:documentation>
+					</xs:annotation>
+					
+					<xs:complexType>
+					
+						<xs:attribute name="localHostDeploy" default="false" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Enable or disable local host deployment. To deploy the project to localhost, a webserver must be setup on this computer and a webapps or similar folder must be available to copy the built files</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>	
+						
+						<xs:attribute name="localHostPath" default="C:\xampp\htdocs\" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>The path to the localhost webapps, htdocs or similar folder for the local webserver where the project built files will be copied</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>	
+						
+						<xs:attribute name="localHostIgnore" default="" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>An expression that will be used to ignore folders or files when copying built files. The matching paths will be ignored on both parts: The source built files and the destination folder, even when doing a project clean</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>	
+						
+						<xs:attribute name="ftpDeploy" default="false" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Enable or disable remote ftp host deployment. An ftp server must be available and accessible to copy the built files</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>	
+						
+						<xs:attribute name="ftpFolder" default="/" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>A path inside the remote ftp location where the built files will be copied</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>	
+						
+						<xs:attribute name="ftpIgnore" default="" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>An expression that will be used to ignore folders or files when copying built files. The matching paths will be ignored on both parts: The source built files and the destination ftp folder, even when doing a project clean</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						
+						<xs:attribute name="ftpServer" default="" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>The remote host or ip where the ftp server is located</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						
+						<xs:attribute name="ftpUser" default="" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>The user name that will be used to login to the remote ftp server</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						
+						<xs:attribute name="ftpPsw" default="" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>The user password that will be used to login to the remote ftp server</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						
+					</xs:complexType>
+					
+				</xs:element>
+
+				
+				<!-- The Database setup part -->
+				<xs:element name="DataBase" minOccurs="0" maxOccurs="1">
+		
+					<xs:annotation>
+						<xs:documentation>Parameters related to database automation when doing a build</xs:documentation>
+					</xs:annotation>
+					
+					<xs:complexType>
+						
+						
+									
+					</xs:complexType>
+					
+				</xs:element>				
 				
 				
 				<!-- Tools setup part -->
