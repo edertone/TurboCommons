@@ -145,23 +145,139 @@
 	<target name="createReleaseVersion" if="${Build.createReleaseVersion}">
 
 		<copy todir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}" overwrite="true">
-			<fileset dir="${mainFolderPath}" casesensitive="false">
-				<exclude name="**/thumbs.db**" />
-				<exclude name="**/.svn/**" />
-				<exclude name="**/.git**" />
+			<fileset dir="${targetFolderPath}/${projectBaseName}" casesensitive="false">
+				<exclude name="**/*.js" />
+				<exclude name="**/*.css" />
+				<exclude name="**/*.php" />
+				<exclude name="**/*.png" />
+				<exclude name="**/*.jpg" />
 			</fileset>
 		</copy>
 
-		<!--<antcall target="minifyPNG" />
+		<antcall target="minifyPNG" />
 		<antcall target="minifyJPG" />
 		<antcall target="minifyPHP" />
 		<antcall target="minifyHTML" />
-		<antcall target="minifyJS" />
+		<!--<antcall target="minifyJS" />
 		<antcall target="minifyCSS" />-->
 
 	</target>
 	
-		
+	
+	<!-- Apply minification to all the PNG files -->
+	<target name="minifyPNG">
+
+		<!-- 
+			Apply the massively powerful pngquant compression tool: Override the png files on the target folder with an optimized version.
+			If the optimizer cannot generate an optimized version of a quality between 56-72, the original will remain untouched
+		 -->
+		<apply executable="${Tools.pngQuantPath}" failonerror="false">
+
+			<fileset dir="${targetFolderPath}/${projectBaseName}" casesensitive="false">
+				<include name="**/*.png" />
+			</fileset>
+
+			<arg line="-f" />
+			<arg line="--ext .png" />
+			<arg line="--speed 1" />
+			<arg line="--quality=60-98" />
+
+		</apply>
+
+		<!-- Apply the optipng compression tool to the target folder pngs, and copy them to the release folder -->
+		<apply executable="${Tools.pngOptimizerPath}" failonerror="true">
+
+			<fileset dir="${targetFolderPath}/${projectBaseName}" casesensitive="false">
+				<include name="**/*.png" />
+			</fileset>
+
+			<arg value="-quiet" />
+			<arg value="-o7" />
+			<srcfile />
+			<arg value="-out" />
+			<targetfile />
+			
+			<mapper type="glob" from="*.png" to="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/*.png" />
+
+		</apply>
+
+	</target>
+	
+	
+	<!-- Apply minification to all the JPG files -->
+	<target name="minifyJPG">
+
+		<apply executable="${Tools.jpgOptimizerPath}" failonerror="true">
+
+			<fileset dir="${targetFolderPath}/${projectBaseName}" casesensitive="false">
+				<include name="**/*.jpg" />
+			</fileset>
+
+			<arg value="-copy" />
+			<arg value="none" />
+			<arg value="-optimize" />
+			<arg value="-outfile" />
+			<targetfile />
+			<srcfile />
+
+			<mapper type="glob" from="*.jpg" to="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/*.jpg" />
+
+		</apply>
+
+	</target>
+
+
+	<!-- Apply minification to all the PHP files -->
+	<target name="minifyPHP">
+
+		<!-- Php files may contain html code. They are stored with .phpTemp extension so they can be processed later by the html minifier -->
+		<apply executable="${Tools.phpPath}" failonerror="true">
+
+			<fileset dir="${targetFolderPath}/${projectBaseName}" casesensitive="false">
+				<include name="**/*.php" />
+			</fileset>
+
+			<arg value="-w" />
+			<srcfile />
+
+			<redirector>
+				<outputmapper id="out" type="glob" from="*.php" to="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/*.phpTemp" />
+			</redirector>
+
+		</apply>
+
+	</target>
+	
+	<!-- Compress html and php files that may contain inlined html. Those are marked with .phpTemp extension -->
+	<target name="minifyHTML">
+
+		<apply executable="java" failonerror="true">
+
+			<fileset dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}">
+				<include name="**/*.phpTemp" />
+			</fileset>
+
+			<mapper type="glob" from="*.phpTemp" to="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/*.php" />
+
+			<arg line="-jar" />
+			<arg path="${Tools.htmlCompressorPath}" />
+			<arg line="--preserve-php" />
+			<arg line="-o" />
+			<targetfile />
+			<srcfile />
+
+		</apply>
+
+		<!-- Clean the phpTemp marked files -->
+		<delete>
+			<fileset dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}">
+				<include name="**/*.phpTemp" />
+			</fileset>
+		</delete>
+
+	</target>
+	
+	
 	<!-- Generate the phar file from the files on the target folder if phar generation is enabled on setup build xml -->
 	<target name="createPhars" if="${Build.createPhars}">
 
