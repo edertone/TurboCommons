@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <SetupBuild xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-			xsi:noNamespaceSchemaLocation=".ant/Setup-Build.xsd">
+			xsi:noNamespaceSchemaLocation=".ant/BuildSetupSchema.xsd">
 
-	<Build createReleaseVersion="true"
-		   versionNumber="0.5"
+	<Build versionNumber="0.1"
 		   createPhars="true"
-		   keepUnPackedFiles="false"
-		   createMergedJs="false" />
+		   createMergedJs="false"
+		   createPhpDoc="true"
+		   createJsDoc="false"
+		   keepUnPackedFiles="true" />
 
-	<Analyse checkProjectStructure="true" />
+	<Release enable="true"
+			 optimizePictures="false"
+			 optimizePhp="true"
+			 optimizeHtml="false"	
+			 optimizeJs="false"
+			 optimizeCss="false"		 
+			 useForDeploy="false" />
 		   
+	<Analyse checkProjectStructure="true" />
+	
 	<Test runTests="true"
 		  localHostTestPath="C:\xampp\htdocs\unitTests" />
 	

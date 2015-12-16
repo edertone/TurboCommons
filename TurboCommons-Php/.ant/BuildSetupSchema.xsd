@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
-	<!-- DEFINITION FOR THE ROOT SETUP ELEMENT ******************************************************** -->
+	<!-- DEFINITION FOR THE ROOT SETUP ELEMENT -->
 	<xs:element name="SetupBuild">
 		
 		<xs:annotation>
@@ -21,12 +21,6 @@
 					
 					<xs:complexType>
 					
-						<xs:attribute name="createReleaseVersion" use="required" type="xs:boolean">
-							<xs:annotation>
-								<xs:documentation>Generate a fully optimized project version ready for production. Build process will perform optimizations like source minification and obfuscation, images optimization, etc.. and the build result will be placed under target/ProjectName-buildnumber/. If phar or merged js file generation is enabled, a phar and / or js files will also be available on the same location with the same name.</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>
-						
 						<xs:attribute name="versionNumber" use="required" type="xs:string">
 							<xs:annotation>
 								<xs:documentation>Specify the project version number. Unlike the build number that is incremented every time a build is performed, this value is not automatically updated and needs to be changed manually. So you should specify here the major version like 1.0, 2.0, 3.2... &lt;br&gt;&lt;br&gt;
@@ -44,13 +38,81 @@
 							<xs:annotation>
 								<xs:documentation>Generate a .js file on the target folder containing all the project javascript files merged so it can be easily included on other projects.</xs:documentation>
 							</xs:annotation>
-						</xs:attribute>							
+						</xs:attribute>	
+						
+						<xs:attribute name="createPhpDoc" default="false" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Compile the phpDoc files inside the target/projectName/doc/php folder</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>		
+						
+						<xs:attribute name="createJsDoc" default="false" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Compile the phpDoc files inside the target/projectName/doc/js folder</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>								
 					
 						<xs:attribute name="keepUnPackedFiles" default="false" type="xs:boolean">
 							<xs:annotation>
 								<xs:documentation>If set to false, all the files that are copied to the target/ProjectName/ folder will be removed. Otherwise they will be kept on the folder.</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>						
+						
+					</xs:complexType>
+					
+				</xs:element>
+				
+				
+				<!-- The Analyse setup part -->
+				<xs:element name="Release" minOccurs="1" maxOccurs="1">
+		
+					<xs:annotation>
+						<xs:documentation>Parameters related to project automated testing</xs:documentation>
+					</xs:annotation>
+					
+					<xs:complexType>
+					
+						<xs:attribute name="enable" use="required" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Enable or disable creating the fully optimized production ready project version. Build process will perform optimizations like source minification and obfuscation, images optimization, etc.. and the build result will be placed under target/ProjectName-buildnumber/</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						
+						<xs:attribute name="optimizePictures" default="true" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Set if project pictures must be optimized as part of the release version build process</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						
+						<xs:attribute name="optimizePhp" default="true" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Set if php files must be optimized as part of the release version build process</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						
+						<xs:attribute name="optimizeHtml" default="true" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Set if php and html files must have its html tags and code optimized as part of the release version build process</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						
+						<xs:attribute name="optimizeJs" default="true" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Set if js files must be optimized as part of the release version build process</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						
+						<xs:attribute name="optimizeCss" default="true" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Set if css files must be optimized as part of the release version build process</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						
+						<xs:attribute name="useForDeploy" default="false" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>If enabled, the release optimized version will be used when performing a deploy of the project (to localhost, remote ftp, ...)</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
 						
 					</xs:complexType>
 					

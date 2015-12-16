@@ -7,6 +7,7 @@
 	
 		Turbo Framework PHP ant project builder.
 		Used to automatize the most common development build operations related to turbo framework projects.
+		Recommended for eclipse, but may work well on other ides. 
 			
 		VERY IMPORTANT !! 
 		An extra library is required to execute FTP operations with ant. Download it here:	http://commons.apache.org/net/index.html
@@ -45,11 +46,20 @@
 		<xmlproperty file="${srcFolderPath}/../Setup-Build.xml" keepRoot="false" semanticattributes="true" />
 		
 		<!-- Set default values for some properties in case they are not specified on the Setup-build.xml -->
-		<property name="Build.createReleaseVersion" value="false" />
 		<property name="Build.versionNumber" value="0.0" />
-		<property name="Build.keepUnPackedFiles" value="false" />
 		<property name="Build.createPhars" value="true" />
-
+		<property name="Build.createMergedJs" value="false" />
+		<property name="Build.createPhpDoc" value="false" />
+		<property name="Build.createJsDoc" value="false" />
+		<property name="Build.keepUnPackedFiles" value="false" />
+				
+		<property name="Release.enable" value="false" />
+		<property name="Release.optimizePictures" value="true" />
+		<property name="Release.optimizePhp" value="true" />
+		<property name="Release.optimizeJs" value="true" />
+		<property name="Release.optimizeCss" value="true" />
+		<property name="Release.useForDeploy" value="false" />
+								
 		<property name="Test.runTests" value="false" />
 		
 		<property name="Deploy.localHostDeploy" value="false" />
@@ -79,11 +89,38 @@
 		<!-- Get the current build number from the build.number file and store it on the ${build.number} property -->
 		<loadproperties srcFile="build.number"/>
 			
-		<antcall target="copyMainFiles" />
-		<antcall target="runTests" />
-		<antcall target="createReleaseVersion" />
-		<antcall target="createPhars" />
-		<antcall target="removeUnpackedFiles" />
+		<!-- Perform all the build tasks -->
+		<script language="javascript">
+			<![CDATA[
+				
+				self.project.executeTarget("copyMainFiles");
+			
+				if(project.getProperty("Test.runTests") == "true"){
+					self.project.executeTarget("runTests");
+				}
+			
+				if(project.getProperty("Build.createPhpDoc") == "true"){
+					self.project.executeTarget("createPhpDoc");
+				}
+			
+				if(project.getProperty("Build.createJsDoc") == "true"){
+					self.project.executeTarget("createJsDoc");
+				}
+			
+				if(project.getProperty("Release.enable") == "true"){
+					self.project.executeTarget("createReleaseVersion");
+				}
+			
+				if(project.getProperty("Build.createPhars") == "true"){
+					self.project.executeTarget("createPhars");
+				}
+			
+				if(project.getProperty("Build.keepUnPackedFiles") != "true"){
+					self.project.executeTarget("removeUnpackedFiles");
+				}
+			
+		    ]]>
+		</script>
 		
 		<!-- Increase the project build number if all finished ok -->
 		<buildnumber/>
@@ -94,14 +131,16 @@
 	<!-- Copy all the project src/main files to the target folder. Any unwanted files/folders are excluded -->
 	<target name="copyMainFiles">
 		
-		<!-- Delete all files on the target folder that are named like the project. This is to clean generated phars and other files in case setup is defined to aviod creating them -->
+		<!-- Delete all files inside the target/projectName except the main folder one -->
 		<delete failonerror="false" includeemptydirs="true">
-			<fileset dir="${targetFolderPath}" casesensitive="false">
-				<include name="${projectBaseName}.*" />
+			<fileset dir="${targetFolderPath}/${projectBaseName}" casesensitive="false">
+				<include name="**/*"/>
+				<exclude name="main/"/>
 			</fileset>			
 		</delete>
 		
-		<sync todir="${targetFolderPath}/${projectBaseName}" overwrite="true">
+		<!-- Update the target/projectName/main folder with the current project state -->
+		<sync todir="${targetFolderPath}/${projectBaseName}/main" overwrite="true">
 			<fileset dir="${mainFolderPath}" casesensitive="false">
 				<exclude name="**/thumbs.db**" />
 				<exclude name="**/.svn/**" />
@@ -113,7 +152,7 @@
 	
 	
 	<!-- Launch the unit tests on console only if autorun property is set -->
-	<target name="runTests" if="${Test.runTests}">
+	<target name="runTests">
 
 		<!-- Test.localHostTestPath must exist -->
 		<fail message="Test.localHostTestPath not found. A local server folder is required to run unit tests.">
@@ -125,7 +164,7 @@
 		</fail>
 
 		<copy todir="${Test.localHostTestPath}/${projectBaseName}-unitTests/main" overwrite="true">
-			<fileset dir="${targetFolderPath}/${projectBaseName}" casesensitive="false" />
+			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false" />
 		</copy>
 			
 		<copy todir="${Test.localHostTestPath}/${projectBaseName}-unitTests/test" overwrite="true">
@@ -141,25 +180,114 @@
 	</target>
 	
 	
+	<!-- Generate the php documentation from source code -->
+	<target name="createPhpDoc">
+
+		<!-- TODO desactivar oputput de la comanda en consola -->
+		<!-- TODO revisar les opcions disponibles per a optimitzar-ho be -->
+		<!-- TODO segurament aixo nomes ens interessa al fer un release build  -->
+		<mkdir dir="${targetFolderPath}/${projectBaseName}/doc/php"/>
+		
+		<exec executable="${Tools.phpPath}" failonerror="true">
+			<arg value="C:\BuildTools\PhpDocumentor\phpDocumentor.phar" />
+			<arg value="-d" />
+			<arg value="${targetFolderPath}/${projectBaseName}/main/php" />
+			<arg value="-t" />
+			<arg value="${targetFolderPath}/${projectBaseName}/doc" />
+		</exec>
+		
+	</target>
+	
+	
+	<!-- Generate the js documentation from source code -->
+	<target name="createJsDoc">
+
+		<!-- TODO -->
+		<mkdir dir="${targetFolderPath}/${projectBaseName}/doc/js"/>
+
+	</target>
+	
+	
 	<!-- Create the optimized release version and tag it with the current version and build number -->
-	<target name="createReleaseVersion" if="${Build.createReleaseVersion}">
+	<target name="createReleaseVersion">
 
-		<copy todir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}" overwrite="true">
-			<fileset dir="${targetFolderPath}/${projectBaseName}" casesensitive="false">
-				<exclude name="**/*.js" />
-				<exclude name="**/*.css" />
-				<exclude name="**/*.php" />
-				<exclude name="**/*.png" />
-				<exclude name="**/*.jpg" />
-			</fileset>
-		</copy>
+		<script language="javascript">
+			<![CDATA[
+				
+				importPackage(Packages.org.apache.tools.ant.types);
+			   	importClass(java.io.File);
+			
+				var targetFolderPath = project.getProperty("targetFolderPath");
+				var projectBaseName = project.getProperty("projectBaseName");
+				var buildVersionNumber = project.getProperty("Build.versionNumber");
+				var buildNumber = project.getProperty("build.number");
+				var releaseOptimizePictures = project.getProperty("Release.optimizePictures");
+				var releaseOptimizePhp = project.getProperty("Release.optimizePhp");
+				var releaseOptimizeHtml = project.getProperty("Release.optimizeHtml");
+				var releaseOptimizeJs = project.getProperty("Release.optimizeJs");
+				var releaseOptimizeCss = project.getProperty("Release.optimizeCss");
+									
+				var fs = new FileSet();
+		      	fs.setDir(new File(targetFolderPath + "/" + projectBaseName));
+				fs.setCaseSensitive(false);
+			
+				var fsExcludes = [];
+			
+				if(releaseOptimizePictures == "true"){
+					fsExcludes.push("**/*.png");
+					fsExcludes.push("**/*.jpg");
+				}
 
-		<antcall target="minifyPNG" />
-		<antcall target="minifyJPG" />
-		<antcall target="minifyPHP" />
-		<antcall target="minifyHTML" />
-		<!--<antcall target="minifyJS" />
-		<antcall target="minifyCSS" />-->
+				if(releaseOptimizePhp == "true"){					
+					fsExcludes.push("**/*.php");
+				}
+			
+				if(releaseOptimizeHtml == "true"){					
+					// TODO
+				}
+						
+				if(releaseOptimizeJs == "true"){				
+					fsExcludes.push("**/*.js");
+				}
+			
+				if(releaseOptimizeCss == "true"){							
+					fsExcludes.push("**/*.css");
+				}
+						
+				fs.setExcludes(fsExcludes.join(" "));
+			   			
+				var c = project.createTask("copy");
+				c.setTodir(new File(targetFolderPath + "/" + projectBaseName + "-" + buildVersionNumber + "." + buildNumber));
+				c.setOverwrite(true);
+		
+				c.addFileset(fs);
+				c.execute();
+			
+				// Call the ant tasks
+				if(releaseOptimizePictures == "true"){
+					
+					self.project.executeTarget("minifyPNG");
+					self.project.executeTarget("minifyJPG");
+				}
+			
+				if(releaseOptimizePhp == "true"){
+					self.project.executeTarget("minifyPHP");
+				}
+			
+				if(releaseOptimizeHtml == "true"){
+					self.project.executeTarget("minifyHTML");
+				}
+			
+				if(releaseOptimizeJs == "true"){
+					self.project.executeTarget("minifyJS");
+				}
+			
+				if(releaseOptimizeCss == "true"){
+					self.project.executeTarget("minifyCSS");
+				}
+			
+		    ]]>
+		</script>
 
 	</target>
 	
@@ -173,7 +301,7 @@
 		 -->
 		<apply executable="${Tools.pngQuantPath}" failonerror="false">
 
-			<fileset dir="${targetFolderPath}/${projectBaseName}" casesensitive="false">
+			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false">
 				<include name="**/*.png" />
 			</fileset>
 
@@ -187,7 +315,7 @@
 		<!-- Apply the optipng compression tool to the target folder pngs, and copy them to the release folder -->
 		<apply executable="${Tools.pngOptimizerPath}" failonerror="true">
 
-			<fileset dir="${targetFolderPath}/${projectBaseName}" casesensitive="false">
+			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false">
 				<include name="**/*.png" />
 			</fileset>
 
@@ -197,7 +325,7 @@
 			<arg value="-out" />
 			<targetfile />
 			
-			<mapper type="glob" from="*.png" to="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/*.png" />
+			<mapper type="glob" from="*.png" to="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main/*.png" />
 
 		</apply>
 
@@ -209,7 +337,7 @@
 
 		<apply executable="${Tools.jpgOptimizerPath}" failonerror="true">
 
-			<fileset dir="${targetFolderPath}/${projectBaseName}" casesensitive="false">
+			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false">
 				<include name="**/*.jpg" />
 			</fileset>
 
@@ -220,7 +348,7 @@
 			<targetfile />
 			<srcfile />
 
-			<mapper type="glob" from="*.jpg" to="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/*.jpg" />
+			<mapper type="glob" from="*.jpg" to="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main/*.jpg" />
 
 		</apply>
 
@@ -233,7 +361,7 @@
 		<!-- Php files may contain html code. They are stored with .phpTemp extension so they can be processed later by the html minifier -->
 		<apply executable="${Tools.phpPath}" failonerror="true">
 
-			<fileset dir="${targetFolderPath}/${projectBaseName}" casesensitive="false">
+			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false">
 				<include name="**/*.php" />
 			</fileset>
 
@@ -241,23 +369,18 @@
 			<srcfile />
 
 			<redirector>
-				<outputmapper id="out" type="glob" from="*.php" to="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/*.phpTemp" />
+				<outputmapper id="out" type="glob" from="*.php" to="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main/*.phpTemp" />
 			</redirector>
 
 		</apply>
-
-	</target>
-	
-	<!-- Compress html and php files that may contain inlined html. Those are marked with .phpTemp extension -->
-	<target name="minifyHTML">
-
+		
 		<apply executable="java" failonerror="true">
 
-			<fileset dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}">
+			<fileset dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main">
 				<include name="**/*.phpTemp" />
 			</fileset>
 
-			<mapper type="glob" from="*.phpTemp" to="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/*.php" />
+			<mapper type="glob" from="*.phpTemp" to="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main/*.php" />
 
 			<arg line="-jar" />
 			<arg path="${Tools.htmlCompressorPath}" />
@@ -270,16 +393,23 @@
 
 		<!-- Clean the phpTemp marked files -->
 		<delete>
-			<fileset dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}">
+			<fileset dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main">
 				<include name="**/*.phpTemp" />
 			</fileset>
 		</delete>
 
 	</target>
 	
+	<!-- Compress html and php files that may contain inlined html. Those are marked with .phpTemp extension -->
+	<target name="minifyHTML">
+
+		<!-- TODO -->		
+
+	</target>
+	
 	
 	<!-- Generate the phar file from the files on the target folder if phar generation is enabled on setup build xml -->
-	<target name="createPhars" if="${Build.createPhars}">
+	<target name="createPhars">
 
 		<!-- Autoloader.php must exist on src/main/php/ for the phar to be correctly generated -->
 		<fail message="src/main/php/AutoLoader.php not found. This is required to create a phar that loads classes automatically">
@@ -297,31 +427,39 @@
 		<exec executable="${Tools.phpPath}" failonerror="true">
 			<arg value="-d display_errors" />
 			<arg value="-r" />
-			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}.phar'); $p->startBuffering(); $p->setStub('${phpStubFile}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}'); $p->stopBuffering();" />
+			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}/${projectBaseName}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}.phar'); $p->startBuffering(); $p->setStub('${phpStubFile}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}/main'); $p->stopBuffering();" />
 		</exec>
 		
-		<antcall target="createPharsRelease" />
+		<script language="javascript">
+			<![CDATA[
+				
+				if(project.getProperty("Release.enable") == "true"){
+					self.project.executeTarget("createPharsRelease");
+				}
+			
+		    ]]>
+		</script>
 		
 	</target>
 	
 	
 	<!-- Generate the release version phars -->
-	<target name="createPharsRelease" if="${Build.createReleaseVersion}">
+	<target name="createPharsRelease">
 
 		<!-- Create the phar using the current project name and version -->
 		<exec executable="${Tools.phpPath}" failonerror="true">
 			<arg value="-d display_errors" />
 			<arg value="-r" />
-			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}-${Build.versionNumber}.${build.number}.phar'); $p->startBuffering(); $p->setStub('${phpStubFile}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}'); $p->stopBuffering();" />
+			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/${projectBaseName}-${Build.versionNumber}.${build.number}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}-${Build.versionNumber}.${build.number}.phar'); $p->startBuffering(); $p->setStub('${phpStubFile}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main'); $p->stopBuffering();" />
 		</exec>
 			
 	</target>
 	
 	
 	<!-- Removes all the unpacked files on the target folder -->
-	<target name="removeUnpackedFiles" unless="${Build.keepUnPackedFiles}">		
-		<delete dir="${targetFolderPath}/${projectBaseName}" failonerror="true" />
-		<delete dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}" failonerror="false" />
+	<target name="removeUnpackedFiles">		
+		<delete dir="${targetFolderPath}/${projectBaseName}/main" failonerror="true" />
+		<delete dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main" failonerror="false" />
 	</target>
 	
 	
