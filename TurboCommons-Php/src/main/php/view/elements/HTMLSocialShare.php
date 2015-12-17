@@ -1,6 +1,6 @@
 <?php
 
-namespace TurboFramework\TurboCommons;
+namespace com\edertone\turboCommons\src\main\php\view\elements;
 
 
 /** Html Social share */

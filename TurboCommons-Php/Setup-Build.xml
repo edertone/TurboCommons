@@ -5,12 +5,12 @@
 	<Build versionNumber="0.1"
 		   createPhars="true"
 		   createMergedJs="false"
-		   createPhpDoc="true"
-		   createJsDoc="false"
 		   keepUnPackedFiles="true" />
 
 	<Release enable="true"
-			 optimizePictures="false"
+			 createPhpDoc="true"
+		   	 createJsDoc="false"
+		   	 optimizePictures="false"
 			 optimizePhp="true"
 			 optimizeHtml="false"	
 			 optimizeJs="false"

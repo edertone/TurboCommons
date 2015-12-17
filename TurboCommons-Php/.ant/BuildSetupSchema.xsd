@@ -40,18 +40,6 @@
 							</xs:annotation>
 						</xs:attribute>	
 						
-						<xs:attribute name="createPhpDoc" default="false" type="xs:boolean">
-							<xs:annotation>
-								<xs:documentation>Compile the phpDoc files inside the target/projectName/doc/php folder</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>		
-						
-						<xs:attribute name="createJsDoc" default="false" type="xs:boolean">
-							<xs:annotation>
-								<xs:documentation>Compile the phpDoc files inside the target/projectName/doc/js folder</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>								
-					
 						<xs:attribute name="keepUnPackedFiles" default="false" type="xs:boolean">
 							<xs:annotation>
 								<xs:documentation>If set to false, all the files that are copied to the target/ProjectName/ folder will be removed. Otherwise they will be kept on the folder.</xs:documentation>
@@ -77,6 +65,18 @@
 								<xs:documentation>Enable or disable creating the fully optimized production ready project version. Build process will perform optimizations like source minification and obfuscation, images optimization, etc.. and the build result will be placed under target/ProjectName-buildnumber/</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
+						
+						<xs:attribute name="createPhpDoc" default="false" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Compile the phpDoc files inside the target/projectName-version/doc/php folder</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>		
+						
+						<xs:attribute name="createJsDoc" default="false" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Compile the phpDoc files inside the target/projectName-version/doc/js folder</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>		
 						
 						<xs:attribute name="optimizePictures" default="true" type="xs:boolean">
 							<xs:annotation>

@@ -49,11 +49,11 @@
 		<property name="Build.versionNumber" value="0.0" />
 		<property name="Build.createPhars" value="true" />
 		<property name="Build.createMergedJs" value="false" />
-		<property name="Build.createPhpDoc" value="false" />
-		<property name="Build.createJsDoc" value="false" />
 		<property name="Build.keepUnPackedFiles" value="false" />
 				
 		<property name="Release.enable" value="false" />
+		<property name="Release.createPhpDoc" value="false" />
+		<property name="Release.createJsDoc" value="false" />
 		<property name="Release.optimizePictures" value="true" />
 		<property name="Release.optimizePhp" value="true" />
 		<property name="Release.optimizeJs" value="true" />
@@ -97,14 +97,6 @@
 			
 				if(project.getProperty("Test.runTests") == "true"){
 					self.project.executeTarget("runTests");
-				}
-			
-				if(project.getProperty("Build.createPhpDoc") == "true"){
-					self.project.executeTarget("createPhpDoc");
-				}
-			
-				if(project.getProperty("Build.createJsDoc") == "true"){
-					self.project.executeTarget("createJsDoc");
 				}
 			
 				if(project.getProperty("Release.enable") == "true"){
@@ -180,34 +172,6 @@
 	</target>
 	
 	
-	<!-- Generate the php documentation from source code -->
-	<target name="createPhpDoc">
-
-		<!-- TODO desactivar oputput de la comanda en consola -->
-		<!-- TODO revisar les opcions disponibles per a optimitzar-ho be -->
-		<!-- TODO segurament aixo nomes ens interessa al fer un release build  -->
-		<mkdir dir="${targetFolderPath}/${projectBaseName}/doc/php"/>
-		
-		<exec executable="${Tools.phpPath}" failonerror="true">
-			<arg value="C:\BuildTools\PhpDocumentor\phpDocumentor.phar" />
-			<arg value="-d" />
-			<arg value="${targetFolderPath}/${projectBaseName}/main/php" />
-			<arg value="-t" />
-			<arg value="${targetFolderPath}/${projectBaseName}/doc" />
-		</exec>
-		
-	</target>
-	
-	
-	<!-- Generate the js documentation from source code -->
-	<target name="createJsDoc">
-
-		<!-- TODO -->
-		<mkdir dir="${targetFolderPath}/${projectBaseName}/doc/js"/>
-
-	</target>
-	
-	
 	<!-- Create the optimized release version and tag it with the current version and build number -->
 	<target name="createReleaseVersion">
 
@@ -233,6 +197,14 @@
 			
 				var fsExcludes = [];
 			
+				if(project.getProperty("Release.createPhpDoc") == "true"){
+					self.project.executeTarget("createPhpDoc");
+				}
+			
+				if(project.getProperty("Release.createJsDoc") == "true"){
+					self.project.executeTarget("createJsDoc");
+				}
+				
 				if(releaseOptimizePictures == "true"){
 					fsExcludes.push("**/*.png");
 					fsExcludes.push("**/*.jpg");
@@ -288,6 +260,35 @@
 			
 		    ]]>
 		</script>
+
+	</target>
+	
+	
+	<!-- Generate the php documentation from source code -->
+	<target name="createPhpDoc">
+
+		<!-- TODO revisar les opcions disponibles per a optimitzar-ho be -->
+		<mkdir dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/doc/php"/>
+		
+		<exec executable="${Tools.phpPath}" failonerror="true" outputproperty="createPhpDocOutputRedir">
+			<arg value="C:\BuildTools\PhpDocumentor\phpDocumentor.phar" />
+			<arg value="--template=&quot;responsive-twig&quot;" />
+			<arg value="--visibility=&quot;public&quot;" />
+			<arg value="--title=&quot;${projectBaseName}-${Build.versionNumber}.${build.number}&quot;" />
+			<arg value="-d" />
+			<arg value="${targetFolderPath}/${projectBaseName}/main/php" />
+			<arg value="-t" />
+			<arg value="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/doc/php" />
+		</exec>
+		
+	</target>
+	
+	
+	<!-- Generate the js documentation from source code -->
+	<target name="createJsDoc">
+
+		<!-- TODO -->
+		<mkdir dir="${targetFolderPath}/${projectBaseName}/doc/js"/>
 
 	</target>
 	
@@ -359,7 +360,7 @@
 	<target name="minifyPHP">
 
 		<!-- Php files may contain html code. They are stored with .phpTemp extension so they can be processed later by the html minifier -->
-		<apply executable="${Tools.phpPath}" failonerror="true">
+		<apply executable="${Tools.phpPath}" failonerror="true" outputproperty="minifyPHPOutputRedir">
 
 			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false">
 				<include name="**/*.php" />
