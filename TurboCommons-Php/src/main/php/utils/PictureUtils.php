@@ -237,47 +237,6 @@ class PictureUtils{
 		return true;
 	}
 
-
-	/**
-	 * Convert the specified text to a PNG image with transparent background.
-	 *
-	 * @param string $text	The text that will be converted to a picture
-	 * @param string $fontPath	The full file system path to the .ttf font file that will be used to render the text
-	 * @param int $width The width for the output picture
-	 * @param int $height The height for the output picture
-	 * @param int $fontSize	The font size in pixels that will be used to generate the picture
-	 * @param string $fontColor The font hexadecimal color. 000000 (Black) by default.
-	 *
-	 * @return string The generated image binary
-	 */
-	public static function textToPicture($text, $fontPath, $width, $height, $fontSize = 20, $fontColor = '000000'){
-
-		// TODO: revisar aquest codi de merda fet pel sergi
-
-		// Create the image
-		$img = imagecreatetruecolor($width, $height);
-
-		// Transparent background
-		imagealphablending($img, false);
-		imagefill($img, 0, 0, imagecolorallocatealpha($img, 0, 0, 0, 127));
-		imagesavealpha($img, true);
-
-		// Attach text to the image
-		imagettftext($img, $fontSize, 0, 0, $fontSize, hexdec($fontColor), $fontPath, $text);
-
-		// Get the image binary
-		ob_start();
-		imagepng($img);
-		$result = ob_get_contents();
-		ob_end_clean();
-
-		// Destroy the image
-		imagedestroy($img);
-
-		// Return the image binary
-		return $result;
-	}
-
 }
 
 ?>

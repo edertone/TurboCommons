@@ -2,38 +2,17 @@
 <SetupBuild xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 			xsi:noNamespaceSchemaLocation=".ant/BuildSetupSchema.xsd">
 
-	<Build versionNumber="0.1"
-		   createPhars="true"
-		   createMergedJs="false"
-		   keepUnPackedFiles="true" />
+	<Build versionNumber="1.0" />
 
 	<Release enable="true"
-			 createPhpDoc="true"
-		   	 createJsDoc="false"
-		   	 optimizePictures="false"
-			 optimizePhp="true"
-			 optimizeHtml="false"	
+			 changeLog="true"
+			 optimizePhp="false"
+			 optimizeHtml="false"
 			 optimizeJs="false"
-			 optimizeCss="false"		 
-			 useForDeploy="false" />
-		   
-	<Analyse checkProjectStructure="true" />
+			 optimizeCss="false"
+			 phpDoc="true" />
 	
 	<Test runTests="true"
 		  localHostTestPath="C:\xampp\htdocs\unitTests" />
-	
-	<Deploy localHostDeploy="true"
-			localHostPath="C:\xampp\htdocs\" 
-			localHostIgnore=""
-			ftpDeploy="false"
-			ftpFolder="/"
-			ftpIgnore=""
-			ftpServer="www.edertone.com"
-			ftpUser="preview@edertone.com"
-			ftpPsw="754dCcdfeexcGVcdgvBHY" />
-	
-	<DataBase />
-	
-	<Tools />
-		
+			
 </SetupBuild>

@@ -310,44 +310,6 @@ class StringUtils {
 
 
     /**
-     * Format an url
-     * TODO: Feta per el sergi, no està ben documentada ni sabem si es fa servir en algun lloc,
-     * de forma que pot ser que s'hagi de marcar com a @deprecated
-     *
-     * @param string $inputUrl The input url to be formatted
-     * @param string $protocol The url protocol to be concatenated at the top of the formatted url
-     * @param boolean $usePath It defines if the formatted url will include a path or not (domain.com/PATH..)
-     *
-     * @return string The output url
-     */
-    public static function formatUrl($inputUrl, $protocol = '', $usePath = true){
-
-    	// Separate url elements
-    	$url = parse_url($inputUrl);
-
-    	// Validate the input url to be formated
-    	if (!isset($url['host']) && !isset($url['path'])){
-    		return 'url_format_error';
-    	}
-
-    	// Build the formatted url
-    	$result = $protocol != '' ? $protocol.'://' : '';
-
-    	if (isset($url['host'])){
-    		$result .= $url['host'];
-    		$result .= isset($url['path']) && $usePath ? $url['path'] : '';
-    	}
-    	else{
-    		$result .= $url['path'];
-    	}
-
-    	// Return the formatted url
-    	return $result;
-
-    }
-
-
-    /**
      * Method to generate a random string with the specified lenght
      *
      * @param int $lenght Specify the lengh of the password
