@@ -54,7 +54,7 @@
 		<property name="Release.enable" value="false" />
 		<property name="Release.phpDoc" value="false" />
 		<property name="Release.jsDoc" value="false" />
-		<property name="Release.changeLog" value="false" />
+		<property name="Release.gitChangeLog" value="false" />
 		<property name="Release.optimizePictures" value="true" />
 		<property name="Release.optimizePhp" value="true" />
 		<property name="Release.optimizeJs" value="true" />
@@ -207,8 +207,8 @@
 					self.project.executeTarget("createJsDoc");
 				}
 			
-				if(project.getProperty("Release.changeLog") == "true"){
-					self.project.executeTarget("createChangeLog");
+				if(project.getProperty("Release.gitChangeLog") == "true"){
+					self.project.executeTarget("createGitChangeLog");
 				}
 			
 				if(releaseOptimizePictures == "true"){
@@ -293,27 +293,67 @@
 	<target name="createJsDoc">
 
 		<!-- TODO -->
-		<mkdir dir="${targetFolderPath}/${projectBaseName}/doc/js"/>
+		<mkdir dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/doc/js"/>
 
 	</target>
 	
 	
 	<!-- Create changelog based on a git repository -->
-	<target name="createChangeLog">
+	<target name="createGitChangeLog">
 
 		<!-- Create the changelog file -->
-		<mkdir dir="${targetFolderPath}/${projectBaseName}/changelog"/>
-		<touch file="${targetFolderPath}/${projectBaseName}/changelog/changelog.txt"/>
+		<mkdir dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/changelog"/>
+		<property name="changeLogFilePath" value="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/changelog/changelog.txt" />
+		<touch file="${changeLogFilePath}"/>
 		
-		<!-- Get the date for the last tag on the current git repo -->
-		<exec executable="git" failonerror="true" outputproperty="gitLastTagDate">
-	        <arg line="show -s --format=%ad 'git rev-list --tags --max-count=1'"/>
-	    </exec>
+		<!-- Write the changelog file header -->
+		<echo file="${changeLogFilePath}" append="true" message="${projectBaseName}-${Build.versionNumber}.${build.number} CHANGELOG ---------------------------------------------" />
 		
-		<exec executable="git" failonerror="true" output="${targetFolderPath}/${projectBaseName}/changelog/changelog.txt">
-	        <arg line="log --oneline --pretty=format:'%ad: %s' --date=short --since='${gitLastTagDate}'"/>
-	    </exec>  
-			    
+		<!-- Get the latest 4 tags -->
+		<exec executable="git" failonerror="true" outputproperty="gitLatest4TagNames">
+	    	<arg line="tag --sort version:refname"/>
+	    </exec> 
+		
+		<!-- Split the 4 tags and generate the respective output -->
+		<script language="javascript"><![CDATA[
+			
+			var tags = project.getProperty("gitLatest4TagNames").replace("\r", "").split("\n").reverse();
+						
+			importClass(java.io.File);
+			
+			var changeLogFile = new File(project.getProperty("changeLogFilePath"));
+	        
+			var echo = project.createTask("echo");
+			echo.setFile(changeLogFile);
+			echo.setAppend(true);
+			
+			for(var i=0; i < tags.length; i++){
+			
+				echo.setMessage("\n\n\nVERSION: " + tags[i] + "\n\n");
+				echo.perform();	
+			
+				var exec = project.createTask("exec");
+				exec.setExecutable("git");
+				exec.setFailonerror(true);
+				exec.setOutputproperty("changeLogTagProperty" + i);
+			
+				if(i >= (tags.length - 1)){
+			
+					exec.createArg().setLine("log " + tags[i] + " --oneline --pretty=format:'%ad: %s%n%b%n' --date=short");
+			
+				}else{
+			
+					exec.createArg().setLine("log " + tags[i+1] + ".." + tags[i] + " --oneline --pretty=format:'%ad: %s%n%b%n' --date=short");
+				}
+				
+				exec.perform();	
+			
+				echo.setMessage(project.getProperty("changeLogTagProperty" + i));
+				echo.perform();	
+			}
+	       
+	    ]]></script>
+				
 	</target>
 	
 	

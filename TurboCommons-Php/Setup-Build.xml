@@ -5,12 +5,12 @@
 	<Build versionNumber="1.0" />
 
 	<Release enable="true"
-			 changeLog="true"
+			 gitChangeLog="true"
 			 optimizePhp="false"
 			 optimizeHtml="false"
 			 optimizeJs="false"
 			 optimizeCss="false"
-			 phpDoc="true" />
+			 phpDoc="false" />
 	
 	<Test runTests="true"
 		  localHostTestPath="C:\xampp\htdocs\unitTests" />
