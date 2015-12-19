@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * TurboCommons-Php
+ *
+ * PHP Version 5.4
+ *
+ * @copyright 2015 Edertone advanced solutions (http://www.edertone.com)
+ * @license   http://www.opensource.org/licenses/mit-license.php MIT
+ * @link      http://turbocommons.org
+ */
+
+
 namespace com\edertone\turboCommons\src\main\php\model;
 
 use Exception;

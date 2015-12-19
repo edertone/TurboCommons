@@ -1,6 +1,17 @@
 <?php
 
-	namespace com\edertone\turboCommons\src\main\php\utils;
+/**
+ * TurboCommons-Php
+ *
+ * PHP Version 5.4
+ *
+ * @copyright 2015 Edertone advanced solutions (http://www.edertone.com)
+ * @license   http://www.opensource.org/licenses/mit-license.php MIT
+ * @link      http://turbocommons.org
+ */
+
+
+namespace com\edertone\turboCommons\src\main\php\utils;
 
 
 /** File system utils */
@@ -190,6 +201,7 @@ class FileSystemUtils{
 	 * Delete a directory from the filesystem and return a boolean telling if the directory delete success or not
 	 *
 	 * @param string $path The path to the directory
+	 * @param string $deleteDirectoryItself Set it to true if the specified directory must also be deleted.
 	 *
 	 * @return bool Returns true on success or false on failure.
 	 */

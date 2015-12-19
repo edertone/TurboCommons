@@ -162,7 +162,10 @@
 						
 						<xs:attribute name="localHostTestPath" use="required" type="xs:string">
 							<xs:annotation>
-								<xs:documentation>Specifies the path where the localhost server http root folder is located, or a subfolder of it where the unit tests will be copied. The unit tests require a local server to run, and will be copied to the specified path under a folder named ProjectName-unitTests</xs:documentation>
+								<xs:documentation>A local server is required to correctly run the tests, so this value specifies a path to that local server http documents folder.
+									A subfolder called "ProjectName-unitTests" will be created when running the tests, and removed once tests are finished.&lt;br&gt;&lt;br&gt;
+									Example: C:/xampp/htdocs/unitTests
+								</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>		
 						

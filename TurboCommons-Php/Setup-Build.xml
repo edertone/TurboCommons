@@ -7,12 +7,9 @@
 	<Release enable="true"
 			 gitChangeLog="true"
 			 optimizePhp="false"
-			 optimizeHtml="false"
-			 optimizeJs="false"
-			 optimizeCss="false"
 			 phpDoc="true" />
 	
 	<Test runTests="true"
-		  localHostTestPath="C:\xampp\htdocs\unitTests" />
+		  localHostTestPath="C:/xampp/htdocs/unitTests" />
 			
 </SetupBuild>

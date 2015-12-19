@@ -298,6 +298,8 @@
 			<arg value="--template=&quot;responsive-twig&quot;" />
 			<arg value="--visibility=&quot;public&quot;" />
 			<arg value="--title=&quot;${projectBaseName}-${Build.versionNumber}.${build.number}&quot;" />
+			<arg value="-i" />
+			<arg value="${targetFolderPath}/${projectBaseName}/main/php/libs,AutoLoader.php" />
 			<arg value="-d" />
 			<arg value="${targetFolderPath}/${projectBaseName}/main/php" />
 			<arg value="-t" />
