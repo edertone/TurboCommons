@@ -71,6 +71,7 @@
 		<property name="Release.phpDoc" value="false" />
 		<property name="Release.jsDoc" value="false" />
 		<property name="Release.gitChangeLog" value="false" />
+		<property name="Release.gitChangeLogCount" value="5" />
 		<property name="Release.optimizePictures" value="true" />
 		<property name="Release.optimizePhp" value="true" />
 		<property name="Release.optimizeJs" value="true" />
@@ -333,7 +334,7 @@
 	    	<arg line="tag --sort version:refname"/>
 	    </exec> 
 		
-		<!-- Split the tags and generate the respective output for the latest 5 versions -->
+		<!-- Split the tags and generate the respective output for the latest ${Release.gitChangeLogCount} number of versions -->
 		<script language="javascript"><![CDATA[
 			
 			var tags = project.getProperty("gitTagsList").replace("\r", "").split("\n").reverse();
@@ -346,7 +347,7 @@
 			echo.setFile(changeLogFile);
 			echo.setAppend(true);
 			
-			for(var i=0; i < Math.min(5, tags.length); i++){
+			for(var i=0; i < Math.min(project.getProperty("Release.gitChangeLogCount"), tags.length); i++){
 			
 				echo.setMessage("\n\n\nVERSION: " + tags[i] + "\n\n");
 				echo.perform();	

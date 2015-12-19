@@ -14,7 +14,9 @@
 namespace com\edertone\turboCommons\src\main\php\utils;
 
 
-/** Complex object conversion utilities */
+/**
+ * Class containing methods that allow us to convert between different types of data structures without losing the contained information.
+ */
 class SerializationUtils{
 
 
@@ -37,7 +39,6 @@ class SerializationUtils{
 		}
 
 		return $class;
-
 	}
 
 
@@ -163,23 +164,6 @@ class SerializationUtils{
 		}
 
 		return implode("\n", $csv);
-
-	}
-
-
-	/**
-	 * Generates a string that contains csv data, but preceded by some extra values that are stored first.
-	 * Normally used to give more info than the one stored on the csv string. The method output will be encoded with the following format: v1-v2-vn_CSV
-	 *
-	 * @param array $array Array containing the data to convert to a csv string
-	 *
-	 * @return string The encoded string
-	 */
-	public static function arrayToCsvCustom(array $array, $delimiter = ',', $enclosure = '"', $linefeed = "\n"){
-
-		$csv = array_shift($array);
-
-		return implode('-', $array).'_'.self::arrayToCsv($csv, $delimiter, $enclosure, $linefeed);
 
 	}
 

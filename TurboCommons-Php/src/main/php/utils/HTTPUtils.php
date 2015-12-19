@@ -18,8 +18,7 @@ require_once __DIR__.'/StringUtils.php';
 
 
 /**
- * This class contains a collection of methods that are used to allow other PHP scripts
- * to call advanced HTTP operations like requests, script execution, sending Post variables to scripts, etc...
+ * This class contains a collection of methods that are related to the most common http operations.
  */
 class HTTPUtils{
 
@@ -91,7 +90,8 @@ class HTTPUtils{
 
 
 	/**
-	 * Get the full filename (including extension) for the current php script that is being executed. Example: Home.php
+	 * Get the full filename for the current php script that is being executed. Result will include the file extension but not the path where the file resides.
+	 * Example: Home.php
 	 *
 	 * @return string
 	 */
@@ -208,191 +208,13 @@ class HTTPUtils{
 
 
 	/**
-	 * Generate Headers Csv
-	 *
-	 * @see HTTPUtils::generateHeadersImageJpg
-	 *
-	 * @return void
-	 */
-	public static function generateHeadersCsv($filesize, $filename = '', $browserCacheEnabled = true){
-
-		// Define the pdf headers
-		if(!$browserCacheEnabled){
-
-			self::disableBrowserCaching();
-
-		}else{
-
-			header('Pragma: private');
-			header('Expires: ' . date(DATE_RFC822,strtotime('300 day'))); // We set the expiration date to 300 days, near 1 year
-			header('Cache-Control: private, max-age=25920000, pre-check=25920000'); //max-age and pre-check values are set in seconds, and match the 300 days value
-
-		}
-
-		// Send the standard image headers
-		header('Content-Type: application/csv');
-		header('Content-Disposition: attachment; filename="'.$filename.'"');
-		header('Content-Transfer-Encoding: binary');
-		header('Content-Length: '.$filesize);
-
-	}
-
-
-	/**
-	 * Generate Headers ZIP. Cache is always disabled for this type of file
-	 *
-	 * @see HTTPUtils::generateHeadersImageJpg
-	 *
-	 * @return void
-	 */
-	public static function generateHeadersZip($filesize = '', $filename = ''){
-
-		header('Pragma: public');
-		header('Expires: 0');
-		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-		header('Cache-Control: public');
-		header('Content-Description: File Transfer');
-		header('Content-type: application/octet-stream');
-		header('Content-Disposition: attachment; filename="'.$filename.'"');
-		header('Content-Transfer-Encoding: binary');
-
-		if($filesize != ''){
-			header('Content-Length: '.$filesize);
-		}
-	}
-
-
-	/**
-	 * Generate Headers Pdf
-	 *
-	 * @see HTTPUtils::generateHeadersImageJpg
-	 *
-	 * @return void
-	 */
-	public static function generateHeadersPdf($filesize, $fileName = '', $browserCacheEnabled = true, $modificationDate = ''){
-
-		// Define the pdf headers
-		if(!$browserCacheEnabled){
-
-			self::disableBrowserCaching();
-
-		}else{
-
-			header('Pragma: private');
-			header('Expires: ' . date(DATE_RFC822,strtotime('300 day'))); // We set the expiration date to 300 days, near 1 year
-
-			if ($modificationDate == ''){
-
-				$modificationDate = '2000-01-01';
-			}
-
-			header('Last-Modified: '.gmdate(DATE_RFC822, strtotime($modificationDate)).' GMT'); // Note that we need the modification date to set the last modified value
-
-			header('Cache-Control: private, max-age=25920000, pre-check=25920000'); //max-age and pre-check values are set in seconds, and match the 300 days value
-
-		}
-
-		// Send the standard image headers
-		header('Content-type: application/pdf');
-		header('Content-Disposition: inline; filename="'.$fileName.'"');
-		header('Content-Transfer-Encoding: binary');
-		header('Content-Length: '.$filesize);
-
-	}
-
-
-	/**
-	 * Generate Headers Image Jpg
-	 *
-	 * @param string  $filesize The size of the file
-	 * @param string  $fileName The name of the file
-	 * @param boolean $browserCacheEnabled Specify if browser's cache is enabled or not
-	 * @param string $modificationDate Date when the file was modified (in a mysql format)
-	 *
-	 * @return void
-	 */
-	public static function generateHeadersImageJpg($filesize, $fileName = '', $browserCacheEnabled = true, $modificationDate = ''){
-
-		// THIS HEADERS HAVE BEEN TESTED WITH ALL BROWSERS for a jpg image generation. So they are goood.
-		// Firefox requires '' for filename !!
-		// Note that we check a variable called "cachebrowserenabled" to enable or disable the image caching by the browser
-
-		// Define the image headers
-		if(!$browserCacheEnabled){
-
-			self::disableBrowserCaching();
-
-		}else{
-
-			header('Pragma: private');
-			header('Expires: ' . date(DATE_RFC822,strtotime('300 day'))); // We set the expiration date to 300 days, near 1 year
-
-			if($modificationDate == ''){
-
-				$modificationDate = '2000-01-01';
-			}
-
-			header('Last-Modified: '.gmdate(DATE_RFC822, strtotime($modificationDate)).' GMT'); // Note that we need the modification date to set the last modified value
-
-			header('Cache-Control: private, max-age=25920000, pre-check=25920000'); //max-age and pre-check values are set in seconds, and match the 300 days value
-
-		}
-
-		// Send the standard image headers
-		header('Content-type: image/jpeg');
-
-		if($fileName != ''){
-			header('Content-Disposition: inline; filename="'.$fileName.'"');
-		}
-
-		header('Content-Transfer-Encoding: binary');
-		header('Content-Length: '.$filesize);
-
-	}
-
-
-	/**
-	 * Automatically try to generate the appropiate headers for the specified file information, depending on the file type
-	 *
-	 * @see HTTPUtils::generateHeadersImageJpg
-	 *
-	 * @return void
-	 */
-	public static function generateHeadersAuto($filesize, $fileName = '', $browserCacheEnabled = true, $modificationDate = ''){
-
-		// First detect the type of the file
-		$type = strtolower(StringUtils::getFileExtension($fileName, true));
-
-		// Detect the type of the file
-		switch($type){
-
-			case 'pdf':
-				self::generateHeadersPdf($filesize, $fileName, $browserCacheEnabled, $modificationDate);
-				break;
-
-			case 'jpg':
-				self::generateHeadersImageJpg($filesize, $fileName, $browserCacheEnabled, $modificationDate);
-				break;
-
-			case 'csv':
-				self::generateHeadersCsv($filesize, $fileName, $browserCacheEnabled);
-				break;
-
-			default:
-				self::generateHeadersZip($filesize, $fileName);
-				break;
-		}
-	}
-
-
-	/**
-	 * Synchronously checks if a domain is free for Internet registering by calling a whois service.
+	 * Synchronously checks if the specified domain is free for Internet registering by calling several whois services.
 	 *
 	 * @param string $domain The domain to check
 	 *
-	 * @return boolean The verification result
+	 * @return boolean True if the specified domain is free can be registered, false if the domain is already registered by somebody
 	 */
-	public static function isDomainFreeForRegistering($domain){
+	public static function isDomainFreeToRegister($domain){
 
 		$domain = strtolower($domain);
 
@@ -452,7 +274,6 @@ class HTTPUtils{
 		fclose($fp);
 
 		return false;
-
 	}
 
 }

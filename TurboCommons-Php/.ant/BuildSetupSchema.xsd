@@ -82,6 +82,12 @@
 							<xs:annotation>
 								<xs:documentation>Enable or disable the automatic GIT changelog generation to the 'target/projectName-version/changelog' folder</xs:documentation>
 							</xs:annotation>
+						</xs:attribute>	
+						
+						<xs:attribute name="gitChangeLogCount" default="5" type="xs:integer">
+							<xs:annotation>
+								<xs:documentation>If gitChangeLog is enabled, this defines the number of git tags to be included on the changelog. For example, a value of 10 will generate a changelog with the detailed information for the last 10 tags on the git repository.</xs:documentation>
+							</xs:annotation>
 						</xs:attribute>		
 						
 						<xs:attribute name="optimizePictures" default="true" type="xs:boolean">
