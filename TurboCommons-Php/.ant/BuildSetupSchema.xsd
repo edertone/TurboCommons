@@ -13,7 +13,7 @@
 			<xs:sequence>		
 		
 				<!-- The Build setup part -->
-				<xs:element name="Build" minOccurs="1" maxOccurs="1">
+				<xs:element name="Build" minOccurs="0" maxOccurs="1">
 		
 					<xs:annotation>
 						<xs:documentation>General options related to the project build process</xs:documentation>
@@ -21,10 +21,10 @@
 					
 					<xs:complexType>
 					
-						<xs:attribute name="versionNumber" use="required" type="xs:string">
+						<xs:attribute name="versionNumber" default="0.0" type="xs:string">
 							<xs:annotation>
-								<xs:documentation>Specify the project version number. Unlike the build number that is incremented every time a build is performed, this value is not automatically updated and needs to be changed manually. So you should specify here the major version like 1.0, 2.0, 3.2... &lt;br&gt;&lt;br&gt;
-									Do not specify build number here, as it will be automatically added if necessary when generating the release version files</xs:documentation>
+								<xs:documentation>Version number is retrieved automatically from the latest GIT Tag. But if we want to define it manually we can define it here and this value will override the one from GIT.&lt;br&gt;&lt;br&gt;
+									NOTE: The build number will be always added automatically after the versionNumber. For example, if versionNumber is 1.4, the final value will be '1.4.buildnumber'</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
 						

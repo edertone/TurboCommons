@@ -45,6 +45,22 @@
 		
 		<xmlproperty file="${srcFolderPath}/../Setup-Build.xml" keepRoot="false" semanticattributes="true" />
 		
+		<!-- Get the latest tag if defined on GIT and not specified on Setup-Build.xml -->
+		<exec executable="git" failonerror="false" resultproperty="gitLatestTagResult" outputproperty="gitLatestTag" >
+	    	<arg line="describe --abbrev=0"/>
+	    </exec> 
+		
+		<script language="javascript">
+			<![CDATA[
+				
+				if(gitLatestTagResult == "0" && project.getProperty("Build.versionNumber") == null){
+			
+					project.setProperty("Build.versionNumber", project.getProperty("gitLatestTag"));				
+				}
+			
+		    ]]>
+		</script>
+		
 		<!-- Set default values for some properties in case they are not specified on the Setup-build.xml -->
 		<property name="Build.versionNumber" value="0.0" />
 		<property name="Build.createPhars" value="true" />
@@ -177,6 +193,8 @@
 	<!-- Create the optimized release version and tag it with the current version and build number -->
 	<target name="createReleaseVersion">
 
+		<mkdir dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}"/>
+				
 		<script language="javascript">
 			<![CDATA[
 				
@@ -302,22 +320,21 @@
 	<target name="createGitChangeLog">
 
 		<!-- Create the changelog file -->
-		<mkdir dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/changelog"/>
-		<property name="changeLogFilePath" value="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/changelog/changelog.txt" />
+		<property name="changeLogFilePath" value="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/changelog.txt" />
 		<touch file="${changeLogFilePath}"/>
 		
 		<!-- Write the changelog file header -->
 		<echo file="${changeLogFilePath}" append="true" message="${projectBaseName}-${Build.versionNumber}.${build.number} CHANGELOG ---------------------------------------------" />
 		
-		<!-- Get the latest 4 tags -->
-		<exec executable="git" failonerror="true" outputproperty="gitLatest4TagNames">
+		<!-- Get the GIT tags sorted by date ascending -->
+		<exec executable="git" failonerror="true" outputproperty="gitTagsList">
 	    	<arg line="tag --sort version:refname"/>
 	    </exec> 
 		
-		<!-- Split the 4 tags and generate the respective output -->
+		<!-- Split the tags and generate the respective output for the latest 5 versions -->
 		<script language="javascript"><![CDATA[
 			
-			var tags = project.getProperty("gitLatest4TagNames").replace("\r", "").split("\n").reverse();
+			var tags = project.getProperty("gitTagsList").replace("\r", "").split("\n").reverse();
 						
 			importClass(java.io.File);
 			
@@ -327,7 +344,7 @@
 			echo.setFile(changeLogFile);
 			echo.setAppend(true);
 			
-			for(var i=0; i < tags.length; i++){
+			for(var i=0; i < Math.min(5, tags.length); i++){
 			
 				echo.setMessage("\n\n\nVERSION: " + tags[i] + "\n\n");
 				echo.perform();	
@@ -469,6 +486,55 @@
 	<target name="minifyHTML">
 
 		<!-- TODO -->		
+
+	</target>
+	
+	
+	<!-- Apply minification to the js files -->
+	<target name="minifyJS">
+
+		<apply executable="java" failonerror="true">
+
+			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false">
+				<exclude name="build\" />
+				<include name="**/*.js" />
+			</fileset>
+
+			<mapper type="glob" from="*.js" to="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main/*.js" />
+
+			<arg line="-jar" />
+			<arg line="-Xss64m" />
+			<arg path="${Tools.minifierPath}" />
+			<arg line="--charset UTF-8" />
+			<srcfile />
+			<arg line="-o" />
+			<targetfile />
+
+		</apply>
+
+	</target>
+
+
+	<!-- Apply minification to the css files -->
+	<target name="minifyCSS">
+
+		<apply executable="java" failonerror="true">
+
+			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false">
+				<include name="**/*.css" />
+			</fileset>
+
+			<mapper type="glob" from="*.css" to="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main/*.css" />
+
+			<arg line="-jar" />
+			<arg line="-Xss64m" />
+			<arg path="${Tools.minifierPath}" />
+			<arg line="--charset UTF-8" />
+			<srcfile />
+			<arg line="-o" />
+			<targetfile />
+
+		</apply>
 
 	</target>
 	

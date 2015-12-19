@@ -2,7 +2,7 @@
 <SetupBuild xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 			xsi:noNamespaceSchemaLocation=".ant/BuildSetupSchema.xsd">
 
-	<Build versionNumber="1.0" />
+	<Build />
 
 	<Release enable="true"
 			 gitChangeLog="true"
@@ -10,7 +10,7 @@
 			 optimizeHtml="false"
 			 optimizeJs="false"
 			 optimizeCss="false"
-			 phpDoc="false" />
+			 phpDoc="true" />
 	
 	<Test runTests="true"
 		  localHostTestPath="C:\xampp\htdocs\unitTests" />
