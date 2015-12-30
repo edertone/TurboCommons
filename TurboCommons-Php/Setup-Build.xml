@@ -4,10 +4,12 @@
 
 	<Build />
 
-	<Release enable="true"
-			 gitChangeLog="true"
+	<Release gitChangeLog="true"
 			 optimizePhp="false"
 			 phpDoc="true" />
+	
+	<Validate checkProjectStructure="true"
+			  validateCss="true" />
 	
 	<Test runTests="true"
 		  localHostTestPath="C:/xampp/htdocs/unitTests" />

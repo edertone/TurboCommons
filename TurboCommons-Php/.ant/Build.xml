@@ -61,6 +61,9 @@
 		    ]]>
 		</script>
 		
+		<!-- Load the Release.enable property if defined on the Setup-Release.txt file -->
+		<property file="../Setup-Release.txt" />
+		
 		<!-- Set default values for some properties in case they are not specified on the Setup-build.xml -->
 		<property name="Build.versionNumber" value="0.0" />
 		<property name="Build.createPhars" value="true" />
@@ -78,6 +81,9 @@
 		<property name="Release.optimizeCss" value="true" />
 		<property name="Release.useForDeploy" value="false" />
 								
+		<property name="Validate.checkProjectStructure" value="true" />
+		<property name="Validate.validateCss" value="true" />
+				
 		<property name="Test.runTests" value="false" />
 		
 		<property name="Deploy.localHostDeploy" value="false" />
@@ -95,6 +101,7 @@
 		<property name="Tools.pngQuantPath" value="C:/BuildTools/pngquant-windows/pngquant.exe" />
 		<property name="Tools.pngOptimizerPath" value="C:/BuildTools/optipng-0.7.4-win32/optipng.exe" />
 		<property name="Tools.jpgOptimizerPath" value="C:/BuildTools/jpegtran/jpegtran.exe" />
+		<property name="Tools.cssValidatorPath" value="C:/BuildTools/W3c-css-validator/css-validator.jar" />
 		<property name="Tools.mysqlPath" value="C:/xampp/mysql/bin/mysql.exe" />	
 		<property name="Tools.phpDocPath" value="C:/BuildTools/PhpDocumentor/phpDocumentor.phar" />
 		<property name="Tools.phpPath" value="C:/xampp/php/php.exe" />

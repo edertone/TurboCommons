@@ -1,7 +1,7 @@
 # Custom project files
 target/
-target-release/
 cache.properties
+Setup-Release.txt
 
 # OS generated files
 .DS_Store

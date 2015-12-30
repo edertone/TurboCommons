@@ -51,21 +51,15 @@
 				</xs:element>
 				
 				
-				<!-- The Analyse setup part -->
+				<!-- The Release setup part -->
 				<xs:element name="Release" minOccurs="1" maxOccurs="1">
 		
 					<xs:annotation>
-						<xs:documentation>Parameters related to project automated testing</xs:documentation>
+						<xs:documentation>Options related to the release production build version generation. To enable the release build version of the project and use these parameters, a file named Setup-Release.txt must exist on the root of the project folder, containing the following line: Release.enable=true</xs:documentation>
 					</xs:annotation>
 					
 					<xs:complexType>
 					
-						<xs:attribute name="enable" use="required" type="xs:boolean">
-							<xs:annotation>
-								<xs:documentation>Enable or disable creating the fully optimized production ready project version. Build process will perform optimizations like source minification and obfuscation, images optimization, etc.. and the build result will be placed under target/ProjectName-buildnumber/</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>
-						
 						<xs:attribute name="phpDoc" default="false" type="xs:boolean">
 							<xs:annotation>
 								<xs:documentation>Enable or disable the automatic documentation generation for the Php code to the 'target/projectName-version/doc/php' folder</xs:documentation>
@@ -131,11 +125,11 @@
 				</xs:element>
 				
 				
-				<!-- The Analyse setup part -->
-				<xs:element name="Analyse" minOccurs="0" maxOccurs="1">
+				<!-- The Validate setup part -->
+				<xs:element name="Validate" minOccurs="0" maxOccurs="1">
 		
 					<xs:annotation>
-						<xs:documentation>Parameters related to project automated testing</xs:documentation>
+						<xs:documentation>Parameters related to project structure and code validation</xs:documentation>
 					</xs:annotation>
 					
 					<xs:complexType>
@@ -143,6 +137,12 @@
 						<xs:attribute name="checkProjectStructure" default="true" type="xs:boolean">
 							<xs:annotation>
 								<xs:documentation>Validate that current project folders and files meet the framework specifications</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>	
+						
+						<xs:attribute name="validateCss" default="true" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Verify that all the css files on the project are valid by passing them to the w3c official validator</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>		
 						
@@ -275,31 +275,37 @@
 					
 						<xs:attribute name="minifierPath" default="C:/BuildTools/yuicompressor-2.4.7/build/yuicompressor-2.4.7.jar" type="xs:string">
 							<xs:annotation>
-								<xs:documentation>Path where the minifier tool is located on this computer. It will take care of compressing js and css files when createReleaseVersion is true</xs:documentation>
+								<xs:documentation>Path where the minifier tool is located on this computer. It will take care of compressing js and css files when release version is enabled</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
 						
 						<xs:attribute name="htmlCompressorPath" default="C:/BuildTools/htmlcompressor/htmlcompressor-1.5.3.jar" type="xs:string">
 							<xs:annotation>
-								<xs:documentation>Path where the html compressor tool is located on this computer. It will take care of compressing php and html files when createReleaseVersion is true</xs:documentation>
+								<xs:documentation>Path where the html compressor tool is located on this computer. It will take care of compressing php and html files when release version is enabled</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
 						
 						<xs:attribute name="pngQuantPath" default="C:/BuildTools/pngquant-windows/pngquant.exe" type="xs:string">
 							<xs:annotation>
-								<xs:documentation>Path where the pngquant tool is located on this computer. It will take care of compressing png files when createReleaseVersion is true</xs:documentation>
+								<xs:documentation>Path where the pngquant tool is located on this computer. It will take care of compressing png files when release version is enabled</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
 						
 						<xs:attribute name="pngOptimizerPath" default="C:/BuildTools/optipng-0.7.4-win32/optipng.exe" type="xs:string">
 							<xs:annotation>
-								<xs:documentation>Path where the optipng tool is located on this computer. It will take care of compressing png files when createReleaseVersion is true</xs:documentation>
+								<xs:documentation>Path where the optipng tool is located on this computer. It will take care of compressing png files when release version is enabled</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
 						
 						<xs:attribute name="jpgOptimizerPath" default="C:/BuildTools/jpegtran/jpegtran.exe" type="xs:string">
 							<xs:annotation>
-								<xs:documentation>Path where the jpegtran tool is located on this computer. It will take care of compressing jpg files when createReleaseVersion is true</xs:documentation>
+								<xs:documentation>Path where the jpegtran tool is located on this computer. It will take care of compressing jpg files when release version is enabled</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						
+						<xs:attribute name="cssValidatorPath" default="C:/BuildTools/W3c-css-validator/css-validator.jar" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>Path where the w3c css validator tool is located on this computer. It will take care of validating the syntax for the css files on the project when release version is enabled</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
 						
