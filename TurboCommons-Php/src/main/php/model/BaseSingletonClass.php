@@ -15,7 +15,7 @@ namespace com\edertone\turboCommons\src\main\php\model;
 
 
 /**
- * A base class that implements the singleton patter for PHP and can be extended to convert a class to a singleton object
+ * A base class that implements the singleton pattern for PHP and can be extended to convert a class to a singleton object
  */
 class BaseSingletonClass extends BaseStrictClass{
 
