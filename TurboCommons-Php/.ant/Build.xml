@@ -145,7 +145,10 @@
 				}
 			
 		    ]]>
-		</script>
+		</script>		
+
+		<!-- Reset the Setup-Release.txt file so release build is not generated again if enabled -->
+		<echo file="../Setup-Release.txt" message="Release.enable = false" />
 				
 	</target>
 	
@@ -296,7 +299,7 @@
 			
 		    ]]>
 		</script>
-
+		
 	</target>
 	
 	
@@ -358,9 +361,28 @@
 			echo.setFile(changeLogFile);
 			echo.setAppend(true);
 			
+			echo.setMessage("\n\n");
+			echo.perform();	
+			
+			// Log the changes from the newest defined tag to the current repo state
+			
+			var exec = project.createTask("exec");
+			exec.setExecutable("git");
+			exec.setFailonerror(true);
+			exec.setOutputproperty("changeLogTagProperty");
+		
+			exec.createArg().setLine("log " + tags[0] + "..HEAD --oneline --pretty=format:'%ad: %s%n%b%n' --date=short");
+			
+			exec.perform();	
+			
+			echo.setMessage(project.getProperty("changeLogTagProperty"));
+			echo.perform();	
+			
+			// Log all the changes for each one of the defined tags
+			
 			for(var i=0; i < Math.min(project.getProperty("Release.gitChangeLogCount"), tags.length); i++){
 			
-				echo.setMessage("\n\n\nVERSION: " + tags[i] + "\n\n");
+				echo.setMessage("\n\n\nVERSION: " + tags[i] + " ---------------------------------------------\n\n");
 				echo.perform();	
 			
 				var exec = project.createTask("exec");
@@ -627,7 +649,12 @@
 	<!-- Generate a release version of the single JS file -->
 	<target name="createMergedJsRelease">
 
-		<concat destfile="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/${projectBaseName}-${Build.versionNumber}.${build.number}.js">
+		<echo file="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/${projectBaseName}-${Build.versionNumber}.${build.number}.js" 
+			  append="true" 
+			  message="/** ${projectBaseName} ${Build.versionNumber}.${build.number} */&#13;&#10;" />
+				
+		<concat destfile="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/${projectBaseName}-${Build.versionNumber}.${build.number}.js"
+				append="true">
 					
 			<fileset dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main" casesensitive="false">
 				<include name="**/*.js" />
