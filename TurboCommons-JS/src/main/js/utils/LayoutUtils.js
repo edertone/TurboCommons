@@ -133,7 +133,7 @@ var LayoutUtils = {
 
 
 	/**
-	 * Centers the given element based on the specified settings: Referred to the window, to another element, to a coordinate, etc... 
+	 * Aligns the given element based on the specified settings: Referred to the window, to another element, to a coordinate, etc... 
 	 * Multiple settings can be used to define how the element must be centered 
 	 * 
 	 * @param element A jquery object that represents the element that we want to center. Note that its position value must be "absolute" or "fixed"
@@ -163,7 +163,7 @@ var LayoutUtils = {
 	 * 
 	 * @return void
 	 */
-	centerElementTo : function(element, reference, mode, offsetX, offsetY, keepInsideViewPort){
+	alignElementTo : function(element, reference, mode, offsetX, offsetY, keepInsideViewPort){
 
 		// Set default values if they are not defined
 		reference = (reference instanceof jQuery || $.isArray(reference)) ? reference : undefined;

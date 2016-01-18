@@ -224,13 +224,13 @@ var PopUpManager = {
 				 * @param fadeInDuration 300ms by default, the time it will take for the fade in effect to complete 
 				 * @param fadeOutDelay 50ms by default, the time it will take for the tooltip to start disappearing
 				 * @param fadeOutDuration 100ms by default, the time it will take for the fade out effect to complete
-				 * @param layoutMode 'center topOut' by default, The centering mode for the tooltip. More information at: LayoutUtils.centerElementTo
-				 * @param offsetX 0 by default, The horizontal centering offset for the tooltip. More information at: LayoutUtils.centerElementTo
-				 * @param offsetY 5 by default, The vertical centering offset for the tooltip. More information at: LayoutUtils.centerElementTo
+				 * @param layoutMode 'center topOut' by default, The centering mode for the tooltip. More information at: LayoutUtils.alignElementTo
+				 * @param offsetX 0 by default, The horizontal centering offset for the tooltip. More information at: LayoutUtils.alignElementTo
+				 * @param offsetY 5 by default, The vertical centering offset for the tooltip. More information at: LayoutUtils.alignElementTo
 				 * @param keepIfMouseOver false by default. If set to true, when the mouse is over the tool tip, it won't disappear.
 				 * @param showMode 0 by default. Defines the behaviour that will make the tool tip visible: 0 - on mouse over, 1 - when the user clicks on the element, 2 - on both
 				 * 
-				 * @see LayoutUtils.centerElementTo()
+				 * @see LayoutUtils.alignElementTo()
 				 * 
 				 * @returns void
 				 */
@@ -267,7 +267,7 @@ var PopUpManager = {
 
 							// Move the tooltip to front and center it
 							LayoutUtils.moveToFront(tooltip);
-							LayoutUtils.centerElementTo(tooltip, element, layoutMode, offsetX, offsetY);
+							LayoutUtils.alignElementTo(tooltip, element, layoutMode, offsetX, offsetY);
 
 							// Apply the specified animation to the tooltip
 							tooltip.stop(true, true).fadeIn(fadeInDuration);
@@ -484,9 +484,9 @@ var PopUpManager = {
 				 * @param fadeInDuration 500 by default. The duration of the showing fade effect in miliseconds
 				 * @param closeIfClickOutside True by default. The popup will be removed from screen if the user clicks anywhere outside it
 				 * @param backgroundColor The color for the area below the popup element (that will be also affected by backgroundAlpha parameter) 
-				 * @param layoutMode 'center center' by default, The centering mode for the popup. More information at: LayoutUtils.centerElementTo
+				 * @param layoutMode 'center center' by default, The centering mode for the popup. More information at: LayoutUtils.alignElementTo
 				 * 
-				 * @see LayoutUtils.centerElementTo()
+				 * @see LayoutUtils.alignElementTo()
 				 * 
 				 * @returns void
 				 */
@@ -525,7 +525,7 @@ var PopUpManager = {
 					// Define a function to layout the element on screen
 					function calculatePopUpLayOut(){
 
-						LayoutUtils.centerElementTo(element, mask, layoutMode);
+						LayoutUtils.alignElementTo(element, mask, layoutMode);
 					}
 
 					// TODO: queda pendent evitar que el focus es surti dels elements del popup cap altres parts de la app
