@@ -61,7 +61,7 @@
 		    ]]>
 		</script>
 		
-		<!-- Load the Release.enable property if defined on the Setup-Release.txt file -->
+		<!-- Load the Release.enabled property if defined on the Setup-Release.txt file -->
 		<property file="../Setup-Release.txt" />
 		
 		<!-- Set default values for some properties in case they are not specified on the Setup-build.xml -->
@@ -70,7 +70,7 @@
 		<property name="Build.createMergedJs" value="false" />
 		<property name="Build.keepUnPackedFiles" value="false" />
 				
-		<property name="Release.enable" value="false" />
+		<property name="Release.enabled" value="false" />
 		<property name="Release.phpDoc" value="false" />
 		<property name="Release.jsDoc" value="false" />
 		<property name="Release.gitChangeLog" value="false" />
@@ -79,23 +79,12 @@
 		<property name="Release.optimizePhp" value="true" />
 		<property name="Release.optimizeJs" value="true" />
 		<property name="Release.optimizeCss" value="true" />
-		<property name="Release.useForDeploy" value="false" />
 								
 		<property name="Validate.checkProjectStructure" value="true" />
 		<property name="Validate.validateCss" value="true" />
 				
 		<property name="Test.runTests" value="false" />
-		
-		<property name="Deploy.localHostDeploy" value="false" />
-		<property name="Deploy.localHostPath" value="C:\xampp\htdocs\" />
-		<property name="Deploy.localHostIgnore" value="" />
-		<property name="Deploy.ftpDeploy" value="false" />
-		<property name="Deploy.ftpFolder" value="/" />
-		<property name="Deploy.ftpIgnore" value="" />
-		<property name="Deploy.ftpServer" value="" />
-		<property name="Deploy.ftpUser" value="" />
-		<property name="Deploy.ftpPsw" value="" />
-		
+				
 		<property name="Tools.minifierPath" value="C:/BuildTools/yuicompressor-2.4.7/build/yuicompressor-2.4.7.jar" />
 		<property name="Tools.htmlCompressorPath" value="C:/BuildTools/htmlcompressor/htmlcompressor-1.5.3.jar" />
 		<property name="Tools.pngQuantPath" value="C:/BuildTools/pngquant-windows/pngquant.exe" />
@@ -128,7 +117,7 @@
 					self.project.executeTarget("runTests");
 				}
 			
-				if(project.getProperty("Release.enable") == "true"){
+				if(project.getProperty("Release.enabled") == "true"){
 					self.project.executeTarget("createReleaseVersion");
 				}
 			
@@ -144,11 +133,19 @@
 					self.project.executeTarget("removeUnpackedFiles");
 				}
 			
+				if(project.getProperty("Deploy.LocalHost.enabled") == "true"){
+					self.project.executeTarget("deployLocalHost");
+				}
+			
+				if(project.getProperty("Deploy.Ftp.enabled") == "true"){
+					self.project.executeTarget("deployFtp");
+				}
+			
 		    ]]>
 		</script>		
 
 		<!-- Reset the Setup-Release.txt file so release build is not generated again if enabled -->
-		<echo file="../Setup-Release.txt" message="Release.enable = false" />
+		<echo file="../Setup-Release.txt" message="Release.enabled = false" />
 				
 	</target>
 	
@@ -599,7 +596,7 @@
 		<script language="javascript">
 			<![CDATA[
 				
-				if(project.getProperty("Release.enable") == "true"){
+				if(project.getProperty("Release.enabled") == "true"){
 					self.project.executeTarget("createPharsRelease");
 				}
 			
@@ -636,7 +633,7 @@
 		<script language="javascript">
 			<![CDATA[
 				
-				if(project.getProperty("Release.enable") == "true"){
+				if(project.getProperty("Release.enabled") == "true"){
 					self.project.executeTarget("createMergedJsRelease");
 				}
 			
@@ -672,10 +669,59 @@
 	</target>
 	
 	
-	<!-- Clean the project by removing the target folder -->
+	<!-- Deploy project files to the specified localhost location -->
+	<target name="deployLocalHost">
+		<sync todir="${Deploy.LocalHost.destPath}" overwrite="true">
+			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false">
+			</fileset>
+		</sync>
+	</target>
+	
+	
+	<!-- Deploy project files to the specified remote ftp location -->
+	<target name="deployFtp">
+		<ftp verbose="true" passive="true" userid="${Deploy.Ftp.user}" password="${Deploy.Ftp.psw}" server="${Deploy.Ftp.server}" remotedir="${Deploy.Ftp.destPath}" >
+			<fileset dir="${targetFolderPath}/${projectBaseName}/main" excludes="${Deploy.Ftp.ignore}">
+				<modified cache="propertyfile">
+					<param name="cache.cachefile" value="${cacheFilePath}" />
+				</modified>
+			</fileset>
+		</ftp>	
+	</target>
+	
+	
+	<!-- Clean all the project elements -->
 	<target name="clean" depends="defineGlobalProperties">
 		<delete file="${cacheFilePath}" failonerror="true" />
 		<delete dir="${targetFolderPath}" failonerror="true" />
+		<antcall target="cleanFtp" />
+		<antcall target="cleanLocalHost" />
 	</target>
 
+
+	<!-- Delete the localhost files if necessary -->
+	<target name="cleanLocalHost" if="${Deploy.LocalHost.enabled}">
+		<delete dir="${Deploy.LocalHost.destPath}" />
+	</target>
+	
+	
+	<!-- Clean the files on the ftp remote location if FTP deploy is enabled -->
+	<target name="cleanFtp" if="${Deploy.Ftp.enabled}">
+
+		<!-- Delete the remote ftp files -->
+		<ftp verbose="true" passive="true" action="delete" userid="${Deploy.Ftp.user}" password="${Deploy.Ftp.psw}" server="${Deploy.Ftp.server}" remotedir="/turbotest">
+			<fileset excludes="${Deploy.Ftp.ignore}">
+				<include name="/**" />
+			</fileset>
+		</ftp>
+
+		<!-- Delete the remote ftp folders -->
+		<ftp verbose="true" passive="true" action="rmdir" userid="${Deploy.Ftp.user}" password="${Deploy.Ftp.psw}" server="${Deploy.Ftp.server}" remotedir="/turbotest">
+			<fileset excludes="${Deploy.Ftp.ignore}">
+				<include name="/**" />
+			</fileset>
+		</ftp>
+
+	</target>
+		
 </project>
