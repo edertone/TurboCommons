@@ -10,23 +10,16 @@
 
 namespace com\edertone\turboCommons\src\main\php\managers;
 
+use com\edertone\turboCommons\src\main\php\model\BaseSingletonClass;
+use com\edertone\turboCommons\src\main\php\utils\BrowserUtils;
+use com\edertone\turboCommons\src\main\php\model\ErrorData;
+
 
 /**
- * A class that is used to encapsulate all the error management in a singleton class
+ * A class that is used to encapsulate the application error management.
+ * It will give total control regarding application exceptions, the way they are handled and notified.
  */
 class ErrorManager extends BaseSingletonClass{
-
-
-	/** The javascript error type*/
-	const JS = 'JS';
-
-
-	/** The PHP warning error type */
-	const PHP_WARNING = 'PHP_WARNING';
-
-
-	/** The php fatal error type */
-	const PHP_FATAL = 'PHP_FATAL';
 
 
 	/**
@@ -41,21 +34,21 @@ class ErrorManager extends BaseSingletonClass{
 	 * If an email address is specified, any error or warning that happens on the application will be sent to the specified address with all the detailed information.
 	 * Defaults to: tecnic@edertone.com
 	 */
-	public $errorsToMail = 'tecnic@edertone.com';
+	public $errorsToMail = '';
 
 
 	/**
 	 * List with error types to ignore when the current browser is detected as a bot or url crawler.
 	 * When the browser is detected as a bot or crawler and an error happens, if the type of the error matches one of this list, no browser output or email alerts will be launched.
-	 * Possible values for the list can be : ErrorManager::PHP_WARNING, ErrorManager::PHP_FATAL, ErrorManager::JS, ...
+	 * Possible values for the list can be : ErrorData::PHP_WARNING, ErrorData::PHP_FATAL, ErrorData::JS, ...
 	 */
-	public $ignoreBrowserBots = [self::JS];
+	public $ignoreBrowserBots = [];
 
 
 	/**
 	 * List with error types to ignore so they will never generate any email alert or browser output.
 	 * Note that once ignored, there will be no way to know if an error happened for these specified types.
-	 * Possible values for the list can be : ErrorManager::PHP_WARNING, ErrorManager::PHP_FATAL, ErrorManager::JS, ...
+	 * Possible values for the list can be : ErrorData::PHP_WARNING, ErrorData::PHP_FATAL, ErrorData::JS, ...
 	 * TODO: aixo no esta implementat del tot
 	 */
 	public $ignoreErrorTypes = [];
@@ -71,6 +64,21 @@ class ErrorManager extends BaseSingletonClass{
 	 * Auxiliary private array that stores all the messages that have been sent via mail on the current execution period, to prevent sending the same notifications multiple times
 	 */
 	private $_messagesSent = [];
+
+
+	/**
+	 * Returns the global ErrorManager singleton instance.
+	 *
+	 * @return ErrorManager The Error Manager instance.
+	 */
+	public static function getInstance(){
+
+		// This method is overriden from the singleton one simply to get correct
+		// autocomplete annotations when returning the instance
+		 $instance = parent::getInstance();
+
+		 return $instance;
+	}
 
 
 	/**
@@ -121,53 +129,12 @@ class ErrorManager extends BaseSingletonClass{
 
 
 	/**
-	 * Generates an associative array containing all the detailed information for an error.
-	 *
-	 * @param string $type The type of error we are creating. Possible values can be : ErrorManager::PHP_WARNING, ErrorManager::PHP_FATAL, ErrorManager::JS, ...
-	 * @param string $fileName The filename where the error happened
-	 * @param string $line The line of code where the error happened
-	 * @param string $message The error message
-	 * @param string $context The context for the error. Not always available.
-	 *
-	 * @return multitype:string unknown mixed Ambigous <string, unknown>
-	 */
-	public function createErrorData($type, $fileName, $line, $message, $context = ''){
-
-		$errorData = array();
-
-		$errorData['type'] = $type;
-
-		$errorData['fileName'] = $fileName;
-
-		$errorData['line'] = $line;
-
-		$errorData['message'] = $message;
-
-		$errorData['context'] = $context;
-
-		$errorData['fullUrl'] = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-
-		$errorData['referer'] = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
-
-		$errorData['usedMemory'] = number_format(memory_get_usage() / 1048576, 2).'M';
-
-		$errorData['getParams'] = print_r($_GET, true);
-
-		$errorData['postParams'] = print_r($_POST, true);
-
-		$errorData['trace'] = $this->getBackTrace();
-
-		return $errorData;
-	}
-
-
-	/**
 	 * If the php errors are setup to be output to the browser html code, this method will generate an alert that will be displayed as any other error message that is handled by this class.
 	 * This verification is very important, cause showing the errors on browser is very dangerous as gives a lot of information to malicious users.
 	 *
 	 * @return void
 	 */
-	public function checkBrowserOutputIsDisabled(){
+	private function _checkBrowserOutputIsDisabled(){
 
 		$message = '';
 
@@ -200,18 +167,22 @@ class ErrorManager extends BaseSingletonClass{
 
 		if($message != ''){
 
-			$errorData = $this->createErrorData(self::PHP_WARNING, '', '', $message.' Malicious users will get lots of information, please disable all php error browser output.');
+			$errorData = new ErrorData();
+			$errorData->type = ErrorData::PHP_WARNING;
+			$errorData->fileName = __FILE__;
+			$errorData->line = '';
+			$errorData->message = $message.' Malicious users will get lots of information, please disable all php error browser output.';
 
 			// Check if error needs to be sent by email
 			if($this->errorsToMail != ''){
 
-				$this->sendErrorToMail($errorData);
+				$this->_sendErrorToMail($errorData);
 			}
 
 			// Check if error needs to be sent to browser output
 			if($this->errorsToBrowser){
 
-				$this->sendErrorToBrowser($errorData);
+				$this->_sendErrorToBrowser($errorData);
 			}
 		}
 	}
@@ -220,45 +191,31 @@ class ErrorManager extends BaseSingletonClass{
 	/**
 	 * Output the given error to browser with a pretty html format
 	 *
-	 * @param array $errorData Associative array containing the error data.<br><br>
-	 * Data that should be defined:<br>
-	 * <i>- type:</i> The error type: PHP, JAVASCRIPT, etc<br>
-	 * <i>- fileName:</i> The script file name where the error occurred<br>
-	 * <i>- line:</i> The script line where the error occurred<br>
-	 * <i>- fullUrl:</i> The full browser URL when the error occurred<br>
-	 * <i>- referer:</i> The url that created the link to the current full url. Useful to trace which url generated this one. (It may not be always available)
-	 * <i>- message:</i> The error description message<br><br>
+	 * @param ErrorData $errorData An ErrorData entity instance containing the information of an exception to send.
 	 *
-	 * Extra error data (not mandatory):<br>
-	 * <i>- usedMemory:</i> The script used memory<br>
-	 * <i>- getParams:</i> The current PHP GET params state when the error occurred<br>
-	 * <i>- postParams:</i> The current PHP POST params state when the error occurred<br>
-	 * <i>- trace:</i> The error trace<br>
-	 * <i>- context:</i> The error context<br><br>
-
 	 * @return void
 	 */
-	public function sendErrorToBrowser(array $errorData){
+	private function _sendErrorToBrowser(ErrorData $errorData){
 
 		// If php errors are ignored, we will skip the error
-		if(in_array($errorData['type'], $this->ignoreErrorTypes)){
+		if(in_array($errorData->type, $this->ignoreErrorTypes)){
 
 			return;
 		}
 
 		// If the current browser is detected as a bot and we want to ignore bots and crawlers, we will skip the error
-		if(in_array($errorData['type'], $this->ignoreBrowserBots) && BrowserUtils::isABot()){
+		if(in_array($errorData->type, $this->ignoreBrowserBots) && BrowserUtils::isABot()){
 
 			return;
 		}
 
-		echo '<br><b>'.$errorData['message'].'</b> '.$errorData['fileName'];
+		echo '<br><b>'.$errorData->message.'</b> -- '.$errorData->fileName;
 
-		if(isset($errorData['line'])){
+		if(isset($errorData->line)){
 
-			if($errorData['line'] != ''){
+			if($errorData->line != ''){
 
-				echo ' line '.$errorData['line'];
+				echo ' line '.$errorData->line;
 			}
 		}
 
@@ -271,38 +228,38 @@ class ErrorManager extends BaseSingletonClass{
 	 * <i>- Browser:</i> The browser info.<br>
 	 * <i>- Cookies:</i> The current cookies state when the error occurred.<br><br>
 	 *
-	 * @param array $errorData see ErrorManager::sendErrorToBrowser
+	 * @param ErrorData $errorData see ErrorManager::_sendErrorToBrowser
 	 *
-	 * @see ErrorManager::sendErrorToBrowser
+	 * @see ErrorManager::_sendErrorToBrowser
 	 *
 	 * @return void
 	 */
-	public function sendErrorToMail(array $errorData){
+	private function _sendErrorToMail(ErrorData $errorData){
 
 		// No error type means nothing to do
-		if(!isset($errorData['type']) || !isset($errorData['fileName'])){
+		if($errorData->type == '' || $errorData->fileName == ''){
 
 			return;
 		}
 
 		// If php errors are ignored, we will skip the error
-		if(in_array($errorData['type'], $this->ignoreErrorTypes)){
+		if(in_array($errorData->type, $this->ignoreErrorTypes)){
 
 			return;
 		}
 
 		// If the current browser is detected as a bot and we want to ignore bots and crawlers, we will skip the error
-		if(in_array($errorData['type'], $this->ignoreBrowserBots) && BrowserUtils::isABot()){
+		if(in_array($errorData->type, $this->ignoreBrowserBots) && BrowserUtils::isABot()){
 
 			return;
 		}
 
 		// If the error type is Javascript, we will skip non useful errors
 		// TODO: aixo caldra tractar-ho al errormanager de javascript, aqui no te sentit
-		if(strtolower($errorData['type']) == 'javascript'){
+		if(strtolower($errorData->type) == 'javascript'){
 
 			// Full js file path must contain the current project domain. Otherwise the error is being raised by an external js file and we won't care.
-			if(strpos($errorData['fileName'], $_SERVER['HTTP_HOST']) === false){
+			if(strpos($errorData->fileName, $_SERVER['HTTP_HOST']) === false){
 
 				return;
 			}
@@ -315,65 +272,65 @@ class ErrorManager extends BaseSingletonClass{
 		}
 
 		// We will split the filename from its path to send them sepparated via mail
-		if(isset($errorData['fileName'])){
+		if(isset($errorData->fileName)){
 
-			$name = str_replace('\\', '/', $errorData['fileName']);
+			$name = str_replace('\\', '/', $errorData->fileName);
 
 			if(strpos($name, '/') !== false){
 				$name = substr(strrchr($name, '/'), 1);
 			}
-			$errorData['filePath'] = $errorData['fileName'];
-			$errorData['fileName'] = $name;
+			$errorData->filePath = $errorData->fileName;
+			$errorData->fileName = $name;
 		}
 
 		// Define the full URL
-		$fullUrl = isset($errorData['fullUrl']) ? $errorData['fullUrl'] : 'Unknown';
+		$fullUrl = isset($errorData->fullUrl) ? $errorData->fullUrl : 'Unknown';
 
 		// Define the referer url if exists
-		$refererUrl = isset($errorData['referer']) ? $errorData['referer'] : '';
+		$refererUrl = isset($errorData->referer) ? $errorData->referer : '';
 
 		// Define the email subject
-		$subject  = $errorData['type'].' for '.str_replace('http://www.', '', $fullUrl).' (Script: '.$errorData['fileName'].') IP:'.$_SERVER['REMOTE_ADDR'];
+		$subject  = $errorData->type.' for '.str_replace('http://www.', '', $fullUrl).' (Script: '.$errorData->fileName.') IP:'.$_SERVER['REMOTE_ADDR'];
 
 		// Define the email message
-		$errorMessage  = 'Error type: '.(isset($errorData['type']) ? $errorData['type'] : 'Unknown')."\n\n";
+		$errorMessage  = 'Error type: '.(isset($errorData->type) ? $errorData->type : 'Unknown')."\n\n";
 		$errorMessage .= 'IP: '.$_SERVER['REMOTE_ADDR']."\n\n";
-		$errorMessage .= 'Line: '.(isset($errorData['line']) ? $errorData['line'] : 'Unknown')."\n";
-		$errorMessage .= 'File name: '.(isset($errorData['fileName']) ? $errorData['fileName'] : 'Unknown')."\n";
-		$errorMessage .= 'File path: '.(isset($errorData['filePath']) ? $errorData['filePath'] : 'Unknown')."\n";
+		$errorMessage .= 'Line: '.(isset($errorData->line) ? $errorData->line : 'Unknown')."\n";
+		$errorMessage .= 'File name: '.(isset($errorData->fileName) ? $errorData->fileName : 'Unknown')."\n";
+		$errorMessage .= 'File path: '.(isset($errorData->filePath) ? $errorData->filePath : 'Unknown')."\n";
 		$errorMessage .= 'Full URL: '.$fullUrl."\n";
 		$errorMessage .= 'Referer URL: '.$refererUrl."\n\n";
-		$errorMessage .= 'Message: '.(isset($errorData['message']) ? $errorData['message'] : 'Unknown')."\n\n";
+		$errorMessage .= 'Message: '.(isset($errorData->message) ? $errorData->message : 'Unknown')."\n\n";
 		$errorMessage .= 'Browser: '.$_SERVER['HTTP_USER_AGENT']."\n\n";
 		$errorMessage .= 'Cookies: '.print_r($_COOKIE, true)."\n\n";
 
-		if(isset($errorData['getParams'])){
-			$errorMessage .= 'GET params: '.$errorData['getParams']."\n\n";
+		if(isset($errorData->getParams)){
+			$errorMessage .= 'GET params: '.$errorData->getParams."\n\n";
 		}
 
-		if(isset($errorData['postParams'])){
-			$errorMessage .= 'POST params: '.$errorData['postParams']."\n\n";
+		if(isset($errorData->postParams)){
+			$errorMessage .= 'POST params: '.$errorData->postParams."\n\n";
 		}
 
 		// Create a string that will be used to compare already sent messages
 		$messageCompare = $this->errorsToMail.$subject.$errorMessage;
 
 		// Add more information related to memory and app context
-		if(isset($errorData['usedMemory'])){
-			$errorMessage .= 'Used memory: '.$errorData['usedMemory'].' of '.ini_get('memory_limit')."\n\n";
+		if(isset($errorData->usedMemory)){
+			$errorMessage .= 'Used memory: '.$errorData->usedMemory.' of '.ini_get('memory_limit')."\n\n";
 		}
 
 		// Add the error trace if available
-		if(isset($errorData['trace'])){
+		if(isset($errorData->trace)){
 
-			if($errorData['trace'] != ''){
+			if($errorData->trace != ''){
 
-				$errorMessage .= 'Trace: '.substr($errorData['trace'], 0, 20000).'...'."\n\n";
+				$errorMessage .= 'Trace: '.substr($errorData->trace, 0, 20000).'...'."\n\n";
 			}
 		}
 
-		if(isset($errorData['context'])){
-			$errorMessage .= 'Context: '.substr($errorData['context'], 0, 20000).'...'."\n\n";
+		if(isset($errorData->context)){
+			$errorMessage .= 'Context: '.substr($errorData->context, 0, 20000).'...'."\n\n";
 		}
 
 		// If this same error message has already been sent, we wont send it again.
@@ -391,7 +348,7 @@ class ErrorManager extends BaseSingletonClass{
 		if(!@mail($this->errorsToMail, $subject, $errorMessage) || $_SERVER['HTTP_HOST'] == 'localhost'){
 
 			// @codingStandardsIgnoreEnd
-			trigger_error($errorData['message'].(isset($errorData['trace']) ? $errorData['trace'] : ''), E_USER_WARNING);
+			trigger_error($errorData->message.(isset($errorData->trace) ? $errorData->trace : ''), E_USER_WARNING);
 		}
 
 		// Store the message to the list of currently sent messages
@@ -404,52 +361,52 @@ class ErrorManager extends BaseSingletonClass{
 	 *
 	 * @return array Associative array containing the error information that is found on the $_POST php object
 	 */
-	public function getErrorDataFromPost(){
+	private function _getErrorDataFromPost(){
 
 		$errorData = array();
 
 		if(isset($_POST['type'])){
-			$errorData['type'] = $_POST['type'];
+			$errorData->type = $_POST['type'];
 		}
 
 		if(isset($_POST['fullUrl'])){
-			$errorData['fullUrl'] = $_POST['fullUrl'];
+			$errorData->fullUrl = $_POST['fullUrl'];
 		}
 
 		if(isset($_POST['referer'])){
-			$errorData['referer'] = $_POST['referer'];
+			$errorData->referer = $_POST['referer'];
 		}
 
 		if(isset($_POST['fileName'])){
-			$errorData['fileName'] = $_POST['fileName'];
+			$errorData->fileName = $_POST['fileName'];
 		}
 
 		if(isset($_POST['line'])){
-			$errorData['line'] = $_POST['line'];
+			$errorData->line = $_POST['line'];
 		}
 
 		if(isset($_POST['message'])){
-			$errorData['message'] = $_POST['message'];
+			$errorData->message = $_POST['message'];
 		}
 
 		if(isset($_POST['type'])){
-			$errorData['type'] = $_POST['type'];
+			$errorData->type = $_POST['type'];
 		}
 
 		if(isset($_POST['getParams'])){
-			$errorData['getParams'] = $_POST['getParams'];
+			$errorData->getParams = $_POST['getParams'];
 		}
 
 		if(isset($_POST['postParams'])){
-			$errorData['postParams'] = $_POST['postParams'];
+			$errorData->postParams = $_POST['postParams'];
 		}
 
 		if(isset($_POST['trace'])){
-			$errorData['trace'] = $_POST['trace'];
+			$errorData->trace = $_POST['trace'];
 		}
 
 		if(isset($_POST['context'])){
-			$errorData['context'] = $_POST['context'];
+			$errorData->context = $_POST['context'];
 		}
 
 		return $errorData;
@@ -506,18 +463,23 @@ class ErrorManager extends BaseSingletonClass{
 					break;
 			}
 
-			$errorData = ErrorManager::getInstance()->createErrorData(ErrorManager::PHP_WARNING, $errorFile, $errorLine, $type.': '.$errorMessage, print_r($errorContext, true));
+			$errorData = new ErrorData();
+			$errorData->type = ErrorData::PHP_WARNING;
+			$errorData->fileName = $errorFile;
+			$errorData->line = $errorLine;
+			$errorData->message = $type.': '.$errorMessage;
+			$errorData->context = print_r($errorContext, true);
 
 			// Check if error needs to be sent by email
 			if(ErrorManager::getInstance()->errorsToMail != ''){
 
-				ErrorManager::getInstance()->sendErrorToMail($errorData);
+				ErrorManager::getInstance()->_sendErrorToMail($errorData);
 			}
 
 			// Check if error needs to be sent to browser output
 			if(ErrorManager::getInstance()->errorsToBrowser){
 
-				ErrorManager::getInstance()->sendErrorToBrowser($errorData);
+				ErrorManager::getInstance()->_sendErrorToBrowser($errorData);
 			}
 		});
 	}
@@ -537,23 +499,27 @@ class ErrorManager extends BaseSingletonClass{
 			if($error['type'] == E_ERROR || $error['type'] == E_USER_ERROR || $error['type'] == E_CORE_ERROR ||
 					$error['type'] == E_COMPILE_ERROR || $error['type'] == E_RECOVERABLE_ERROR || $error['type'] == E_PARSE){
 
-				$errorData = ErrorManager::getInstance()->createErrorData(ErrorManager::PHP_FATAL, $error['file'], $error['line'], $error['message']);
+				$errorData = new ErrorData();
+				$errorData->type = ErrorData::PHP_FATAL;
+				$errorData->fileName = $error['file'];
+				$errorData->line = $error['line'];
+				$errorData->message = $error['message'];
 
 				// Check if error needs to be sent by email
 				if(ErrorManager::getInstance()->errorsToMail != ''){
 
-					ErrorManager::getInstance()->sendErrorToMail($errorData);
+					ErrorManager::getInstance()->_sendErrorToMail($errorData);
 				}
 
 				// Check if error needs to be sent to browser output
 				if(ErrorManager::getInstance()->errorsToBrowser){
 
-					ErrorManager::getInstance()->sendErrorToBrowser($errorData);
+					ErrorManager::getInstance()->_sendErrorToBrowser($errorData);
 				}
 			}
 
 			// This is called here to perform this verification at the end of the current script, and launch a warning if necessary
-			ErrorManager::getInstance()->checkBrowserOutputIsDisabled();
+			ErrorManager::getInstance()->_checkBrowserOutputIsDisabled();
 		});
 	}
 }

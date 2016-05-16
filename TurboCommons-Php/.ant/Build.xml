@@ -334,7 +334,7 @@
 	<target name="createGitChangeLog">
 
 		<!-- Create the changelog file -->
-		<property name="changeLogFilePath" value="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/changelog.txt" />
+		<property name="changeLogFilePath" value="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/Changelog.txt" />
 		<touch file="${changeLogFilePath}"/>
 		
 		<!-- Write the changelog file header -->
@@ -613,7 +613,7 @@
 		<exec executable="${Tools.phpPath}" failonerror="true">
 			<arg value="-d display_errors" />
 			<arg value="-r" />
-			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/${projectBaseName}-${Build.versionNumber}.${build.number}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}-${Build.versionNumber}.${build.number}.phar'); $p->startBuffering(); $p->setStub('${phpStubFile}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main'); $p->stopBuffering();" />
+			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/${projectBaseName}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}-${Build.versionNumber}.${build.number}.phar'); $p->startBuffering(); $p->setStub('${phpStubFile}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main'); $p->stopBuffering();" />
 		</exec>
 			
 	</target>
