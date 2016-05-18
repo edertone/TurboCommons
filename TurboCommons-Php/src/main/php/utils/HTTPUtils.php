@@ -11,9 +11,6 @@
 namespace com\edertone\turboCommons\src\main\php\utils;
 
 
-require_once __DIR__.'/StringUtils.php';
-
-
 /**
  * This class contains a collection of methods that are related to the most common http operations.
  */
@@ -21,81 +18,24 @@ class HTTPUtils{
 
 
 	/**
-	 * Process the value for the given GET or POST variable by formatting it depending on if it is set or not and the requested data type.
+	 * Obtain the value for the specified GET variable
 	 *
-	 * @param string $key The GET or POST variable name that we want to process
-	 * @param mixed $unSetValue The value that will be returned if the requested variable is not set. The type of this parameter will also determine the type of the function result when the value is set.
-	 * @param string $method POST by default. The http method we are using: GET or POST. There's a special value ANY that will try to get the value from POST or GET if not exists.
-	 *
-	 * @return mixed The value for the given variable. If not set, the 'notSetValue' will be given. If set, the value will be also converted to the type of the notSetValue variable.
+	 * @return string The GET parameter value for the specified key
 	 */
-	public static function formatVAR($key, $unSetValue = '', $method = 'POST'){
+	public static function get($key){
 
-		// Check if the specified variable is set or not
-		$isset = false;
-
-		switch($method){
-
-			case 'POST':
-				$isset = isset($_POST[$key]);
-				break;
-
-			case 'GET':
-				$isset = isset($_GET[$key]);
-				break;
-
-			case 'ANY':
-				$isset = (isset($_POST[$key]) | isset($_GET[$key]));
-				break;
-
-			default:
-				$isset = false;
-				break;
-		}
-
-		if($isset){
-
-			switch($method){
-
-				case 'POST':
-					$value = $_POST[$key];
-					break;
-
-				case 'GET':
-					$value = $_GET[$key];
-					break;
-
-				case 'ANY':
-					$value = isset($_POST[$key]) ? $_POST[$key] : isset($_GET[$key]) ? $_GET[$key] : '';
-					break;
-			}
-
-			if(is_bool($unSetValue)){
-
-				return ($value == '0' || $value == 'false') ? false : true;
-
-			}else{
-
-				return $value;
-			}
-
-		}else{
-
-			return $unSetValue;
-		}
+		return (isset($_GET[$key])) ? $_GET[$key] : '';
 	}
 
 
 	/**
-	 * Get the full filename for the current php script that is being executed. Result will include the file extension but not the path where the file resides.
-	 * Example: Home.php
+	 * Obtain the value for the specified POST variable
 	 *
-	 * @return string
+	 * @return string The POST parameter value for the specified key
 	 */
-	public static function getCurrentFileName(){
+	public static function post($key){
 
-		return basename($_SERVER['PHP_SELF']);
-
+		return (isset($_POST[$key])) ? $_POST[$key] : '';
 	}
 
 
@@ -104,10 +44,9 @@ class HTTPUtils{
 	 *
 	 * @return string
 	 */
-	public static function getCurrentDomain(){
+	public static function getDomain(){
 
 		return $_SERVER['HTTP_HOST'];
-
 	}
 
 
@@ -116,16 +55,15 @@ class HTTPUtils{
 	 *
 	 * @return string
 	 */
-	public static function getCurrentFullURL(){
+	public static function getFullURL(){
 
 		return 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-
 	}
 
 
 	/**
 	 * This method will get the output of the given URL, letting us send POST or GET parameters.
-	 * WARNING IMPORTANT! - The flag "allow_url_fopen" must be set to TRUE on php.ini for this method to work, otherwise it will FUCKING FAIL
+	 * WARNING IMPORTANT! - The flag "allow_url_fopen" must be set to TRUE on php.ini for this method to work, otherwise it will FAIL
 	 *
 	 * @param string $url		The url to get it's contents. It must be an absolute path like http://www.xxx.com/yyy/file.php
 	 * @param string $params	Array with parameters that will be passed to the url. example: array('a' => 1, 'b' => 2)
@@ -150,7 +88,6 @@ class HTTPUtils{
 
 		// Do the request and return it's result
 		return file_get_contents($url, false, stream_context_create($context_options));
-
 	}
 
 
@@ -162,14 +99,13 @@ class HTTPUtils{
    	 * @param string $params	Array with parameters that will be passed to the url with the specified method
    	 * @param string $method	POST or GET depending on the script needs. By default is POST
    	 *
-   	 * @return An object containing the converted XML output given by the URL.
+   	 * @return \SimpleXMLElement An object containing the converted XML output given by the URL.
    	 */
-	public static function getUrlContentsXML($url, $params, $method = 'POST'){
+	public static function getUrlContentsAsXML($url, $params, $method = 'POST'){
 
 		$xml = self::getUrlContents($url, $params, $method);
 
 		return simplexml_load_string($xml);
-
 	}
 
 
@@ -185,7 +121,6 @@ class HTTPUtils{
 		header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 		header('Cache-Control: post-check=0, pre-check=0', false);
 		header('Pragma: no-cache');
-
 	}
 
 
@@ -247,13 +182,14 @@ class HTTPUtils{
 				$server = 'whois.crsnic.net';
 				$pattern = 'No match for ';
 				break;
-
 		}
 
 		// we normally use the "$errno: $errstr" to show if something's happened instead of "1". But in this case, we must return a 1 value if
 		// no communication is obtained, so our users can continue using the app
-		if(!($fp = fsockopen ($server, 43, $errnr, $errstr, 20)))
+		if(!($fp = fsockopen ($server, 43, $errnr, $errstr, 20))){
+
 			die(1);
+		}
 
 		fputs($fp, $domain."\n");
 
@@ -262,17 +198,16 @@ class HTTPUtils{
 			$serverReturn = fgets($fp, 2048);
 
 			if(substr_count($serverReturn, $pattern) > 0){
+
 				fclose($fp);
 				return true;
 			}
-
 		}
 
 		fclose($fp);
 
 		return false;
 	}
-
 }
 
 ?>

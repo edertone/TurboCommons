@@ -154,7 +154,7 @@
 					
 					<xs:complexType>
 					
-						<xs:attribute name="runTests" use="required" type="xs:boolean">
+						<xs:attribute name="runTests" use="required" type="xs:boolean" default="false">
 							<xs:annotation>
 								<xs:documentation>Specifies if unit tests located on the src/test folder must be executed as part of the build process or not.</xs:documentation>
 							</xs:annotation>

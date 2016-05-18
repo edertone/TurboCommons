@@ -32,6 +32,25 @@ class BrowserUtils{
 
 
 	/**
+	 * Tries to detect the current browser preferred language.
+	 *
+	 * @return string A two digits string containing the detected browser language. For example 'es', 'en', ...
+	 */
+	public static function detectLanguage(){
+
+		$lan = '';
+
+		if(isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])){
+
+			$lan = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+
+			$lan = strtolower(substr(chop($lan[0]), 0, 2));
+		}
+
+		return $lan;
+	}
+
+	/**
 	 * Redirects the browser to the specified page. Note that as this method uses headers, no output can be written before performing the redirect or it will fail.
 	 *
 	 * @param string $url The url where the browser will be redirected.
