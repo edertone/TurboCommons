@@ -8,8 +8,7 @@
  * CopyRight : -> Copyright 2015 Edertone Advanded Solutions (08211 Castellar del Vallès, Barcelona). http://www.edertone.com
  */
 
-namespace com\edertone\turboDB\src\test\php\managers;
-
+namespace com\edertone\turboCommons\src\test\php\managers;
 
 use PHPUnit_Framework_TestCase;
 use com\edertone\turboCommons\src\main\php\utils\StringUtils;
@@ -24,7 +23,7 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
-	 * TestisEmpty
+	 * testIsEmpty
 	 *
 	 * @return void
 	 */
@@ -38,6 +37,19 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(!StringUtils::isEmpty('    sdfasdsf'));
 	}
 
+
+	/**
+	 * TestFormatPath
+	 *
+	 * @return void
+	 */
+	public function testFormatPath(){
+
+		$this->assertTrue(StringUtils::formatPath('test//test/') == 'test'.DIRECTORY_SEPARATOR.'test');
+		$this->assertTrue(StringUtils::formatPath('////test//////test////') == DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'test');
+		$this->assertTrue(StringUtils::formatPath('\\\\////test//test/') == DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'test');
+		$this->assertTrue(StringUtils::formatPath('test\test/hello\\\\') == 'test'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'hello');
+	}
 }
 
 ?>

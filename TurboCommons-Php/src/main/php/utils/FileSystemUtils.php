@@ -11,8 +11,23 @@
 namespace com\edertone\turboCommons\src\main\php\utils;
 
 
-/** File system utils */
+/**
+ * Class that helps with the most common file system operations
+ */
 class FileSystemUtils{
+
+
+	/**
+	 * Check if the specified path is a file or not
+	 *
+	 * @param string $path The (supposed) file path
+	 *
+	 * @return bool true if the path exists and is a file, false otherwise.
+	 */
+	public static function isFile($path){
+
+		return is_file($path);
+	}
 
 
 	/**
@@ -40,7 +55,7 @@ class FileSystemUtils{
 
 
 	/**
-	 * Create a directory to the specified filesystem path
+	 * Create a directory at the specified filesystem path
 	 *
 	 * @param string $path The full path to the directoy we want to create
 	 * @param int $mode Is 0755 by default, which means the widest possible access. Ignored on windows
@@ -204,7 +219,7 @@ class FileSystemUtils{
 	 */
 	public static function deleteDirectory($path, $deleteDirectoryItself = true){
 
-		$path = StringUtils::formatFilePath($path);
+		$path = StringUtils::formatPath($path);
 
 		if (!file_exists($path)){
 
@@ -334,13 +349,13 @@ class FileSystemUtils{
 	 *
 	 * @param string $path The file full path
 	 *
-	 * @return string The file contents (binary or string), an empty string if the file does not exist or false if the file cannot be read.
+	 * @return string The file contents (binary or string), false if the file does not exist or cannot be read.
 	 */
 	public static function readFile($path){
 
 		if(!is_file($path)){
 
-			return '';
+			return false;
 		}
 
 		return file_get_contents($path, true);

@@ -92,58 +92,6 @@ class StringUtils {
 
 
     /**
-     * Clean latin and strange accents from a string. String encoding is utf8 by default
-     *
-     * @param string $str String to remove accents
-     * @param string $charset Sort of charset
-     *
-     * @return mixed
-     */
-    public static function removeAccents($str, $charset='utf-8'){
-
-    	$str = htmlentities($str, ENT_NOQUOTES, $charset);
-
-	    $str = preg_replace('#&([A-za-z])(?:acute|cedil|circ|grave|orn|ring|slash|th|tilde|uml);#', '\1', $str);
-	    $str = preg_replace('#&([A-za-z]{2})(?:lig);#', '\1', $str);
-	    $str = preg_replace('#&[^;]+;#', '', $str);
-
-	    return $str;
-
-    }
-
-
-	/**
-	 * Full text search is the official name for the process of searching on a big text content based on a string containing text to find.
-	 * This method will process a text so it removes all the accents and non alphanumerical characters that are not usefull for searching on strings,
-	 * and converts everything to lower case.
-	 * To perform the search it is important that both search and searched strings are standarized the same way, to maximize possible matches.
-	 *
-	 * @param string $string String to process
-	 * @param string $wordSepparator The character that will be used as the word sepparator. By default it is the empty space character ' '
-	 *
-	 * @return string The resulting string
-	 */
-    public static function processForFullTextSearch($string, $wordSepparator = ' '){
-
-    	// Remove accents
-    	$res = self::removeAccents($string);
-
-    	// make all lowercase
-    	$res = strtolower($res);
-
-    	// Take only alphanumerical characters, but keep the spaces
-    	$res = preg_replace('/[^a-z0-9 ]/', '', $res);
-
-    	if($wordSepparator != ' '){
-
-    		$res = str_replace(' ', $wordSepparator, $res);
-    	}
-
-    	return $res;
-    }
-
-
-    /**
      * Extracts all the lines from the given string. It does not matter which line sepparator's been used (Windows, linux...)
      *
      * Any empty line will be discarded
@@ -226,9 +174,7 @@ class StringUtils {
     	}else{
 
     		return array_slice($res, 0, $max);
-
     	}
-
     }
 
 
@@ -301,16 +247,53 @@ class StringUtils {
      *
      * @return string The correctly formated path
      */
-    public static function formatFilePath($path){
+    public static function formatPath($path){
 
     	// Replace all slashes on the path to the os default
     	$res = str_replace('/', DIRECTORY_SEPARATOR, $path);
     	$res = str_replace('\\', DIRECTORY_SEPARATOR, $res);
 
+    	// Remove duplicate path separator characters
+    	while(strpos($res, DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR) !== false) {
+
+    		$res = str_replace(DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $res);
+    	}
+
     	// Remove the last slash only if it exists, to prevent duplicate directory separator
     	if(substr($res, strlen($res) - 1) == DIRECTORY_SEPARATOR){
 
     		$res = substr($res, 0, strlen($res) - 1);
+    	}
+
+    	return $res;
+    }
+
+
+    /**
+     * Full text search is the official name for the process of searching on a big text content based on a string containing text to find.
+     * This method will process a text so it removes all the accents and non alphanumerical characters that are not usefull for searching on strings,
+     * and converts everything to lower case.
+     * To perform the search it is important that both search and searched strings are standarized the same way, to maximize possible matches.
+     *
+     * @param string $string String to process
+     * @param string $wordSepparator The character that will be used as the word sepparator. By default it is the empty space character ' '
+     *
+     * @return string The resulting string
+     */
+    public static function formatForFullTextSearch($string, $wordSepparator = ' '){
+
+    	// Remove accents
+    	$res = self::removeAccents($string);
+
+    	// make all lowercase
+    	$res = strtolower($res);
+
+    	// Take only alphanumerical characters, but keep the spaces
+    	$res = preg_replace('/[^a-z0-9 ]/', '', $res);
+
+    	if($wordSepparator != ' '){
+
+    		$res = str_replace(' ', $wordSepparator, $res);
     	}
 
     	return $res;
@@ -348,6 +331,27 @@ class StringUtils {
 	    }
 
 	    return $pass;
+
+	}
+
+
+	/**
+	 * Clean latin and strange accents from a string. String encoding is utf8 by default
+	 *
+	 * @param string $str String to remove accents
+	 * @param string $charset Sort of charset
+	 *
+	 * @return mixed
+	 */
+	public static function removeAccents($str, $charset='utf-8'){
+
+		$str = htmlentities($str, ENT_NOQUOTES, $charset);
+
+		$str = preg_replace('#&([A-za-z])(?:acute|cedil|circ|grave|orn|ring|slash|th|tilde|uml);#', '\1', $str);
+		$str = preg_replace('#&([A-za-z]{2})(?:lig);#', '\1', $str);
+		$str = preg_replace('#&[^;]+;#', '', $str);
+
+		return $str;
 
 	}
 
@@ -415,22 +419,6 @@ class StringUtils {
 
 		return implode(' ', $res);
 
-	}
-
-
-	/**
-	 * If we have a string that contains some sort of prefix that is appended by a sepparator, and we want to remove it, we can use this method.
-	 *
-	 * @param string $string The string to process
-	 * @param string $sepparator The character or characters that are used to sepparate the string prefix from the string itself
-	 *
-	 * @return string The string without the prefix, based on the given sepparator. For example: pre-string woud become string if we specify - as the sepparator.
-	 */
-	public static function removePrefix($string, $sepparator) {
-
-		$tmp = explode('*', $string, 2);
-
-		return array_pop($tmp);
 	}
 
 

@@ -475,6 +475,56 @@ class SerializationUtils{
 
 
 	/**
+	 * Convert a string containing the contents of a Java .properties file to an associative array.
+	 *
+	 * @param string $str String containing the contents of a .properties Java file
+	 *
+	 * @return array The properties format parsed as an associative array
+	 */
+	public static function propertiesToArray($str){
+
+		$key = '';
+		$result = [];
+		$lines = StringUtils::extractLines($str);
+		$isWaitingOtherLine = false;
+
+		foreach($lines as $i=>$line) {
+
+			if(!$isWaitingOtherLine && strpos($line, '#') === 0){
+
+				continue;
+			}
+
+			if(!$isWaitingOtherLine) {
+
+				$key = substr($line,0, strpos($line,'='));
+				$value = substr($line, strpos($line,'=') + 1, strlen($line));
+
+			}else{
+
+				$value .= $line;
+			}
+
+			// Check if ends with single '\'
+			if(strrpos($value,'\\') === strlen($value)-strlen('\\')) {
+
+				$value = substr($value, 0, strlen($value)-1)."\n";
+				$isWaitingOtherLine = true;
+
+			}else{
+
+				$isWaitingOtherLine = false;
+			}
+
+			$result[$key] = $value;
+			unset($lines[$i]);
+		}
+
+		return $result;
+	}
+
+
+	/**
 	 * Convert a received xml structure to the related class or structure of classes.
 	 * Class properties are read from the xml attributes on the root node. Each child node will be parsed to an array
 	 * of entities, and will be stored on the class property that has the same name as the node. Each entity on the array

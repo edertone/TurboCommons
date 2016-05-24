@@ -42,7 +42,7 @@ class BaseStrictClass {
 	 */
 	public function __set($name, $value) {
 
-		throw new Exception('ShoppingCartManager property '.$name.' does not exist');
+		throw new Exception(get_class($this).' property '.$name.' does not exist');
 	}
 
 
