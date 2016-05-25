@@ -421,6 +421,32 @@ class SerializationUtils{
 
 
 	/**
+	 * Convert a JSON string to the respective PHP object
+ 	 *
+ 	 * @param string $json The JSON string that contains the defined object.
+	 *
+	 * @return Object A Php object representation for the received json string
+	 */
+	public static function jsonToObject($json){
+
+		return json_decode($json, false);
+	}
+
+
+	/**
+	 * Convert a PHP generical object (stdClass) to the respective JSON Object
+	 *
+	 * @param stClass $object The Php object that will be converted to json
+	 *
+	 * @return string The string json representation for the given PHP object
+	 */
+	public static function objectToJson($object){
+
+		return json_encode(get_object_vars($object));
+	}
+
+
+	/**
 	 * Read all the currently defined POST variables and store them on the respective property (a property with the same name) for the given class instance.
 	 *
 	 * @param Object $class The class instance that will be filled with the POST data
@@ -449,32 +475,6 @@ class SerializationUtils{
 
 
 	/**
-	 * Convert a JSON string to the respective PHP object
- 	 *
- 	 * @param string $json The JSON string that contains the defined object.
-	 *
-	 * @return Object A Php object representation for the received json string
-	 */
-	public static function jsonToObject($json){
-
-		return json_decode($json, false);
-	}
-
-
-	/**
-	 * Convert a PHP generical object (stdClass) to the respective JSON Object
-	 *
-	 * @param stClass $object The Php object that will be converted to json
-	 *
-	 * @return string The string json representation for the given PHP object
-	 */
-	public static function objectToJson($object){
-
-		return json_encode(get_object_vars($object));
-	}
-
-
-	/**
 	 * Convert a string containing the contents of a Java .properties file to an associative array.
 	 *
 	 * @param string $str String containing the contents of a .properties Java file
@@ -490,15 +490,21 @@ class SerializationUtils{
 
 		foreach($lines as $i=>$line) {
 
-			if(!$isWaitingOtherLine && strpos($line, '#') === 0){
+			if(!$isWaitingOtherLine && (strpos($line, '#') === 0 || strpos($line, '!') === 0)){
 
 				continue;
 			}
 
 			if(!$isWaitingOtherLine) {
 
-				$key = substr($line,0, strpos($line,'='));
-				$value = substr($line, strpos($line,'=') + 1, strlen($line));
+				$key = trim(substr($line,0, strpos($line,'=')));
+				$value = ltrim(substr($line, strpos($line,'=') + 1, strlen($line)));
+
+				// Replace escaped characters with the real values
+				$value = str_replace(['\#', '\!', '\=', '\:'], ['#', '!', '=', ':'], $value);
+
+				// Decode unicode characters
+				$value = json_decode('"'.$value.'"');
 
 			}else{
 
