@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
+	
+	<!-- DEFINITION FOR THE SIMPLE TYPES -->
+	<xs:simpleType name="phpTestsMode">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="commandLine" />
+			<xs:enumeration value="localWebServer" />
+		</xs:restriction>
+	</xs:simpleType>
+		
+
 	<!-- DEFINITION FOR THE ROOT SETUP ELEMENT -->
 	<xs:element name="SetupBuild">
 		
@@ -154,20 +164,68 @@
 					
 					<xs:complexType>
 					
-						<xs:attribute name="runTests" use="optional" type="xs:boolean" default="false">
-							<xs:annotation>
-								<xs:documentation>Specifies if unit tests located on the src/test folder must be executed as part of the build process or not.</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>	
-						
-						<xs:attribute name="localHostTestPath" use="required" type="xs:string">
-							<xs:annotation>
-								<xs:documentation>A local server is required to correctly run the tests, so this value specifies a path to that local server http documents folder.
-									A subfolder called "ProjectName-unitTests" will be created when running the tests, and removed once tests are finished.&lt;br&gt;&lt;br&gt;
-									Example: C:/xampp/htdocs/unitTests
-								</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>		
+						<xs:sequence>
+					
+							<!-- Php element -->
+							<xs:element name="Php" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>Contains the configuration for the automatic PHP unit tests when building the project</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+								
+									<xs:attribute name="enabled" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>Enable or disable the php unit tests as part of the build process</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+									
+									<xs:attribute name="mode" use="required" type="phpTestsMode">
+										<xs:annotation>
+											<xs:documentation>
+												Defines how the tests will be executed when enabled. Possible values are:&lt;br&gt;&lt;br&gt;
+												commandLine: The tests will be executed using the php command line executable which is defined at Tools->phpPath on this same xml setup.&lt;br&gt;
+												localWebServer: The tests will be copied to a web server that exists on the current local machine, and executed as part of the build process (if tests are enabled). 
+												Note that even if tests are disabled, setting this mode will mean the tests are copied to the specified web server. 
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+									
+									<xs:attribute name="localServerPath" use="optional" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>
+												A local server is required to correctly run the tests when localWebServer mode is defined, so this value specifies a path to that local server http documents folder.
+												A subfolder called "ProjectName-unitTests" will be created when running the tests, and removed once tests are finished.&lt;br&gt;&lt;br&gt;
+												Example: C:/xampp/htdocs/unitTests
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+								
+								</xs:complexType>
+								
+							</xs:element>
+							
+							<!-- TODO Js element -->
+							<xs:element name="Js" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>TODO</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+								
+									<xs:attribute name="TODO" default="false" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>TODO</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+																	
+								</xs:complexType>
+								
+							</xs:element>
+					
+						</xs:sequence>
 						
 					</xs:complexType>
 					

@@ -11,7 +11,11 @@
 	<Validate checkProjectStructure="true"
 			  validateCss="true" />
 	
-	<Test runTests="true"
-		  localHostTestPath="C:/xampp/htdocs/unitTests" />
+	<Test>	
+	
+		<Php enabled="true" 
+			 mode="commandLine" />	
+			 	  
+	</Test>
 			
 </SetupBuild>

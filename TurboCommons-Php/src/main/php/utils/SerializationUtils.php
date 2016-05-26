@@ -423,13 +423,13 @@ class SerializationUtils{
 	/**
 	 * Convert a JSON string to the respective PHP object
  	 *
- 	 * @param string $json The JSON string that contains the defined object.
+ 	 * @param string $str The JSON string that contains the defined object.
 	 *
 	 * @return Object A Php object representation for the received json string
 	 */
-	public static function jsonToObject($json){
+	public static function jsonToObject($str){
 
-		return json_decode($json, false);
+		return json_decode($str, false);
 	}
 
 
@@ -475,7 +475,8 @@ class SerializationUtils{
 
 
 	/**
-	 * Convert a string containing the contents of a Java .properties file to an associative array.
+	 * Convert a string containing the contents of a Java properties file to an associative array.
+	 * For example: tag1=value1 will be converted to ['tag1' => 'value1']
 	 *
 	 * @param string $str String containing the contents of a .properties Java file
 	 *
@@ -587,6 +588,7 @@ class SerializationUtils{
 	public static function xmlToArray($xml){
 
 		if(is_string($xml)){
+
 			$xml = simplexml_load_string($xml);
 		}
 
@@ -594,14 +596,17 @@ class SerializationUtils{
 
 		// Loop the entity attributes and fill the class with the values
 		foreach($xml->attributes() as $name => $value){
+
 			$array[$name] = (string)$value;
 		}
 
 		// Loop any possible class child nodes and generate the related entities
 		foreach($xml as $item){
+
 			$itemName = $item->getName();
 
 			if (!isset($array[$itemName])){
+
 				$array[$itemName] = array();
 			}
 
@@ -633,17 +638,19 @@ class SerializationUtils{
     		}
 
     		array_push($aux, $v);
-
     	}
 
     	$res = implode($delimiter, $aux);
 
     	// If the result contains only empty fields, we will return an empty string
-    	if(strlen($res) == count($aux) - 1)
-    		return '';
-    	else
-    		return $res;
+    	if(strlen($res) == count($aux) - 1){
 
+    		return '';
+
+    	}else{
+
+    		return $res;
+    	}
     }
 }
 

@@ -30,22 +30,47 @@ class LocalesManager extends BaseSingletonClass{
 
 
 	/**
+	 * Defines the JAVA properties file format, which is the JAVA standard for text internationalization.
+	 *
+	 * JAVA properties format is a plain text format that stores KEY/VALUE pairs as 'Key=Value'.
+	 * The file is encoded as ISO-8859-1 by definition, so it is not recommended to use UTF-8 when creating a .properties file.
+	 * All special characters that are not ISO-8859-1 need to be escaped as unicode characters like \u0009, \u00F1 inside the file.
+	 */
+	const FORMAT_JAVA_PROPERTIES = 'FORMAT_JAVA_PROPERTIES';
+
+
+	/**
+	 * TODO
+	 */
+	const FORMAT_ANDROID_XML = 'FORMAT_ANDROID_XML';
+
+
+	/**
 	 * A list of languages by order of preference to search in the available resource bundles for a translation<br><br>
 	 * For example: Setting this property to ['en_US', 'es_ES', 'fr_FR'] and calling
 	 * LocalesManager::getInstance()->get('HELLO', 'Greetings') will try to locate the en_US value for the
 	 * HELLO tag on the Greetings bundle. If the tag is not found for the specified locale and bundle, the same
-	 * operation will be performed for the es_ES locale, and so, till a value is found or no more locales are defined.
+	 * search will be performed for the es_ES locale, and so, till a value is found or no more locales are defined.
+	 *
+	 * @var array
 	 */
 	public $locales = [];
 
 
 	/**
-	 * Specifies the expected format for the loaded resourcebundle files.
-	 * Possible values: 'properties'
+	 * Specifies the expected format for the loaded resourcebundle files on each of the specified paths.
 	 *
-	 * TODO: Add more formats
+	 * We can define a different format for each of the paths in the $paths property of this class, but is not mandatory.
+	 * We can define a single format for all of the specified paths, or we can specify the first n. If there are more
+	 * defined paths than formats, the last format will be used for all the subsequent paths on the $paths array.
+	 *
+	 * Possible values: LocalesManager::FORMAT_JAVA_PROPERTIES, LocalesManager::FORMAT_ANDROID_XML
+	 *
+	 * TODO: Add support for more internationalization formats
+	 *
+	 * @var array
 	 */
-	public $bundleFormat = 'properties';
+	public $bundleFormat = [self::FORMAT_JAVA_PROPERTIES];
 
 
 	/**
