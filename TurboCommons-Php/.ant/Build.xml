@@ -499,7 +499,7 @@
 	<!-- Apply minification to all the PHP files -->
 	<target name="minifyPHP">
 
-		<!-- Php files may contain html code. They are stored with .phpTemp extension so they can be processed later by the html minifier -->
+		<!-- Php files may contain html code. They are stored with .phpTemp extension so we can process them next with the html minifier -->
 		<apply executable="${Tools.phpPath}" failonerror="true" outputproperty="minifyPHPOutputRedir">
 
 			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false">
@@ -514,7 +514,8 @@
 			</redirector>
 
 		</apply>
-		
+
+		<!-- Apply the html minifier to the temp php files, and copy the result with the correct .php extension -->
 		<apply executable="java" failonerror="true">
 
 			<fileset dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main">
