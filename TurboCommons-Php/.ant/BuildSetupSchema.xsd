@@ -100,7 +100,7 @@
 							</xs:annotation>
 						</xs:attribute>
 						
-						<xs:attribute name="optimizePhp" default="true" type="xs:boolean">
+						<xs:attribute name="optimizePhp" default="false" type="xs:boolean">
 							<xs:annotation>
 								<xs:documentation>Set if php files must be optimized as part of the release version build process</xs:documentation>
 							</xs:annotation>

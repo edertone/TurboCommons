@@ -76,14 +76,16 @@
 		<property name="Release.gitChangeLog" value="false" />
 		<property name="Release.gitChangeLogCount" value="5" />
 		<property name="Release.optimizePictures" value="true" />
-		<property name="Release.optimizePhp" value="true" />
+		<property name="Release.optimizePhp" value="false" />
 		<property name="Release.optimizeJs" value="true" />
 		<property name="Release.optimizeCss" value="true" />
 								
 		<property name="Validate.checkProjectStructure" value="true" />
 		<property name="Validate.validateCss" value="true" />
 				
-		<property name="Test.runTests" value="false" />
+		<property name="Test.Php.enabled" value="false" />
+		<property name="Test.Php.mode" value="commandLine" />
+		<property name="Test.Js.enabled" value="false" />	
 				
 		<property name="Tools.minifierPath" value="C:/BuildTools/yuicompressor-2.4.7/build/yuicompressor-2.4.7.jar" />
 		<property name="Tools.htmlCompressorPath" value="C:/BuildTools/htmlcompressor/htmlcompressor-1.5.3.jar" />
@@ -113,8 +115,16 @@
 				
 				self.project.executeTarget("copyMainFiles");
 			
-				if(project.getProperty("Test.runTests") == "true"){
-					self.project.executeTarget("runTests");
+				if(project.getProperty("Test.Php.enabled") == "true"){
+			
+					if(project.getProperty("Test.Php.mode") == "localWebServer"){
+			
+						self.project.executeTarget("runPhpTestsLocalServer");
+			
+					}else{
+			
+						self.project.executeTarget("runPhpTestsCmd");
+					}
 				}
 			
 				if(project.getProperty("Release.enabled") == "true"){
@@ -173,34 +183,50 @@
 	</target>
 	
 	
-	<!-- Launch the unit tests on console only if autorun property is set -->
-	<target name="runTests">
+	<!-- Launch the PHP unit tests via Command line -->
+	<target name="runPhpTestsCmd">
 
-		<!-- Test.localHostTestPath must exist -->
-		<fail message="Test.localHostTestPath not found. A local server folder is required to run unit tests.">
+		<copy todir="${targetFolderPath}/${projectBaseName}/test" overwrite="true">
+			<fileset dir="${srcFolderPath}/test" casesensitive="false" />
+		</copy>
+
+		<exec executable="${Tools.phpPath}" failonerror="true" >
+			<arg value="${targetFolderPath}/${projectBaseName}/test/index.php" />
+		</exec>
+		
+		<delete dir="${targetFolderPath}/${projectBaseName}/test" failonerror="true" />
+
+	</target>
+	
+	
+	<!-- Launch the PHP unit tests via local web server -->
+	<target name="runPhpTestsLocalServer">
+	
+		<!-- Test.Php.localServerPath must exist -->
+		<fail message="Test.Php.localServerPath not found. A local server folder is required to run unit tests.">
 		    <condition>
 		    	<not>
-		    		<available file="${Test.localHostTestPath}" />
+		    		<available file="${Test.Php.localServerPath}" />
 		    	</not>
 		    </condition>
 		</fail>
 
-		<copy todir="${Test.localHostTestPath}/${projectBaseName}-unitTests/main" overwrite="true">
+		<copy todir="${Test.Php.localServerPath}/${projectBaseName}-unitTests/main" overwrite="true">
 			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false" />
 		</copy>
 			
-		<copy todir="${Test.localHostTestPath}/${projectBaseName}-unitTests/test" overwrite="true">
+		<copy todir="${Test.Php.localServerPath}/${projectBaseName}-unitTests/test" overwrite="true">
 			<fileset dir="${srcFolderPath}/test" casesensitive="false" />
 		</copy>
 		
 		<exec executable="${Tools.phpPath}" failonerror="true" >
-			<arg value="${Test.localHostTestPath}/${projectBaseName}-unitTests/test/index.php" />
+			<arg value="${Test.Php.localServerPath}/${projectBaseName}-unitTests/test/index.php" />
 		</exec>
 
-		<delete dir="${Test.localHostTestPath}/${projectBaseName}-unitTests" failonerror="true" />
-
+		<delete dir="${Test.Php.localServerPath}/${projectBaseName}-unitTests" failonerror="true" />
+		
 	</target>
-	
+		
 	
 	<!-- Create the optimized release version and tag it with the current version and build number -->
 	<target name="createReleaseVersion">
@@ -473,7 +499,7 @@
 	<!-- Apply minification to all the PHP files -->
 	<target name="minifyPHP">
 
-		<!-- Php files may contain html code. They are stored with .phpTemp extension so they can be processed later by the html minifier -->
+		<!-- Php files may contain html code. They are stored with .phpTemp extension so we can process them next with the html minifier -->
 		<apply executable="${Tools.phpPath}" failonerror="true" outputproperty="minifyPHPOutputRedir">
 
 			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false">
@@ -488,7 +514,8 @@
 			</redirector>
 
 		</apply>
-		
+
+		<!-- Apply the html minifier to the temp php files, and copy the result with the correct .php extension -->
 		<apply executable="java" failonerror="true">
 
 			<fileset dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main">
@@ -586,11 +613,11 @@
 		<!--Define the contents for the stub file that will be autoexecuted when the phar file is included -->
 		<property name="phpStubFile" value="&lt;?php Phar::mapPhar(); include \'phar://${projectBaseName}.phar/php/AutoLoader.php\'; __HALT_COMPILER(); ?>"/>
 		
-		<!-- Create the phar using the current project name and version -->
+		<!-- Create the phar using the current project name -->
 		<exec executable="${Tools.phpPath}" failonerror="true">
 			<arg value="-d display_errors" />
 			<arg value="-r" />
-			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}/${projectBaseName}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}.phar'); $p->startBuffering(); $p->setStub('${phpStubFile}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}/main'); $p->stopBuffering();" />
+			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}/${projectBaseName}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}.phar'); $p->startBuffering(); $p->setStub('${phpStubFile}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}/main'); $p->compressFiles(Phar::GZ); $p->stopBuffering();" />
 		</exec>
 		
 		<script language="javascript">
@@ -613,7 +640,7 @@
 		<exec executable="${Tools.phpPath}" failonerror="true">
 			<arg value="-d display_errors" />
 			<arg value="-r" />
-			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/${projectBaseName}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}-${Build.versionNumber}.${build.number}.phar'); $p->startBuffering(); $p->setStub('${phpStubFile}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main'); $p->stopBuffering();" />
+			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/${projectBaseName}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}-${Build.versionNumber}.${build.number}.phar'); $p->startBuffering(); $p->setStub('${phpStubFile}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main'); $p->compressFiles(Phar::GZ); $p->stopBuffering();" />
 		</exec>
 			
 	</target>
