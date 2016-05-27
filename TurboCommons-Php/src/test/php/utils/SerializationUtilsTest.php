@@ -30,30 +30,57 @@ class SerializationUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testPropertiesToArray(){
 
-		// Test properties file encoding
-		// TODO
+		$basePath = __DIR__.'/../../resources/utils/serializationUtils/propertiesToArray';
 
 		// Test the properties file 1
-		$test1 = FileSystemUtils::readFile(__DIR__.'/../../resources/utils/serializationUtils/Test1.properties');
-		$test1 = SerializationUtils::propertiesToArray($test1);
+		$test = FileSystemUtils::readFile($basePath.'/Test1.properties');
+		$test = SerializationUtils::propertiesToArray($test);
 
-		$this->assertTrue($test1['period.maintenance.InMillis'] == '86400000');
-		$this->assertTrue($test1['decontamination.frequency.inDays'] == '30');
-		$this->assertTrue($test1['decontamination.warningBeforehand.inDays'] == '1');
-		$this->assertTrue($test1['technicalServiceInspection.frequency.inMonths'] == '12');
-		$this->assertTrue($test1['technicalServiceInspection.warningBeforehand.inDays'] == '7');
-		$this->assertTrue($test1['instrument.restartFrequency.inDays'] == '7');
-		$this->assertTrue($test1['start.purgeFinishedTestsPriorToTheLast.inDays'] == '7');
+		$this->assertTrue(count($test) == 45);
+		$this->assertTrue($test['period.maintenance.InMillis'] == '86400000');
+		$this->assertTrue($test['decontamination.frequency.inDays'] == '30');
+		$this->assertTrue($test['decontamination.warningBeforehand.inDays'] == '1');
+		$this->assertTrue($test['technicalServiceInspection.frequency.inMonths'] == '12');
+		$this->assertTrue($test['technicalServiceInspection.warningBeforehand.inDays'] == '7');
+		$this->assertTrue($test['instrument.restartFrequency.inDays'] == '7');
+		$this->assertTrue($test['start.purgeFinishedTestsPriorToTheLast.inDays'] == '7');
+		$this->assertTrue($test['max.error.count'] == '-1');
+		$this->assertTrue($test['error.delimeter'] == '(!)');
+		$this->assertTrue($test['log.stdout'] == 'N');
+		$this->assertTrue($test['portalrolemembership.bb.controlled.fields'] == '');
+		$this->assertTrue($test['membership.datasource.key'] == '');
+		$this->assertTrue($test['reconcile'] == 'Y');
 
 		// Test the properties file 2
-		$test2 = FileSystemUtils::readFile(__DIR__.'/../../resources/utils/serializationUtils/Test2.properties');
-		$test2 = SerializationUtils::propertiesToArray($test2);
+		$test = FileSystemUtils::readFile($basePath.'/Test2.properties');
+		$test = SerializationUtils::propertiesToArray($test);
 
-		$this->assertTrue($test2['website'] == 'http://en.wikipedia.org/');
-		$this->assertTrue($test2['language'] == 'English');
-		// TODO $this->assertTrue($test2['message'] == 'Welcome to Wikipedia!');
-		// TODO $this->assertTrue($test2['key with spaces'] == 'English');
+		$this->assertTrue(count($test) == 11);
+		$this->assertTrue($test['Currency_Converter'] == 'Chuyen doi tien te  ');
+		$this->assertTrue($test['Enter_Amount'] == 'Nhập vào số lượng  ');
+		$this->assertTrue($test['Target_Currency'] == 'Đơn vị chuyển  ');
+		$this->assertTrue($test['Alert_Mess'] == 'Vui lòng nhập một số hợp lệ  ');
+		$this->assertTrue($test['Alert_Title'] == 'Thong bao ');
+
+		// Test the properties file 3
+		$test = FileSystemUtils::readFile($basePath.'/Test3.properties');
+		$test = SerializationUtils::propertiesToArray($test);
+
+		$this->assertTrue(count($test) == 5);
+		$this->assertTrue($test['website'] == 'http://en.wikipedia.org/');
+		$this->assertTrue($test['language'] == 'English');
+		$this->assertTrue($test['message'] == 'Welcome to Wikipedia!');
+		$this->assertTrue($test['key with spaces'] == 'This is the value that could be looked up with the key "key with spaces".');
 		// TODO $this->assertTrue($test2['tab'] == "\t");
+
+		// Test the properties file 4
+		$test = FileSystemUtils::readFile($basePath.'/Test4.properties');
+		$test = SerializationUtils::propertiesToArray($test);
+
+		$this->assertTrue(count($test) == 3);
+		$this->assertTrue($test['key with spaces'] == "This line contains lots ' of \" special # characers \\!#'=.::sooo");
+		$this->assertTrue($test['escaped key!=:# is __good'] == 'And must work as "escaped key!=:# is __good"');
+		//$this->assertTrue($test['multiline.values'] == "line 1\nline 2\nline 3\nline 4\\");
 	}
 }
 

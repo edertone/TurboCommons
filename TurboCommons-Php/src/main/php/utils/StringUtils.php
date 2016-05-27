@@ -92,26 +92,27 @@ class StringUtils {
 
 
     /**
-     * Extracts all the lines from the given string. It does not matter which line sepparator's been used (Windows, linux...)
+     * Extracts all the lines from the given string and outputs an array with each line as an element.
+     * It does not matter which line sepparator's been used (\n, \r, Windows, linux...). All source lines will be correctly extracted.
      *
-     * Any empty line will be discarded
+     * @param string $string Text containing one or more lines that will be converted to an array with each line on a different element.
+     * @param array $filters One or more regular expressions that will be used to filter unwanted lines. Lines that match any of the
+     *  filters will be excluded from the result. By default, all empty lines are ignored (those containing only newline, blank, tabulators, etc..).
      *
-     * @param string $string String to extract its lines
-     * @param strign $limit If specified, then only lines up to limit are returned with the rest of the string being placed in the last line.
-     *
-     * @return array A list of all the string lines sepparated on each array element.
+     * @return array A list with all the string lines sepparated as different array elements.
      */
-    public static function extractLines($string, $limit = null){
+    public static function extractLines($string, array $filters = ['/\s+/']){
 
     	$res = array();
 
-    	$tmp = preg_split("/((\r?\n)|(\r\n?))/", $string, $limit);
+    	$tmp = preg_split("/((\r?\n)|(\r\n?))/", $string);
 
     	foreach($tmp as $line){
 
-    		if(!self::isEmpty($line)){
+    		// Apply specified filters
+    		if(preg_replace($filters, '', $line) != ''){
 
-    			array_push($res, $line);
+    				array_push($res, $line);
     		}
     	}
 

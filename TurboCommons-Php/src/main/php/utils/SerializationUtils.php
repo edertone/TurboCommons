@@ -476,7 +476,9 @@ class SerializationUtils{
 
 	/**
 	 * Convert a string containing the contents of a Java properties file to an associative array.
-	 * For example: tag1=value1 will be converted to ['tag1' => 'value1']
+	 * For example: tag1=value1 will be converted to ['tag1' => 'value1'].<br><br>
+	 * Note that the input string must be encoded with ISO-8859-1 and strictly follow the Java
+	 * properties file format (Otherwise results may not be correct).
 	 *
 	 * @param string $str String containing the contents of a .properties Java file
 	 *
@@ -486,36 +488,42 @@ class SerializationUtils{
 
 		$key = '';
 		$result = [];
-		$lines = StringUtils::extractLines($str);
 		$isWaitingOtherLine = false;
+
+		// Generate an array with the properties lines, ignoring blank lines and comments
+		$lines = StringUtils::extractLines($str, ['/\s+/', '/ *#.*| *!.*/']);
 
 		foreach($lines as $i=>$line) {
 
-			if(!$isWaitingOtherLine && (strpos($line, '#') === 0 || strpos($line, '!') === 0)){
+			// Remove all blank spaces at the left of each line
+			$line = ltrim($line);
 
-				continue;
-			}
+			// Restore escaped characters
+			$line = str_replace(['\\\\'], ['\\'], $line);
 
-			if(!$isWaitingOtherLine) {
+			if($isWaitingOtherLine) {
 
-				$key = trim(substr($line,0, strpos($line,'=')));
-				$value = ltrim(substr($line, strpos($line,'=') + 1, strlen($line)));
-
-				// Replace escaped characters with the real values
-				$value = str_replace(['\#', '\!', '\=', '\:'], ['#', '!', '=', ':'], $value);
-
-				// Decode unicode characters
-				$value = json_decode('"'.$value.'"');
+				$value .= EncodingUtils::unicodeCharsToUtf8($line);
 
 			}else{
 
-				$value .= $line;
+				// Find the key/value divider index
+				$tmpLine = str_replace(['\\=', '\\:'], 'xx', $line);
+				$keyDividerIndex = min([stripos($tmpLine.'=', '='), stripos($tmpLine.':', ':')]);
+
+				// Extract the key from the line
+				$key = trim(substr($line, 0, $keyDividerIndex));
+				$key = str_replace(['\\ ', '\#', '\!', '\=', '\:'], [' ', '#', '!', '=', ':'], $key);
+
+				// Extract the value from the line
+				$value = ltrim(substr($line, $keyDividerIndex + 1, strlen($line)));
 			}
 
 			// Check if ends with single '\'
 			if(strrpos($value,'\\') === strlen($value)-strlen('\\')) {
 
-				$value = substr($value, 0, strlen($value)-1)."\n";
+				$value = substr($value, 0, strlen($value)-1);
+
 				$isWaitingOtherLine = true;
 
 			}else{
@@ -523,7 +531,14 @@ class SerializationUtils{
 				$isWaitingOtherLine = false;
 			}
 
+			if(!$isWaitingOtherLine) {
+
+				// Decode unicode characters
+				$value = EncodingUtils::unicodeCharsToUtf8($value);
+			}
+
 			$result[$key] = $value;
+
 			unset($lines[$i]);
 		}
 

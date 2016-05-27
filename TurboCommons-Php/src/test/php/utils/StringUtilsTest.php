@@ -39,6 +39,22 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
+	 * testExtractLines
+	 *
+	 * @return void
+	 */
+	public function testExtractLines(){
+
+		$this->assertTrue(StringUtils::extractLines('') == []);
+		$this->assertTrue(StringUtils::extractLines("line1\nline2\nline3") == ['line1', 'line2', 'line3']);
+		$this->assertTrue(StringUtils::extractLines("line1\n        \nline2") == ['line1', 'line2']);
+		$this->assertTrue(StringUtils::extractLines("line1\n\n\n\t\r       \nline2") == ['line1', 'line2']);
+		$this->assertTrue(StringUtils::extractLines("line1\n   \nline2", []) == ['line1', '   ', 'line2']);
+		$this->assertTrue(StringUtils::extractLines("line1\n 1  \nline2") == ['line1', ' 1  ', 'line2']);
+	}
+
+
+	/**
 	 * TestFormatPath
 	 *
 	 * @return void

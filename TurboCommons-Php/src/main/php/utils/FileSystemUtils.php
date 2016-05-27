@@ -10,6 +10,8 @@
 
 namespace com\edertone\turboCommons\src\main\php\utils;
 
+use Exception;
+
 
 /**
  * Class that helps with the most common file system operations
@@ -347,18 +349,25 @@ class FileSystemUtils{
 	/**
 	 * Read and return a filesystem file contents. Not suitable for big files (More than 5 MB)
 	 *
-	 * @param string $path The file full path
+	 * @param string $path The file full or relative path
 	 *
-	 * @return string The file contents (binary or string), false if the file does not exist or cannot be read.
+	 * @return string The file contents (binary or string). If the file is not found or cannot be read, an exception will be thrown.
 	 */
 	public static function readFile($path){
 
 		if(!is_file($path)){
 
-			return false;
+			throw new Exception('FileSystemUtils->readFile: File not found - '.$path);
 		}
 
-		return file_get_contents($path, true);
+		$contents = file_get_contents($path, true);
+
+		if($contents === false){
+
+			throw new Exception('FileSystemUtils->readFile: Error reading file - '.$path);
+		}
+
+		return $contents;
 	}
 
 
