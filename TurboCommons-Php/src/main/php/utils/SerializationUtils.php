@@ -452,7 +452,7 @@ class SerializationUtils{
 	 * @param Object $class The class instance that will be filled with the POST data
 	 * @param boolean $removeHtmlTags Enable or disable the HTML code in the url keys / values
 	 *
-	 * @return array An associative array containing the parameters that where stored on the GET string as key - value pairs.
+	 * @return array An associative array containing the parameters that where stored on the POST string as key - value pairs.
 	 */
 	public static function postParametersToClass($class, $removeHtmlTags = true){
 
@@ -495,11 +495,8 @@ class SerializationUtils{
 
 		foreach($lines as $i=>$line) {
 
-			// Remove all blank spaces at the left of each line
+			// Remove all blank spaces at the beginning of the line
 			$line = ltrim($line);
-
-			// Restore escaped characters
-			$line = str_replace(['\\\\'], ['\\'], $line);
 
 			if($isWaitingOtherLine) {
 
@@ -519,19 +516,20 @@ class SerializationUtils{
 				$value = ltrim(substr($line, $keyDividerIndex + 1, strlen($line)));
 			}
 
-			// Check if ends with single '\'
-			if(strrpos($value,'\\') === strlen($value)-strlen('\\')) {
+			// Unescape escaped slashes on the value
+			$value = str_replace(['\\\\'], ['\u005C'], $value);
 
-				$value = substr($value, 0, strlen($value)-1);
+			// Check if ends with single '\'
+			if(substr($value, -1) == '\\'){
+
+				// Remove trailing backslash
+				$value = substr_replace($value, '', -1);
 
 				$isWaitingOtherLine = true;
 
 			}else{
 
 				$isWaitingOtherLine = false;
-			}
-
-			if(!$isWaitingOtherLine) {
 
 				// Decode unicode characters
 				$value = EncodingUtils::unicodeCharsToUtf8($value);
