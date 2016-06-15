@@ -10,6 +10,8 @@
 
 namespace com\edertone\turboCommons\src\main\php\managers;
 
+use com\edertone\turboCommons\src\main\php\model\BaseStrictClass;
+
 
 /**
  * A Synchronous class to manage and operate with ftp connections
