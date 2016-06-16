@@ -41,8 +41,7 @@ class PictureUtils{
 		// GD extension must be enabled
 		if(!extension_loaded('gd')) {
 
-			trigger_error('GD library for php is not installed or enabled', E_USER_ERROR);
-			die();
+			throw new Exception('PictureUtils->thumbnailGenerate: GD library for php is not installed or enabled');
 		}
 
 		// By default, stretch mode: resize and distort the image if necessary to fill the full destination size
@@ -151,7 +150,6 @@ class PictureUtils{
 	}
 
 
-
 	/**
 	 * Performs maximum jpg optimization possible by calling the jpegtran command line tool.
 	 * jpegtran is an open source library tool to compress jpg images as much as possible, that normally comes bundled with linux distributions. If not available, we must install it on our machine.
@@ -168,25 +166,19 @@ class PictureUtils{
 
 		if($checkJpegTran != 0) {
 
-			trigger_error('PictureUtils::compressJpgPicture Error: jpegtran is not enabled on the system.', E_USER_WARNING);
-
-			return false;
+			throw new Exception('PictureUtils::compressJpgPicture: jpegtran is not enabled on the system');
 		}
 
 		// Check that source image exists
 		if(!is_file($imagePath)){
 
-			trigger_error('PictureUtils::compressJpgPicture Error: Specified image file ('.$imagePath.') does not exist', E_USER_WARNING);
-
-			return false;
+			throw new Exception('PictureUtils::compressJpgPicture: Specified image file ('.$imagePath.') does not exist');
 		}
 
 		// Check that source and output paths are not the same!
 		if($imagePath == $outputPath) {
 
-			trigger_error('PictureUtils::compressJpgPicture Error: source and output paths cannot be the same.', E_USER_WARNING);
-
-			return false;
+			throw new Exception('PictureUtils::compressJpgPicture: source and output paths cannot be the same');
 		}
 
 		if($outputPath == ''){
@@ -201,9 +193,7 @@ class PictureUtils{
 		// Check any problem on jpegtran execution
 		if ($return != 0) {
 
-			trigger_error('PictureUtils::compressJpgPicture jpegtran failed :'.implode("\n", $output), E_USER_WARNING);
-
-			return false;
+			throw new Exception('PictureUtils::compressJpgPicture: jpegtran failed. '.implode("\n", $output));
 		}
 
 		return true;
@@ -224,9 +214,7 @@ class PictureUtils{
 		// Verify that path exists and is a real directory
 		if(!is_dir($imagesPath)){
 
-			trigger_error('PictureUtils::compressJpgPictureFolder : Specified path ('.$imagesPath.') is not a folder', E_USER_WARNING);
-
-			return false;
+			throw new Exception('PictureUtils::compressJpgPictureFolder: Specified path ('.$imagesPath.') is not a folder');
 		}
 
 		$images = FileSystemUtils::getDirectoryList($imagesPath);
@@ -244,7 +232,6 @@ class PictureUtils{
 
 		return true;
 	}
-
 }
 
 ?>
