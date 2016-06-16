@@ -84,7 +84,7 @@ class SerializationUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($test['key with spaces'] == "This line contains lots ' of \" special # characers \\\\!#'=.::sooo");
 		$this->assertTrue($test['escaped key!=:# is __good'] == 'And must work as "escaped key!=:# is __good"');
 		$this->assertTrue($test['multiline.values'] == "line 1\nline 2\nline 3\nline 4\\");
-		$this->assertTrue($test['key\with\slashes'] == "value");
+		$this->assertTrue($test['key\with\slashes'] == 'value');
 		$this->assertTrue($test['multiplebackslashes'] == '\\\\\\value\\\\');
 		$this->assertTrue($test['multiline.backslashes'] == "value\n\n\\value");
 	}

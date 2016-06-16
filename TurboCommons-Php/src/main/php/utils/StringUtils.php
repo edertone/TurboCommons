@@ -180,73 +180,87 @@ class StringUtils {
 
 
 	/**
-	* Method that gives the file name from a path, without its extension. Example: "//folder/pepe/tete/file.txt" ---> results in "file"
-	*
-	* @param string $path The path of the file
-	*
-	* @return File name
-	*/
-	public static function getFilenameNoextension($path){
+	 * Given a filesystem path which contains some file, this method extracts the filename plus its extension.
+	 * Example: "//folder/folder2/folder3/file.txt" -> results in "file.txt"
+	 *
+	 * @param string $path A file system path containing some file
+	 *
+	 * @return string The extracted filename and extension, like: finemane.txt
+	 */
+	public static function extractFileNameWithExtension($path){
 
-		$aux = str_replace('\\', '/', $path);
+		if(self::isEmpty($path)){
 
-		if(strpos($aux, '/') !== false){
-
-			$aux = substr(strrchr($aux, '/'), 1);
+			return '';
 		}
 
-		if(strpos($aux, '.') !== false){
+		$path = self::formatPath($path);
 
-			$aux = substr($aux, 0, strrpos($aux, '.'));
+		if(strpos($path, DIRECTORY_SEPARATOR) !== false){
+
+			$path = substr(strrchr($path, DIRECTORY_SEPARATOR), 1);
 		}
 
-		return $aux;
-    }
-
-
-	/**
-	* Method that gives the file name from a path, with its extension. Example: "//folder/pepe/tete/file.txt" ---> results in "file.txt"
-	*
-	* @param string $path The file path
-	*
-	* @return File name + extension
-	*/
-	public static function getFilenameWithExtension($path){
-
-		$aux = str_replace('\\', '/', $path);
-
-		if(strpos($aux, '/') !== false)
-			$aux = substr(strrchr($aux, '/'), 1);
-
-		return $aux;
-
-    }
-
-
-	/**
-	* Method that gives the file extension for a given path (The dot symbol is NOT included)
-	*
-	* @param string $path The path of the file
-	* @param boolean $lowercase Specify if the return value will be converted to lower case or not
-	*
-	* @return file extension WITHOUT dot character. For example: jpg, png, js, exe ...
-	*/
-	public static function getFileExtension($path, $lowercase = false){
-
-		// Find the extension by getting the last position of the dot character
-		$extension = substr($path, strrpos($path, '.') + 1);
-
-		return $lowercase ? strtolower($extension) : $extension;
+		return $path;
     }
 
 
     /**
-     * Gives correct format to a file path so all the directory separators are correct for the current OS, and makes sure that no directory separator is present at the end.
-     * The method basically standarizes the given file path format.
+     * Given a filesystem path which contains some file, this method extracts the filename WITHOUT its extension.
+     * Example: "//folder/folder2/folder3/file.txt" -> results in "file"
      *
-     * @param string $path The path that must be formated
+     * @param string $path A file system path containing some file
      *
-     * @return string The correctly formated path
+     * @return string The extracted filename WITHOUT extension, like: finemane
+     */
+    public static function extractFileNameWithoutExtension($path){
+
+    	if(self::isEmpty($path)){
+
+    		return '';
+    	}
+
+    	$path = self::extractFileNameWithExtension($path);
+
+		if(strpos($path, '.') !== false){
+
+			$path = substr($path, 0, strrpos($path, '.'));
+		}
+
+		return $path;
+    }
+
+
+	/**
+	 * Given a filesystem path which contains some file, this method extracts only the file extension
+	 * Example: "//folder/folder2/folder3/file.txt" -> results in "txt"
+	 *
+	 * @param string $path A file system path containing some file
+	 *
+	 * @return string The file extension WITHOUT the dot character. For example: jpg, png, js, exe ...
+	 */
+	public static function extractFileExtension($path){
+
+		if(self::isEmpty($path)){
+
+			return '';
+		}
+
+		// Find the extension by getting the last position of the dot character
+		return substr($path, strrpos($path, '.') + 1);
+    }
+
+
+    /**
+     * Given a raw string containing a file system path, this method will process it to obtain a path that is 100% format valid for the current operating system.
+	 * Directory separators will be converted to the OS valid ones, and no directory separator will be present at the end. This method basically standarizes
+	 * the given path so it does not fail for the current OS.
+	 *
+	 * NOTE: This method will not check if the path is a real path on the current file system; it will only fix formatting problems
+	 *
+     * @param string $path The path that must be formatted
+     *
+     * @return string The correctly formatted path without any trailing directory separator
      */
     public static function formatPath($path){
 
@@ -271,9 +285,9 @@ class StringUtils {
 
 
     /**
-     * Full text search is the official name for the process of searching on a big text content based on a string containing text to find.
+     * Full text search is the official name for the process of searching on a big text content based on a string containing some text to find.
      * This method will process a text so it removes all the accents and non alphanumerical characters that are not usefull for searching on strings,
-     * and converts everything to lower case.
+     * and convert everything to lower case.
      * To perform the search it is important that both search and searched strings are standarized the same way, to maximize possible matches.
      *
      * @param string $string String to process

@@ -29,6 +29,7 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testIsEmpty(){
 
+		$this->assertTrue(StringUtils::isEmpty(null));
 		$this->assertTrue(StringUtils::isEmpty(''));
 		$this->assertTrue(StringUtils::isEmpty('      '));
 		$this->assertTrue(StringUtils::isEmpty("\n\n  \n"));
@@ -45,12 +46,73 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testExtractLines(){
 
-		$this->assertTrue(StringUtils::extractLines('') == []);
+		$this->assertTrue(StringUtils::extractLines(null) === []);
+		$this->assertTrue(StringUtils::extractLines('') === []);
+		$this->assertTrue(StringUtils::extractLines('          ') === []);
 		$this->assertTrue(StringUtils::extractLines("line1\nline2\nline3") == ['line1', 'line2', 'line3']);
 		$this->assertTrue(StringUtils::extractLines("line1\n        \nline2") == ['line1', 'line2']);
 		$this->assertTrue(StringUtils::extractLines("line1\n\n\n\t\r       \nline2") == ['line1', 'line2']);
 		$this->assertTrue(StringUtils::extractLines("line1\n   \nline2", []) == ['line1', '   ', 'line2']);
 		$this->assertTrue(StringUtils::extractLines("line1\n 1  \nline2") == ['line1', ' 1  ', 'line2']);
+	}
+
+
+	/**
+	 * testExtractFileNameWithExtension
+	 *
+	 * @return void
+	 */
+	public function testExtractFileNameWithExtension(){
+
+		$this->assertTrue(StringUtils::extractFileNameWithExtension('') === '');
+		$this->assertTrue(StringUtils::extractFileNameWithExtension(null) === '');
+		$this->assertTrue(StringUtils::extractFileNameWithExtension('       ') === '');
+		$this->assertTrue(StringUtils::extractFileNameWithExtension('C:\Program Files\CCleaner\CCleaner64.exe') == 'CCleaner64.exe');
+		$this->assertTrue(StringUtils::extractFileNameWithExtension('\\Files/CCleaner/CCleaner64.exe') == 'CCleaner64.exe');
+		$this->assertTrue(StringUtils::extractFileNameWithExtension('//folder/folder2/folder3/file.txt') == 'file.txt');
+		$this->assertTrue(StringUtils::extractFileNameWithExtension('CCleaner64.exe') == 'CCleaner64.exe');
+		$this->assertTrue(StringUtils::extractFileNameWithExtension('\\\\\\CCleaner64.exe') == 'CCleaner64.exe');
+		$this->assertTrue(StringUtils::extractFileNameWithExtension('\some long path containing lots of spaces\\///CCleaner64.exe') == 'CCleaner64.exe');
+	}
+
+
+	/**
+	 * testExtractFileNameWithoutExtension
+	 *
+	 * @return void
+	 */
+	public function testExtractFileNameWithoutExtension(){
+
+		$this->assertTrue(StringUtils::extractFileNameWithoutExtension('') === '');
+		$this->assertTrue(StringUtils::extractFileNameWithoutExtension(null) === '');
+		$this->assertTrue(StringUtils::extractFileNameWithoutExtension('       ') === '');
+		$this->assertTrue(StringUtils::extractFileNameWithoutExtension('C:\Program Files\CCleaner\CCleaner64.exe') == 'CCleaner64');
+		$this->assertTrue(StringUtils::extractFileNameWithoutExtension('\\Files/CCleaner/CCleaner64.exe') == 'CCleaner64');
+		$this->assertTrue(StringUtils::extractFileNameWithoutExtension('//folder/folder2/folder3/file.txt') == 'file');
+		$this->assertTrue(StringUtils::extractFileNameWithoutExtension('CCleaner64.exe') == 'CCleaner64');
+		$this->assertTrue(StringUtils::extractFileNameWithoutExtension('\\\\\\CCleaner64.exe') == 'CCleaner64');
+		$this->assertTrue(StringUtils::extractFileNameWithoutExtension('\some long path containing lots of spaces\\///CCleaner64.exe') == 'CCleaner64');
+	}
+
+
+	/**
+	 * testExtractFileExtension
+	 *
+	 * @return void
+	 */
+	public function testExtractFileExtension(){
+
+		$this->assertTrue(StringUtils::extractFileExtension('') === '');
+		$this->assertTrue(StringUtils::extractFileExtension(null) === '');
+		$this->assertTrue(StringUtils::extractFileExtension('       ') === '');
+		$this->assertTrue(StringUtils::extractFileExtension('C:\Program Files\CCleaner\CCleaner64.exe') == 'exe');
+		$this->assertTrue(StringUtils::extractFileExtension('\\Files/CCleaner/CCleaner64.exe') == 'exe');
+		$this->assertTrue(StringUtils::extractFileExtension('//folder/folder2/folder3/file.txt') == 'txt');
+		$this->assertTrue(StringUtils::extractFileExtension('CCleaner64.exe') == 'exe');
+		$this->assertTrue(StringUtils::extractFileExtension('\\\\\\CCleaner64.exe') == 'exe');
+		$this->assertTrue(StringUtils::extractFileExtension('\some long path containing lots of spaces\\///CCleaner64.exe') == 'exe');
+		$this->assertTrue(StringUtils::extractFileExtension('CCleaner64.EXE', true) == 'EXE');
+		$this->assertTrue(StringUtils::extractFileExtension('\\\\\\CCleaner64.eXEfile', true) == 'eXEfile');
 	}
 
 
@@ -61,6 +123,9 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testFormatPath(){
 
+		$this->assertTrue(StringUtils::formatPath(null) === '');
+		$this->assertTrue(StringUtils::formatPath('') === '');
+		$this->assertTrue(StringUtils::formatPath('       ') === '       ');
 		$this->assertTrue(StringUtils::formatPath('test//test/') == 'test'.DIRECTORY_SEPARATOR.'test');
 		$this->assertTrue(StringUtils::formatPath('////test//////test////') == DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'test');
 		$this->assertTrue(StringUtils::formatPath('\\\\////test//test/') == DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'test');

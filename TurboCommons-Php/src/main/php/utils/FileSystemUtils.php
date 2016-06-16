@@ -47,6 +47,37 @@ class FileSystemUtils{
 
 
 	/**
+	 * Checks that the specified folder is empty
+	 *
+	 * @param string $path The path to the directory we want to check
+	 *
+	 * @return boolean True if directory is empty, false if not. If it does not exist or cannot be read, an exception will be generated
+	 */
+	public static function isDirectoryEmpty($path) {
+
+		if (!is_readable($path)){
+
+			throw new Exception('FileSystemUtils->isDirectoryEmpty: Path does not exist: '.$path);
+		}
+
+		$handle = opendir($path);
+
+		while (false !== ($entry = readdir($handle))) {
+
+			if ($entry != '.' && $entry != '..') {
+
+				return false;
+			}
+		}
+
+		// Required on windows to prevent permision denied errors
+		closedir($handle);
+
+		return true;
+	}
+
+
+	/**
 	 * Gives us the current OS directory sepparator character, so we can build cross platform file paths
 	 *
 	 * @return string The current OS directory sepparator character
@@ -58,15 +89,135 @@ class FileSystemUtils{
 
 
 	/**
+	 * Search for a folder name that does not exist on the provided path.
+	 *
+	 * If we want to create a new folder inside another one without knowing for sure what does it contain, this method will
+	 * guarantee us that we have a unique directory name that does not collide with any other that currently exists on the path.
+	 *
+	 * NOTE: This method does not create any folder or alter the given path in any way.
+	 *
+	 * @param string $path The full path to the directoy we want to check for a unique folder name
+	 * @param string $desiredName We can specify a suggested name for the unique directory. This method will verify that it does not exist, or otherwise give us a name that is unique for the given path
+	 * @param string $text Text that will be appended to the suggested name in case it already exists. For example: Setting text to 'copy' will generate a result like 'NewFolder-copy-1' if a folder named 'NewFolder' already exists
+	 * @param string $separator String that will be used to join the suggested name with the text and the numeric file counter. For example: Setting separator to '---' will generate a result like 'NewFolder---copy---1' if a folder named 'NewFolder' already exists
+	 * @param string $isPrefix Defines if the extra text that will be appended to the desired name will be placed after or before the name on the result. For example, setting this to true will generate a result like 'copy-1-NewFolder' if a folder named 'NewFolder' already exists
+	 *
+	 * @return string A directory name that can be safely created on the specified path, cause no one exists with the same name (No path is returned with this method, only a directory name. For example: 'folder-1', 'directoryName-5', etc..).
+	 */
+	public static function findUniqueDirectoryName($path, $desiredName = '', $text = '', $separator = '-', $isPrefix = false){
+
+		$i = 1;
+		$path = StringUtils::formatPath($path);
+		$result = ($desiredName == '' ? $i : $desiredName);
+
+		while(is_dir($path.DIRECTORY_SEPARATOR.$result)){
+
+			$result = self::_generateUniqueNameAux($i, $desiredName, $text, $separator, $isPrefix);
+
+			$i++;
+		}
+
+		return $result;
+	}
+
+
+	/**
+	 * Search for a file name that does not exist on the provided path.
+	 *
+	 * If we want to create a new file inside a folder without knowing for sure what does it contain, this method will
+	 * guarantee us that we have a unique file name that does not collide with any other that currently exists on the path.
+	 *
+	 * NOTE: This method does not create any file or alter the given path in any way.
+	 *
+	 * @param string $path The full path to the directoy we want to check for a unique file name
+	 * @param string $desiredName We can specify a suggested name for the unique file. This method will verify that it does not exist, or otherwise give us a name that is unique for the given path
+	 * @param string $text Text that will be appended to the suggested name in case it already exists. For example: Setting text to 'copy' will generate a result like 'NewFile-copy-1' if a file named 'NewFile' already exists
+	 * @param string $separator String that will be used to join the suggested name with the text and the numeric file counter. For example: Setting separator to '---' will generate a result like 'NewFile---copy---1' if a file named 'NewFile' already exists
+	 * @param string $isPrefix Defines if the extra text that will be appended to the desired name will be placed after or before the name on the result. For example, setting this to true will generate a result like 'copy-1-NewFile' if a file named 'NewFile' already exists
+	 *
+	 * @return string A file name that can be safely created on the specified path, cause no one exists with the same name (No path is returned with this method, only a file name. For example: 'file-1', 'fileName-5', etc..).
+	 */
+	public static function findUniqueFileName($path, $desiredName = '', $text = '', $separator = '-', $isPrefix = false){
+
+		$i = 1;
+		$path = StringUtils::formatPath($path);
+		$result = ($desiredName == '' ? $i : $desiredName);
+		$extension = StringUtils::extractFileExtension($desiredName);
+
+		while(is_file($path.DIRECTORY_SEPARATOR.$result)){
+
+			$result = self::_generateUniqueNameAux($i, StringUtils::extractFileNameWithoutExtension($desiredName), $text, $separator, $isPrefix);
+
+			if($extension != ''){
+
+				$result .= '.'.$extension;
+			}
+
+			$i++;
+		}
+
+		return $result;
+	}
+
+
+	/**
+	 * Auxiliary method that is used by the findUniqueFileName and findUniqueDirectoryName methods
+	 *
+	 * @param int $i Current index for the name generation
+	 * @param string $desiredName Desired name as used on the parent method
+	 * @param string $text text name as used on the parent method
+	 * @param string $separator separator name as used on the parent method
+	 * @param bool $isPrefix isPrefix name as used on the parent method
+	 *
+	 * @return string The generated name
+	 */
+	private static function _generateUniqueNameAux($i, $desiredName, $text, $separator, $isPrefix){
+
+		$result = [];
+
+		if($isPrefix){
+
+			if($text != ''){
+
+				array_push($result, $text);
+			}
+
+			array_push($result, $i);
+
+			if($desiredName != ''){
+
+				array_push($result, $desiredName);
+			}
+
+		}else{
+
+			if($desiredName != ''){
+
+				array_push($result, $desiredName);
+			}
+
+			if($text != ''){
+
+				array_push($result, $text);
+			}
+
+			array_push($result, $i);
+		}
+
+		return implode($separator, $result);
+	}
+
+
+	/**
 	 * Create a directory at the specified filesystem path
 	 *
 	 * @param string $path The full path to the directoy we want to create
-	 * @param int $mode Is 0755 by default, which means the widest possible access. Ignored on windows
 	 * @param bool $recursive Allows the creation of nested directories specified in the pathname. Defaults to false.
+	 * @param int $mode Is 0755 by default, which means the widest possible access. Ignored on windows
 	 *
 	 * @return bool Returns true on success or false if the folder already exists (an exception may be also thrown if a file exists with the same name).
 	 */
-	public static function createDirectory($path, $mode = 0755, $recursive = false){
+	public static function createDirectory($path, $recursive = false, $mode = 0755){
 
 		// If folder already exists, nothing to do
 		if(is_dir($path)){
@@ -262,35 +413,6 @@ class FileSystemUtils{
 		unset($fileInfo);
 
 		return $deleteDirectoryItself ? rmdir($path) : true;
-	}
-
-
-	/**
-	 * Checks if the specified folder is empty or not
-	 *
-	 * @param string $path The path to the directory we want to check
-	 *
-	 * @return null|boolean True if directory is empty, false if not, and null if does not exist or cannot be read
-	 */
-	public static function isDirectoryEmpty($path) {
-
-		if (!is_readable($path)) return null;
-
-		$handle = opendir($path);
-
-		while (false !== ($entry = readdir($handle))) {
-
-			if ($entry != '.' && $entry != '..') {
-
-				return false;
-			}
-		}
-
-		// Required on windows to prevent permision denied errors
-		closedir($handle);
-
-		return true;
-
 	}
 
 
