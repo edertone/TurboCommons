@@ -92,7 +92,7 @@ class FileSystemUtils{
 	 * Search for a folder name that does not exist on the provided path.
 	 *
 	 * If we want to create a new folder inside another one without knowing for sure what does it contain, this method will
-	 * guarantee us that we have a unique directory name that does not collide with any other that currently exists on the path.
+	 * guarantee us that we have a unique directory name that does not collide with any other folder or file that currently exists on the path.
 	 *
 	 * NOTE: This method does not create any folder or alter the given path in any way.
 	 *
@@ -110,7 +110,7 @@ class FileSystemUtils{
 		$path = StringUtils::formatPath($path);
 		$result = ($desiredName == '' ? $i : $desiredName);
 
-		while(is_dir($path.DIRECTORY_SEPARATOR.$result)){
+		while(is_dir($path.DIRECTORY_SEPARATOR.$result) || is_file($path.DIRECTORY_SEPARATOR.$result)){
 
 			$result = self::_generateUniqueNameAux($i, $desiredName, $text, $separator, $isPrefix);
 
@@ -125,7 +125,7 @@ class FileSystemUtils{
 	 * Search for a file name that does not exist on the provided path.
 	 *
 	 * If we want to create a new file inside a folder without knowing for sure what does it contain, this method will
-	 * guarantee us that we have a unique file name that does not collide with any other that currently exists on the path.
+	 * guarantee us that we have a unique file name that does not collide with any other file or folder that currently exists on the path.
 	 *
 	 * NOTE: This method does not create any file or alter the given path in any way.
 	 *
@@ -144,7 +144,7 @@ class FileSystemUtils{
 		$result = ($desiredName == '' ? $i : $desiredName);
 		$extension = StringUtils::extractFileExtension($desiredName);
 
-		while(is_file($path.DIRECTORY_SEPARATOR.$result)){
+		while(is_dir($path.DIRECTORY_SEPARATOR.$result) || is_file($path.DIRECTORY_SEPARATOR.$result)){
 
 			$result = self::_generateUniqueNameAux($i, StringUtils::extractFileNameWithoutExtension($desiredName), $text, $separator, $isPrefix);
 

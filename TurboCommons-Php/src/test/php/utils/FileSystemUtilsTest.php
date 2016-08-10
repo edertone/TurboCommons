@@ -39,9 +39,8 @@ class FileSystemUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(!FileSystemUtils::isDirectoryEmpty($basePath));
 
 		// test that exception happens with non existant folder
-		FileSystemUtils::deleteDirectory($basePath, true);
 		$this->setExpectedException('Exception');
-		FileSystemUtils::isDirectoryEmpty($basePath);
+		FileSystemUtils::isDirectoryEmpty($basePath.DIRECTORY_SEPARATOR.'asdfwer');
 	}
 
 
@@ -56,6 +55,7 @@ class FileSystemUtilsTest extends PHPUnit_Framework_TestCase {
 		$basePath = FileSystemUtils::createTempDirectory('TurboCommons-Php');
 		$this->assertTrue(FileSystemUtils::isDirectoryEmpty($basePath));
 
+		// Test generated directory names for the created empty folder
 		$this->assertTrue(FileSystemUtils::findUniqueDirectoryName($basePath) == '1');
 		$this->assertTrue(FileSystemUtils::findUniqueDirectoryName($basePath, 'NewFolder') == 'NewFolder');
 		$this->assertTrue(FileSystemUtils::findUniqueDirectoryName($basePath, 'NewFolder', '-') == 'NewFolder');
@@ -67,21 +67,27 @@ class FileSystemUtilsTest extends PHPUnit_Framework_TestCase {
 		FileSystemUtils::createDirectory($basePath.DIRECTORY_SEPARATOR.'NewFolder');
 		$this->assertTrue(FileSystemUtils::isDirectory($basePath.DIRECTORY_SEPARATOR.'NewFolder'));
 
-		$this->assertTrue(FileSystemUtils::findUniqueDirectoryName($basePath) == '2');
+		// Create a file that is named like a directory (without extension)
+		FileSystemUtils::createFile($basePath.DIRECTORY_SEPARATOR.'2', 'test file');
+		$this->assertTrue(FileSystemUtils::isFile($basePath.DIRECTORY_SEPARATOR.'2'));
+
+		// Verify generated dir names when folders already exist at destination path
+		$this->assertTrue(FileSystemUtils::findUniqueDirectoryName($basePath) == '3');
 		$this->assertTrue(FileSystemUtils::findUniqueDirectoryName($basePath, 'NewFolder') == 'NewFolder-1');
 		$this->assertTrue(FileSystemUtils::findUniqueDirectoryName($basePath, 'NewFolder', '', '-', true) == '1-NewFolder');
 		$this->assertTrue(FileSystemUtils::findUniqueDirectoryName($basePath, 'NewFolder', 'copy', '-', false) == 'NewFolder-copy-1');
 		$this->assertTrue(FileSystemUtils::findUniqueDirectoryName($basePath, 'NewFolder', 'copy', '-', true) == 'copy-1-NewFolder');
 
 		// Create some more folders
-		FileSystemUtils::createDirectory($basePath.DIRECTORY_SEPARATOR.'2');
-		$this->assertTrue(FileSystemUtils::isDirectory($basePath.DIRECTORY_SEPARATOR.'2'));
+		FileSystemUtils::createDirectory($basePath.DIRECTORY_SEPARATOR.'3');
+		$this->assertTrue(FileSystemUtils::isDirectory($basePath.DIRECTORY_SEPARATOR.'3'));
 		FileSystemUtils::createDirectory($basePath.DIRECTORY_SEPARATOR.'NewFolder-1');
 		$this->assertTrue(FileSystemUtils::isDirectory($basePath.DIRECTORY_SEPARATOR.'NewFolder-1'));
 		FileSystemUtils::createDirectory($basePath.DIRECTORY_SEPARATOR.'NewFolder-copy-1');
 		$this->assertTrue(FileSystemUtils::isDirectory($basePath.DIRECTORY_SEPARATOR.'NewFolder-copy-1'));
 
-		$this->assertTrue(FileSystemUtils::findUniqueDirectoryName($basePath) == '3');
+		// Verify generated names again
+		$this->assertTrue(FileSystemUtils::findUniqueDirectoryName($basePath) == '4');
 		$this->assertTrue(FileSystemUtils::findUniqueDirectoryName($basePath, 'NewFolder') == 'NewFolder-2');
 		$this->assertTrue(FileSystemUtils::findUniqueDirectoryName($basePath, 'NewFolder', '', '-', true) == '1-NewFolder');
 		$this->assertTrue(FileSystemUtils::findUniqueDirectoryName($basePath, 'NewFolder', 'copy', '-', false) == 'NewFolder-copy-2');
@@ -100,6 +106,7 @@ class FileSystemUtilsTest extends PHPUnit_Framework_TestCase {
 		$basePath = FileSystemUtils::createTempDirectory('TurboCommons-Php');
 		$this->assertTrue(FileSystemUtils::isDirectoryEmpty($basePath));
 
+		// Test generated file names for the created empty folder
 		$this->assertTrue(FileSystemUtils::findUniqueFileName($basePath) == '1', 'error '.FileSystemUtils::findUniqueFileName($basePath));
 		$this->assertTrue(FileSystemUtils::findUniqueFileName($basePath, 'NewFile.txt') == 'NewFile.txt');
 		$this->assertTrue(FileSystemUtils::findUniqueFileName($basePath, 'NewFile.txt', '-') == 'NewFile.txt');
@@ -111,22 +118,27 @@ class FileSystemUtilsTest extends PHPUnit_Framework_TestCase {
 		FileSystemUtils::createFile($basePath.DIRECTORY_SEPARATOR.'NewFile.txt', 'hello baby');
 		$this->assertTrue(FileSystemUtils::isFile($basePath.DIRECTORY_SEPARATOR.'NewFile.txt'));
 
-		$this->assertTrue(FileSystemUtils::findUniqueFileName($basePath) == '2');
+		// Create a folder that is named like a possible file
+		FileSystemUtils::createDirectory($basePath.DIRECTORY_SEPARATOR.'2');
+		$this->assertTrue(FileSystemUtils::isDirectory($basePath.DIRECTORY_SEPARATOR.'2'));
 
+		// Verify generated file names when files already exist at destination path
+		$this->assertTrue(FileSystemUtils::findUniqueFileName($basePath) == '3');
 		$this->assertTrue(FileSystemUtils::findUniqueFileName($basePath, 'NewFile.txt') == 'NewFile-1.txt');
 		$this->assertTrue(FileSystemUtils::findUniqueFileName($basePath, 'NewFile.txt', '', '-', true) == '1-NewFile.txt');
 		$this->assertTrue(FileSystemUtils::findUniqueFileName($basePath, 'NewFile.txt', 'copy', '-', false) == 'NewFile-copy-1.txt');
 		$this->assertTrue(FileSystemUtils::findUniqueFileName($basePath, 'NewFile.txt', 'copy', '-', true) == 'copy-1-NewFile.txt');
 
-		// Create some more folders
-		FileSystemUtils::createFile($basePath.DIRECTORY_SEPARATOR.'2', 'hello baby');
-		$this->assertTrue(FileSystemUtils::isFile($basePath.DIRECTORY_SEPARATOR.'2'));
+		// Create some more files
+		FileSystemUtils::createFile($basePath.DIRECTORY_SEPARATOR.'3', 'hello baby');
+		$this->assertTrue(FileSystemUtils::isFile($basePath.DIRECTORY_SEPARATOR.'3'));
 		FileSystemUtils::createFile($basePath.DIRECTORY_SEPARATOR.'NewFile-1.txt', 'hello baby');
 		$this->assertTrue(FileSystemUtils::isFile($basePath.DIRECTORY_SEPARATOR.'NewFile-1.txt'));
 		FileSystemUtils::createFile($basePath.DIRECTORY_SEPARATOR.'NewFile-copy-1.txt', 'hello baby');
 		$this->assertTrue(FileSystemUtils::isFile($basePath.DIRECTORY_SEPARATOR.'NewFile-copy-1.txt'));
 
-		$this->assertTrue(FileSystemUtils::findUniqueFileName($basePath) == '3');
+		// Verify generated names again
+		$this->assertTrue(FileSystemUtils::findUniqueFileName($basePath) == '4');
 		$this->assertTrue(FileSystemUtils::findUniqueFileName($basePath, 'NewFile.txt') == 'NewFile-2.txt');
 		$this->assertTrue(FileSystemUtils::findUniqueFileName($basePath, 'NewFile.txt', '', '-', true) == '1-NewFile.txt');
 		$this->assertTrue(FileSystemUtils::findUniqueFileName($basePath, 'NewFile.txt', 'copy', '-', false) == 'NewFile-copy-2.txt');
