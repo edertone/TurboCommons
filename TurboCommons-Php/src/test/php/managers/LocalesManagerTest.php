@@ -40,6 +40,12 @@ class LocalesManagerTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($localesManager->get('PASSWORD', 'Locales') == 'Password');
 		$this->assertTrue($localesManager->get('USER', 'Locales') == 'User');
 		$this->assertTrue($localesManager->get('LOGIN', 'Locales') == 'Login');
+		$this->assertTrue($localesManager->get('PASSWORD', 'Locales', 'en_US') == 'Password');
+		$this->assertTrue($localesManager->get('USER', 'Locales', 'es_ES') == 'Usuario');
+
+		// Verify defined attributes are still the same
+		$this->assertTrue($localesManager->locales === ['en_US', 'es_ES']);
+		$this->assertTrue($localesManager->paths === [__DIR__.'/../../resources/managers/localesManager/test1']);
 
 		// Test ES_ES
 		$localesManager->locales = ['es_ES', 'en_US'];
@@ -50,6 +56,10 @@ class LocalesManagerTest extends PHPUnit_Framework_TestCase {
 
 		// Test tag that is missing on es_ES but found on en_US
 		$this->assertTrue($localesManager->get('MISSING_TAG', 'Locales') == 'Missing tag');
+
+		// Verify defined attributes are still the same
+		$this->assertTrue($localesManager->locales === ['es_ES', 'en_US']);
+		$this->assertTrue($localesManager->paths === [__DIR__.'/../../resources/managers/localesManager/test1']);
 
 		// Test tag that is missing everywhere
 		$this->setExpectedException('Exception');

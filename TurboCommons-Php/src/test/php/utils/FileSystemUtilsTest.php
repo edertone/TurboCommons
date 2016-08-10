@@ -30,11 +30,8 @@ class FileSystemUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testIsDirectoryEmpty(){
 
-		$basePath = __DIR__.'/../../resources/utils/fileSystemUtils/isDirectoryEmpty';
-
-		// Create the folder
-		FileSystemUtils::createDirectory($basePath, true);
-		$this->assertTrue(FileSystemUtils::isDirectory($basePath));
+		// Create a temporary folder
+		$basePath = FileSystemUtils::createTempDirectory('TurboCommons-Php');
 		$this->assertTrue(FileSystemUtils::isDirectoryEmpty($basePath));
 
 		// Create some file
@@ -55,11 +52,9 @@ class FileSystemUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testFindUniqueDirectoryName(){
 
-		$basePath = __DIR__.'/../../resources/utils/fileSystemUtils/findUniqueDirectoryName';
-
-		// Make sure base path does not exist and create it
-		$this->assertTrue(!FileSystemUtils::isDirectory($basePath));
-		FileSystemUtils::createDirectory($basePath, true);
+		// Create a temporary folder
+		$basePath = FileSystemUtils::createTempDirectory('TurboCommons-Php');
+		$this->assertTrue(FileSystemUtils::isDirectoryEmpty($basePath));
 
 		$this->assertTrue(FileSystemUtils::findUniqueDirectoryName($basePath) == '1');
 		$this->assertTrue(FileSystemUtils::findUniqueDirectoryName($basePath, 'NewFolder') == 'NewFolder');
@@ -101,11 +96,9 @@ class FileSystemUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testFindUniqueFileName(){
 
-		$basePath = __DIR__.'/../../resources/utils/fileSystemUtils/findUniqueFileName';
-
-		// Make sure base path does not exist and create it
-		$this->assertTrue(!FileSystemUtils::isDirectory($basePath));
-		FileSystemUtils::createDirectory($basePath, true);
+		// Create a temporary folder
+		$basePath = FileSystemUtils::createTempDirectory('TurboCommons-Php');
+		$this->assertTrue(FileSystemUtils::isDirectoryEmpty($basePath));
 
 		$this->assertTrue(FileSystemUtils::findUniqueFileName($basePath) == '1', 'error '.FileSystemUtils::findUniqueFileName($basePath));
 		$this->assertTrue(FileSystemUtils::findUniqueFileName($basePath, 'NewFile.txt') == 'NewFile.txt');

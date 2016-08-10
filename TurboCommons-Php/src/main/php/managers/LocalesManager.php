@@ -125,14 +125,17 @@ class LocalesManager extends BaseSingletonClass{
 	 * that was used on the inmediate previous call of this method will be used. This can save us lots of typing
 	 * if we are reading multiple consecutive keys from the same bundle.
 	 * @param string $locale The locale we are requesting from the specified bundle and key. If not specified, the value
-	 * that is defined on the locale parameter of this class will be used.
+	 * that is defined on the locales attribute of this class will be used.
 	 *
 	 * @return string The localized text
 	 */
 	public function get($key, $bundle = '', $locale = ''){
 
+		// We copy the locales array to prevent it from being altered by this method
+		$localesArray = $this->locales;
+
 		// Locales must be an array
-		if(!is_array($this->locales)){
+		if(!is_array($localesArray)){
 
 			throw new Exception('LocalesManager->get: locales property must be an array');
 		}
@@ -151,11 +154,11 @@ class LocalesManager extends BaseSingletonClass{
 		// Add the specified locale at the start of the list of locales
 		if($locale != ''){
 
-			array_unshift($this->locales, $locale);
+			array_unshift($localesArray, $locale);
 		}
 
 		// Loop all the locales to find the first one with a value for the specified key
-		foreach ($this->locales as $locale) {
+		foreach ($localesArray as $locale) {
 
 			// Check if we need to load the bundle from disk
 			if(!isset($this->_loadedData[$bundle][$locale])){
@@ -169,7 +172,7 @@ class LocalesManager extends BaseSingletonClass{
 			}
 		}
 
-		throw new Exception('LocalesManager->get: Specified key <'.$key.'> was not found on locales list: ['.implode(', ', $this->locales).']');
+		throw new Exception('LocalesManager->get: Specified key <'.$key.'> was not found on locales list: ['.implode(', ', $localesArray).']');
 	}
 
 

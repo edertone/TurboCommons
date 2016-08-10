@@ -253,6 +253,41 @@ class FileSystemUtils{
 
 
 	/**
+	 * Create a TEMPORARY directory on the operating system tmp files location, and gives us the full path to access it.
+	 * OS should take care of its removal but it is not assured, so it is recommended to make sure all the tmp data is deleted after
+	 * using it (This is specially important if the tmp folder contains sensitive data). Even so, this method tries to delete the generated tmp
+	 * folder by default when the application ends.
+	 *
+	 * @param string $desiredName A name we want for the new directory to be created. If name is not available, a unique one (based on the given name) will be generated automatically.
+	 * @param boolean $deleteOnExecutionEnd Defines if the generated temp folder must be deleted after the current script execution finishes. Note that when files inside the folder are still used by the app or OS, exceptions or problems may happen, and it is not 100% guaranteed that the folder will be always deleted.
+	 *
+	 * @return string The full path to the newly created temporary directory, including the directory itself. For example: C:\Users\Me\AppData\Local\Temp\MyDesiredName
+	 */
+	public static function createTempDirectory($desiredName, $deleteOnExecutionEnd = true) {
+
+		$tempRoot = StringUtils::formatPath(sys_get_temp_dir());
+
+		$tempDirectory = $tempRoot.DIRECTORY_SEPARATOR.self::findUniqueDirectoryName($tempRoot, $desiredName);
+
+		if(!self::createDirectory($tempDirectory)){
+
+			throw new Exception('FileSystemUtils->createTempDirectory: Could not create TMP directory '.$tempDirectory);
+		}
+
+		// Add a shutdown function to try to delete the file when the current script execution ends
+		if($deleteOnExecutionEnd){
+
+			register_shutdown_function(function () use ($tempDirectory) {
+
+				self::deleteDirectory($tempDirectory);
+			});
+		}
+
+		return $tempDirectory;
+	}
+
+
+	/**
 	 * Gives the list of items that are stored on the specified folder. It will give files and directories, and each element will be the item name, without the path to it.
 	 * The contents of any subfolder will not be listed. We must call this method for each child folder if we want to get it's list.
 	 * (The method ignores the . and .. items if exist).
@@ -452,6 +487,12 @@ class FileSystemUtils{
 		}
 
 		return true;
+
+	}
+
+
+	/** TODO */
+	public static function createTempFile(){
 
 	}
 
