@@ -3,20 +3,42 @@
 /**
  * TurboCommons is a general purpose and cross-language library that implements frequently used and generic software development tasks.
  *
+ * Website : -> http://www.turbocommons.org
  * License : -> Licensed under the Apache License, Version 2.0. You may not use this file except in compliance with the License.
  * License Url : -> http://www.apache.org/licenses/LICENSE-2.0
  * CopyRight : -> Copyright 2015 Edertone Advanded Solutions (08211 Castellar del Vallès, Barcelona). http://www.edertone.com
  */
 
+/** @namespace */
+var org_turbocommons_src_main_js_managers = org_turbocommons_src_main_js_managers || {};
+
 
 /**
  * SINGLETON General purpose popup management class
- * import path: 'js/libs/libEdertoneJS/managers/PopUpManager.js'
+ * 
+ * <pre><code>
+ * Usage example:
+ * 
+ * var p = org_turbocommons_src_main_js_managers.PopUpManager.getInstance();
+ * 
+ * p.showBusyCursor();
+ * p.removeBusyCursor();
+ * ...
+ * </code></pre>
+ * 
+ * @class
  */
-var PopUpManager = {
+org_turbocommons_src_main_js_managers.PopUpManager = {
 
 	_popUpManager : null,
 
+	/**
+	 * Get the global singleton class instance
+	 * 
+	 * @memberOf org_turbocommons_src_main_js_managers.PopUpManager
+	 * 
+	 * @returns {org_turbocommons_src_main_js_managers.PopUpManager} The global PopUpManager instance
+	 */
 	getInstance : function(){
 
 		if(!this._popUpManager){
@@ -28,6 +50,8 @@ var PopUpManager = {
 				 * Note1: The css property that is used to show and hide the menu element is "visibility"
 				 * Note2: The menu positioning and layout is not modified by this method, so it must be defined via the respective css on the menu element.
 				 * Note3: Rollover show / hide is also possible by setting the enableRollOver parameter to true
+				 * 
+				 * @memberOf org_turbocommons_src_main_js_managers.PopUpManager.prototype
 				 * 
 				 * @param button A JQuery object that represents the button that will control the related menu element
 				 * @param menu A JQuery object that represents the menu that will be shown and hidden by the related button element. Visibility is the css property that is used to show or hide this menu. 
@@ -218,6 +242,8 @@ var PopUpManager = {
 				/**
 				 * Attaches the specified tooltip to the specified element.
 				 * 
+				 * @memberOf org_turbocommons_src_main_js_managers.PopUpManager.prototype
+				 * 
 				 * @param element A jquery object that will represent the element where the tooltip will be attached
 				 * @param tooltip A jquery object that will represent the tooltip that will be attached to the specified element
 				 * @param fadeInDelay 300ms by default, the time it will take for the tooltip to start appearing 
@@ -343,6 +369,8 @@ var PopUpManager = {
 				 * Opens the specified URL in a new standalone browser window that can have a custom defined size.
 				 * Not recomended on multi device apps, cause it will have unexpected behaviours on mobile browsers.
 				 * 
+				 * @memberOf org_turbocommons_src_main_js_managers.PopUpManager.prototype
+				 * 
 				 * @param url the address that will be opened on the standalone browser window 
 				 * @param title The title that will be displayed on the top of the browser window that will contain the specified url
 				 * @param size full by default. The browser window dimensions. We can define a WidthxHeight value or set it to 'full'. for example: 250x100, 600x400, full, ...
@@ -422,6 +450,8 @@ var PopUpManager = {
 				/**
 				 * Darkens the current screen and adds a simple busy cursor to the pointer. Note that mobile devices won't show any cursor, only the darkened screen
 				 * 
+				 * @memberOf org_turbocommons_src_main_js_managers.PopUpManager.prototype
+				 * 
 				 * @param backgroundAlpha Default .4, defines the alpha for the darkened background that will be shown
 				 * 
 				 * @returns void
@@ -452,6 +482,8 @@ var PopUpManager = {
 				/**
 				 * Removes a previously added busy cursor
 				 * 
+				 * @memberOf org_turbocommons_src_main_js_managers.PopUpManager.prototype
+				 * 
 				 * @returns void
 				 */
 				removeBusyCursor : function(){
@@ -478,6 +510,8 @@ var PopUpManager = {
 
 				/**
 				 * Shows the provided jquery element as a modal popup. 
+				 * 
+				 * @memberOf org_turbocommons_src_main_js_managers.PopUpManager.prototype
 				 * 
 				 * @param element The jquery element we want to show as a modal popup. It is mandatory to set its css display value to "display: none" by default. 
 				 * @param backgroundAlpha 0.8 bu default. The alpha for the background area below the popup element
@@ -594,6 +628,8 @@ var PopUpManager = {
 				/**
 				 * Remove an existing modal popup from the screen.
 				 * 
+				 * @memberOf org_turbocommons_src_main_js_managers.PopUpManager.prototype
+				 * 
 				 * @param element A jquery element that is currently being shown as a modal popup. 
 				 * @param destroy false by default. If true, once the popup element is removed it will be totally destroyed. If false it will be appended again to the root of the body, so it can be reused.
 				 * 
@@ -660,6 +696,8 @@ var PopUpManager = {
 
 				/**
 				 * Used to show an animated general purpose notification bar
+				 * 
+				 * @memberOf org_turbocommons_src_main_js_managers.PopUpManager.prototype
 				 * 
 				 * @param content  The information that will be shown on the notification bar. We can use html data or plain text.
 				 * @param link '' by default. Url that will be opened by the bar once it is clicked. If we leave it empty, the bar will not respond to click event.
@@ -837,6 +875,8 @@ var PopUpManager = {
 				/**
 				 * Remove an existing notification bar
 				 * 
+				 * @memberOf org_turbocommons_src_main_js_managers.PopUpManager.prototype
+				 * 
 				 * @param notificationBar A notification bar jquery object, obtained from a previous call to the showNotificationBar method
 				 * 
 				 * @returns void
@@ -855,6 +895,8 @@ var PopUpManager = {
 
 				/**
 				 * Used to show the legal cookies policy dialog. If the user accepts it, a cookie is used to prevent it from being shown again.
+				 * 
+				 * @memberOf org_turbocommons_src_main_js_managers.PopUpManager.prototype
 				 * 
 				 * @param text The legal informative text that will be shown on the dialog. Only plain text is allowed here. Note that you can use the predefined Locales on the LibEdertonePhp library: App::importLocaleBundle('Legal', '', ProjectPaths::LIBS_EDERTONE_PHP_LOCALE);	App::setVar('LOC_COOKIES_WARNING', LOC_COOKIES_WARNING);
 				 * @param moreInfoLink '' by default. An url that will be opened when the more info link is clicked 

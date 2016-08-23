@@ -3,16 +3,17 @@
 /**
  * TurboCommons is a general purpose and cross-language library that implements frequently used and generic software development tasks.
  *
+ * Website : -> http://www.turbocommons.org
  * License : -> Licensed under the Apache License, Version 2.0. You may not use this file except in compliance with the License.
  * License Url : -> http://www.apache.org/licenses/LICENSE-2.0
  * CopyRight : -> Copyright 2015 Edertone Advanded Solutions (08211 Castellar del Vallès, Barcelona). http://www.edertone.com
  */
 
-namespace com\edertone\turboCommons\src\test\php\managers;
+namespace org\turbocommons\src\test\php\managers;
 
 use Exception;
 use PHPUnit_Framework_TestCase;
-use com\edertone\turboCommons\src\main\php\utils\FileSystemUtils;
+use org\turbocommons\src\main\php\utils\FileSystemUtils;
 
 
 /**
@@ -41,6 +42,17 @@ class FileSystemUtilsTest extends PHPUnit_Framework_TestCase {
 		// test that exception happens with non existant folder
 		$this->setExpectedException('Exception');
 		FileSystemUtils::isDirectoryEmpty($basePath.DIRECTORY_SEPARATOR.'asdfwer');
+	}
+
+
+	/**
+	 * testGetDirectorySeparator
+	 *
+	 * @return void
+	 */
+	public function testGetDirectorySeparator(){
+
+		// TODO
 	}
 
 

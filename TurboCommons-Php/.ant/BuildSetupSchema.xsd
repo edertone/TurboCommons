@@ -206,20 +206,70 @@
 								
 							</xs:element>
 							
-							<!-- TODO Js element -->
+							<!-- Js element -->
 							<xs:element name="Js" minOccurs="0" maxOccurs="1">
 								
 								<xs:annotation>
-									<xs:documentation>TODO</xs:documentation>
+									<xs:documentation>Contains the configuration for the automatic JS unit tests when building the project</xs:documentation>
 								</xs:annotation>
 								
 								<xs:complexType>
-								
-									<xs:attribute name="TODO" default="false" type="xs:boolean">
+																	
+									<xs:choice minOccurs="1" maxOccurs="unbounded">
+									
+										<xs:element name="Browser">
+											
+											<xs:annotation>
+												<xs:documentation>Defines a browser instance where the tests will be executed. Multiple browsers can be used at the same time to test the project</xs:documentation>
+											</xs:annotation>
+											
+											<xs:complexType>
+											
+												<xs:attribute name="enabled" use="required" type="xs:boolean">
+													<xs:annotation>
+														<xs:documentation>Enable or disable the JS unit tests on this browser instance</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>	
+												
+												<xs:attribute name="osPath" use="required" type="xs:string">
+													<xs:annotation>
+														<xs:documentation>
+															Full Operating System path to the browser executable so it can be automatically executed by the tests build.&lt;br&gt;&lt;br&gt;
+															Example: C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+														</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>
+																				
+											</xs:complexType>
+											
+										</xs:element>
+									
+									</xs:choice>
+
+									<xs:attribute name="enabled" use="required" type="xs:boolean">
 										<xs:annotation>
-											<xs:documentation>TODO</xs:documentation>
+											<xs:documentation>Enable or disable the JS unit tests as part of the build process</xs:documentation>
 										</xs:annotation>
 									</xs:attribute>	
+									
+									<xs:attribute name="localServerPath" use="required" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>
+												A local server is required to correctly run the JS tests, so this value specifies a path to that local server http documents folder.
+												A subfolder called "ProjectName-unitTests" will be created when running the tests.&lt;br&gt;&lt;br&gt;
+												Example: C:/xampp/htdocs/unitTests
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="localServerUrl" use="required" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>
+												A local server is required to correctly run the JS tests, so this value specifies the same root folder as localServerPath but accessible via http, so the tests can be run on browser.&lt;br&gt;&lt;br&gt;
+												Example: http://localhost/unitTests
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
 																	
 								</xs:complexType>
 								
@@ -401,7 +451,19 @@
 							<xs:annotation>
 								<xs:documentation>Path where the phpdoc library 'phpDocumentor.phar' file is located</xs:documentation>
 							</xs:annotation>
-						</xs:attribute>	
+						</xs:attribute>
+						
+						<xs:attribute name="jsDocPath" default="C:/Program Files/nodejs/node_modules/.bin/jsdoc.cmd" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>Path where the jsdoc executor is located. Note that jsdoc needs to be installed on our system via node.js</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						
+						<xs:attribute name="jsDocTemplatePath" default="C:/Program Files/nodejs/node_modules/ink-docstrap/template" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>Path where the jsdoc custom template is located. This template is used to change the generated HTML documentation page. Extra templates are normally installed via node.js</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>		
 						
 						<xs:attribute name="phpPath" default="C:/xampp/php/php.exe" type="xs:string">
 							<xs:annotation>

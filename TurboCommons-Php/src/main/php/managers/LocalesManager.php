@@ -3,18 +3,19 @@
 /**
  * TurboCommons is a general purpose and cross-language library that implements frequently used and generic software development tasks.
  *
+ * Website : -> http://www.turbocommons.org
  * License : -> Licensed under the Apache License, Version 2.0. You may not use this file except in compliance with the License.
  * License Url : -> http://www.apache.org/licenses/LICENSE-2.0
  * CopyRight : -> Copyright 2015 Edertone Advanded Solutions (08211 Castellar del Vallès, Barcelona). http://www.edertone.com
  */
 
-namespace com\edertone\turboCommons\src\main\php\managers;
+namespace org\turbocommons\src\main\php\managers;
 
 use Exception;
-use com\edertone\turboCommons\src\main\php\model\BaseSingletonClass;
-use com\edertone\turboCommons\src\main\php\utils\FileSystemUtils;
-use com\edertone\turboCommons\src\main\php\utils\StringUtils;
-use com\edertone\turboCommons\src\main\php\utils\SerializationUtils;
+use org\turbocommons\src\main\php\model\BaseSingletonClass;
+use org\turbocommons\src\main\php\utils\FileSystemUtils;
+use org\turbocommons\src\main\php\utils\StringUtils;
+use org\turbocommons\src\main\php\utils\SerializationUtils;
 
 
 /**
@@ -46,7 +47,8 @@ class LocalesManager extends BaseSingletonClass{
 
 
 	/**
-	 * A list of languages by order of preference to search in the available resource bundles for a translation<br><br>
+	 * A list of languages that will be used by this class to translate the given keys, sorted by preference. When a key and bundle are requested for translation,
+	 * the class will check on the first language of this list for a translated text. If missing, the next one will be used, and so.<br><br>
 	 * For example: Setting this property to ['en_US', 'es_ES', 'fr_FR'] and calling
 	 * LocalesManager::getInstance()->get('HELLO', 'Greetings') will try to locate the en_US value for the
 	 * HELLO tag on the Greetings bundle. If the tag is not found for the specified locale and bundle, the same
@@ -74,26 +76,40 @@ class LocalesManager extends BaseSingletonClass{
 
 
 	/**
-	 * List of filesystem paths (relative or absolute) where the resourcebundles are located.
-	 * The class will try to load the data from the paths in order of preference, so if a duplicate key is found,
-	 * the one read first will prevail.
+	 * List of filesystem paths (relative or absolute) where the roots of our resourcebundles are located.
+	 * The class will try to load the data from the paths in order of preference. If a bundle name is duplicated on different paths, the bundle located on the first
+	 * path of the list will be always used.<br><br>
+	 * For example, if $paths = ['path1', 'path2'] and we have the same bundle named 'Customers' on both paths, the translation
+	 * for a key called 'NAME' will be always retrieved from path1. In case path1 does not contain the key, path2 will NOT be used to find a bundle.
 	 *
 	 * Example: ['../locales', 'src/resources/shared/locales']
+	 *
+	 * @var array
 	 */
 	public $paths = [];
 
 
 	/**
-	 * Defines the expected folder structure for the folders that contain the resourcebundles.
-	 * When trying to locate the bundle files, $locale will be replaced by the expected locale, and $bundle by the bundle name.
+	 * List that defines the expected structure for each of the specified bundle root folders. Its main purpose is to allow us storing
+	 * the bundles with any directory structure we want.
 	 *
-	 * TODO: improve documentation
+	 * Following format is expected: 'somefolder/somefolder/$locale/$bundle.extension', where $locale will be replaced by the
+	 * current locale, and $bundle by the current bundle name.
+	 *
+	 * Note:  If there are less elements in $pathStructure than in $paths, the last element of the list
+	 * list will be used for the rest of the paths that do no have an explicit path structure defined.
+	 *
+	 * Example: ['myFolder/$locale/$bundle.txt'] will resolve to 'myFolder/en_US/Customers.txt' when trying to load the Customers bundle for US english locale.
+	 *
+	 * @var array
 	 */
-	public $pathStructure = '$locale/$bundle.properties';
+	public $pathStructure = ['$locale/$bundle.properties'];
 
 
 	/**
 	 * Stores the locales data as it is read from disk
+	 *
+	 * @var array
 	 */
 	private $_loadedData = [];
 
@@ -140,6 +156,22 @@ class LocalesManager extends BaseSingletonClass{
 			throw new Exception('LocalesManager->get: locales property must be an array');
 		}
 
+		// Paths verifications
+		if(!is_array($this->paths)){
+
+			throw new Exception('LocalesManager->get: paths property must be an array');
+		}
+
+		if(!is_array($this->pathStructure)){
+
+			throw new Exception('LocalesManager->get: pathStructure property must be an array');
+		}
+
+		if(count($this->pathStructure) > count($this->paths)){
+
+			throw new Exception('LocalesManager->get: pathStructure cannot have more elements than paths');
+		}
+
 		// Check if we need to load the last used bundle
 		if($bundle == ''){
 
@@ -150,6 +182,9 @@ class LocalesManager extends BaseSingletonClass{
 
 			throw new Exception('LocalesManager->get: No resource bundle specified');
 		}
+
+		// Store the specified bundle name as the last that's been used till now
+		$this->_lastBundle = $bundle;
 
 		// Add the specified locale at the start of the list of locales
 		if($locale != ''){
@@ -186,10 +221,15 @@ class LocalesManager extends BaseSingletonClass{
 	 */
 	private function _loadBundle($bundle, $locale){
 
-		// Process the path format string
-		$pathStructure = str_replace(['$bundle', '$locale'], [$bundle, $locale], $this->pathStructure);
+		$pathStructureArray = $this->pathStructure;
 
 		foreach ($this->paths as $path) {
+
+			// Process the path format string
+			if(count($pathStructureArray) > 0){
+
+				$pathStructure = str_replace(['$bundle', '$locale'], [$bundle, $locale], array_shift($pathStructureArray));
+			}
 
 			$bundlePath = StringUtils::formatPath($path.DIRECTORY_SEPARATOR.$pathStructure);
 

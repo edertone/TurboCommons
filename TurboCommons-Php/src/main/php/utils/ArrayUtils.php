@@ -9,16 +9,22 @@
  * CopyRight : -> Copyright 2015 Edertone Advanded Solutions (08211 Castellar del Vallès, Barcelona). http://www.edertone.com
  */
 
-require_once __DIR__.'/../main/php/AutoLoader.php';
-require_once __DIR__.'/php/libs/phpunit.phar';
+namespace org\turbocommons\src\main\php\utils;
 
 
-$phpunit = new PHPUnit_TextUI_TestRunner();
+/**
+ * Utilities to perform common array operations
+ */
+class ArrayUtils {
 
-// Run all the tests inside the current folder or subfolders for all the files ending with Test.php
-if(!$phpunit->dorun($phpunit->getTest(__DIR__, '', 'Test.php'))->wasSuccessful()){
 
-	throw new Exception();
+	/**
+	 * TODO
+	 */
+	public static function isEqual(){
+
+		// TODO: copiar de javascript
+	}
 }
 
 ?>

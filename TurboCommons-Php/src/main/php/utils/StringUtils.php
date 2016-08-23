@@ -3,12 +3,15 @@
 /**
  * TurboCommons is a general purpose and cross-language library that implements frequently used and generic software development tasks.
  *
+ * Website : -> http://www.turbocommons.org
  * License : -> Licensed under the Apache License, Version 2.0. You may not use this file except in compliance with the License.
  * License Url : -> http://www.apache.org/licenses/LICENSE-2.0
  * CopyRight : -> Copyright 2015 Edertone Advanded Solutions (08211 Castellar del Vallès, Barcelona). http://www.edertone.com
  */
 
-namespace com\edertone\turboCommons\src\main\php\utils;
+namespace org\turbocommons\src\main\php\utils;
+
+use Exception;
 
 
 /**
@@ -59,11 +62,14 @@ class StringUtils {
 		}
 
 		// Check if the empty keys array is specified
-		if(count($otherEmptyKeys) > 0){
+		if(is_array($otherEmptyKeys)){
 
-			if(in_array($aux, $otherEmptyKeys)){
+			if(count($otherEmptyKeys) > 0){
 
-				return true;
+				if(in_array($aux, $otherEmptyKeys)){
+
+					return true;
+				}
 			}
 		}
 
@@ -72,28 +78,76 @@ class StringUtils {
 
 
 	/**
-	 * Method that limits the lenght of a given string, appending 3 dots, meaning the string is longer.
+	 * Count the number of words that exist on the given string
+	 *
+	 * @param string $string The string which words will be counted
+	 * @param string wordSeparator ' ' by default. The character that is considered as the word sepparator
+	 *
+	 * @return int The number of words (elements divided by the wordSeparator value) that are present on the string
+	 */
+	public static function countWords($string, $wordSeparator = ' '){
+
+		$count = 0;
+		$lines = StringUtils::extractLines($string);
+
+		for ($i = 0; $i < count($lines); $i++) {
+
+			$words = explode($wordSeparator, $lines[$i]);
+
+			for ($j = 0; $j < count($words); $j++) {
+
+				if(!StringUtils::isEmpty($words[$j])){
+
+					$count++;
+				}
+			}
+		}
+
+		return $count;
+	}
+
+
+	/**
+	 * Method that limits the lenght of a string and optionally appends informative characters like ' ...'
+	 * to inform that the original string was longer.
 	 *
 	 * @param string $string String to limit
 	 * @param int $limit Max number of characters
 	 * @param string $limiterString If the specified text exceeds the specified limit, the value of this parameter will be added to the end of the result. The value is ' ...' by default.
 	 *
-	 * @return string The specified string but limited by the specified lenght
+	 * @return string The specified string but limited in length if necessary. Final result will never exceed the specified limit, also with the limiterString appended.
 	 */
 	public static function limitLen($string, $limit = 100, $limiterString = ' ...'){
+
+		if(!is_numeric($limit)){
+
+			throw new Exception('StringUtils->limitLen: limit must be a numeric value');
+		}
+
+		if(!is_string($string)){
+
+			return '';
+		}
 
 		if(strlen($string) <= $limit){
 
 			return $string;
 		}
 
-		return mb_strcut($string, 0, $limit, mb_detect_encoding($string)).$limiterString;
-    }
+		if(strlen($limiterString) > $limit){
+
+			return substr($limiterString, 0, $limit);
+
+		}else{
+
+			return substr($string, 0, $limit - strlen($limiterString)).$limiterString;
+		}
+	}
 
 
     /**
      * Extracts all the lines from the given string and outputs an array with each line as an element.
-     * It does not matter which line sepparator's been used (\n, \r, Windows, linux...). All source lines will be correctly extracted.
+     * It does not matter which line separator's been used (\n, \r, Windows, linux...). All source lines will be correctly extracted.
      *
      * @param string $string Text containing one or more lines that will be converted to an array with each line on a different element.
      * @param array $filters One or more regular expressions that will be used to filter unwanted lines. Lines that match any of the
@@ -103,16 +157,25 @@ class StringUtils {
      */
     public static function extractLines($string, array $filters = ['/\s+/']){
 
-    	$res = array();
+    	$res = [];
 
-    	$tmp = preg_split("/((\r?\n)|(\r\n?))/", $string);
+    	// Validate we are receiving a string
+    	if(!is_string($string)){
+
+    		return $res;
+    	}
+
+    	$tmp = preg_split("/\r?\n/", $string);
 
     	foreach($tmp as $line){
 
     		// Apply specified filters
-    		if(preg_replace($filters, '', $line) != ''){
+    		if(is_String($line)){
+
+	    		if(preg_replace($filters, '', $line) != ''){
 
     				array_push($res, $line);
+	    		}
     		}
     	}
 
@@ -121,17 +184,18 @@ class StringUtils {
 
 
     /**
-     * Generates an array containing the words that are more common on the text until the count reaches the max specified value
+     * Generates an array with a list of common words from the specified text.
+     * The list will be sorted so the words that appear more times on the string are placed first.
      *
-     * @param string $string String to extract its keywords
-     * @param string $max The maxium of keywords which will be extracted. If no specified, all keywords will be returned
-     * @param string $longerThan The minimum number of chars for the keywords to find
+     * @param string $string Piece of text that contains the keywords we want to extract
+     * @param string $max The maxium of keywords to extract. If set to null, all unique words on the given text will be returned
+     * @param string $longerThan The minimum number of chars for the keywords to find. This is useful to filter some irrelevant words like: the, it, me, ...
      * @param string $shorterThan The maximum number of chars for the keywords to find
-     * @param string $removeNumericWords Flag that will tell the method to skip words that represent numeric values
+     * @param string $ignoreNumericWords Tells the method to skip words that represent numeric values on the result. False by default
      *
-     * @return array The list of keywords that have been extracted
+     * @return array The list of keywords that have been extracted from the given text
      */
-    public static function extractKeywords($string, $max = '', $longerThan = 3, $shorterThan = 15, $removeNumericWords = false){
+    public static function extractKeyWords($string, $max = 25, $longerThan = 3, $shorterThan = 15, $ignoreNumericWords = false){
 
     	// Convert all the - and _ characters to blank spaces
     	$string = str_replace('-', ' ', str_replace('_', ' ', $string));
@@ -160,7 +224,7 @@ class StringUtils {
 
     		foreach($words as $key => $v){
     			if($v == $i){
-					if(!is_numeric($key) || (is_numeric($key) && !$removeNumericWords)){
+					if(!is_numeric($key) || (is_numeric($key) && !$ignoreNumericWords)){
 						array_push($res, $key);
 					}
     			}
@@ -252,9 +316,11 @@ class StringUtils {
 
 
     /**
-     * Given a raw string containing a file system path, this method will process it to obtain a path that is 100% format valid for the current operating system.
-	 * Directory separators will be converted to the OS valid ones, and no directory separator will be present at the end. This method basically standarizes
-	 * the given path so it does not fail for the current OS.
+     * Given a raw string containing a file system path, this method will process it to obtain a path that
+     * is 100% format valid for the current operating system.
+	 * Directory separators will be converted to the OS valid ones, no directory separator will be present
+	 * at the end and duplicate separators will be removed.
+	 * This method basically standarizes the given path so it does not fail for the current OS.
 	 *
 	 * NOTE: This method will not check if the path is a real path on the current file system; it will only fix formatting problems
 	 *
@@ -264,23 +330,35 @@ class StringUtils {
      */
     public static function formatPath($path){
 
-    	// Replace all slashes on the path to the os default
-    	$res = str_replace('/', DIRECTORY_SEPARATOR, $path);
-    	$res = str_replace('\\', DIRECTORY_SEPARATOR, $res);
+    	$osSeparator = FileSystemUtils::getDirectorySeparator();
+
+    	if($path == null){
+
+    		return '';
+    	}
+
+    	if(!is_string($path)){
+
+    		throw new Exception('StringUtils->formatPath: Specified path must be a string');
+    	}
+
+    	// Replace all slashes on the path with the os default
+    	$path = str_replace('/', $osSeparator, $path);
+    	$path = str_replace('\\', $osSeparator, $path);
 
     	// Remove duplicate path separator characters
-    	while(strpos($res, DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR) !== false) {
+    	while(strpos($path, $osSeparator.$osSeparator) !== false) {
 
-    		$res = str_replace(DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $res);
+    		$path = str_replace($osSeparator.$osSeparator, $osSeparator, $path);
     	}
 
     	// Remove the last slash only if it exists, to prevent duplicate directory separator
-    	if(substr($res, strlen($res) - 1) == DIRECTORY_SEPARATOR){
+    	if(substr($path, strlen($path) - 1) == $osSeparator){
 
-    		$res = substr($res, 0, strlen($res) - 1);
+    		$path = substr($path, 0, strlen($path) - 1);
     	}
 
-    	return $res;
+    	return $path;
     }
 
 
@@ -291,11 +369,11 @@ class StringUtils {
      * To perform the search it is important that both search and searched strings are standarized the same way, to maximize possible matches.
      *
      * @param string $string String to process
-     * @param string $wordSepparator The character that will be used as the word sepparator. By default it is the empty space character ' '
+     * @param string $wordSeparator The character that will be used as the word separator. By default it is the empty space character ' '
      *
      * @return string The resulting string
      */
-    public static function formatForFullTextSearch($string, $wordSepparator = ' '){
+    public static function formatForFullTextSearch($string, $wordSeparator = ' '){
 
     	// Remove accents
     	$res = self::removeAccents($string);
@@ -306,9 +384,9 @@ class StringUtils {
     	// Take only alphanumerical characters, but keep the spaces
     	$res = preg_replace('/[^a-z0-9 ]/', '', $res);
 
-    	if($wordSepparator != ' '){
+    	if($wordSeparator != ' '){
 
-    		$res = str_replace(' ', $wordSepparator, $res);
+    		$res = str_replace(' ', $wordSeparator, $res);
     	}
 
     	return $res;

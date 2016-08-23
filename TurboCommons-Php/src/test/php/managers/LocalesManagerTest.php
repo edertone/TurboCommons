@@ -3,16 +3,17 @@
 /**
  * TurboCommons is a general purpose and cross-language library that implements frequently used and generic software development tasks.
  *
+ * Website : -> http://www.turbocommons.org
  * License : -> Licensed under the Apache License, Version 2.0. You may not use this file except in compliance with the License.
  * License Url : -> http://www.apache.org/licenses/LICENSE-2.0
  * CopyRight : -> Copyright 2015 Edertone Advanded Solutions (08211 Castellar del Vallès, Barcelona). http://www.edertone.com
  */
 
-namespace com\edertone\turboCommons\src\test\php\managers;
+namespace org\turbocommons\src\test\php\managers;
 
 use Exception;
 use PHPUnit_Framework_TestCase;
-use com\edertone\turboCommons\src\main\php\managers\LocalesManager;
+use org\turbocommons\src\main\php\managers\LocalesManager;
 
 
 /**
@@ -46,6 +47,7 @@ class LocalesManagerTest extends PHPUnit_Framework_TestCase {
 		// Verify defined attributes are still the same
 		$this->assertTrue($localesManager->locales === ['en_US', 'es_ES']);
 		$this->assertTrue($localesManager->paths === [__DIR__.'/../../resources/managers/localesManager/test1']);
+		$this->assertTrue($localesManager->pathStructure === ['$locale/$bundle.properties']);
 
 		// Test ES_ES
 		$localesManager->locales = ['es_ES', 'en_US'];
@@ -57,9 +59,15 @@ class LocalesManagerTest extends PHPUnit_Framework_TestCase {
 		// Test tag that is missing on es_ES but found on en_US
 		$this->assertTrue($localesManager->get('MISSING_TAG', 'Locales') == 'Missing tag');
 
+		// Test that if we skip the bundle name, previous bundle will be used to get the translation
+		$this->assertTrue($localesManager->get('PASSWORD') == 'Contraseña');
+		$this->assertTrue($localesManager->get('USER') == 'Usuario');
+		$this->assertTrue($localesManager->get('LOGIN') == 'Login');
+
 		// Verify defined attributes are still the same
 		$this->assertTrue($localesManager->locales === ['es_ES', 'en_US']);
 		$this->assertTrue($localesManager->paths === [__DIR__.'/../../resources/managers/localesManager/test1']);
+		$this->assertTrue($localesManager->pathStructure === ['$locale/$bundle.properties']);
 
 		// Test tag that is missing everywhere
 		$this->setExpectedException('Exception');

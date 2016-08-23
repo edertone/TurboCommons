@@ -95,6 +95,8 @@
 		<property name="Tools.cssValidatorPath" value="C:/BuildTools/W3c-css-validator/css-validator.jar" />
 		<property name="Tools.mysqlPath" value="C:/xampp/mysql/bin/mysql.exe" />	
 		<property name="Tools.phpDocPath" value="C:/BuildTools/PhpDocumentor/phpDocumentor.phar" />
+		<property name="Tools.jsDocPath" value="C:/Program Files/nodejs/node_modules/.bin/jsdoc.cmd" />
+		<property name="Tools.jsDocTemplatePath" value="C:/Program Files/nodejs/node_modules/ink-docstrap/template" />
 		<property name="Tools.phpPath" value="C:/xampp/php/php.exe" />
 				
 	</target>
@@ -125,6 +127,11 @@
 			
 						self.project.executeTarget("runPhpTestsCmd");
 					}
+				}
+			
+				if(project.getProperty("Test.Js.enabled") == "true"){
+						
+					self.project.executeTarget("runJsTestsLocalServer");
 				}
 			
 				if(project.getProperty("Release.enabled") == "true"){
@@ -203,7 +210,7 @@
 	<target name="runPhpTestsLocalServer">
 	
 		<!-- Test.Php.localServerPath must exist -->
-		<fail message="Test.Php.localServerPath not found. A local server folder is required to run unit tests.">
+		<fail message="Test.Php.localServerPath not found. A local server folder is required to run unit tests. Create it if not exists">
 		    <condition>
 		    	<not>
 		    		<available file="${Test.Php.localServerPath}" />
@@ -226,6 +233,70 @@
 		<delete dir="${Test.Php.localServerPath}/${projectBaseName}-unitTests" failonerror="true" />
 		
 	</target>
+	
+	
+	<!-- Launch the Js unit tests via local web server -->
+	<target name="runJsTestsLocalServer">
+	
+		<!-- Test.Js.localServerPath must exist -->
+		<fail message="Test.Js.localServerPath not found. A local server folder is required to run unit tests. Create it if not exists">
+		    <condition>
+		    	<not>
+		    		<available file="${Test.Js.localServerPath}" />
+		    	</not>
+		    </condition>
+		</fail>
+
+		<!-- Clear the destination folder -->
+		<delete dir="${Test.Js.localServerPath}/${projectBaseName}-unitTests" failonerror="true" />
+				
+		<!-- Copy all the required files -->
+		<copy todir="${Test.Js.localServerPath}/${projectBaseName}-unitTests" overwrite="true">
+			<fileset dir="${srcFolderPath}/test" casesensitive="false" />
+		</copy>
+			
+		<concat destfile="${Test.Js.localServerPath}/${projectBaseName}-unitTests/index.js">
+			
+			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false">
+				<include name="**/*.js" />
+			</fileset>
+	    
+		</concat>
+		
+		<concat destfile="${Test.Js.localServerPath}/${projectBaseName}-unitTests/index.js" 
+				append="true">
+					
+			<fileset dir="${Test.Js.localServerPath}/${projectBaseName}-unitTests/js" casesensitive="false">
+				<include name="**/*.js" />
+				<exclude name="libs/" />
+			</fileset>
+	    
+		</concat>
+		
+		<script language="javascript">
+			<![CDATA[
+			    
+				var browsersEnabled = project.getProperty("Test.Js.Browser.enabled").split(",");
+				var browserPaths = project.getProperty("Test.Js.Browser.osPath").split(",");
+				var url = project.getProperty("Test.Js.localServerUrl") + "/" + project.getProperty("projectBaseName") + "-unitTests/index.html";
+			
+				for(var i=0; i < browserPaths.length; i++){
+					
+					if(browsersEnabled[i] === "true"){
+			
+						var exec = project.createTask("exec");
+						exec.setExecutable(browserPaths[i]);
+						exec.setSpawn(true);
+					
+						exec.createArg().setLine(url);
+						
+						exec.perform();
+					}						
+				}				
+			]]>
+		</script>
+				
+	</target>
 		
 	
 	<!-- Create the optimized release version and tag it with the current version and build number -->
@@ -235,6 +306,12 @@
 				
 		<script language="javascript">
 			<![CDATA[
+					
+				// Java 8 requires to load a compatibility library for some imports to work
+				var version = java.lang.System.getProperty("java.version");
+				if (version.startsWith("1.8.0")) {
+				    load("nashorn:mozilla_compat.js");
+				}
 				
 				importPackage(Packages.org.apache.tools.ant.types);
 			   	importClass(java.io.File);
@@ -350,8 +427,16 @@
 	<!-- Generate the js documentation from source code -->
 	<target name="createJsDoc">
 
-		<!-- TODO -->
 		<mkdir dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/doc/js"/>
+
+		<exec executable="${Tools.jsDocPath}" failonerror="true" outputproperty="createJsDocOutputRedir">
+			<arg value="${targetFolderPath}/${projectBaseName}/main/js" />
+			<arg value="-t" />
+			<arg value="${Tools.jsDocTemplatePath}" />
+			<arg value="-r" />
+			<arg value="-d" />
+			<arg value="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/doc/js" />
+		</exec>
 
 	</target>
 	
@@ -374,9 +459,21 @@
 		<!-- Split the tags and generate the respective output for the latest ${Release.gitChangeLogCount} number of versions -->
 		<script language="javascript"><![CDATA[
 			
-			var tags = project.getProperty("gitTagsList").replace("\r", "").split("\n").reverse();
-						
+			// Java 8 requires to load a compatibility library for some imports to work
+			var version = java.lang.System.getProperty("java.version");
+			if (version.startsWith("1.8.0")) {
+			    load("nashorn:mozilla_compat.js");
+			}
+			
 			importClass(java.io.File);
+			
+			// get the list of tags on the git repo and clean up any unwanted character
+			var tags = project.getProperty("gitTagsList").split("\n").reverse();
+			
+			for(var i=0; i < tags.length; i++){
+			
+				tags[i] = tags[i].replace(/\r?\n|\r/g, "");
+			}
 			
 			var changeLogFile = new File(project.getProperty("changeLogFilePath"));
 	        
@@ -411,7 +508,7 @@
 				var exec = project.createTask("exec");
 				exec.setExecutable("git");
 				exec.setFailonerror(true);
-				exec.setOutputproperty("changeLogTagProperty" + i);
+				exec.setOutputproperty("changeLogTagProperty" + i.toString());
 			
 				if(i >= (tags.length - 1)){
 			
@@ -424,7 +521,7 @@
 				
 				exec.perform();	
 			
-				echo.setMessage(project.getProperty("changeLogTagProperty" + i));
+				echo.setMessage(project.getProperty("changeLogTagProperty" + i.toString()));
 				echo.perform();	
 			}
 	       
