@@ -81,22 +81,24 @@ class StringUtils {
 	 * Count the number of words that exist on the given string
 	 *
 	 * @param string $string The string which words will be counted
-	 * @param string wordSeparator ' ' by default. The character that is considered as the word sepparator
+	 * @param string $wordSeparator ' ' by default. The character that is considered as the word sepparator
 	 *
 	 * @return int The number of words (elements divided by the wordSeparator value) that are present on the string
 	 */
 	public static function countWords($string, $wordSeparator = ' '){
 
 		$count = 0;
-		$lines = StringUtils::extractLines($string);
+		$lines = self::extractLines($string);
+		$linesCount = count($lines);
 
-		for ($i = 0; $i < count($lines); $i++) {
+		for ($i = 0; $i < $linesCount; $i++) {
 
 			$words = explode($wordSeparator, $lines[$i]);
+			$wordsCount = count($words);
 
-			for ($j = 0; $j < count($words); $j++) {
+			for ($j = 0; $j < $wordsCount; $j++) {
 
-				if(!StringUtils::isEmpty($words[$j])){
+				if(!self::isEmpty($words[$j])){
 
 					$count++;
 				}
@@ -170,7 +172,7 @@ class StringUtils {
     	foreach($tmp as $line){
 
     		// Apply specified filters
-    		if(is_String($line)){
+    		if(is_string($line)){
 
 	    		if(preg_replace($filters, '', $line) != ''){
 

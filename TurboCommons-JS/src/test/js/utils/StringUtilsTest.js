@@ -11,7 +11,6 @@
 
 // Import namespaces
 var utils = org_turbocommons_src_main_js_utils;
-var managers = org_turbocommons_src_main_js_managers;
 
 
 QUnit.module("StringUtilsTest");

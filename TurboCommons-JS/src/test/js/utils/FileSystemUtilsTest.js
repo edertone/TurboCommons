@@ -9,9 +9,6 @@
  * CopyRight : -> Copyright 2015 Edertone Advanded Solutions (08211 Castellar del Vallès, Barcelona). http://www.edertone.com
  */
 
-// Import namespaces
-var utils = org_turbocommons_src_main_js_utils;
-
 
 QUnit.module("FileSystemUtilsTest");
 
