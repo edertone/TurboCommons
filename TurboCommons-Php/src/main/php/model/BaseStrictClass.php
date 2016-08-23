@@ -47,7 +47,7 @@ class BaseStrictClass {
 	}
 
 
-	// TODO: Incloure més bones practiques OOP
+	// TODO: Add More OOP best practices
 
 }
 
