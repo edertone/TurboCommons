@@ -190,7 +190,7 @@ class StringUtils {
      * The list will be sorted so the words that appear more times on the string are placed first.
      *
      * @param string $string Piece of text that contains the keywords we want to extract
-     * @param string $max The maxium of keywords to extract. If set to null, all unique words on the given text will be returned
+     * @param string $max The maxium number of keywords that will appear on the result. If set to null, all unique words on the given text will be returned
      * @param string $longerThan The minimum number of chars for the keywords to find. This is useful to filter some irrelevant words like: the, it, me, ...
      * @param string $shorterThan The maximum number of chars for the keywords to find
      * @param string $ignoreNumericWords Tells the method to skip words that represent numeric values on the result. False by default
@@ -199,11 +199,16 @@ class StringUtils {
      */
     public static function extractKeyWords($string, $max = 25, $longerThan = 3, $shorterThan = 15, $ignoreNumericWords = false){
 
+    	if($string == null){
+
+    		return [];
+    	}
+
     	// Convert all the - and _ characters to blank spaces
     	$string = str_replace('-', ' ', str_replace('_', ' ', $string));
 
     	// Process the received string to contain only alphanumeric lowercase values
-    	$string = self::processForFullTextSearch($string);
+    	$string = self::formatForFullTextSearch($string);
 
       	// Remove all the words that are shorter than the specified lenght
       	$string = self::removeWordsShorterThan($string, $longerThan);
@@ -220,7 +225,7 @@ class StringUtils {
     	// Generate the result by adding first the most repeated words.
     	// Note that we sort in a way that the original words order is preserved when the repeat count is the same, so
     	// the text sorting does not get altered when all the words are repeated the same number of times.
-    	$res = array();
+    	$res = [];
 
     	for($i=$maxCount; $i> 0; $i--){
 
@@ -249,11 +254,13 @@ class StringUtils {
 	 * Given a filesystem path which contains some file, this method extracts the filename plus its extension.
 	 * Example: "//folder/folder2/folder3/file.txt" -> results in "file.txt"
 	 *
-	 * @param string $path A file system path containing some file
+	 * @param string $path An OS system path containing some file
 	 *
 	 * @return string The extracted filename and extension, like: finemane.txt
 	 */
 	public static function extractFileNameWithExtension($path){
+
+		$osSeparator = FileSystemUtils::getDirectorySeparator();
 
 		if(self::isEmpty($path)){
 
@@ -262,9 +269,9 @@ class StringUtils {
 
 		$path = self::formatPath($path);
 
-		if(strpos($path, DIRECTORY_SEPARATOR) !== false){
+		if(strpos($path, $osSeparator) !== false){
 
-			$path = substr(strrchr($path, DIRECTORY_SEPARATOR), 1);
+			$path = substr(strrchr($path, $osSeparator), 1);
 		}
 
 		return $path;
@@ -275,7 +282,7 @@ class StringUtils {
      * Given a filesystem path which contains some file, this method extracts the filename WITHOUT its extension.
      * Example: "//folder/folder2/folder3/file.txt" -> results in "file"
      *
-     * @param string $path A file system path containing some file
+     * @param string $path An OS system path containing some file
      *
      * @return string The extracted filename WITHOUT extension, like: finemane
      */
@@ -301,7 +308,7 @@ class StringUtils {
 	 * Given a filesystem path which contains some file, this method extracts only the file extension
 	 * Example: "//folder/folder2/folder3/file.txt" -> results in "txt"
 	 *
-	 * @param string $path A file system path containing some file
+	 * @param string $path An OS system path containing some file
 	 *
 	 * @return string The file extension WITHOUT the dot character. For example: jpg, png, js, exe ...
 	 */
@@ -431,89 +438,189 @@ class StringUtils {
 
 
 	/**
-	 * Clean latin and strange accents from a string. String encoding is utf8 by default
+	 * Converts all accent characters to ASCII characters on a given string.<br>
+	 * This method is based on the WordPress implementation called remove_Accents
 	 *
-	 * @param string $str String to remove accents
-	 * @param string $charset Sort of charset
+	 * @see https://core.trac.wordpress.org/browser/tags/3.9/src/wp-includes/formatting.php#L682
 	 *
-	 * @return mixed
+	 * @param string $string Text from which accents must be cleaned
+	 *
+	 * @return string The given string with all accent and diacritics replaced by the respective ASCII characters.
 	 */
-	public static function removeAccents($str, $charset='utf-8'){
+	public static function removeAccents($string){
 
-		$str = htmlentities($str, ENT_NOQUOTES, $charset);
+		if($string == null){
 
-		$str = preg_replace('#&([A-za-z])(?:acute|cedil|circ|grave|orn|ring|slash|th|tilde|uml);#', '\1', $str);
-		$str = preg_replace('#&([A-za-z]{2})(?:lig);#', '\1', $str);
-		$str = preg_replace('#&[^;]+;#', '', $str);
+			return '';
+		}
 
-		return $str;
+		if(!preg_match('/[\x80-\xff]/', $string)){
 
+			return $string;
+		}
+
+	    $chars = array(
+		    // Decompositions for Latin-1 Supplement
+		    chr(195).chr(128) => 'A', chr(195).chr(129) => 'A',
+		    chr(195).chr(130) => 'A', chr(195).chr(131) => 'A',
+		    chr(195).chr(132) => 'A', chr(195).chr(133) => 'A',
+		    chr(195).chr(135) => 'C', chr(195).chr(136) => 'E',
+		    chr(195).chr(137) => 'E', chr(195).chr(138) => 'E',
+		    chr(195).chr(139) => 'E', chr(195).chr(140) => 'I',
+		    chr(195).chr(141) => 'I', chr(195).chr(142) => 'I',
+		    chr(195).chr(143) => 'I', chr(195).chr(145) => 'N',
+		    chr(195).chr(146) => 'O', chr(195).chr(147) => 'O',
+		    chr(195).chr(148) => 'O', chr(195).chr(149) => 'O',
+		    chr(195).chr(150) => 'O', chr(195).chr(153) => 'U',
+		    chr(195).chr(154) => 'U', chr(195).chr(155) => 'U',
+		    chr(195).chr(156) => 'U', chr(195).chr(157) => 'Y',
+		    chr(195).chr(159) => 's', chr(195).chr(160) => 'a',
+		    chr(195).chr(161) => 'a', chr(195).chr(162) => 'a',
+		    chr(195).chr(163) => 'a', chr(195).chr(164) => 'a',
+		    chr(195).chr(165) => 'a', chr(195).chr(167) => 'c',
+		    chr(195).chr(168) => 'e', chr(195).chr(169) => 'e',
+		    chr(195).chr(170) => 'e', chr(195).chr(171) => 'e',
+		    chr(195).chr(172) => 'i', chr(195).chr(173) => 'i',
+		    chr(195).chr(174) => 'i', chr(195).chr(175) => 'i',
+		    chr(195).chr(177) => 'n', chr(195).chr(178) => 'o',
+		    chr(195).chr(179) => 'o', chr(195).chr(180) => 'o',
+		    chr(195).chr(181) => 'o', chr(195).chr(182) => 'o',
+		    chr(195).chr(182) => 'o', chr(195).chr(185) => 'u',
+		    chr(195).chr(186) => 'u', chr(195).chr(187) => 'u',
+		    chr(195).chr(188) => 'u', chr(195).chr(189) => 'y',
+		    chr(195).chr(191) => 'y',
+		    // Decompositions for Latin Extended-A
+		    chr(196).chr(128) => 'A', chr(196).chr(129) => 'a',
+		    chr(196).chr(130) => 'A', chr(196).chr(131) => 'a',
+		    chr(196).chr(132) => 'A', chr(196).chr(133) => 'a',
+		    chr(196).chr(134) => 'C', chr(196).chr(135) => 'c',
+		    chr(196).chr(136) => 'C', chr(196).chr(137) => 'c',
+		    chr(196).chr(138) => 'C', chr(196).chr(139) => 'c',
+		    chr(196).chr(140) => 'C', chr(196).chr(141) => 'c',
+		    chr(196).chr(142) => 'D', chr(196).chr(143) => 'd',
+		    chr(196).chr(144) => 'D', chr(196).chr(145) => 'd',
+		    chr(196).chr(146) => 'E', chr(196).chr(147) => 'e',
+		    chr(196).chr(148) => 'E', chr(196).chr(149) => 'e',
+		    chr(196).chr(150) => 'E', chr(196).chr(151) => 'e',
+		    chr(196).chr(152) => 'E', chr(196).chr(153) => 'e',
+		    chr(196).chr(154) => 'E', chr(196).chr(155) => 'e',
+		    chr(196).chr(156) => 'G', chr(196).chr(157) => 'g',
+		    chr(196).chr(158) => 'G', chr(196).chr(159) => 'g',
+		    chr(196).chr(160) => 'G', chr(196).chr(161) => 'g',
+		    chr(196).chr(162) => 'G', chr(196).chr(163) => 'g',
+		    chr(196).chr(164) => 'H', chr(196).chr(165) => 'h',
+		    chr(196).chr(166) => 'H', chr(196).chr(167) => 'h',
+		    chr(196).chr(168) => 'I', chr(196).chr(169) => 'i',
+		    chr(196).chr(170) => 'I', chr(196).chr(171) => 'i',
+		    chr(196).chr(172) => 'I', chr(196).chr(173) => 'i',
+		    chr(196).chr(174) => 'I', chr(196).chr(175) => 'i',
+		    chr(196).chr(176) => 'I', chr(196).chr(177) => 'i',
+		    chr(196).chr(178) => 'IJ',chr(196).chr(179) => 'ij',
+		    chr(196).chr(180) => 'J', chr(196).chr(181) => 'j',
+		    chr(196).chr(182) => 'K', chr(196).chr(183) => 'k',
+		    chr(196).chr(184) => 'k', chr(196).chr(185) => 'L',
+		    chr(196).chr(186) => 'l', chr(196).chr(187) => 'L',
+		    chr(196).chr(188) => 'l', chr(196).chr(189) => 'L',
+		    chr(196).chr(190) => 'l', chr(196).chr(191) => 'L',
+		    chr(197).chr(128) => 'l', chr(197).chr(129) => 'L',
+		    chr(197).chr(130) => 'l', chr(197).chr(131) => 'N',
+		    chr(197).chr(132) => 'n', chr(197).chr(133) => 'N',
+		    chr(197).chr(134) => 'n', chr(197).chr(135) => 'N',
+		    chr(197).chr(136) => 'n', chr(197).chr(137) => 'N',
+		    chr(197).chr(138) => 'n', chr(197).chr(139) => 'N',
+		    chr(197).chr(140) => 'O', chr(197).chr(141) => 'o',
+		    chr(197).chr(142) => 'O', chr(197).chr(143) => 'o',
+		    chr(197).chr(144) => 'O', chr(197).chr(145) => 'o',
+		    chr(197).chr(146) => 'OE',chr(197).chr(147) => 'oe',
+		    chr(197).chr(148) => 'R',chr(197).chr(149) => 'r',
+		    chr(197).chr(150) => 'R',chr(197).chr(151) => 'r',
+		    chr(197).chr(152) => 'R',chr(197).chr(153) => 'r',
+		    chr(197).chr(154) => 'S',chr(197).chr(155) => 's',
+		    chr(197).chr(156) => 'S',chr(197).chr(157) => 's',
+		    chr(197).chr(158) => 'S',chr(197).chr(159) => 's',
+		    chr(197).chr(160) => 'S', chr(197).chr(161) => 's',
+		    chr(197).chr(162) => 'T', chr(197).chr(163) => 't',
+		    chr(197).chr(164) => 'T', chr(197).chr(165) => 't',
+		    chr(197).chr(166) => 'T', chr(197).chr(167) => 't',
+		    chr(197).chr(168) => 'U', chr(197).chr(169) => 'u',
+		    chr(197).chr(170) => 'U', chr(197).chr(171) => 'u',
+		    chr(197).chr(172) => 'U', chr(197).chr(173) => 'u',
+		    chr(197).chr(174) => 'U', chr(197).chr(175) => 'u',
+		    chr(197).chr(176) => 'U', chr(197).chr(177) => 'u',
+		    chr(197).chr(178) => 'U', chr(197).chr(179) => 'u',
+		    chr(197).chr(180) => 'W', chr(197).chr(181) => 'w',
+		    chr(197).chr(182) => 'Y', chr(197).chr(183) => 'y',
+		    chr(197).chr(184) => 'Y', chr(197).chr(185) => 'Z',
+		    chr(197).chr(186) => 'z', chr(197).chr(187) => 'Z',
+		    chr(197).chr(188) => 'z', chr(197).chr(189) => 'Z',
+		    chr(197).chr(190) => 'z', chr(197).chr(191) => 's'
+	    );
+
+	    return strtr($string, $chars);
 	}
 
 
 	/**
 	 * Deletes from a string all the words that are shorter than the specified length
 	 *
-	 * @param string $string   The string to process
-	 * @param int $shorterThan The minimum length for the words to be preserved
-	 * @param int $startWithLen The strings that are shorter than the specified length wont be processed.
-	 *
+	 * @param string $string The string to process
+	 * @param int $shorterThan The minimum length for the words to be preserved. So any word that is shorther than the specified value will be removed.
+	 * @param string $wordSeparator The character that will be used as the word separator. By default it is the empty space character ' '
+     *
 	 * @return string The string without the removed words
 	 */
-	public static function removeWordsShorterThan($string, $shorterThan = 3, $startWithLen = 45){
+	public static function removeWordsShorterThan($string, $shorterThan = 3, $wordSeparator = ' '){
 
-		if(strlen($string) <= $startWithLen){
-			return $string;
+		if($string == null){
+
+			return '';
 		}
 
-		// Array where the result will be stored
-		$res = array();
-
 		// Generate an array with the received string words
-		$words = explode(' ', $string);
+		$words = explode($wordSeparator, $string);
+		$wordsCount = count($words);
 
-		foreach($words as $value){
+		for ($i = 0; $i < $wordsCount; $i++) {
 
-			if(strlen($value) >= $shorterThan){
-				array_push($res, $value);
+			if(strlen($words[$i]) < $shorterThan){
+
+				$words[$i] = '';
 			}
 		}
 
-		return implode(' ', $res);
-
+		return implode($wordSeparator, $words);
 	}
 
 
 	/**
 	 * Deletes from a string all the words that are longer than the specified length
 	 *
-	 * @param string $string   The string to process
-	 * @param int $longerThan The maximum length for the words to be preserved
-	 * @param int $startWithLen The strings that are shorter than the specified length wont be processed.
-	 *
+	 * @param string $string The string to process
+	 * @param int $longerThan The maximum length for the words to be preserved. Any word that exceeds the specified length will be removed from the string.
+	 * @param string $wordSeparator The character that will be used as the word separator. By default it is the empty space character ' '
+     *
 	 * @return string The string without the removed words
 	 */
-	public static function removeWordsLongerThan($string, $longerThan = 3, $startWithLen = 45){
+	public static function removeWordsLongerThan($string, $longerThan = 3, $wordSeparator = ' '){
 
-		if(strlen($string) <= $startWithLen){
-			return $string;
+		if($string == null){
+
+			return '';
 		}
 
-		// Array where the result will be stored
-		$res = array();
-
 		// Generate an array with the received string words
-		$words = explode(' ', $string);
+		$words = explode($wordSeparator, $string);
+		$wordsCount = count($words);
 
-		foreach($words as $value){
+		for ($i = 0; $i < $wordsCount; $i++) {
 
-			if(strlen($value) <= $longerThan){
-				array_push($res, $value);
+			if(strlen($words[$i]) > $longerThan){
+
+				$words[$i] = '';
 			}
 		}
 
-		return implode(' ', $res);
-
+		return implode($wordSeparator, $words);
 	}
 
 

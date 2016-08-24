@@ -23,7 +23,7 @@ class ArrayUtils {
 	 */
 	public static function isEqual(){
 
-		// TODO: copiar de javascript
+		// TODO: copy from javascript
 	}
 }
 

@@ -123,8 +123,11 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testExtractKeyWords(){
 
-		// TODO
+		$this->assertTrue(StringUtils::extractKeyWords(null) === []);
+		$this->assertTrue(StringUtils::extractKeyWords('') === []);
+		$this->assertTrue(StringUtils::extractKeyWords('hello') === ['hello']);
 
+		// TODO: add lot more tests
 	}
 
 
@@ -135,15 +138,15 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testExtractFileNameWithExtension(){
 
-		$this->assertTrue(StringUtils::extractFileNameWithExtension('') === '');
 		$this->assertTrue(StringUtils::extractFileNameWithExtension(null) === '');
+		$this->assertTrue(StringUtils::extractFileNameWithExtension('') === '');
 		$this->assertTrue(StringUtils::extractFileNameWithExtension('       ') === '');
-		$this->assertTrue(StringUtils::extractFileNameWithExtension('C:\Program Files\CCleaner\CCleaner64.exe') == 'CCleaner64.exe');
+		$this->assertTrue(StringUtils::extractFileNameWithExtension('C:\\Program Files\\CCleaner\\CCleaner64.exe') == 'CCleaner64.exe');
 		$this->assertTrue(StringUtils::extractFileNameWithExtension('\\Files/CCleaner/CCleaner64.exe') == 'CCleaner64.exe');
 		$this->assertTrue(StringUtils::extractFileNameWithExtension('//folder/folder2/folder3/file.txt') == 'file.txt');
 		$this->assertTrue(StringUtils::extractFileNameWithExtension('CCleaner64.exe') == 'CCleaner64.exe');
 		$this->assertTrue(StringUtils::extractFileNameWithExtension('\\\\\\CCleaner64.exe') == 'CCleaner64.exe');
-		$this->assertTrue(StringUtils::extractFileNameWithExtension('\some long path containing lots of spaces\\///CCleaner64.exe') == 'CCleaner64.exe');
+		$this->assertTrue(StringUtils::extractFileNameWithExtension('\\some long path containing lots of spaces\\///CCleaner64.exe') == 'CCleaner64.exe');
 	}
 
 
@@ -154,15 +157,15 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testExtractFileNameWithoutExtension(){
 
-		$this->assertTrue(StringUtils::extractFileNameWithoutExtension('') === '');
 		$this->assertTrue(StringUtils::extractFileNameWithoutExtension(null) === '');
+		$this->assertTrue(StringUtils::extractFileNameWithoutExtension('') === '');
 		$this->assertTrue(StringUtils::extractFileNameWithoutExtension('       ') === '');
-		$this->assertTrue(StringUtils::extractFileNameWithoutExtension('C:\Program Files\CCleaner\CCleaner64.exe') == 'CCleaner64');
+		$this->assertTrue(StringUtils::extractFileNameWithoutExtension('C:\\Program Files\\CCleaner\\CCleaner64.exe') == 'CCleaner64');
 		$this->assertTrue(StringUtils::extractFileNameWithoutExtension('\\Files/CCleaner/CCleaner64.exe') == 'CCleaner64');
 		$this->assertTrue(StringUtils::extractFileNameWithoutExtension('//folder/folder2/folder3/file.txt') == 'file');
 		$this->assertTrue(StringUtils::extractFileNameWithoutExtension('CCleaner64.exe') == 'CCleaner64');
 		$this->assertTrue(StringUtils::extractFileNameWithoutExtension('\\\\\\CCleaner64.exe') == 'CCleaner64');
-		$this->assertTrue(StringUtils::extractFileNameWithoutExtension('\some long path containing lots of spaces\\///CCleaner64.exe') == 'CCleaner64');
+		$this->assertTrue(StringUtils::extractFileNameWithoutExtension('\\some long path containing lots of spaces\\///CCleaner64.exe') == 'CCleaner64');
 	}
 
 
@@ -173,17 +176,17 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testExtractFileExtension(){
 
-		$this->assertTrue(StringUtils::extractFileExtension('') === '');
 		$this->assertTrue(StringUtils::extractFileExtension(null) === '');
+		$this->assertTrue(StringUtils::extractFileExtension('') === '');
 		$this->assertTrue(StringUtils::extractFileExtension('       ') === '');
-		$this->assertTrue(StringUtils::extractFileExtension('C:\Program Files\CCleaner\CCleaner64.exe') == 'exe');
+		$this->assertTrue(StringUtils::extractFileExtension('C:\Program Files\\CCleaner\\CCleaner64.exe') == 'exe');
 		$this->assertTrue(StringUtils::extractFileExtension('\\Files/CCleaner/CCleaner64.exe') == 'exe');
 		$this->assertTrue(StringUtils::extractFileExtension('//folder/folder2/folder3/file.txt') == 'txt');
 		$this->assertTrue(StringUtils::extractFileExtension('CCleaner64.exe') == 'exe');
 		$this->assertTrue(StringUtils::extractFileExtension('\\\\\\CCleaner64.exe') == 'exe');
-		$this->assertTrue(StringUtils::extractFileExtension('\some long path containing lots of spaces\\///CCleaner64.exe') == 'exe');
-		$this->assertTrue(StringUtils::extractFileExtension('CCleaner64.EXE', true) == 'EXE');
-		$this->assertTrue(StringUtils::extractFileExtension('\\\\\\CCleaner64.eXEfile', true) == 'eXEfile');
+		$this->assertTrue(StringUtils::extractFileExtension('\\some long path containing lots of spaces\\///CCleaner64.exe') == 'exe');
+		$this->assertTrue(StringUtils::extractFileExtension('CCleaner64.EXE') == 'EXE');
+		$this->assertTrue(StringUtils::extractFileExtension('\\\\\\CCleaner64.eXEfile') == 'eXEfile');
 	}
 
 
@@ -205,6 +208,105 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		// Test non string paths throw exception
 		$this->setExpectedException('Exception');
 		StringUtils::formatPath(['1']);
+	}
+
+
+	/**
+	 * testFormatForFullTextSearch
+	 *
+	 * @return void
+	 */
+	public function testFormatForFullTextSearch(){
+
+		$this->assertTrue(StringUtils::formatForFullTextSearch(null) === '');
+		$this->assertTrue(StringUtils::formatForFullTextSearch('') === '');
+
+		// TODO!!
+
+	}
+
+
+	/**
+	 * testGenerateRandomPassword
+	 *
+	 * @return void
+	 */
+	public function testGenerateRandomPassword(){
+
+		// TODO!!
+
+	}
+
+
+	/**
+	 * testRemoveAccents
+	 *
+	 * @return void
+	 */
+	public function testRemoveAccents(){
+
+		$this->assertTrue(StringUtils::removeAccents(null) === '');
+		$this->assertTrue(StringUtils::removeAccents('') === '');
+		$this->assertTrue(StringUtils::removeAccents('        ') === '        ');
+		$this->assertTrue(StringUtils::removeAccents('Fó Bår') === 'Fo Bar');
+		$this->assertTrue(StringUtils::removeAccents("|!€%'''") === "|!€%'''");
+		$this->assertTrue(StringUtils::removeAccents('hiweury asb fsuyr weqr') === 'hiweury asb fsuyr weqr');
+		$this->assertTrue(StringUtils::removeAccents('!iYgh65541tGY%$$73267yt') === '!iYgh65541tGY%$$73267yt');
+		$this->assertTrue(StringUtils::removeAccents('hello 12786,.123123') === 'hello 12786,.123123');
+		$this->assertTrue(StringUtils::removeAccents('check this `^+*´--_{}[]') === 'check this `^+*´--_{}[]');
+		$this->assertTrue(StringUtils::removeAccents('hellóóóóóí´ 12786,.123123"') === 'helloooooi´ 12786,.123123"');
+		$this->assertTrue(StringUtils::removeAccents("hello\nbaby\r\ntest it well !!!!!") === "hello\nbaby\r\ntest it well !!!!!");
+		$this->assertTrue(StringUtils::removeAccents('óíéàùú hello') === 'oieauu hello');
+		$this->assertTrue(StringUtils::removeAccents("óóó èèè\núùúùioler    \r\noughúíééanh hello") === "ooo eee\nuuuuioler    \r\noughuieeanh hello");
+		$this->assertTrue(StringUtils::removeAccents('öïüíúóèà go!!.;') === 'oiuiuoea go!!.;');
+	}
+
+
+	/**
+	 * testRemoveWordsShorterThan
+	 *
+	 * @return void
+	 */
+	public function testRemoveWordsShorterThan(){
+
+		$this->assertTrue(StringUtils::removeWordsShorterThan(null) === '');
+		$this->assertTrue(StringUtils::removeWordsShorterThan('') === '');
+		$this->assertTrue(StringUtils::removeWordsShorterThan('', 0) === '');
+		$this->assertTrue(StringUtils::removeWordsShorterThan('hello', 0) === 'hello');
+		$this->assertTrue(StringUtils::removeWordsShorterThan('hello', 2) === 'hello');
+		$this->assertTrue(StringUtils::removeWordsShorterThan('hello', 5) === 'hello');
+		$this->assertTrue(StringUtils::removeWordsShorterThan('hello', 6) === '');
+		$this->assertTrue(StringUtils::removeWordsShorterThan('hello by today', 6) === '  ');
+		$this->assertTrue(StringUtils::removeWordsShorterThan('hello by today', 5) === 'hello  today');
+		$this->assertTrue(StringUtils::removeWordsShorterThan('hello by today', 1) === 'hello by today');
+		$this->assertTrue(StringUtils::removeWordsShorterThan("Line1\nline2\r\nline3 and  \nline4", 4) === "Line1\nline2\r\nline3   \nline4");
+		// TODO: multi line strings do not work!
+		// $this->assertTrue(StringUtils::removeWordsShorterThan("Line1 line12\nline2\r\nline3 and  \nline4", 6) === " line12\n\r\n   \n");
+		// TODO: add more multi line tests
+	}
+
+
+	/**
+	 * testRemoveWordsLongerThan
+	 *
+	 * @return void
+	 */
+	public function testRemoveWordsLongerThan(){
+
+		$this->assertTrue(StringUtils::removeWordsLongerThan(null) === '');
+		$this->assertTrue(StringUtils::removeWordsLongerThan('') === '');
+		$this->assertTrue(StringUtils::removeWordsLongerThan('', 0) === '');
+		$this->assertTrue(StringUtils::removeWordsLongerThan('hello', 0) === '');
+		$this->assertTrue(StringUtils::removeWordsLongerThan('hello', 2) === '');
+		$this->assertTrue(StringUtils::removeWordsLongerThan('hello', 5) === 'hello');
+		$this->assertTrue(StringUtils::removeWordsLongerThan('hello', 6) === 'hello');
+		$this->assertTrue(StringUtils::removeWordsLongerThan('hello by today', 6) === 'hello by today');
+		$this->assertTrue(StringUtils::removeWordsLongerThan('hello by today', 5) === 'hello by today');
+		$this->assertTrue(StringUtils::removeWordsLongerThan('hello by today', 1) === '  ');
+		// TODO: multi line strings do not work!
+		// $this->assertTrue(StringUtils::removeWordsLongerThan("Line1\nline2\r\nline3 and  \nline4", 4) === "\n\r\n and  \n");
+		// $this->assertTrue(StringUtils::removeWordsLongerThan("Line1 line12\nline2\r\nline3 and  \nline4", 6) === " line12\n\r\n   \n");
+		// TODO: add more multi line tests
 	}
 }
 
