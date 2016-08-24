@@ -45,43 +45,45 @@ org_turbocommons_src_main_js_managers.ValidationManager = function(){
 
 
 /** 
- * Validation is correct
+ * Constant that defines the correct validation status
  * 
- * @constant {number}
+ * @constant {int}
  */
 org_turbocommons_src_main_js_managers.ValidationManager.VALIDATION_OK = 0;
 
 
-/** Validation is in a warning status constant
+/** 
+ * Constant that defines the warning validation status
  *
- * @constant {number}
+ * @constant {int}
  */
 org_turbocommons_src_main_js_managers.ValidationManager.VALIDATION_WARNING = 1;
 
 
 /** 
- * Validation is on error status constant 
+ * Constant that defines the error validation status
  * 
- * @constant {number}
+ * @constant {int}
  */
 org_turbocommons_src_main_js_managers.ValidationManager.VALIDATION_ERROR = 2;
 
 
 /**
- * Validation will fail if specified value is a false boolean
+ * Validation will fail if specified value is not a true boolean value
  *
- * @param value The bool to validate
- * @param errorMessage The error message that will be generated if validation fails
- * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
+ * @param {boolean} value A boolean expression to validate
+ * @param {string} errorMessage The error message that will be generated if validation fails
+ * @param {boolean} isWarning Tells if the validation fail will be processed as a validation error or a validation warning
  *
- * @return False in case the validation fails or true if validation succeeds.
+ * @returns {boolean} False in case the validation fails or true if validation succeeds.
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isTrue = function(value, errorMessage, isWarning){
 
 	// Set optional parameters default values
+	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value is not true' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 
-	var res = (!value) ? errorMessage : '';
+	var res = (value !== true) ? errorMessage : '';
 
 	this._updateValidationStatus(res, isWarning);
 
@@ -92,16 +94,16 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isTrue = funct
 /**
  * Validation will fail if specified value is not numeric
  *
- * @param value The number to validate
- * @param errorMessage The error message that will be generated if validation fails
- * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
+ * @param {Number} value The number to validate
+ * @param {string} errorMessage The error message that will be generated if validation fails
+ * @param {boolean} isWarning Tells if the validation fail will be processed as a validation error or a validation warning
  *
- * @return False in case the validation fails or true if validation succeeds.
+ * @returns {boolean} False in case the validation fails or true if validation succeeds.
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isNumeric = function(value, errorMessage, isWarning){
 
 	// Set optional parameters default values
-	errorMessage = (errorMessage === undefined) ? value + ' is not a number' : errorMessage;
+	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value is not a number' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 
 	var res = (!(!isNaN(parseFloat(value)) && isFinite(value))) ? errorMessage : '';
@@ -115,16 +117,16 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isNumeric = fu
 /**
  * Validation will fail if specified value is not a string
  *
- * @param value The string to validate
- * @param errorMessage The error message that will be generated if validation fails
- * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
+ * @param {string} value The element to validate
+ * @param {string} errorMessage The error message that will be generated if validation fails
+ * @param {boolean} isWarning Tells if the validation fail will be processed as a validation error or a validation warning
  *
- * @return False in case the validation fails or true if validation succeeds.
+ * @returns {boolean} False in case the validation fails or true if validation succeeds.
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isString = function(value, errorMessage, isWarning){
 
 	// Set optional parameters default values
-	errorMessage = (errorMessage === undefined) ? value + ' is not a string' : errorMessage;
+	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value is not a string' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 
 	var res = (!(typeof value === 'string' || value instanceof String)) ? errorMessage : '';
@@ -138,16 +140,16 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isString = fun
 /**
  * Validation will fail if specified value is not an array
  *
- * @param value The array to validate
- * @param errorMessage The error message that will be generated if validation fails
- * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
+ * @param {array} value The array to validate
+ * @param {string} errorMessage The error message that will be generated if validation fails
+ * @param {boolean} isWarning Tells if the validation fail will be processed as a validation error or a validation warning
  *
- * @return False in case the validation fails or true if validation succeeds.
+ * @returns {boolean} False in case the validation fails or true if validation succeeds.
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isArray = function(value, errorMessage, isWarning){
 
 	// Set optional parameters default values
-	errorMessage = (errorMessage === undefined) ? value + ' is not an array' : errorMessage;
+	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value is not an array' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 
 	var res = (!(Object.prototype.toString.call(value) === '[object Array]')) ? errorMessage : '';
@@ -165,11 +167,12 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isArray = func
  * @param errorMessage The error message that will be generated if validation fails
  * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
  *
- * @return False in case the validation fails or true if validation succeeds.
+ * @returns False in case the validation fails or true if validation succeeds.
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isRequired = function(text, errorMessage, isWarning){
 
 	// Set optional parameters default values
+	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value is required' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 
 	var res = '';
@@ -194,11 +197,12 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isRequired = f
  * @param required True means the value is required
  * @param inputformat The date format that we are validating. dd/mm/yyyy by default
  *
- * @return False in case the validation fails or true if validation succeeds.
+ * @returns False in case the validation fails or true if validation succeeds.
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isDate = function(text, errorMessage, isWarning, required, inputformat){
 
 	// Set optional parameters default values
+	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value is not a date' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 	required = (required === undefined) ? true : required;
 	inputformat = (inputformat === undefined) ? "dd/mm/yyyy" : inputformat;
@@ -235,11 +239,12 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isDate = funct
  * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
  * @param required True means the value is required
  *
- * @return False in case the validation fails or true if validation succeeds.
+ * @returns False in case the validation fails or true if validation succeeds.
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isMail = function(text, errorMessage, isWarning, required){
 
 	// Set optional parameters default values
+	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value is not an email' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 	required = (required === undefined) ? true : required;
 
@@ -284,11 +289,12 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isMail = funct
  * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
  * @param required True means the value is required
  *
- * @return False in case the validation fails or true if validation succeeds.
+ * @returns False in case the validation fails or true if validation succeeds.
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isEqualToValue = function(text, originalText, errorMessage, isWarning, required){
 
 	// Set optional parameters default values
+	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'values are not equal' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 	required = (required === undefined) ? true : required;
 
@@ -332,11 +338,12 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isEqualToValue
  * @param required True means the value is required
  * @param wordSeparator The character that is considered as the words separator
  *
- * @return False in case the validation fails or true if validation succeeds.
+ * @returns False in case the validation fails or true if validation succeeds.
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isMinimumWords = function(text, minWords, errorMessage, isWarning, required, wordSeparator){
 
 	// Set optional parameters default values
+	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value does not have the minimum words' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 	required = (required === undefined) ? true : required;
 	wordSeparator = (wordSeparator === undefined) ? ' ' : wordSeparator;
@@ -378,11 +385,12 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isMinimumWords
  * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
  * @param required True means the value is required
  *
- * @return False in case the validation fails or true if validation succeeds.
+ * @returns False in case the validation fails or true if validation succeeds.
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isNIF = function(text, errorMessage, isWarning, required){
 
 	// Set optional parameters default values
+	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value is not a NIF' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 	required = (required === undefined) ? true : required;
 
@@ -448,11 +456,12 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isNIF = functi
  * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
  * @param required True means the value is required
  *
- * @return False in case the validation fails or true if validation succeeds.
+ * @returns False in case the validation fails or true if validation succeeds.
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isMinimumLength = function(text, minLen, errorMessage, isWarning, required){
 
 	// Set optional parameters default values
+	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value does not meet minimum length' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 	required = (required === undefined) ? true : required;
 
@@ -493,7 +502,7 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isMinimumLengt
  * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
  * @param required True means the value is required
  *
- * @return False in case the validation fails or true if validation succeeds.
+ * @returns False in case the validation fails or true if validation succeeds.
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isPostalCode = function(text, errorMessage, isWarning, required){
 
@@ -509,11 +518,12 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isPostalCode =
  * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
  * @param required True means the value is required
  *
- * @return False in case the validation fails or true if validation succeeds.
+ * @returns False in case the validation fails or true if validation succeeds.
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isPhone = function(text, errorMessage, isWarning, required){
 
 	// Set optional parameters default values
+	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value is not a phone' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 	required = (required === undefined) ? true : required;
 
@@ -711,7 +721,7 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isHtmlFormVali
 /** 
  * Reinitialize the validation status for this class
  * 
- * @return void
+ * @returns void
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.reset = function(){
 
@@ -727,12 +737,12 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.reset = functi
 
 
 /**
- * Check if specified validation result is valid and update the validation error status
+ * Update the class validation Status depending on the provided error message.
  *
- * @param errorMessage The error message that results from a validation method
- * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
+ * @param {string} errorMessage The error message that's been generated from a previously executed validation method
+ * @param {boolean} isWarning Tells if the validation fail will be processed as a validation error or a validation warning
  *
- * @return void
+ * @returns void
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype._updateValidationStatus = function(errorMessage, isWarning){
 

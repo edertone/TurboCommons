@@ -117,8 +117,15 @@ QUnit.test("extractKeyWords", function(assert){
  */
 QUnit.test("extractFileNameWithExtension", function(assert){
 
-	// TODO: copy tests from PHP
-	assert.ok(true);
+	assert.ok(utils.StringUtils.extractFileNameWithExtension(null) === '');
+	assert.ok(utils.StringUtils.extractFileNameWithExtension('') === '');
+	assert.ok(utils.StringUtils.extractFileNameWithExtension('       ') === '');
+	assert.ok(utils.StringUtils.extractFileNameWithExtension('C:\\Program Files\\CCleaner\\CCleaner64.exe') === 'CCleaner64.exe');
+	assert.ok(utils.StringUtils.extractFileNameWithExtension('\\Files/CCleaner/CCleaner64.exe') === 'CCleaner64.exe');
+	assert.ok(utils.StringUtils.extractFileNameWithExtension('//folder/folder2/folder3/file.txt') === 'file.txt');
+	assert.ok(utils.StringUtils.extractFileNameWithExtension('CCleaner64.exe') === 'CCleaner64.exe');
+	assert.ok(utils.StringUtils.extractFileNameWithExtension('\\\\\\CCleaner64.exe') === 'CCleaner64.exe');
+	assert.ok(utils.StringUtils.extractFileNameWithExtension('\\some long path containing lots of spaces\\///CCleaner64.exe') === 'CCleaner64.exe');
 });
 
 
@@ -127,8 +134,15 @@ QUnit.test("extractFileNameWithExtension", function(assert){
  */
 QUnit.test("extractFileNameWithoutExtension", function(assert){
 
-	// TODO: copy tests from PHP
-	assert.ok(true);
+	assert.ok(utils.StringUtils.extractFileNameWithoutExtension(null) === '');
+	assert.ok(utils.StringUtils.extractFileNameWithoutExtension('') === '');
+	assert.ok(utils.StringUtils.extractFileNameWithoutExtension('       ') === '');
+	assert.ok(utils.StringUtils.extractFileNameWithoutExtension('C:\\Program Files\\CCleaner\\CCleaner64.exe') === 'CCleaner64');
+	assert.ok(utils.StringUtils.extractFileNameWithoutExtension('\\Files/CCleaner/CCleaner64.exe') === 'CCleaner64');
+	assert.ok(utils.StringUtils.extractFileNameWithoutExtension('//folder/folder2/folder3/file.txt') === 'file');
+	assert.ok(utils.StringUtils.extractFileNameWithoutExtension('CCleaner64.exe') === 'CCleaner64');
+	assert.ok(utils.StringUtils.extractFileNameWithoutExtension('\\\\\\CCleaner64.exe') === 'CCleaner64');
+	assert.ok(utils.StringUtils.extractFileNameWithoutExtension('\\some long path containing lots of spaces\\///CCleaner64.exe') === 'CCleaner64');
 });
 
 
@@ -137,8 +151,17 @@ QUnit.test("extractFileNameWithoutExtension", function(assert){
  */
 QUnit.test("extractFileExtension", function(assert){
 
-	// TODO: copy tests from PHP
-	assert.ok(true);
+	assert.ok(utils.StringUtils.extractFileExtension(null) === '');
+	assert.ok(utils.StringUtils.extractFileExtension('') === '');
+	assert.ok(utils.StringUtils.extractFileExtension('       ') === '');
+	assert.ok(utils.StringUtils.extractFileExtension('C:\\Program Files\\CCleaner\\CCleaner64.exe') === 'exe');
+	assert.ok(utils.StringUtils.extractFileExtension('\\Files/CCleaner/CCleaner64.exe') === 'exe');
+	assert.ok(utils.StringUtils.extractFileExtension('//folder/folder2/folder3/file.txt') === 'txt');
+	assert.ok(utils.StringUtils.extractFileExtension('CCleaner64.exe') === 'exe');
+	assert.ok(utils.StringUtils.extractFileExtension('\\\\\\CCleaner64.exe') === 'exe');
+	assert.ok(utils.StringUtils.extractFileExtension('\\some long path containing lots of spaces\\///CCleaner64.exe') === 'exe');
+	assert.ok(utils.StringUtils.extractFileExtension('CCleaner64.EXE') === 'EXE');
+	assert.ok(utils.StringUtils.extractFileExtension('\\\\\\CCleaner64.eXEfile') === 'eXEfile');
 });
 
 
@@ -162,4 +185,47 @@ QUnit.test("formatPath", function(assert){
 
 		utils.StringUtils.formatPath(['1']);
 	});
+});
+
+
+/**
+ * formatForFullTextSearch
+ */
+QUnit.test("formatForFullTextSearch", function(assert){
+
+	// TODO: copy tests from PHP
+	assert.ok(true);
+});
+
+
+/**
+ * generateRandomPassword
+ */
+QUnit.test("generateRandomPassword", function(assert){
+
+	// TODO: copy tests from PHP
+	assert.ok(true);
+});
+
+
+/**
+ * removeAccents
+ */
+QUnit.test("removeAccents", function(assert){
+
+	assert.ok(utils.StringUtils.removeAccents(null) === '');
+	assert.ok(utils.StringUtils.removeAccents('') === '');
+	assert.ok(utils.StringUtils.removeAccents('        ') === '        ');
+	assert.ok(utils.StringUtils.removeAccents('Fó Bår') === 'Fo Bar');
+	assert.ok(utils.StringUtils.removeAccents("|!€%'''") === "|!€%'''");
+	assert.ok(utils.StringUtils.removeAccents('hiweury asb fsuyr weqr') === 'hiweury asb fsuyr weqr');
+	assert.ok(utils.StringUtils.removeAccents('!iYgh65541tGY%$$73267yt') === '!iYgh65541tGY%$$73267yt');
+	assert.ok(utils.StringUtils.removeAccents('hello 12786,.123123') === 'hello 12786,.123123');
+	assert.ok(utils.StringUtils.removeAccents('check this `^+*´--_{}[]') === 'check this `^+*´--_{}[]');
+	assert.ok(utils.StringUtils.removeAccents('hellóóóóóí´ 12786,.123123"') === 'helloooooi´ 12786,.123123"');
+	assert.ok(utils.StringUtils.removeAccents("hello\nbaby\r\ntest it well !!!!!") === "hello\nbaby\r\ntest it well !!!!!");
+	assert.ok(utils.StringUtils.removeAccents('óíéàùú hello') === 'oieauu hello');
+	assert.ok(utils.StringUtils.removeAccents("óóó èèè\núùúùioler    \r\noughúíééanh hello") === "ooo eee\nuuuuioler    \r\noughuieeanh hello");
+	assert.ok(utils.StringUtils.removeAccents('öïüíúóèà go!!.;') === 'oiuiuoea go!!.;');
+
 });

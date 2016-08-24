@@ -25,7 +25,9 @@ QUnit.test("isTrue", function(assert){
 	assert.ok(validationManager.isTrue(true));
 	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_OK);
 
-	assert.ok(!validationManager.isTrue(false, 'false error'));
+	assert.ok(!validationManager.isTrue(false));
+	assert.ok(!validationManager.isTrue(null));
+	assert.ok(!validationManager.isTrue([]));
 	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_ERROR);
 
 	validationManager.reset();
@@ -36,9 +38,6 @@ QUnit.test("isTrue", function(assert){
 	assert.ok(!validationManager.isTrue(false, 'false error 2'));
 	assert.ok(validationManager.lastMessage === 'false error 2');
 	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_ERROR);
-
-	// Check validation reset works as expected
-	// TODO: call here the reset test code. We want to reuse it
 });
 
 
@@ -55,53 +54,86 @@ QUnit.test("isNumeric", function(assert){
 	assert.ok(validationManager.isNumeric(-1.56567));
 	assert.ok(validationManager.isNumeric(1.34435));
 	assert.ok(validationManager.isNumeric(-3453451));
-	assert.ok(validationManager.isNumeric("1"));
-	assert.ok(validationManager.isNumeric("1.4545645"));
-	assert.ok(validationManager.isNumeric("-1.345"));
-	assert.ok(validationManager.isNumeric("-345341"));
-	assert.ok(validationManager.isNumeric("1.4564564563456"));
+	assert.ok(validationManager.isNumeric('1'));
+	assert.ok(validationManager.isNumeric('1.4545645'));
+	assert.ok(validationManager.isNumeric('-1.345'));
+	assert.ok(validationManager.isNumeric('-345341'));
+	assert.ok(validationManager.isNumeric('1.4564564563456'));
 	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_OK);
 
-	assert.ok(!validationManager.isNumeric("hello", 'numeric error'));
-	assert.ok(!validationManager.isNumeric("1,4356", 'numeric error'));
-	assert.ok(!validationManager.isNumeric("1,4.4545", 'numeric error'));
-	assert.ok(!validationManager.isNumeric("--345", 'numeric error'));
+	assert.ok(!validationManager.isNumeric([]));
+	assert.ok(!validationManager.isNumeric(new managers.ValidationManager()));
+	assert.ok(!validationManager.isNumeric('hello', 'numeric error'));
+	assert.ok(!validationManager.isNumeric('1,4356', 'numeric error'));
+	assert.ok(!validationManager.isNumeric('1,4.4545', 'numeric error'));
+	assert.ok(!validationManager.isNumeric('--345', 'numeric error'));
 	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_ERROR);
 
 	validationManager.reset();
 
-	assert.ok(!validationManager.isNumeric("hello", 'numeric error', true));
+	assert.ok(!validationManager.isNumeric('hello', 'numeric error', true));
 	assert.ok(validationManager.lastMessage === 'numeric error');
 	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_WARNING);
-	assert.ok(!validationManager.isNumeric("hello", 'numeric error 2'));
+	assert.ok(!validationManager.isNumeric('hello', 'numeric error 2'));
 	assert.ok(validationManager.lastMessage === 'numeric error 2');
 	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_ERROR);
-
-	// Check validation reset works as expected
-	// TODO: call here the reset test code. We want to reuse it
 });
 
 
 /**
- * reset
+ * isString
  */
-QUnit.test("reset", function(assert){
-
-	// TODO: this code must be reused on all the other tests
+QUnit.test("isString", function(assert){
 
 	var validationManager = new managers.ValidationManager();
 
-	// Check validation reset works as expected
-	validationManager.reset();
-	assert.ok(validationManager.isArray(validationManager.failedElementsList));
-	assert.ok(validationManager.failedElementsList.length === 0);
-	assert.ok(validationManager.isArray(validationManager.failedMessagesList));
-	assert.ok(validationManager.failedMessagesList.length === 0);
-	assert.ok(validationManager.isArray(validationManager.failedStatusList));
-	assert.ok(validationManager.failedStatusList.length === 0);
-	assert.ok(validationManager.lastMessage === '');
+	assert.ok(validationManager.isString(''));
+	assert.ok(validationManager.isString('sfadf'));
+	assert.ok(validationManager.isString('3453515 532'));
+	assert.ok(validationManager.isString("\n\n$!"));
+	assert.ok(validationManager.isString('hello baby how are you'));
+	assert.ok(validationManager.isString("hello\n\nbably\r\ntest"));
 	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_OK);
 
+	assert.ok(!validationManager.isString(null, '', true));
+	assert.ok(!validationManager.isString(123, '', true));
+	assert.ok(!validationManager.isString(4.879, '', true));
+	assert.ok(!validationManager.isString(new managers.ValidationManager(), '', true));
+	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_WARNING);
+	assert.ok(!validationManager.isString([]));
+	assert.ok(!validationManager.isString(-978));
+	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_ERROR);
+
+	validationManager.reset();
+	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_OK);
 });
 
-// TODO - tots els testos que falten
+
+/**
+ * isArray
+ */
+QUnit.test("isArray", function(assert){
+
+	var validationManager = new managers.ValidationManager();
+
+	assert.ok(validationManager.isArray([]));
+	assert.ok(validationManager.isArray([1]));
+	assert.ok(validationManager.isArray(['1']));
+	assert.ok(validationManager.isArray(['1', 5, []]));
+	assert.ok(validationManager.isArray([null]));
+	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_OK);
+
+	assert.ok(!validationManager.isArray(null, '', true));
+	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_WARNING);
+	assert.ok(!validationManager.isArray(1));
+	assert.ok(!validationManager.isArray(''));
+	assert.ok(!validationManager.isArray(new managers.ValidationManager()));
+	assert.ok(!validationManager.isArray('hello'));
+	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_ERROR);
+
+	validationManager.reset();
+	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_OK);
+});
+
+
+// TODO - Add all missing tests
