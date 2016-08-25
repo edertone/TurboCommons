@@ -175,9 +175,12 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isRequired = f
 	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value is required' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 
+	// Alias namespace
+	var ns = org_turbocommons_src_main_js_utils;
+
 	var res = '';
 
-	if(StringUtils.isEmpty(text)){
+	if(ns.StringUtils.isEmpty(text)){
 
 		res = errorMessage;
 	}

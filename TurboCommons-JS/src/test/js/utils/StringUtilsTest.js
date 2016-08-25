@@ -126,6 +126,7 @@ QUnit.test("extractFileNameWithExtension", function(assert){
 	assert.ok(utils.StringUtils.extractFileNameWithExtension('CCleaner64.exe') === 'CCleaner64.exe');
 	assert.ok(utils.StringUtils.extractFileNameWithExtension('\\\\\\CCleaner64.exe') === 'CCleaner64.exe');
 	assert.ok(utils.StringUtils.extractFileNameWithExtension('\\some long path containing lots of spaces\\///CCleaner64.exe') === 'CCleaner64.exe');
+	assert.ok(utils.StringUtils.extractFileNameWithExtension("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe") === 'CCleaner64.exe');
 });
 
 
@@ -143,6 +144,7 @@ QUnit.test("extractFileNameWithoutExtension", function(assert){
 	assert.ok(utils.StringUtils.extractFileNameWithoutExtension('CCleaner64.exe') === 'CCleaner64');
 	assert.ok(utils.StringUtils.extractFileNameWithoutExtension('\\\\\\CCleaner64.exe') === 'CCleaner64');
 	assert.ok(utils.StringUtils.extractFileNameWithoutExtension('\\some long path containing lots of spaces\\///CCleaner64.exe') === 'CCleaner64');
+	assert.ok(utils.StringUtils.extractFileNameWithoutExtension("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe") === 'CCleaner64');
 });
 
 
@@ -162,6 +164,7 @@ QUnit.test("extractFileExtension", function(assert){
 	assert.ok(utils.StringUtils.extractFileExtension('\\some long path containing lots of spaces\\///CCleaner64.exe') === 'exe');
 	assert.ok(utils.StringUtils.extractFileExtension('CCleaner64.EXE') === 'EXE');
 	assert.ok(utils.StringUtils.extractFileExtension('\\\\\\CCleaner64.eXEfile') === 'eXEfile');
+	assert.ok(utils.StringUtils.extractFileExtension("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe") === 'exe');
 });
 
 

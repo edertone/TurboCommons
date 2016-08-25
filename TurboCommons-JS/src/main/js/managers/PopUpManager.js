@@ -26,6 +26,7 @@ var org_turbocommons_src_main_js_managers = org_turbocommons_src_main_js_manager
  * ...
  * </code></pre>
  * 
+ * @requires jQuery
  * @class
  */
 org_turbocommons_src_main_js_managers.PopUpManager = {
@@ -37,7 +38,7 @@ org_turbocommons_src_main_js_managers.PopUpManager = {
 	 * 
 	 * @memberOf org_turbocommons_src_main_js_managers.PopUpManager
 	 * 
-	 * @returns {org_turbocommons_src_main_js_managers.PopUpManager} The global PopUpManager instance
+	 * @returns {org_turbocommons_src_main_js_managers.PopUpManager} The singleton instance
 	 */
 	getInstance : function(){
 
