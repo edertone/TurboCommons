@@ -68,9 +68,9 @@ class ErrorManager extends BaseSingletonClass{
 
 
 	/**
-	 * Returns the global ErrorManager singleton instance.
+	 * Returns the global singleton instance.
 	 *
-	 * @return ErrorManager The Error Manager instance.
+	 * @return ErrorManager The singleton instance.
 	 */
 	public static function getInstance(){
 

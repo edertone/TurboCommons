@@ -36,7 +36,7 @@ class LocalesManagerTest extends PHPUnit_Framework_TestCase {
 
 		// Test EN_US
 		$localesManager->locales = ['en_US', 'es_ES'];
-		$localesManager->paths = [__DIR__.'/../../resources/managers/localesManager/test1'];
+		$localesManager->paths = [__DIR__.'/../resources/managers/localesManager/test1'];
 
 		$this->assertTrue($localesManager->get('PASSWORD', 'Locales') == 'Password');
 		$this->assertTrue($localesManager->get('USER', 'Locales') == 'User');
@@ -46,7 +46,7 @@ class LocalesManagerTest extends PHPUnit_Framework_TestCase {
 
 		// Verify defined attributes are still the same
 		$this->assertTrue($localesManager->locales === ['en_US', 'es_ES']);
-		$this->assertTrue($localesManager->paths === [__DIR__.'/../../resources/managers/localesManager/test1']);
+		$this->assertTrue($localesManager->paths === [__DIR__.'/../resources/managers/localesManager/test1']);
 		$this->assertTrue($localesManager->pathStructure === ['$locale/$bundle.properties']);
 
 		// Test ES_ES
@@ -66,7 +66,7 @@ class LocalesManagerTest extends PHPUnit_Framework_TestCase {
 
 		// Verify defined attributes are still the same
 		$this->assertTrue($localesManager->locales === ['es_ES', 'en_US']);
-		$this->assertTrue($localesManager->paths === [__DIR__.'/../../resources/managers/localesManager/test1']);
+		$this->assertTrue($localesManager->paths === [__DIR__.'/../resources/managers/localesManager/test1']);
 		$this->assertTrue($localesManager->pathStructure === ['$locale/$bundle.properties']);
 
 		// Test tag that is missing everywhere

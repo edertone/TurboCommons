@@ -198,7 +198,7 @@
 		</copy>
 
 		<exec executable="${Tools.phpPath}" failonerror="true" >
-			<arg value="${targetFolderPath}/${projectBaseName}/test/index.php" />
+			<arg value="${targetFolderPath}/${projectBaseName}/test/php/index.php" />
 		</exec>
 		
 		<delete dir="${targetFolderPath}/${projectBaseName}/test" failonerror="true" />
@@ -218,19 +218,19 @@
 		    </condition>
 		</fail>
 
-		<copy todir="${Test.Php.localServerPath}/${projectBaseName}-unitTests/main" overwrite="true">
+		<copy todir="${Test.Php.localServerPath}/${projectBaseName}-unitTests/php/main" overwrite="true">
 			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false" />
 		</copy>
 			
-		<copy todir="${Test.Php.localServerPath}/${projectBaseName}-unitTests/test" overwrite="true">
+		<copy todir="${Test.Php.localServerPath}/${projectBaseName}-unitTests/php/test" overwrite="true">
 			<fileset dir="${srcFolderPath}/test" casesensitive="false" />
 		</copy>
 		
 		<exec executable="${Tools.phpPath}" failonerror="true" >
-			<arg value="${Test.Php.localServerPath}/${projectBaseName}-unitTests/test/index.php" />
+			<arg value="${Test.Php.localServerPath}/${projectBaseName}-unitTests/php/test/index.php" />
 		</exec>
 
-		<delete dir="${Test.Php.localServerPath}/${projectBaseName}-unitTests" failonerror="true" />
+		<delete dir="${Test.Php.localServerPath}/${projectBaseName}-unitTests/php" failonerror="true" />
 		
 	</target>
 	
@@ -250,25 +250,27 @@
 		<!-- Clear the destination folder -->
 		<delete dir="${Test.Js.localServerPath}/${projectBaseName}-unitTests" failonerror="true" />
 				
-		<!-- Copy all the required files -->
-		<copy todir="${Test.Js.localServerPath}/${projectBaseName}-unitTests" overwrite="true">
-			<fileset dir="${srcFolderPath}/test" casesensitive="false" />
+		<!-- Copy all the test files to local server -->
+		<copy todir="${Test.Js.localServerPath}/${projectBaseName}-unitTests/js" overwrite="true">
+			<fileset dir="${srcFolderPath}/test/js" casesensitive="false" />
 		</copy>
+		
+		<!-- Append all the Js code to the index.js file -->
+		<concat destfile="${Test.Js.localServerPath}/${projectBaseName}-unitTests/js/index.js">
 			
-		<concat destfile="${Test.Js.localServerPath}/${projectBaseName}-unitTests/index.js">
-			
-			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false">
+			<fileset dir="${targetFolderPath}/${projectBaseName}/main/js" casesensitive="false">
 				<include name="**/*.js" />
 			</fileset>
 	    
 		</concat>
 		
-		<concat destfile="${Test.Js.localServerPath}/${projectBaseName}-unitTests/index.js" 
+		<concat destfile="${Test.Js.localServerPath}/${projectBaseName}-unitTests/js/index.js" 
 				append="true">
 					
-			<fileset dir="${Test.Js.localServerPath}/${projectBaseName}-unitTests/js" casesensitive="false">
+			<fileset dir="${srcFolderPath}/test/js" casesensitive="false">
 				<include name="**/*.js" />
 				<exclude name="libs/" />
+				<exclude name="index.js" />
 			</fileset>
 	    
 		</concat>
@@ -278,7 +280,7 @@
 			    
 				var browsersEnabled = project.getProperty("Test.Js.Browser.enabled").split(",");
 				var browserPaths = project.getProperty("Test.Js.Browser.osPath").split(",");
-				var url = project.getProperty("Test.Js.localServerUrl") + "/" + project.getProperty("projectBaseName") + "-unitTests/index.html";
+				var url = project.getProperty("Test.Js.localServerUrl") + "/" + project.getProperty("projectBaseName") + "-unitTests/js/index.html";
 			
 				for(var i=0; i < browserPaths.length; i++){
 					
@@ -288,7 +290,7 @@
 						exec.setExecutable(browserPaths[i]);
 						exec.setSpawn(true);
 					
-						exec.createArg().setLine(url);
+						exec.createArg().setLine(encodeURI(url));
 						
 						exec.perform();
 					}						

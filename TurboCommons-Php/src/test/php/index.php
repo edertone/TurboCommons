@@ -9,8 +9,8 @@
  * CopyRight : -> Copyright 2015 Edertone Advanded Solutions (08211 Castellar del Vallès, Barcelona). http://www.edertone.com
  */
 
-require_once __DIR__.'/../main/php/AutoLoader.php';
-require_once __DIR__.'/php/libs/phpunit.phar';
+require_once __DIR__.'/../../main/php/AutoLoader.php';
+require_once __DIR__.'/libs/phpunit.phar';
 
 
 $phpunit = new PHPUnit_TextUI_TestRunner();

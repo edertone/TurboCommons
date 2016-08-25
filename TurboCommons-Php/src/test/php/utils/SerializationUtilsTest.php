@@ -31,7 +31,7 @@ class SerializationUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testPropertiesToArray(){
 
-		$basePath = __DIR__.'/../../resources/utils/serializationUtils/propertiesToArray';
+		$basePath = __DIR__.'/../resources/utils/serializationUtils/propertiesToArray';
 
 		// Test the properties file 1
 		$test = FileSystemUtils::readFile($basePath.'/Test1.properties');
