@@ -76,7 +76,9 @@ org_turbocommons_src_main_js_utils.LayoutUtils = {
 	 */
 	moveToFront : function(element){
 
-		var zIndex = LayoutUtils.getMaxZIndex() + 1;
+		var ns = org_turbocommons_src_main_js_utils;
+
+		var zIndex = ns.LayoutUtils.getMaxZIndex() + 1;
 
 		element.css("z-index", zIndex);
 

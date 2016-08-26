@@ -146,21 +146,88 @@ org_turbocommons_src_main_js_managers.BrowserManager = {
 
 
 				/**
+				 * Gives the current position for the browser scroll
+				 * 
+				 * @memberOf org_turbocommons_src_main_js_managers.BrowserManager.prototype
+				 * 
+				 * @returns {array} The current x,y position based on the top left corner of the current document
+				 */
+				getScrollPosition : function(){
+
+					return [$(document).scrollLeft(), $(document).scrollTop()];
+				},
+
+
+				/**
+				 * Moves the browser scroll to the specified X-Y axis position.
+				 * 
+				 * @memberOf org_turbocommons_src_main_js_managers.BrowserManager.prototype
+				 * 
+				 * @param {int} x The horizontal position where the scroll will go. It is based on the left of the current page, so we can only specify positive values. Set it to null to avoid x scroll movement
+				 * @param {int} y The vertical position where the scroll will go. It is based on the top of the current page, so we can only specify positive values. Set it to null to avoid y scroll movement
+				 * @param {int} time The animation duration in miliseconds. Set it to 0 to perform a direct scroll change.
+				 * @param {string} easingFunction The jquery easing function to use with the animation. By default jquery has only 'linear' and 'swing', but we may import other jQuery easing libraries if required
+				 * 
+				 * @returns {boolean} True if scroll position changed after the execution of this method or false if no scroll change happened.
+				  */
+				scrollTo : function(x, y, time, easingFunction){
+
+					// Set default values if they are not defined
+					time = time === undefined ? 1000 : time;
+					easingFunction = easingFunction === undefined ? 'swing' : easingFunction;
+
+					var validationManager = new org_turbocommons_src_main_js_managers.ValidationManager();
+
+					if(x !== null && (!validationManager.isNumeric(x) || x < 0)){
+
+						throw new Error("BrowserUtils.scrollTo - x coordinate must be a positive number");
+					}
+
+					if(y !== null && (!validationManager.isNumeric(y) || y < 0)){
+
+						throw new Error("BrowserUtils.scrollTo - y coordinate must be a positive number");
+					}
+
+					// Perform scrolling
+					var res = false;
+					var animateObj = {};
+
+					if(x !== null){
+
+						res = true;
+						animateObj.scrollLeft = x;
+					}
+
+					if(y !== null){
+
+						res = true;
+						animateObj.scrollTop = y;
+					}
+
+					if(res){
+
+						$('html, body').stop().animate(animateObj, time, easingFunction);
+					}
+
+					return res;
+				},
+
+
+				/**
 				 * Enables or disables a smooth scrolling animation when the user clicks on any internal page link.
 				 * Example: &lt;a href="#contact"&gt; will scroll the page to the element that has id="contact". NOTE that ony one element with the 'contact' id is expected)
 				 * 
 				 * @memberOf org_turbocommons_src_main_js_managers.BrowserManager.prototype
 				 * 
+				 * @param {boolean} enabled True to enable the animated scroll, false to disable it. If disabled, all the rest arguments of this method are useless
 				 * @param {int} time The animation duration in miliseconds
 				 * @param {int} offSet The vertical offset where the scroll will end. We can specify positive or negative values. Use this to modify the final scrolling point.
-				 * @param {string} easingFunction The jquery easing function to use with the animation. By default jquery has only 'linear' and 'swing', but we can easily import other easing jquery libraries.
+				 * @param {string} easingFunction The jquery easing function to use with the animation. By default jquery has only 'linear' and 'swing', but we may import other jQuery easing libraries if required
 				 * @param {string} selectedClass If a value is specified for this parameter, all the <a> elements pointing to the currently selected anchor will be set with the specified css class. Usefull to mark selected items with a special css class on a menu.
 				 * 
 				 * @returns void
 				  */
 				setAnimatedScroll : function(enabled, time, offSet, easingFunction, selectedClass){
-
-					// TODO: this method must be revised and tested. Changes may be necesary.. Change its name? remove parameters and set them as BrowserManager class properties?
 
 					// Set default values if they are not defined
 					time = time === undefined ? 1000 : time;
@@ -168,29 +235,51 @@ org_turbocommons_src_main_js_managers.BrowserManager = {
 					offSet = offSet === undefined ? 0 : offSet;
 					selectedClass = selectedClass === undefined ? '' : selectedClass;
 
-					// Alias namespace
+					// Alias namespaces
 					var ns = org_turbocommons_src_main_js_managers;
+					var eventsNs = 'org_turbocommons_src_main_js_managers.BrowserManager.setAnimatedScroll';
+
+					// Validate method parameters
+					var validationManager = new ns.ValidationManager();
+
+					validationManager.isBoolean(enabled, "enabled parameter must be a boolean value");
+					validationManager.isNumeric(time, "time parameter must be a numeric value");
+					validationManager.isNumeric(offSet, "offSet parameter must be a numeric value");
+					validationManager.isString(easingFunction, "easingFunction parameter must be a string value");
+					validationManager.isString(selectedClass, "selectedClass parameter must be a string value");
+
+					if(validationManager.validationStatus !== ns.ValidationManager.VALIDATION_OK){
+
+						throw new Error("BrowserUtils.scrollTo - " + validationManager.lastMessage);
+					}
 
 					// Method that performs scroll animation to a clicked element
 					function onElementMouseClick(event){
 
-						event.preventDefault();
+						// Detect that the click target is an anchor element with hash (a href = "#")
+						if(event.target.nodeName.toLowerCase() === 'a'){
 
-						// Perform the scroll animation to the element that is pointed by the link hash
-						if(this.hash != ''){
+							if(event.target.hash != ''){
 
-							// Check for duplicate ids on the current document
-							HtmlUtils.findDuplicateIds();
+								// Perform the scroll animation to the element that is pointed by the link hash
+								event.preventDefault();
 
-							// Launch an error if the specified anchor link does not exist
-							if(!$(this.hash).length){
+								// Alias namespace
+								var ut = org_turbocommons_src_main_js_utils;
 
-								throw new Error("BrowserUtils.animateScrollToInternalLinks - Specified anchor link not found: " + this.hash);
+								// Check for duplicate ids on the current document
+								ut.HtmlUtils.findDuplicateIds();
+
+								// Launch an error if the specified anchor link does not exist
+								if(!$(event.target.hash).length){
+
+									throw new Error("BrowserUtils.animateScrollToInternalLinks - Specified anchor link not found: " + event.target.hash);
+								}
+
+								$('html, body').stop().animate({
+									'scrollTop' : $(event.target.hash).offset().top + offSet
+								}, time, easingFunction);
 							}
-
-							$('html, body').stop().animate({
-								'scrollTop' : $(this.hash).offset().top + offSet
-							}, time, easingFunction);
 						}
 					}
 
@@ -269,11 +358,11 @@ org_turbocommons_src_main_js_managers.BrowserManager = {
 							}
 						}
 
-						// Listen for the click event on all the a elements that have an internal anchor link
-						$('a[href^="#"]').on('click', onElementMouseClick);
+						// Listen for the click event to launch the animation
+						$(document).on('click.' + eventsNs, onElementMouseClick);
 
 						// Listen for the main browser scroll event
-						$(document).on('scroll', onBrowserScroll);
+						$(document).on('scroll.' + eventsNs, onBrowserScroll);
 					}
 
 					// Check if we need to enable or disable the scrolling animations
@@ -286,15 +375,14 @@ org_turbocommons_src_main_js_managers.BrowserManager = {
 
 						}else{
 
-							$(window).on('load', initScrollListeners);
+							$(window).one('load', initScrollListeners);
 						}
 
 					}else{
 
 						// Remove any listeners that may have been created by this method
-						$('a[href^="#"]').off('click', onElementMouseClick);
-						$(document).off('scroll', onBrowserScroll);
-						$(window).off('load', initScrollListeners);
+						$(document).off('click.' + eventsNs);
+						$(document).off('scroll.' + eventsNs);
 					}
 				},
 			};

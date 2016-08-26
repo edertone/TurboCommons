@@ -92,6 +92,29 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isTrue = funct
 
 
 /**
+ * Validation will fail if specified value is not a boolean type
+ *
+ * @param {boolean} value The bool to validate
+ * @param {string} errorMessage The error message that will be generated if validation fails
+ * @param {boolean} isWarning Tells if the validation fail will be processed as a validation error or a validation warning
+ *
+ * @returns {boolean} False in case the validation fails or true if validation succeeds.
+ */
+org_turbocommons_src_main_js_managers.ValidationManager.prototype.isBoolean = function(value, errorMessage, isWarning){
+
+	// Set optional parameters default values
+	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value is not a boolean' : errorMessage;
+	isWarning = (isWarning === undefined) ? false : isWarning;
+
+	var res = (typeof (value) !== "boolean") ? errorMessage : '';
+
+	this._updateValidationStatus(res, isWarning);
+
+	return (res == '');
+};
+
+
+/**
  * Validation will fail if specified value is not numeric
  *
  * @param {Number} value The number to validate
@@ -152,7 +175,7 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isArray = func
 	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value is not an array' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 
-	var res = (!(Object.prototype.toString.call(value) === '[object Array]')) ? errorMessage : '';
+	var res = (Object.prototype.toString.call(value) !== '[object Array]') ? errorMessage : '';
 
 	this._updateValidationStatus(res, isWarning);
 

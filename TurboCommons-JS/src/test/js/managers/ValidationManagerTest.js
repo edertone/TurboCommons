@@ -15,6 +15,7 @@ var managers = org_turbocommons_src_main_js_managers;
 
 QUnit.module("ValidationManagerTest");
 
+
 /**
  * isTrue
  */
@@ -37,6 +38,24 @@ QUnit.test("isTrue", function(assert){
 	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_WARNING);
 	assert.ok(!validationManager.isTrue(false, 'false error 2'));
 	assert.ok(validationManager.lastMessage === 'false error 2');
+	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_ERROR);
+});
+
+
+/**
+ * isBoolean
+ */
+QUnit.test("isBoolean", function(assert){
+
+	var validationManager = new managers.ValidationManager();
+
+	assert.ok(validationManager.isBoolean(true));
+	assert.ok(validationManager.isBoolean(false));
+	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_OK);
+
+	assert.ok(!validationManager.isBoolean(undefined));
+	assert.ok(!validationManager.isBoolean(null));
+	assert.ok(!validationManager.isBoolean([]));
 	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_ERROR);
 });
 
@@ -136,4 +155,4 @@ QUnit.test("isArray", function(assert){
 });
 
 
-// TODO - Add all missing tests
+//TODO - Add all missing tests

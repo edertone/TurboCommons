@@ -10,8 +10,8 @@
  */
 
 //Import namespaces
+var utils = org_turbocommons_src_main_js_utils;
 var managers = org_turbocommons_src_main_js_managers;
-
 
 QUnit.module("BrowserManagerTest");
 
@@ -44,6 +44,7 @@ QUnit.test("getPreferredLanguage", function(assert){
 
 	assert.ok(validationManager.isString(browserManager.getPreferredLanguage()));
 	assert.ok(browserManager.getPreferredLanguage().length == 2);
+	assert.ok(validationManager.isRequired(browserManager.getPreferredLanguage()));
 });
 
 
@@ -55,7 +56,67 @@ QUnit.test("goToUrl", function(assert){
 	// TODO
 	assert.ok(true);
 
-	// TODO: Not much tests are possible on this method, but try to add as much as possible
+	// TODO: Not much tests are possible on this method, but try thinking in something
+});
+
+
+/**
+ * getScrollPosition
+ */
+QUnit.test("getScrollPosition", function(assert){
+
+	var browserManager = managers.BrowserManager.getInstance();
+
+	assert.ok(utils.ArrayUtils.isEqual(browserManager.getScrollPosition(), [0, 0]));
+});
+
+
+/**
+ * scrollTo
+ */
+QUnit.test("scrollTo", function(assert){
+
+	var browserManager = managers.BrowserManager.getInstance();
+
+	// Test wrong values
+	assert.throws(function(){
+
+		browserManager.scrollTo(-1, 2);
+	});
+
+	assert.throws(function(){
+
+		browserManager.scrollTo(10, []);
+	});
+
+	assert.ok(browserManager.scrollTo(null, null) === false);
+	assert.ok(browserManager.scrollTo(null, null, 2000) === false);
+
+	// Add a big div that exceeds the display height with some internal links and targets
+	var div = $('<div style="position:absolute;z-index:999999;top:0px;left:0px;width:5300px;height:10000px"></div>');
+	$("body").append(div);
+
+	// Test the scroll movements
+	browserManager.scrollTo(0, 0, 0);
+	assert.ok(utils.ArrayUtils.isEqual(browserManager.getScrollPosition(), [0, 0]));
+
+	browserManager.scrollTo(0, 2000, 0);
+	assert.ok(utils.ArrayUtils.isEqual(browserManager.getScrollPosition(), [0, 2000]));
+
+	browserManager.scrollTo(0, 0, 0);
+	assert.ok(utils.ArrayUtils.isEqual(browserManager.getScrollPosition(), [0, 0]));
+
+	browserManager.scrollTo(3000, 5000, 0);
+	assert.ok(utils.ArrayUtils.isEqual(browserManager.getScrollPosition(), [3000, 5000]));
+
+	browserManager.scrollTo(null, 8000, 0);
+	assert.ok(utils.ArrayUtils.isEqual(browserManager.getScrollPosition(), [3000, 8000]));
+
+	browserManager.scrollTo(0, 0, 0);
+	assert.ok(utils.ArrayUtils.isEqual(browserManager.getScrollPosition(), [0, 0]));
+
+	// Remove the test div
+	div.remove();
 });
 
 
@@ -66,13 +127,63 @@ QUnit.test("setAnimatedScroll", function(assert){
 
 	var browserManager = managers.BrowserManager.getInstance();
 
-	assert.ok(browserManager.isLoaded() === true);
+	// Test wrong values
+	assert.throws(function(){
 
-	// Make sure no exception happens when enabling and disabling animated scroll
-	browserManager.setAnimatedScroll(true);
+		browserManager.setAnimatedScroll([]);
+	});
+
+	assert.throws(function(){
+
+		browserManager.setAnimatedScroll(true, 'hello');
+	});
+
+	assert.throws(function(){
+
+		browserManager.setAnimatedScroll(true, 10, []);
+	});
+
+	assert.throws(function(){
+
+		browserManager.setAnimatedScroll(true, 1, 1, []);
+	});
+
+	assert.throws(function(){
+
+		browserManager.setAnimatedScroll(true, 1, 1, [], 9);
+	});
+
+	browserManager.setAnimatedScroll(true, 0);
+
+	// Add a big div that exceeds the display height with some internal links and targets
+	var div = $('<div style="position:absolute;z-index:999999;top:0px;left:0px;width:300px;height:10000px"></div>');
+
+	var anchorTestLink1 = $('<a href="#" >undefined link</a>');
+	var anchorTestLink2 = $('<a href="#anchorTestTarget1" >link1</a>');
+	var anchorTestLink3 = $('<a href="#anchorTestTarget2" >link2</a>');
+
+	var anchorTestTarget1 = $('<div id="anchorTestTarget1" style="position:absolute;top:500px;width:50px;height:50px;background-color:#ff0000"></div>');
+	var anchorTestTarget2 = $('<div id="anchorTestTarget2" style="position:absolute;top:7500px;width:50px;height:50px;background-color:#00ff00"></div>');
+
+	$("body").append(div);
+	div.append(anchorTestLink1);
+	div.append(anchorTestLink2);
+	div.append(anchorTestLink3);
+	div.append(anchorTestTarget1);
+	div.append(anchorTestTarget2);
+
+	// Test animations work as expected
+	anchorTestLink2.trigger("click");
+	assert.ok(utils.ArrayUtils.isEqual(browserManager.getScrollPosition(), [0, 500]));
+
+	anchorTestLink3.trigger("click");
+	assert.ok(utils.ArrayUtils.isEqual(browserManager.getScrollPosition(), [0, 7500]));
 
 	browserManager.setAnimatedScroll(false);
 
-	// TODO: Not much tests are possible on this method, but try to add as much as possible
+	browserManager.scrollTo(0, 0, 0);
+	assert.ok(utils.ArrayUtils.isEqual(browserManager.getScrollPosition(), [0, 0]));
 
+	// Remove the test div
+	div.remove();
 });
