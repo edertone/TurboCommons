@@ -83,6 +83,28 @@ class ValidationManager extends BaseStrictClass{
 
 
 	/**
+	 * Validation will fail if specified value is not a boolean
+	 *
+	 * @param boolean $value The boolean to validate
+	 * @param string $errorMessage The error message that will be generated if validation fails
+	 * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
+	 *
+	 * @return boolean False in case the validation fails or true if validation succeeds.
+	 */
+	public function isBoolean($value, $errorMessage = '', $isWarning = false){
+
+		// Set optional parameters default values
+		$errorMessage = ($errorMessage === '') ? 'value is not a boolean' : $errorMessage;
+
+		$res = !is_bool($value) ? $errorMessage : '';
+
+		$this->_updateValidationStatus($res, $isWarning);
+
+		return ($res == '');
+	}
+
+
+	/**
 	 * Validation will fail if specified value is not numeric
 	 *
 	 * @param Number $value The number to validate

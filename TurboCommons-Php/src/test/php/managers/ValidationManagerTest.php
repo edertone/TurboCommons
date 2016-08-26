@@ -52,6 +52,26 @@ class ValidationManagerTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
+	 * isBoolean
+	 *
+	 * @return void
+	 */
+	public function isBoolean(){
+
+		$validationManager = new ValidationManager();
+
+		$this->assertTrue($validationManager->isBoolean(true));
+		$this->assertTrue($validationManager->isBoolean(false));
+		$this->assertTrue($validationManager->validationStatus === ValidationManager::VALIDATION_OK);
+
+		$this->assertTrue(!$validationManager->isBoolean(undefined));
+		$this->assertTrue(!$validationManager->isBoolean(null));
+		$this->assertTrue(!$validationManager->isBoolean([]));
+		$this->assertTrue($validationManager->validationStatus === ValidationManager::VALIDATION_ERROR);
+	}
+
+
+	/**
 	 * testIsNumeric
 	 *
 	 * @return void
