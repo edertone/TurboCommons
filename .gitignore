@@ -1,5 +1,6 @@
 # Custom project files
 target/
+bin/
 cache.properties
 Setup-Release.txt
 
