@@ -9,7 +9,7 @@
  * CopyRight : -> Copyright 2015 Edertone Advanded Solutions (08211 Castellar del Vallès, Barcelona). http://www.edertone.com
  */
 
-namespace org\turbocommons\src\test\php\managers;
+namespace org\turbocommons\src\test\php\utils;
 
 use Exception;
 use PHPUnit_Framework_TestCase;

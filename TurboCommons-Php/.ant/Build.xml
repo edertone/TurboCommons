@@ -5,11 +5,11 @@
 
 	<description>
 	
-		Turbo Framework PHP ant project builder.
+		Turbo Framework project builder.
 		Used to automatize the most common development build operations related to turbo framework projects.
 		Recommended for eclipse, but may work well on other ides. 
 			
-		VERY IMPORTANT !! 
+		VERY IMPORTANT - Eclipse setup !! 
 		An extra library is required to execute FTP operations with ant. Download it here:	http://commons.apache.org/net/index.html
 		and copy it to:	C:\Program Files\eclipse\plugins\org.apache.ant_1.8.2.v20110505-1300\lib
 		Then go to "Window/Preferences/Ant/Runtime/ClassPath" and add this lib as an external jar to "Ant home entries" (Say yes to ignore possible problem if prompted)
@@ -47,7 +47,7 @@
 		
 		<!-- Get the latest tag if defined on GIT and not specified on Setup-Build.xml -->
 		<exec executable="git" failonerror="false" resultproperty="gitLatestTagResult" outputproperty="gitLatestTag" >
-	    	<arg line="describe --abbrev=0"/>
+	    	<arg line="describe --abbrev=0 --tags"/>
 	    </exec> 
 		
 		<script language="javascript">
@@ -186,6 +186,11 @@
 				<exclude name="**/.git**" />
 			</fileset>
 		</sync>
+		
+		<!-- Replace the string @@package-build-version@@ on all the files with the real build version number -->
+		<replace dir="${targetFolderPath}/${projectBaseName}" token="@@package-build-version@@" value="${Build.versionNumber}.${build.number}" >
+			<exclude name="**/resources/"/>
+		</replace>
 		
 	</target>
 	
@@ -537,7 +542,7 @@
 
 		<!-- 
 			Apply the massively powerful pngquant compression tool: Override the png files on the target folder with an optimized version.
-			If the optimizer cannot generate an optimized version of a quality between 56-72, the original will remain untouched
+			If the optimizer cannot generate an optimized version of the specified quality, the original will remain untouched
 		 -->
 		<apply executable="${Tools.pngQuantPath}" failonerror="false">
 

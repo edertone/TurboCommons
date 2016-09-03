@@ -11,7 +11,10 @@
 
 namespace org\turbocommons\src\main\php\utils;
 
+use Exception;
 
+
+use org\turbocommons\src\main\php\managers\ValidationManager;
 /**
  * The most common conversion utilities to change the data from a simple type to another one.
  * To convert complex classes or structures, use SerializationUtils class.
@@ -20,81 +23,53 @@ class ConversionUtils {
 
 
 	/**
-	 * Converts a Mysql date to a dd/mm/yyyy format
+	 * Encode a string to base64
 	 *
-	 * @param string $date Date to format
-	 * @param string $seppar String separator for the date
-	 * @param boolean $showTimeValue Specify if show time value or not
+	 * @param string $string The input string to be converted
 	 *
-	 * @return string
+	 * @return string The input string as base 64
 	 */
-	public static function dateMysqlToDMY($date, $seppar = '/', $showTimeValue = true){
+	public static function stringToBase64($string){
 
-		if($date == '' || $date == '0000-00-00'){
+		if($string === null){
+
 			return '';
 		}
 
-		// Split time and date
-		$aux = explode(' ', $date);
+		$validationManager = new ValidationManager();
 
-		$d = explode('-', $aux[0]);
+		if(!$validationManager->isString($string)){
 
-		$time = isset($aux[1]) ? $aux[1] : '';
+			throw new Exception('ConversionUtils->stringToBase64: value is not a string');
+		}
 
-		// Generate the correct format to the res variable
-		$res = $d[2].$seppar.$d[1].$seppar.$d[0];
-
-		return ($showTimeValue) ? $res.' '.$time : $res;
-
-    }
+		return base64_encode($string);
+	}
 
 
-    /**
-     * Converts a date to a string format, using day names and full year numbers like '8 may 2009'.
-	 * Optionally we can get the day of the week name as 'monday 8 may 2009'
-     *
-     * @param string $date Date to format
-     * @param boolean $showDayName Specify if show day name
-     *
-     * @return string
-     */
-	public static function dateMysqlDMYToLocalized($date, $showDayName){
+	/**
+	 * Decode a string from base64
+	 *
+	 * @param string $string a base64 string
+	 *
+	 * @return string The base64 decoded as its original string
+	 */
+	public static function base64ToString($string){
 
-    	$res = self::dateMysqlToDMY($date, '/', false);
-    	$res = explode('/', $res);
+		if($string === null){
 
-    	$day = $res[0];
-    	$month = $res[1];
-    	$year = $res[2];
+			return '';
+		}
 
-	   	if($showDayName){
-    		return DateUtils::getDayName($day).' '.DateUtils::getMonthName($month).' '.$year;
-	   	}else{
-	   		return $day.' '.DateUtils::getMonthName($month).' '.$year;
-	   	}
-    }
+		$validationManager = new ValidationManager();
 
+		if(!$validationManager->isString($string)){
 
-    /**
-     * Converts a color in hex format to the respective RGB numeric values.
-     *
-     * @param string $hexColor A 6 digit color in HEX format, like #ffffff, 000000, #ff09A7 ...
-     *
-     * @return array Array with three values, corresponding to the rgb codes. For example [255, 255, 255] if #ffffff is received.
-     */
-    public static function colorHexToRgb($hexColor){
+			throw new Exception('ConversionUtils->base64ToString: value is not a string');
+		}
 
-    	$formattedValue = ltrim($hexColor, '#');
-
-    	// Check that received color code format is ok
-    	if(strlen($formattedValue) != 6){
-
-    		trigger_error('ConversionUtils::colorHexToRgb : Invalid color HEX format received: '.$hexColor, E_USER_WARNING);
-    	}
-
-    	return array_map('hexdec', str_split($formattedValue, 2));
-    }
-
+		return base64_decode($string);
+	}
 }
 
 ?>

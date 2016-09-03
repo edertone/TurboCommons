@@ -173,5 +173,5 @@ class ValidationManagerTest extends PHPUnit_Framework_TestCase {
 }
 
 
-// TODO - Add all missing tests
+// TODO - Add all missing tests from javascript
 ?>

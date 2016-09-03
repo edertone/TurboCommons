@@ -9,7 +9,7 @@
  * CopyRight : -> Copyright 2015 Edertone Advanded Solutions (08211 Castellar del Vallès, Barcelona). http://www.edertone.com
  */
 
-namespace org\turbocommons\src\test\php\managers;
+namespace org\turbocommons\src\test\php\utils;
 
 use PHPUnit_Framework_TestCase;
 use org\turbocommons\src\main\php\utils\StringUtils;
@@ -40,6 +40,8 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(!StringUtils::isEmpty('EMPTY'));
 		$this->assertTrue(!StringUtils::isEmpty('EMPTY test', ['EMPTY']));
 		$this->assertTrue(StringUtils::isEmpty('EMPTY', ['EMPTY']));
+		$this->assertTrue(StringUtils::isEmpty('EMPTY       void   hole    ', ['EMPTY', 'void', 'hole']));
+		$this->assertTrue(!StringUtils::isEmpty('EMPTY       void   hole    XX', ['EMPTY', 'void', 'hole']));
 	}
 
 
@@ -90,6 +92,28 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		// Test non numeric limit value gives exception
 		$this->setExpectedException('Exception');
 		$this->assertTrue(StringUtils::limitLen('hello', null) === '');
+	}
+
+
+	/**
+	 * testExtractDomainFromUrl
+	 *
+	 * @return void
+	 */
+	public function testExtractDomainFromUrl(){
+
+		// TODO - copy tests from js
+	}
+
+
+	/**
+	 * testExtractHostNameFromUrl
+	 *
+	 * @return void
+	 */
+	public function testExtractHostNameFromUrl(){
+
+		// TODO - copy tests from js
 	}
 
 

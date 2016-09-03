@@ -25,11 +25,11 @@ class StringUtils {
 	 * This method checks all these different conditions that can tell us that a string is empty.
 	 *
 	 * @param string $string String to check
-	 * @param array $otherEmptyKeys Optional array containing a list of string values that will be considered as empty for the given string. This can be useful in some cases when we want to consider a string like 'NULL' as an empty string.
+	 * @param array $emptyChars List of strings that will be also considered as empty characters. For example, if we also want to define 'NULL' and '_' as empty string values, we can set this to ['NULL', '_']
 	 *
-	 * @return boolean false if the string is not empty, true if the string contains only spaces, newlines or any other "empty" character
+	 * @return boolean false if the string is not empty, true if the string contains only spaces, newlines or any other characters defined as "empty" values
 	 */
-	public static function isEmpty($string, array $otherEmptyKeys = null){
+	public static function isEmpty($string, array $emptyChars = []){
 
 		$aux = '';
 
@@ -61,15 +61,14 @@ class StringUtils {
 			return true;
 		}
 
-		// Check if the empty keys array is specified
-		if(is_array($otherEmptyKeys)){
+		// Replace all extra empty characters
+		$emptyCharsCount = count($emptyChars);
 
-			if(count($otherEmptyKeys) > 0){
+		for($i = 0; $i < $emptyCharsCount; $i++){
 
-				if(in_array($aux, $otherEmptyKeys)){
+			if(($aux = str_replace($emptyChars[$i], '', $aux)) == ''){
 
-					return true;
-				}
+				return true;
 			}
 		}
 
@@ -144,6 +143,24 @@ class StringUtils {
 
 			return substr($string, 0, $limit - strlen($limiterString)).$limiterString;
 		}
+	}
+
+
+	/**
+	 * TODO
+	 */
+	public static function extractDomainFromUrl($string){
+
+		// TODO translate from JS
+	}
+
+
+	/**
+	 * TODO
+	 */
+	public static function extractHostNameFromUrl($string){
+
+		// TODO translate from JS
 	}
 
 

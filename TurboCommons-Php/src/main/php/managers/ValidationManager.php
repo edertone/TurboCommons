@@ -12,6 +12,7 @@
 namespace org\turbocommons\src\main\php\managers;
 
 use org\turbocommons\src\main\php\model\BaseStrictClass;
+use org\turbocommons\src\main\php\utils\StringUtils;
 
 
 /**
@@ -44,10 +45,6 @@ class ValidationManager extends BaseStrictClass{
 	public $validationStatus = 0;
 
 
-	/** Stores the list of jquery elements that have generated a warning or error message, in the same order as happened. */
-	public $failedElementsList = [];
-
-
 	/** Stores the list of generated warning or error messages, in the same order as happened. */
 	public $failedMessagesList = [];
 
@@ -72,7 +69,7 @@ class ValidationManager extends BaseStrictClass{
 	public function isTrue($value, $errorMessage = '', $isWarning = false){
 
 		// Set optional parameters default values
-		$errorMessage = ($errorMessage === '') ? 'value is not true' : $errorMessage;
+		$errorMessage = (StringUtils::isEmpty($errorMessage)) ? 'value is not true' : $errorMessage;
 
 		$res = (!$value) ? $errorMessage : '';
 
@@ -94,7 +91,7 @@ class ValidationManager extends BaseStrictClass{
 	public function isBoolean($value, $errorMessage = '', $isWarning = false){
 
 		// Set optional parameters default values
-		$errorMessage = ($errorMessage === '') ? 'value is not a boolean' : $errorMessage;
+		$errorMessage = (StringUtils::isEmpty($errorMessage)) ? 'value is not a boolean' : $errorMessage;
 
 		$res = !is_bool($value) ? $errorMessage : '';
 
@@ -116,7 +113,7 @@ class ValidationManager extends BaseStrictClass{
 	public function isNumeric($value, $errorMessage = '', $isWarning = false){
 
 		// Set optional parameters default values
-		$errorMessage = ($errorMessage === '') ? 'value is not a number' : $errorMessage;
+		$errorMessage = (StringUtils::isEmpty($errorMessage)) ? 'value is not a number' : $errorMessage;
 
 		$res = (!is_numeric($value)) ? $errorMessage : '';
 
@@ -138,7 +135,7 @@ class ValidationManager extends BaseStrictClass{
 	public function isString($value, $errorMessage = '', $isWarning = false){
 
 		// Set optional parameters default values
-		$errorMessage = ($errorMessage === '') ? 'value is not a string' : $errorMessage;
+		$errorMessage = (StringUtils::isEmpty($errorMessage)) ? 'value is not a string' : $errorMessage;
 
 		$res = (!is_string($value)) ? $errorMessage : '';
 
@@ -160,7 +157,7 @@ class ValidationManager extends BaseStrictClass{
 	public function isArray($value, $errorMessage = '', $isWarning = false){
 
 		// Set optional parameters default values
-		$errorMessage = ($errorMessage === '') ? 'value is not an array' : $errorMessage;
+		$errorMessage = (StringUtils::isEmpty($errorMessage)) ? 'value is not an array' : $errorMessage;
 
 		$res = (!is_array($value)) ? $errorMessage : '';
 
@@ -173,7 +170,7 @@ class ValidationManager extends BaseStrictClass{
 	/**
 	 * TODO - translate from JS
 	 */
-	public function isRequired(){
+	public function isFilledIn(){
 
 		// TODO - translate from JS
 	}
@@ -268,7 +265,6 @@ class ValidationManager extends BaseStrictClass{
 	public function reset(){
 
 		$this->validationStatus = self::VALIDATION_OK;
-		$this->failedElementsList = [];
 		$this->failedMessagesList = [];
 		$this->failedStatusList = [];
 		$this->lastMessage = '';
@@ -294,7 +290,6 @@ class ValidationManager extends BaseStrictClass{
 		// If the validation fails, we must change the validation status
 		if($errorMessage != ""){
 
-			array_push($this->failedElementsList, null);
 			array_push($this->failedMessagesList, $errorMessage);
 
 			if($isWarning){
