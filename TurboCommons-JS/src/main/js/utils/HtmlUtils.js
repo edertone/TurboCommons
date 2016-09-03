@@ -54,11 +54,9 @@ org_turbocommons_src_main_js_utils.HtmlUtils = {
 	 * 
 	 * @static
 	 * 
-	 * @returns {boolean} true if any duplicate id was found, false otherwise. In case a duplicate id is found, an exception will also be thrown with info about the duplicated id
+	 * @returns {boolean} False if no duplicate ids where found on the current page. If a duplicate id is found, an exception will be thrown showing the duplicated id name
 	 */
 	findDuplicateIds : function(){
-
-		var idsFound = false;
 
 		$('[id]').each(function(){
 
@@ -66,14 +64,12 @@ org_turbocommons_src_main_js_utils.HtmlUtils = {
 
 			if(ids.length > 1 && ids[0] == this){
 
-				idsFound = true;
-
 				throw new Error("HtmlUtils.findDuplicateIds - Duplicate id found on Html document: " + this.id);
 			}
 
 		});
 
-		return idsFound;
+		return false;
 	},
 
 
@@ -129,71 +125,6 @@ org_turbocommons_src_main_js_utils.HtmlUtils = {
 		element = (element === undefined) ? $("body") : element;
 
 		element.html(element.html().replace(search, replace));
-	},
-
-
-	/**
-	 * Totally disables the current page scrolling, useful when creating popups or elements that have an internal scroll, and we don't want it to interfere with the main document scroll.<br><br>
-	 * Can be enabled again with enableScrolling.<br><br>  
-	 * Solution taken from : http://stackoverflow.com/questions/8701754/just-disable-scroll-not-hide-it
-	 * 
-	 * @static
-	 * 
-	 * @returns void
-	 */
-	disableScrolling : function(){
-
-		if($(document).height() > $(window).height()){
-
-			var html = $('html');
-
-			// Store the current css values to jquery data so we can restore them later
-			html.data('HtmlUtils.disablePageScrolling.previous-position', html.css('position'));
-			html.data('HtmlUtils.disablePageScrolling.previous-overflow-y', html.css('overflow-y'));
-
-			// Calculate the scroll position
-			var scrollTop = (html.scrollTop()) ? html.scrollTop() : $('body').scrollTop();
-
-			// Set css values to lock the scroll on the main body
-			html.css('position', 'fixed');
-			html.css('overflow-y', 'scroll');
-			html.css('width', '100%');
-			html.css('top', -scrollTop);
-		}
-	},
-
-
-	/**
-	 * Restores main document scrolling that has been disabled with HtmlUtils.disableScrolling<br><br>
-	 * Solution taken from : http://stackoverflow.com/questions/8701754/just-disable-scroll-not-hide-it
-	 * 
-	 * @static
-	 * 
-	 * @returns void
-	 */
-	enableScrolling : function(){
-
-		// If the scroll is disabled, the previous css data will exist 
-		if($('html').data('HtmlUtils.disablePageScrolling.previous-overflow-y')){
-
-			var html = $('html');
-
-			var scrollTop = parseInt(html.css('top'));
-
-			// Restore the previous css data values
-			html.css('position', html.data('HtmlUtils.disablePageScrolling.previous-position'));
-			html.css('overflow-y', html.data('HtmlUtils.disablePageScrolling.previous-overflow-y'));
-
-			// Width is a bit special, and to prevent problems when resizing the document again, we will reset it by setting it to "".
-			// This is a fix for the original code found on stackoverflow
-			html.css('width', "");
-
-			$('html,body').scrollTop(-scrollTop);
-
-			// Clear all the stored css data
-			html.removeData('HtmlUtils.disablePageScrolling.previous-position');
-			html.removeData('HtmlUtils.disablePageScrolling.previous-overflow-y');
-		}
 	},
 
 

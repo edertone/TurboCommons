@@ -30,6 +30,8 @@ QUnit.test("isEmpty", function(assert){
 	assert.ok(!utils.StringUtils.isEmpty('EMPTY'));
 	assert.ok(!utils.StringUtils.isEmpty('EMPTY test', ['EMPTY']));
 	assert.ok(utils.StringUtils.isEmpty('EMPTY', ['EMPTY']));
+	assert.ok(utils.StringUtils.isEmpty('EMPTY       void   hole    ', ['EMPTY', 'void', 'hole']));
+	assert.ok(!utils.StringUtils.isEmpty('EMPTY       void   hole    XX', ['EMPTY', 'void', 'hole']));
 });
 
 
@@ -78,6 +80,54 @@ QUnit.test("limitLen", function(assert){
 
 		assert.ok(utils.StringUtils.limitLen('hello', null) === '');
 	});
+});
+
+
+/**
+ * extractDomainFromUrl
+ */
+QUnit.test("extractDomainFromUrl", function(assert){
+
+	assert.ok(utils.StringUtils.extractDomainFromUrl(null) === '');
+	assert.ok(utils.StringUtils.extractDomainFromUrl(undefined) === '');
+	assert.ok(utils.StringUtils.extractDomainFromUrl('') === '');
+	assert.ok(utils.StringUtils.extractDomainFromUrl("aa....aa..") === '');
+	assert.ok(utils.StringUtils.extractDomainFromUrl('google.com') === 'google.com');
+	assert.ok(utils.StringUtils.extractDomainFromUrl('http://google.com') === 'google.com');
+	assert.ok(utils.StringUtils.extractDomainFromUrl('http://www.google.com') === 'google.com');
+	assert.ok(utils.StringUtils.extractDomainFromUrl('https://www.youtube.com/watch?v=Zs3im94FSpU') === 'youtube.com');
+	assert.ok(utils.StringUtils.extractDomainFromUrl('https://developer.chrome.com/extensions/notifications#method-clear') === 'chrome.com');
+	assert.ok(utils.StringUtils.extractDomainFromUrl('http://www.abc.es/internacional/abci-represion-mediatica-venezuela-periodistas-detenidos-y-expulsados-menos-24-horas-201609011727_noticia.html') === 'abc.es');
+	assert.ok(utils.StringUtils.extractDomainFromUrl('file:///C:/Users/Jaume/Desktop/Extension%200.2.9/PopUp-Enable.html') === '');
+	assert.ok(utils.StringUtils.extractDomainFromUrl(' asdfa sfdaewr 345 drtwertwert5324') === '');
+	assert.ok(utils.StringUtils.extractDomainFromUrl("\n\t\n2i34.,.324 .,h we. h \n\n") === '');
+	assert.ok(utils.StringUtils.extractDomainFromUrl('ftp://ftp.funet.fi/pub/standards/RFC/rfc959.txt') === 'funet.fi');
+	assert.ok(utils.StringUtils.extractDomainFromUrl('ftp://jess12:bosox67@ftp.xyz.com') === 'xyz.com');
+	assert.ok(utils.StringUtils.extractDomainFromUrl('ftp://jess12@xyz.com:bosox67@ftp.xyz.com') === 'xyz.com');
+});
+
+
+/**
+ * extractHostNameFromUrl
+ */
+QUnit.test("extractHostNameFromUrl", function(assert){
+
+	assert.ok(utils.StringUtils.extractHostNameFromUrl(null) === '');
+	assert.ok(utils.StringUtils.extractHostNameFromUrl(undefined) === '');
+	assert.ok(utils.StringUtils.extractHostNameFromUrl('') === '');
+	assert.ok(utils.StringUtils.extractHostNameFromUrl("aa....aa..") === '');
+	assert.ok(utils.StringUtils.extractHostNameFromUrl('google.com') === 'google.com');
+	assert.ok(utils.StringUtils.extractHostNameFromUrl('http://google.com') === 'google.com');
+	assert.ok(utils.StringUtils.extractHostNameFromUrl('http://www.google.com') === 'www.google.com');
+	assert.ok(utils.StringUtils.extractHostNameFromUrl('https://www.youtube.com/watch?v=Zs3im94FSpU') === 'www.youtube.com');
+	assert.ok(utils.StringUtils.extractHostNameFromUrl('https://developer.chrome.com/extensions/notifications#method-clear') === 'developer.chrome.com');
+	assert.ok(utils.StringUtils.extractHostNameFromUrl('http://www.abc.es/internacional/abci-represion-mediatica-venezuela-periodistas-detenidos-y-expulsados-menos-24-horas-201609011727_noticia.html') === 'www.abc.es');
+	assert.ok(utils.StringUtils.extractHostNameFromUrl('file:///C:/Users/Jaume/Desktop/Extension%200.2.9/PopUp-Enable.html') === '');
+	assert.ok(utils.StringUtils.extractHostNameFromUrl(' asdfa sfdaewr 345 drtwertwert5324') === '');
+	assert.ok(utils.StringUtils.extractHostNameFromUrl("\n\t\n2i34.,.324 .,h we. h \n\n") === '');
+	assert.ok(utils.StringUtils.extractDomainFromUrl('ftp://ftp.funet.fi/pub/standards/RFC/rfc959.txt') === 'ftp.funet.fi');
+	assert.ok(utils.StringUtils.extractDomainFromUrl('ftp://jess12:bosox67@ftp.xyz.com') === 'ftp.xyz.com');
+	assert.ok(utils.StringUtils.extractDomainFromUrl('ftp://jess12@xyz.com:bosox67@ftp.xyz.com') === 'ftp.xyz.com');
 });
 
 

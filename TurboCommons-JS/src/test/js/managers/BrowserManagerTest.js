@@ -44,7 +44,7 @@ QUnit.test("getPreferredLanguage", function(assert){
 
 	assert.ok(validationManager.isString(browserManager.getPreferredLanguage()));
 	assert.ok(browserManager.getPreferredLanguage().length == 2);
-	assert.ok(validationManager.isRequired(browserManager.getPreferredLanguage()));
+	assert.ok(validationManager.isFilledIn(browserManager.getPreferredLanguage()));
 });
 
 
@@ -57,6 +57,26 @@ QUnit.test("goToUrl", function(assert){
 	assert.ok(true);
 
 	// TODO: Not much tests are possible on this method, but try thinking in something
+});
+
+
+/**
+ * disableScroll
+ */
+QUnit.test("disableScroll", function(assert){
+
+	// TODO
+	assert.ok(true);
+});
+
+
+/**
+ * enableScroll
+ */
+QUnit.test("enableScroll", function(assert){
+
+	// TODO
+	assert.ok(true);
 });
 
 

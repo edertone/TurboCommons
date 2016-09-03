@@ -33,10 +33,7 @@ org_turbocommons_src_main_js_utils.ArrayUtils = {
 	 */
 	isEqual : function(array1, array2){
 
-		// Namespace alias
-		var managers = org_turbocommons_src_main_js_managers;
-
-		var validationManager = new managers.ValidationManager();
+		var validationManager = new org_turbocommons_src_main_js_managers.ValidationManager();
 
 		// Both provided values must be arrays or an exception will be launched
 		if(!validationManager.isArray(array1) || !validationManager.isArray(array2)){
@@ -69,5 +66,62 @@ org_turbocommons_src_main_js_utils.ArrayUtils = {
 		}
 
 		return true;
+	},
+
+
+	/**
+	 * Remove the specified item from an array
+	 * 
+	 * @static
+	 * 
+	 * @param {array} array An array (it will not be modified by this method)
+	 * @param {object} element The element that must be removed from the given array
+	 *
+	 * @returns {array} The provided array but without the specified element (if found). Note that originally received array is not modified by this method
+	 */
+	removeElement : function(array, element){
+
+		// Alias namespaces
+		var ut = org_turbocommons_src_main_js_utils;
+
+		var validationManager = new org_turbocommons_src_main_js_managers.ValidationManager();
+
+		// Provided array must be an array
+		if(!validationManager.isArray(array)){
+
+			throw new Error("ArrayUtils.removeElement: Provided parameter must be an array");
+		}
+
+		var res = [];
+
+		if(validationManager.isArray(element)){
+
+			for(var i = 0; i < array.length; i++){
+
+				if(!validationManager.isArray(array[i])){
+
+					res.push(array[i]);
+
+				}else{
+
+					if(!ut.ArrayUtils.isEqual(element, array[i])){
+
+						res.push(array[i]);
+					}
+				}
+			}
+
+		}else{
+
+			for(var j = 0; j < array.length; j++){
+
+				if(element !== array[j]){
+
+					res.push(array[j]);
+				}
+			}
+		}
+
+		return res;
 	}
 };

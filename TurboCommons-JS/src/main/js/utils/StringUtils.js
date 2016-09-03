@@ -39,14 +39,14 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 * @static
 	 * 
 	 * @param {string} string String to check
-	 * @param {array} otherEmptyKeys Optional array containing a list of string values that will be considered as empty for the given string. This can be useful in some cases when we want to consider a string like 'NULL' as an empty string.
+	 * @param {array} emptyChars List of strings that will be also considered as empty characters. For example, if we also want to define 'NULL' and '_' as empty string values, we can set this to ['NULL', '_']
 	 *
-	 * @returns boolean false if the string is not empty, true if the string contains only spaces, newlines or any other "empty" character
+	 * @returns {boolean} false if the string is not empty, true if the string contains only spaces, newlines or any other characters defined as "empty" values
 	 */
-	isEmpty : function(string, otherEmptyKeys){
+	isEmpty : function(string, emptyChars){
 
 		// Set optional parameters default values
-		otherEmptyKeys = (otherEmptyKeys === undefined) ? null : otherEmptyKeys;
+		emptyChars = (emptyChars === undefined || emptyChars === null) ? [] : emptyChars;
 
 		var aux = '';
 
@@ -56,7 +56,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 			return true;
 		}
 
-		// Replace all empty spaces.
+		// Replace all empty spaces
 		if((aux = string.replace(/ /g, '')) == ''){
 
 			return true;
@@ -78,15 +78,12 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 			return true;
 		}
 
-		// Check if the empty keys array is specified
-		if(Object.prototype.toString.call(otherEmptyKeys) === '[object Array]'){
+		// Replace all extra empty characters
+		for(var i = 0; i < emptyChars.length; i++){
 
-			if(otherEmptyKeys.length > 0){
+			if((aux = aux.replace(new RegExp(emptyChars[i], 'g'), '')) == ''){
 
-				if(otherEmptyKeys.indexOf(aux) >= 0){
-
-					return true;
-				}
+				return true;
 			}
 		}
 
@@ -175,6 +172,58 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 
 			return string.substring(0, limit - limiterString.length) + limiterString;
 		}
+	},
+
+
+	/**
+	 * Extracts the domain name from a given url (excluding subdomain). 
+	 * For example: http://subdomain.google.com/test/ will result in 'google.com'
+	 * 
+	 * @static
+	 * 
+	 * @param {string} url A string containing an URL
+	 * 
+	 * @returns {string} The domain from the given string (excluding the subdomain if exists)
+	 */
+	extractDomainFromUrl : function(url){
+
+		// Alias namespaces
+		var ns = org_turbocommons_src_main_js_utils;
+
+		var hostName = ns.StringUtils.extractHostNameFromUrl(url);
+
+		hostName = hostName.split('.');
+
+		hostName.shift();
+
+		return hostName.join('.');
+	},
+
+
+	/**
+	 * Extracts the hostname (domain including subdomain) from a given url.
+	 * For example: http://subdomain.google.com/test/ will result in 'subdomain.google.com'
+	 * 
+	 * @static
+	 * 
+	 * @param {string} url A string containing an URL
+	 * 
+	 * @returns {string} The domain and subdomain from the given string (subdomain.domain.com)
+	 */
+	extractHostNameFromUrl : function(url){
+
+		var validationManager = new org_turbocommons_src_main_js_managers.ValidationManager();
+
+		if(!validationManager.isFilledIn(url)){
+
+			return '';
+		}
+
+		var tmp = document.createElement('a');
+
+		tmp.href = url;
+
+		return tmp.host;
 	},
 
 

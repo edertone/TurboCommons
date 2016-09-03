@@ -155,4 +155,37 @@ QUnit.test("isArray", function(assert){
 });
 
 
+/**
+ * isFilledIn
+ */
+QUnit.test("isFilledIn", function(assert){
+
+	var validationManager = new managers.ValidationManager();
+
+	// Test empty strings
+	assert.ok(!validationManager.isFilledIn(undefined, null, '', true));
+	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_WARNING);
+
+	assert.ok(!validationManager.isFilledIn(null));
+	assert.ok(!validationManager.isFilledIn('      '));
+	assert.ok(!validationManager.isFilledIn("\n\n  \n"));
+	assert.ok(!validationManager.isFilledIn("\t   \n     \r\r"));
+	assert.ok(!validationManager.isFilledIn('EMPTY', ['EMPTY']));
+	assert.ok(!validationManager.isFilledIn('EMPTY           ', ['EMPTY']));
+	assert.ok(!validationManager.isFilledIn('EMPTY       void   hole    ', ['EMPTY', 'void', 'hole']));
+
+	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_ERROR);
+
+	// Test non empty strings
+	validationManager.reset();
+
+	assert.ok(validationManager.isFilledIn('adsadf'));
+	assert.ok(validationManager.isFilledIn('    sdfasdsf'));
+	assert.ok(validationManager.isFilledIn('EMPTY'));
+	assert.ok(validationManager.isFilledIn('EMPTY test', ['EMPTY']));
+
+	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_OK);
+});
+
+
 //TODO - Add all missing tests

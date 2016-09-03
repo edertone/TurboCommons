@@ -27,10 +27,6 @@ org_turbocommons_src_main_js_managers.ValidationManager = function(){
 	this.validationStatus = 0;
 
 
-	/** Stores the list of jquery elements that have generated a warning or error message, in the same order as happened. */
-	this.failedElementsList = [];
-
-
 	/** Stores the list of generated warning or error messages, in the same order as happened. */
 	this.failedMessagesList = [];
 
@@ -79,8 +75,11 @@ org_turbocommons_src_main_js_managers.ValidationManager.VALIDATION_ERROR = 2;
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isTrue = function(value, errorMessage, isWarning){
 
+	// Alias namespace
+	var ns = org_turbocommons_src_main_js_utils;
+
 	// Set optional parameters default values
-	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value is not true' : errorMessage;
+	errorMessage = (ns.StringUtils.isEmpty(errorMessage)) ? 'value is not true' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 
 	var res = (value !== true) ? errorMessage : '';
@@ -102,8 +101,11 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isTrue = funct
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isBoolean = function(value, errorMessage, isWarning){
 
+	// Alias namespace
+	var ns = org_turbocommons_src_main_js_utils;
+
 	// Set optional parameters default values
-	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value is not a boolean' : errorMessage;
+	errorMessage = (ns.StringUtils.isEmpty(errorMessage)) ? 'value is not a boolean' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 
 	var res = (typeof (value) !== "boolean") ? errorMessage : '';
@@ -125,8 +127,11 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isBoolean = fu
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isNumeric = function(value, errorMessage, isWarning){
 
+	// Alias namespace
+	var ns = org_turbocommons_src_main_js_utils;
+
 	// Set optional parameters default values
-	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value is not a number' : errorMessage;
+	errorMessage = (ns.StringUtils.isEmpty(errorMessage)) ? 'value is not a number' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 
 	var res = (!(!isNaN(parseFloat(value)) && isFinite(value))) ? errorMessage : '';
@@ -148,8 +153,11 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isNumeric = fu
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isString = function(value, errorMessage, isWarning){
 
+	// Alias namespace
+	var ns = org_turbocommons_src_main_js_utils;
+
 	// Set optional parameters default values
-	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value is not a string' : errorMessage;
+	errorMessage = (ns.StringUtils.isEmpty(errorMessage)) ? 'value is not a string' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 
 	var res = (!(typeof value === 'string' || value instanceof String)) ? errorMessage : '';
@@ -171,8 +179,11 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isString = fun
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isArray = function(value, errorMessage, isWarning){
 
+	// Alias namespace
+	var ns = org_turbocommons_src_main_js_utils;
+
 	// Set optional parameters default values
-	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value is not an array' : errorMessage;
+	errorMessage = (ns.StringUtils.isEmpty(errorMessage)) ? 'value is not an array' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 
 	var res = (Object.prototype.toString.call(value) !== '[object Array]') ? errorMessage : '';
@@ -184,18 +195,26 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isArray = func
 
 
 /**
- * Validation will fail if specified text is empty
+ * Validation will fail if specified text is empty.<br>
+ * See Stringutils.isEmpty to understand what is considered as an empty text
+ * 
+ * @see Stringutils.isEmpty
  *
- * @param text The text to validate
- * @param errorMessage The error message that will be generated if validation fails
- * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
+ * @param {string} value A text that must not be empty.
+ * @param {array} otherEmptyKeys Optional array containing a list of string values that will be considered as empty for the given string. This can be useful in some cases when we want to consider a string like 'NULL' as an empty string.	 
+ * @param {string} errorMessage The error message that will be generated if validation fails
+ * @param {boolean} isWarning Tells if the validation fail will be processed as a validation error or a validation warning
  *
- * @returns False in case the validation fails or true if validation succeeds.
+ * @returns {boolean} False in case the validation fails or true if validation succeeds.
  */
-org_turbocommons_src_main_js_managers.ValidationManager.prototype.isRequired = function(text, errorMessage, isWarning){
+org_turbocommons_src_main_js_managers.ValidationManager.prototype.isFilledIn = function(value, otherEmptyKeys, errorMessage, isWarning){
+
+	// Alias namespace
+	var ns = org_turbocommons_src_main_js_utils;
 
 	// Set optional parameters default values
-	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value is required' : errorMessage;
+	otherEmptyKeys = (otherEmptyKeys === undefined) ? null : otherEmptyKeys;
+	errorMessage = (ns.StringUtils.isEmpty(errorMessage)) ? 'value is required' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 
 	// Alias namespace
@@ -203,7 +222,7 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isRequired = f
 
 	var res = '';
 
-	if(ns.StringUtils.isEmpty(text)){
+	if(ns.StringUtils.isEmpty(value, otherEmptyKeys)){
 
 		res = errorMessage;
 	}
@@ -215,43 +234,38 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isRequired = f
 
 
 /**
- * Validation will fail if specified value is not a date with the specified format
- *
- * @param text The text to validate
- * @param errorMessage The error message that will be generated if validation fails
- * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
- * @param required True means the value is required
- * @param inputformat The date format that we are validating. dd/mm/yyyy by default
- *
- * @returns False in case the validation fails or true if validation succeeds.
+ * TODO
  */
-org_turbocommons_src_main_js_managers.ValidationManager.prototype.isDate = function(text, errorMessage, isWarning, required, inputformat){
+org_turbocommons_src_main_js_managers.ValidationManager.prototype.isDate = function(value, required, inputFormat, errorMessage, isWarning){
+
+	// TODO - review all of this method. May be necessary to change it all
+
+	// Alias namespace
+	var ns = org_turbocommons_src_main_js_utils;
 
 	// Set optional parameters default values
-	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value is not a date' : errorMessage;
+	errorMessage = (ns.StringUtils.isEmpty(errorMessage)) ? 'value is not a date' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 	required = (required === undefined) ? true : required;
-	inputformat = (inputformat === undefined) ? "dd/mm/yyyy" : inputformat;
+	inputFormat = (inputFormat === undefined) ? "dd/mm/yyyy" : inputFormat;
 
 	// Deferr required validation to the isRequired method
 	if(required){
 
-		if(!this.isRequired(text, errorMessage, isWarning)){
+		if(!this.isRequired(value, errorMessage, isWarning)){
 
 			return false;
 		}
 
 	}else{
 
-		if(StringUtils.isEmpty(text)){
+		if(StringUtils.isEmpty(value)){
 
 			return true;
 		}
 	}
 
 	var res = '';
-
-	// TODO: Prové de flex, repensar per a javascript
 
 	return (res == '');
 };
@@ -269,8 +283,11 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isDate = funct
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isMail = function(text, errorMessage, isWarning, required){
 
+	// Alias namespace
+	var ns = org_turbocommons_src_main_js_utils;
+
 	// Set optional parameters default values
-	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value is not an email' : errorMessage;
+	errorMessage = (ns.StringUtils.isEmpty(errorMessage)) ? 'value is not an email' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 	required = (required === undefined) ? true : required;
 
@@ -319,8 +336,11 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isMail = funct
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isEqualToValue = function(text, originalText, errorMessage, isWarning, required){
 
+	// Alias namespace
+	var ns = org_turbocommons_src_main_js_utils;
+
 	// Set optional parameters default values
-	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'values are not equal' : errorMessage;
+	errorMessage = (ns.StringUtils.isEmpty(errorMessage)) ? 'values are not equal' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 	required = (required === undefined) ? true : required;
 
@@ -368,8 +388,11 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isEqualToValue
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isMinimumWords = function(text, minWords, errorMessage, isWarning, required, wordSeparator){
 
+	// Alias namespace
+	var ns = org_turbocommons_src_main_js_utils;
+
 	// Set optional parameters default values
-	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value does not have the minimum words' : errorMessage;
+	errorMessage = (ns.StringUtils.isEmpty(errorMessage)) ? 'value does not have the minimum words' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 	required = (required === undefined) ? true : required;
 	wordSeparator = (wordSeparator === undefined) ? ' ' : wordSeparator;
@@ -415,8 +438,11 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isMinimumWords
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isNIF = function(text, errorMessage, isWarning, required){
 
+	// Alias namespace
+	var ns = org_turbocommons_src_main_js_utils;
+
 	// Set optional parameters default values
-	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value is not a NIF' : errorMessage;
+	errorMessage = (ns.StringUtils.isEmpty(errorMessage)) ? 'value is not a NIF' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 	required = (required === undefined) ? true : required;
 
@@ -486,8 +512,11 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isNIF = functi
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isMinimumLength = function(text, minLen, errorMessage, isWarning, required){
 
+	// Alias namespace
+	var ns = org_turbocommons_src_main_js_utils;
+
 	// Set optional parameters default values
-	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value does not meet minimum length' : errorMessage;
+	errorMessage = (ns.StringUtils.isEmpty(errorMessage)) ? 'value does not meet minimum length' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 	required = (required === undefined) ? true : required;
 
@@ -548,8 +577,11 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isPostalCode =
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isPhone = function(text, errorMessage, isWarning, required){
 
+	// Alias namespace
+	var ns = org_turbocommons_src_main_js_utils;
+
 	// Set optional parameters default values
-	errorMessage = (errorMessage === undefined || errorMessage == '') ? 'value is not a phone' : errorMessage;
+	errorMessage = (ns.StringUtils.isEmpty(errorMessage)) ? 'value is not a phone' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 	required = (required === undefined) ? true : required;
 
@@ -622,9 +654,11 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isPhone = func
  * @param throwAlert True by default. If enabled, a javascript alert will be thrown with the validation error when any validation fails.
  * @param invalidElementClass '' by default. Css class that will be applied to the elements that fail validation, so we can style them the way we want.
  * 
- * @returns True if validation was ok, false otherwise. Validation error / warning messages and elements history can be found on this class properties
+ * @returns {array} Empty array if validation was OK or an array containing the list of the different objects that have generated a warning or error message, in the same order as they happened
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isHtmlFormValid = function(form, throwAlert, invalidElementClass){
+
+	// TODO - This method must be tested intensively
 
 	// Set optional parameters default values
 	throwAlert = (throwAlert === undefined) ? true : throwAlert;
@@ -636,6 +670,7 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isHtmlFormVali
 	validationManager.reset();
 
 	var res = true;
+	var failedElementsList = [];
 
 	var errorMessage = StringUtils.isEmpty(form.attr("data-validationError")) ? 'Invalid form' : form.attr("data-validationError");
 
@@ -732,15 +767,13 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isHtmlFormVali
 						alert(validationManager.lastMessage);
 					}
 
-					validationManager.failedElementsList[validationManager.failedElementsList.length - 1] = $(this);
-
-					return false;
+					failedElementsList[failedElementsList.length - 1] = $(this);
 				}
 			}
 		}
 	});
 
-	return res;
+	return failedElementsList;
 };
 
 
@@ -755,7 +788,6 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.reset = functi
 	var ns = org_turbocommons_src_main_js_managers;
 
 	this.validationStatus = ns.ValidationManager.VALIDATION_OK;
-	this.failedElementsList = [];
 	this.failedMessagesList = [];
 	this.failedStatusList = [];
 	this.lastMessage = '';
@@ -784,7 +816,6 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype._updateValidat
 	// If the validation fails, we must change the validation status
 	if(errorMessage != ""){
 
-		this.failedElementsList.push(null);
 		this.failedMessagesList.push(errorMessage);
 
 		if(isWarning){

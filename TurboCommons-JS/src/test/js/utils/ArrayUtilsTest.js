@@ -15,6 +15,7 @@ var utils = org_turbocommons_src_main_js_utils;
 
 QUnit.module("ArrayUtilsTest");
 
+
 /**
  * isEqual
  */
@@ -61,5 +62,43 @@ QUnit.test("isEqual", function(assert){
 	}], [{
 		a : 1
 	}]));
+
+});
+
+
+/**
+ * removeElement
+ */
+QUnit.test("removeElement", function(assert){
+
+	// Test non array values must launch exception
+	assert.throws(function(){
+
+		utils.ArrayUtils.removeElement(null, null);
+	});
+
+	assert.throws(function(){
+
+		utils.ArrayUtils.removeElement(1, 1);
+	});
+
+	assert.throws(function(){
+
+		utils.ArrayUtils.removeElement("asfasf1", "345345");
+	});
+
+	// Test several arrays
+	assert.ok(utils.ArrayUtils.isEqual(utils.ArrayUtils.removeElement([], null), []));
+	assert.ok(utils.ArrayUtils.isEqual(utils.ArrayUtils.removeElement([], 1), []));
+	assert.ok(utils.ArrayUtils.isEqual(utils.ArrayUtils.removeElement([1], 1), []));
+	assert.ok(utils.ArrayUtils.isEqual(utils.ArrayUtils.removeElement(["1"], 1), ["1"]));
+	assert.ok(utils.ArrayUtils.isEqual(utils.ArrayUtils.removeElement(["1"], "1"), []));
+	assert.ok(utils.ArrayUtils.isEqual(utils.ArrayUtils.removeElement([1, 2, 3, 4], 1), [2, 3, 4]));
+	assert.ok(utils.ArrayUtils.isEqual(utils.ArrayUtils.removeElement([1, 2, 3, 4], 8), [1, 2, 3, 4]));
+	assert.ok(utils.ArrayUtils.isEqual(utils.ArrayUtils.removeElement(["hello", "guys"], "guys"), ["hello"]));
+	assert.ok(utils.ArrayUtils.isEqual(utils.ArrayUtils.removeElement(["hello", 1, ["test"]], 1), ["hello", ["test"]]));
+	assert.ok(utils.ArrayUtils.isEqual(utils.ArrayUtils.removeElement(["hello", 1, ["test"]], ["test"]), ["hello", 1]));
+	assert.ok(utils.ArrayUtils.isEqual(utils.ArrayUtils.removeElement(["hello", 1, ["test", "array"], ["test"]], ["test", "array"]), ["hello", 1, ["test"]]));
+
 
 });

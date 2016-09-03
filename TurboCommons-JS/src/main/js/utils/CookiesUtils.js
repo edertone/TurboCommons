@@ -78,7 +78,7 @@ org_turbocommons_src_main_js_utils.CookiesUtils = {
 		var validationManager = new org_turbocommons_src_main_js_managers.ValidationManager();
 
 		// Empty key means an exception
-		if(!validationManager.isString(key) || !validationManager.isRequired(key)){
+		if(!validationManager.isString(key) || !validationManager.isFilledIn(key)){
 
 			throw new Error("CookiesUtils.setCookie: key must be defined");
 		}
@@ -133,7 +133,7 @@ org_turbocommons_src_main_js_utils.CookiesUtils = {
 		var validationManager = new org_turbocommons_src_main_js_managers.ValidationManager();
 
 		// Empty key means an exception
-		if(!validationManager.isString(key) || !validationManager.isRequired(key)){
+		if(!validationManager.isString(key) || !validationManager.isFilledIn(key)){
 
 			throw new Error("CookiesUtils.getCookie: key must be defined");
 		}
@@ -172,7 +172,7 @@ org_turbocommons_src_main_js_utils.CookiesUtils = {
 		var validationManager = new org_turbocommons_src_main_js_managers.ValidationManager();
 
 		// Empty key means an exception
-		if(!validationManager.isString(key) || !validationManager.isRequired(key)){
+		if(!validationManager.isString(key) || !validationManager.isFilledIn(key)){
 
 			throw new Error("CookiesUtils.deleteCookie: key must be defined");
 		}

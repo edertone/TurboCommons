@@ -146,6 +146,72 @@ org_turbocommons_src_main_js_managers.BrowserManager = {
 
 
 				/**
+				 * Totally disables the current page scrolling. Useful when creating popups or elements that have an internal scroll, 
+				 * and we don't want it to interfere with the main document scroll.<br><br>
+				 * Can be enabled again with enableScroll.<br><br>  
+				 * Solution taken from : http://stackoverflow.com/questions/8701754/just-disable-scroll-not-hide-it
+				 * 
+				 * @memberOf org_turbocommons_src_main_js_managers.BrowserManager.prototype
+				 * 
+				 * @returns void
+				 */
+				disableScroll : function(){
+
+					if($(document).height() > $(window).height()){
+
+						var html = $('html');
+
+						// Store the current css values to jquery data so we can restore them later
+						html.data('HtmlUtils.disablePageScrolling.previous-position', html.css('position'));
+						html.data('HtmlUtils.disablePageScrolling.previous-overflow-y', html.css('overflow-y'));
+
+						// Calculate the scroll position
+						var scrollTop = (html.scrollTop()) ? html.scrollTop() : $('body').scrollTop();
+
+						// Set css values to lock the scroll on the main body
+						html.css('position', 'fixed');
+						html.css('overflow-y', 'scroll');
+						html.css('width', '100%');
+						html.css('top', -scrollTop);
+					}
+				},
+
+
+				/**
+				 * Restores main document scrolling if has been disabled with HtmlUtils.disableScroll<br><br>
+				 * Solution taken from : http://stackoverflow.com/questions/8701754/just-disable-scroll-not-hide-it
+				 * 
+				 * @memberOf org_turbocommons_src_main_js_managers.BrowserManager.prototype
+				 * 
+				 * @returns void
+				 */
+				enableScroll : function(){
+
+					// If the scroll is disabled, the previous css data will exist 
+					if($('html').data('HtmlUtils.disablePageScrolling.previous-overflow-y')){
+
+						var html = $('html');
+
+						var scrollTop = parseInt(html.css('top'));
+
+						// Restore the previous css data values
+						html.css('position', html.data('HtmlUtils.disablePageScrolling.previous-position'));
+						html.css('overflow-y', html.data('HtmlUtils.disablePageScrolling.previous-overflow-y'));
+
+						// Width is a bit special, and to prevent problems when resizing the document again, we will reset it by setting it to "".
+						// This is a fix for the original code found on stackoverflow
+						html.css('width', "");
+
+						$('html,body').scrollTop(-scrollTop);
+
+						// Clear all the stored css data
+						html.removeData('HtmlUtils.disablePageScrolling.previous-position');
+						html.removeData('HtmlUtils.disablePageScrolling.previous-overflow-y');
+					}
+				},
+
+
+				/**
 				 * Gives the current position for the browser scroll
 				 * 
 				 * @memberOf org_turbocommons_src_main_js_managers.BrowserManager.prototype

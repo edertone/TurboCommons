@@ -534,10 +534,14 @@ org_turbocommons_src_main_js_managers.PopUpManager = {
 					backgroundColor = backgroundColor === undefined ? '#000000' : backgroundColor;
 					layoutMode = layoutMode === undefined ? 'center center' : layoutMode;
 
-					HtmlUtils.disableScrolling();
+					// Alias namespaces
+					var ut = org_turbocommons_src_main_js_utils;
+					var mg = org_turbocommons_src_main_js_managers;
+
+					mg.BrowserManager.getInstance().disableScroll();
 
 					// Create the mask main container
-					var maskId = HtmlUtils.generateUniqueId('popupMask');
+					var maskId = ut.HtmlUtils.generateUniqueId('popupMask');
 
 					var mask = $('<div id="' + maskId + '" style="position:fixed;top:0px;left:0px;right:0px;bottom:0px;"></div>');
 
@@ -555,12 +559,12 @@ org_turbocommons_src_main_js_managers.PopUpManager = {
 					$("body").append(mask);
 
 					// Move the mask to the front of the current document
-					LayoutUtils.moveToFront(mask);
+					ut.LayoutUtils.moveToFront(mask);
 
 					// Define a function to layout the element on screen
 					function calculatePopUpLayOut(){
 
-						LayoutUtils.alignElementTo(element, mask, layoutMode);
+						ut.LayoutUtils.centerElementTo(element, mask, layoutMode);
 					}
 
 					// TODO: queda pendent evitar que el focus es surti dels elements del popup cap altres parts de la app
@@ -586,7 +590,7 @@ org_turbocommons_src_main_js_managers.PopUpManager = {
 							if(e.keyCode == 27){
 
 								// The removeModalPopUp method will take care of removing all event handlers
-								PopUpManager.getInstance().removeModalPopUp(element);
+								mg.PopUpManager.getInstance().removeModalPopUp(element);
 							}
 						});
 
@@ -599,7 +603,7 @@ org_turbocommons_src_main_js_managers.PopUpManager = {
 
 									$(document).on("mouseup." + maskId, function(){
 
-										PopUpManager.getInstance().removeModalPopUp(element);
+										mg.PopUpManager.getInstance().removeModalPopUp(element);
 									});
 								}
 							});
@@ -616,7 +620,7 @@ org_turbocommons_src_main_js_managers.PopUpManager = {
 							// Close the popup when the back button is pressed
 							$(window).on("popstate." + maskId, function(){
 
-								PopUpManager.getInstance().removeModalPopUp(element);
+								mg.PopUpManager.getInstance().removeModalPopUp(element);
 							});
 						}
 
