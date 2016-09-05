@@ -22,16 +22,24 @@ QUnit.test("isEmpty", function(assert){
 
 	assert.ok(utils.StringUtils.isEmpty(null));
 	assert.ok(utils.StringUtils.isEmpty(''));
+	assert.ok(utils.StringUtils.isEmpty([]));
 	assert.ok(utils.StringUtils.isEmpty('      '));
 	assert.ok(utils.StringUtils.isEmpty("\n\n  \n"));
 	assert.ok(utils.StringUtils.isEmpty("\t   \n     \r\r"));
+	assert.ok(utils.StringUtils.isEmpty('EMPTY', ['EMPTY']));
+	assert.ok(utils.StringUtils.isEmpty('EMPTY       void   hole    ', ['EMPTY', 'void', 'hole']));
+
 	assert.ok(!utils.StringUtils.isEmpty('adsadf'));
 	assert.ok(!utils.StringUtils.isEmpty('    sdfasdsf'));
 	assert.ok(!utils.StringUtils.isEmpty('EMPTY'));
 	assert.ok(!utils.StringUtils.isEmpty('EMPTY test', ['EMPTY']));
-	assert.ok(utils.StringUtils.isEmpty('EMPTY', ['EMPTY']));
-	assert.ok(utils.StringUtils.isEmpty('EMPTY       void   hole    ', ['EMPTY', 'void', 'hole']));
 	assert.ok(!utils.StringUtils.isEmpty('EMPTY       void   hole    XX', ['EMPTY', 'void', 'hole']));
+
+	// Test non string value gives exception
+	assert.throws(function(){
+
+		assert.ok(utils.StringUtils.isEmpty(123) === '');
+	});
 });
 
 
@@ -117,17 +125,20 @@ QUnit.test("extractHostNameFromUrl", function(assert){
 	assert.ok(utils.StringUtils.extractHostNameFromUrl('') === '');
 	assert.ok(utils.StringUtils.extractHostNameFromUrl("aa....aa..") === '');
 	assert.ok(utils.StringUtils.extractHostNameFromUrl('google.com') === 'google.com');
+	assert.ok(utils.StringUtils.extractHostNameFromUrl('http://x.y') === 'x.y');
 	assert.ok(utils.StringUtils.extractHostNameFromUrl('http://google.com') === 'google.com');
 	assert.ok(utils.StringUtils.extractHostNameFromUrl('http://www.google.com') === 'www.google.com');
+	assert.ok(utils.StringUtils.extractHostNameFromUrl('|%$)"·/%') === '');
+	assert.ok(utils.StringUtils.extractHostNameFromUrl('http://|%$)"·/%') === '');
 	assert.ok(utils.StringUtils.extractHostNameFromUrl('https://www.youtube.com/watch?v=Zs3im94FSpU') === 'www.youtube.com');
 	assert.ok(utils.StringUtils.extractHostNameFromUrl('https://developer.chrome.com/extensions/notifications#method-clear') === 'developer.chrome.com');
 	assert.ok(utils.StringUtils.extractHostNameFromUrl('http://www.abc.es/internacional/abci-represion-mediatica-venezuela-periodistas-detenidos-y-expulsados-menos-24-horas-201609011727_noticia.html') === 'www.abc.es');
 	assert.ok(utils.StringUtils.extractHostNameFromUrl('file:///C:/Users/Jaume/Desktop/Extension%200.2.9/PopUp-Enable.html') === '');
 	assert.ok(utils.StringUtils.extractHostNameFromUrl(' asdfa sfdaewr 345 drtwertwert5324') === '');
 	assert.ok(utils.StringUtils.extractHostNameFromUrl("\n\t\n2i34.,.324 .,h we. h \n\n") === '');
-	assert.ok(utils.StringUtils.extractDomainFromUrl('ftp://ftp.funet.fi/pub/standards/RFC/rfc959.txt') === 'ftp.funet.fi');
-	assert.ok(utils.StringUtils.extractDomainFromUrl('ftp://jess12:bosox67@ftp.xyz.com') === 'ftp.xyz.com');
-	assert.ok(utils.StringUtils.extractDomainFromUrl('ftp://jess12@xyz.com:bosox67@ftp.xyz.com') === 'ftp.xyz.com');
+	assert.ok(utils.StringUtils.extractHostNameFromUrl('ftp://ftp.funet.fi/pub/standards/RFC/rfc959.txt') === 'ftp.funet.fi');
+	assert.ok(utils.StringUtils.extractHostNameFromUrl('ftp://jess12:bosox67@ftp.xyz.com') === 'ftp.xyz.com');
+	assert.ok(utils.StringUtils.extractHostNameFromUrl('ftp://jess12@xyz.com:bosox67@ftp.xyz.com') === 'ftp.xyz.com');
 });
 
 
@@ -238,6 +249,15 @@ QUnit.test("formatPath", function(assert){
 
 		utils.StringUtils.formatPath(['1']);
 	});
+});
+
+
+/**
+ * formatUrl
+ */
+QUnit.test("formatUrl", function(assert){
+
+	// TODO
 });
 
 

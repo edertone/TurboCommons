@@ -129,6 +129,58 @@ QUnit.test("isString", function(assert){
 
 
 /**
+ * isUrl
+ */
+QUnit.test("isUrl", function(assert){
+
+	var validationManager = new managers.ValidationManager();
+
+	// Wrong url cases
+	assert.ok(!validationManager.isUrl(''));
+	assert.ok(!validationManager.isUrl(null));
+	assert.ok(!validationManager.isUrl(undefined));
+	assert.ok(!validationManager.isUrl([]));
+	assert.ok(!validationManager.isUrl('123f56'));
+	assert.ok(!validationManager.isUrl('cacacacaca'));
+	assert.ok(!validationManager.isUrl('8/%$144///(!(/"'));
+	assert.ok(!validationManager.isUrl('http'));
+	assert.ok(!validationManager.isUrl('ftp'));
+	assert.ok(!validationManager.isUrl('    '));
+	assert.ok(!validationManager.isUrl('google.com-'));
+	assert.ok(!validationManager.isUrl("\n   \t\n"));
+	assert.ok(!validationManager.isUrl('http:\\google.com'));
+	assert.ok(!validationManager.isUrl('_http://google.com'));
+	assert.ok(!validationManager.isUrl('http://www.example..com'));
+	assert.ok(!validationManager.isUrl('http://.com'));
+	assert.ok(!validationManager.isUrl('http://.'));
+	assert.ok(!validationManager.isUrl('http://www.example.'));
+
+	// good url cases
+	assert.ok(validationManager.isUrl('x.y'));
+	assert.ok(validationManager.isUrl('google.com'));
+	assert.ok(validationManager.isUrl('http://x.y'));
+	assert.ok(validationManager.isUrl('http://google.com'));
+	assert.ok(validationManager.isUrl('http:\\google.com '));
+	assert.ok(validationManager.isUrl('http://www.example.com:8800'));
+	assert.ok(validationManager.isUrl('http://www.example.com/a/b/c/d/e/f/g/h/i.html'));
+	assert.ok(validationManager.isUrl('http://www.test.com?pageid=123&testid=1524'));
+	assert.ok(validationManager.isUrl('http://www.test.com/do.html#A'));
+	assert.ok(validationManager.isUrl('https://subdomain.test.com/'));
+	assert.ok(validationManager.isUrl('https://test.com'));
+	// TODO: add ftp related urls
+
+	validationManager.reset();
+	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_OK);
+
+	// Test non string values throw exceptions
+	assert.throws(function(){
+
+		assert.ok(!validationManager.isUrl([12341]));
+	});
+});
+
+
+/**
  * isArray
  */
 QUnit.test("isArray", function(assert){

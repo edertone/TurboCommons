@@ -56,6 +56,14 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 			return true;
 		}
 
+		// Throw exception if non string value was received
+		var validationManager = new org_turbocommons_src_main_js_managers.ValidationManager();
+
+		if(!validationManager.isString(string)){
+
+			throw new Error("StringUtils.isEmpty: value is not a string");
+		}
+
 		// Replace all empty spaces
 		if((aux = string.replace(/ /g, '')) == ''){
 
@@ -214,7 +222,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 
 		var validationManager = new org_turbocommons_src_main_js_managers.ValidationManager();
 
-		if(!validationManager.isFilledIn(url)){
+		if(!validationManager.isFilledIn(url) || !validationManager.isUrl(url)){
 
 			return '';
 		}
@@ -222,6 +230,14 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 		var tmp = document.createElement('a');
 
 		tmp.href = url;
+
+		// Validate domain contains a valid number of dots
+		var dotsCount = tmp.host.split(".").length - 1;
+
+		if(dotsCount <= 0 || dotsCount > 2){
+
+			return '';
+		}
 
 		return tmp.host;
 	},
@@ -262,7 +278,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 			if(validationManager.isString(tmp[i])){
 
 				// TODO: this is not exactly the same behaviour as the php version.
-				// In the php version, we can define an array of filters and if any of the filters matches th current line,
+				// In the php version, we can define an array of filters and if any of the filters matches the current line,
 				// it will not be added to the result. This version only accepts the first element of the filters array, it must be fixed!
 				if(tmp[i].replace(filters[0], '') != ''){
 
@@ -438,6 +454,18 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 		}
 
 		return path;
+	},
+
+
+	/**
+	 * TODO
+	 * 
+	 * @static
+	 * 
+	 */
+	formatUrl : function(url){
+
+		// TODO		
 	},
 
 

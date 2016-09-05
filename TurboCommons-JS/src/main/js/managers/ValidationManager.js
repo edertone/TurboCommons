@@ -119,7 +119,7 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isBoolean = fu
 /**
  * Validation will fail if specified value is not numeric
  *
- * @param {Number} value The number to validate
+ * @param {Number} value The element to validate
  * @param {string} errorMessage The error message that will be generated if validation fails
  * @param {boolean} isWarning Tells if the validation fail will be processed as a validation error or a validation warning
  *
@@ -161,6 +161,41 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isString = fun
 	isWarning = (isWarning === undefined) ? false : isWarning;
 
 	var res = (!(typeof value === 'string' || value instanceof String)) ? errorMessage : '';
+
+	this._updateValidationStatus(res, isWarning);
+
+	return (res == '');
+};
+
+
+/**
+ * Validation will fail if specified value is not a correct internet url
+ *
+ * @param {string} value The element to validate
+ * @param {string} errorMessage The error message that will be generated if validation fails
+ * @param {boolean} isWarning Tells if the validation fail will be processed as a validation error or a validation warning
+ *
+ * @returns {boolean} False in case the validation fails or true if validation succeeds.
+ */
+org_turbocommons_src_main_js_managers.ValidationManager.prototype.isUrl = function(value, errorMessage, isWarning){
+
+	// Alias namespace
+	var ns = org_turbocommons_src_main_js_utils;
+
+	// Set optional parameters default values
+	errorMessage = (ns.StringUtils.isEmpty(errorMessage)) ? 'value is not an URL' : errorMessage;
+	isWarning = (isWarning === undefined) ? false : isWarning;
+
+	var validationManager = new org_turbocommons_src_main_js_managers.ValidationManager();
+
+	if(!validationManager.isFilledIn(value) || !validationManager.isString(value)){
+
+		res = errorMessage;
+
+	}else{
+
+		var res = !value.match(/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:/~+#-]*[\w@?^=%&amp;/~+#-])?/) ? errorMessage : '';
+	}
 
 	this._updateValidationStatus(res, isWarning);
 
@@ -216,9 +251,6 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isFilledIn = f
 	otherEmptyKeys = (otherEmptyKeys === undefined) ? null : otherEmptyKeys;
 	errorMessage = (ns.StringUtils.isEmpty(errorMessage)) ? 'value is required' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
-
-	// Alias namespace
-	var ns = org_turbocommons_src_main_js_utils;
 
 	var res = '';
 
@@ -561,7 +593,7 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isMinimumLengt
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isPostalCode = function(text, errorMessage, isWarning, required){
 
-	// TODO: aixo té força tela...
+	// TODO: This is really tough
 };
 
 
