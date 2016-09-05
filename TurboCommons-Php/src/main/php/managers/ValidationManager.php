@@ -146,6 +146,15 @@ class ValidationManager extends BaseStrictClass{
 
 
 	/**
+	 * TODO - translate from js
+	 */
+	public function isUrl(){
+
+		// TODO - translate from js
+	}
+
+
+	/**
 	 * Validation will fail if specified value is not an array
 	 *
 	 * @param array value The array to validate

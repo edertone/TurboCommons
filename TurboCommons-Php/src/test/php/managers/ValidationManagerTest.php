@@ -144,6 +144,17 @@ class ValidationManagerTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
+	 * testIsUrl
+	 *
+	 * @return void
+	 */
+	public function testIsUrl(){
+
+		// TODO - translate from js
+	}
+
+
+	/**
 	 * testIsArray
 	 *
 	 * @return void

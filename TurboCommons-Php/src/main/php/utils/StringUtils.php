@@ -12,6 +12,7 @@
 namespace org\turbocommons\src\main\php\utils;
 
 use Exception;
+use org\turbocommons\src\main\php\managers\ValidationManager;
 
 
 /**
@@ -37,6 +38,14 @@ class StringUtils {
 		if($string == null || $string == ''){
 
 			return true;
+		}
+
+		// Throw exception if non string value was received
+		$validationManager = new ValidationManager();
+
+		if(!$validationManager->isString($string)){
+
+			throw new Exception('StringUtils->isEmpty: value is not a string');
 		}
 
 		// Replace all empty spaces.
@@ -385,6 +394,15 @@ class StringUtils {
     	}
 
     	return $path;
+    }
+
+
+    /**
+     * TODO - copy from js
+     */
+    public static function formatUrl(){
+
+    	// TODO - copy from js
     }
 
 

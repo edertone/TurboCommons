@@ -32,16 +32,23 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertTrue(StringUtils::isEmpty(null));
 		$this->assertTrue(StringUtils::isEmpty(''));
+		$this->assertTrue(StringUtils::isEmpty([]));
 		$this->assertTrue(StringUtils::isEmpty('      '));
 		$this->assertTrue(StringUtils::isEmpty("\n\n  \n"));
 		$this->assertTrue(StringUtils::isEmpty("\t   \n     \r\r"));
+		$this->assertTrue(StringUtils::isEmpty('EMPTY', ['EMPTY']));
+		$this->assertTrue(StringUtils::isEmpty('EMPTY       void   hole    ', ['EMPTY', 'void', 'hole']));
+
 		$this->assertTrue(!StringUtils::isEmpty('adsadf'));
 		$this->assertTrue(!StringUtils::isEmpty('    sdfasdsf'));
 		$this->assertTrue(!StringUtils::isEmpty('EMPTY'));
 		$this->assertTrue(!StringUtils::isEmpty('EMPTY test', ['EMPTY']));
-		$this->assertTrue(StringUtils::isEmpty('EMPTY', ['EMPTY']));
-		$this->assertTrue(StringUtils::isEmpty('EMPTY       void   hole    ', ['EMPTY', 'void', 'hole']));
 		$this->assertTrue(!StringUtils::isEmpty('EMPTY       void   hole    XX', ['EMPTY', 'void', 'hole']));
+
+		// Test non string value gives exception
+		// TODO - this test fails here but passes on JS!!
+		$this->setExpectedException('Exception');
+		$this->assertTrue(StringUtils::isEmpty(123) === '');
 	}
 
 
