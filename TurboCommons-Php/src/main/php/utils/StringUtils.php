@@ -351,6 +351,15 @@ class StringUtils {
 
 
     /**
+     * TODO - translate from js
+     */
+    public static function extractSchemeFromUrl(){
+
+    	// TODO - translate from js
+    }
+
+
+    /**
      * Given a raw string containing a file system path, this method will process it to obtain a path that
      * is 100% format valid for the current operating system.
 	 * Directory separators will be converted to the OS valid ones, no directory separator will be present

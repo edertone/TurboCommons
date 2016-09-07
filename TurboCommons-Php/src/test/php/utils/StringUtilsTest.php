@@ -225,6 +225,18 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
+	 * testExtractSchemeFromUrl
+	 *
+	 * @return void
+	 */
+	public function testExtractSchemeFromUrl(){
+
+		// TODO - copy from js!!
+
+	}
+
+
+	/**
 	 * TestFormatPath
 	 *
 	 * @return void
@@ -242,6 +254,17 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		// Test non string paths throw exception
 		$this->setExpectedException('Exception');
 		StringUtils::formatPath(['1']);
+	}
+
+
+	/**
+	 * testFormatUrl
+	 *
+	 * @return void
+	 */
+	public function testFormatUrl(){
+
+		// TODO copy from js
 	}
 
 

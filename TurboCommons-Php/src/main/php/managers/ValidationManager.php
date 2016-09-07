@@ -75,7 +75,7 @@ class ValidationManager extends BaseStrictClass{
 
 		$this->_updateValidationStatus($res, $isWarning);
 
-		return ($res == '');
+		return $res == '';
 	}
 
 
@@ -97,7 +97,7 @@ class ValidationManager extends BaseStrictClass{
 
 		$this->_updateValidationStatus($res, $isWarning);
 
-		return ($res == '');
+		return $res == '';
 	}
 
 
@@ -119,7 +119,7 @@ class ValidationManager extends BaseStrictClass{
 
 		$this->_updateValidationStatus($res, $isWarning);
 
-		return ($res == '');
+		return $res == '';
 	}
 
 
@@ -141,7 +141,7 @@ class ValidationManager extends BaseStrictClass{
 
 		$this->_updateValidationStatus($res, $isWarning);
 
-		return ($res == '');
+		return $res == '';
 	}
 
 
@@ -172,7 +172,7 @@ class ValidationManager extends BaseStrictClass{
 
 		$this->_updateValidationStatus($res, $isWarning);
 
-		return ($res == '');
+		return $res == '';
 	}
 
 
