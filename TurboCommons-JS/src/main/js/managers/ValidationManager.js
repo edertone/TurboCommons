@@ -86,7 +86,7 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isTrue = funct
 
 	this._updateValidationStatus(res, isWarning);
 
-	return (res == '');
+	return res == '';
 };
 
 
@@ -112,7 +112,7 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isBoolean = fu
 
 	this._updateValidationStatus(res, isWarning);
 
-	return (res == '');
+	return res == '';
 };
 
 
@@ -138,7 +138,7 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isNumeric = fu
 
 	this._updateValidationStatus(res, isWarning);
 
-	return (res == '');
+	return res == '';
 };
 
 
@@ -164,12 +164,13 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isString = fun
 
 	this._updateValidationStatus(res, isWarning);
 
-	return (res == '');
+	return res == '';
 };
 
 
 /**
- * Validation will fail if specified value is not a correct internet url
+ * Validation will fail if specified value is not a correct internet url.
+ * Note that correct urls always start with a scheme (http://, ftp://....)
  *
  * @param {string} value The element to validate
  * @param {string} errorMessage The error message that will be generated if validation fails
@@ -186,20 +187,21 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isUrl = functi
 	errorMessage = (ns.StringUtils.isEmpty(errorMessage)) ? 'value is not an URL' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 
+	var res = errorMessage;
+
 	var validationManager = new org_turbocommons_src_main_js_managers.ValidationManager();
 
-	if(!validationManager.isFilledIn(value) || !validationManager.isString(value)){
+	if(validationManager.isFilledIn(value) && validationManager.isString(value)){
 
-		res = errorMessage;
+		// This amazingly good solution's been found at http://stackoverflow.com/questions/3809401/what-is-a-good-regular-expression-to-match-a-url
+		var urlRegex = '^(?!mailto:)(?:(?:http|https|ftp)://)(?:\\S+(?::\\S*)?@)?(?:(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))|localhost)(?::\\d{2,5})?(?:(/|\\?|#)[^\\s]*)?$';
 
-	}else{
-
-		var res = !value.match(/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:/~+#-]*[\w@?^=%&amp;/~+#-])?/) ? errorMessage : '';
+		res = !(value.length < 2083 && (new RegExp(urlRegex, 'i')).test(value)) ? errorMessage : '';
 	}
 
 	this._updateValidationStatus(res, isWarning);
 
-	return (res == '');
+	return res == '';
 };
 
 
@@ -225,7 +227,7 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isArray = func
 
 	this._updateValidationStatus(res, isWarning);
 
-	return (res == '');
+	return res == '';
 };
 
 
@@ -252,16 +254,11 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isFilledIn = f
 	errorMessage = (ns.StringUtils.isEmpty(errorMessage)) ? 'value is required' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 
-	var res = '';
-
-	if(ns.StringUtils.isEmpty(value, otherEmptyKeys)){
-
-		res = errorMessage;
-	}
+	var res = ns.StringUtils.isEmpty(value, otherEmptyKeys) ? errorMessage : '';
 
 	this._updateValidationStatus(res, isWarning);
 
-	return (res == '');
+	return res == '';
 };
 
 
@@ -299,7 +296,7 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isDate = funct
 
 	var res = '';
 
-	return (res == '');
+	return res == '';
 };
 
 
@@ -314,6 +311,8 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isDate = funct
  * @returns False in case the validation fails or true if validation succeeds.
  */
 org_turbocommons_src_main_js_managers.ValidationManager.prototype.isMail = function(text, errorMessage, isWarning, required){
+
+	// TODO - review
 
 	// Alias namespace
 	var ns = org_turbocommons_src_main_js_utils;
@@ -351,7 +350,7 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isMail = funct
 
 	this._updateValidationStatus(res, isWarning);
 
-	return (res == '');
+	return res == '';
 };
 
 
@@ -402,7 +401,7 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isEqualToValue
 
 	this._updateValidationStatus(res, isWarning);
 
-	return (res == '');
+	return res == '';
 };
 
 
@@ -454,7 +453,7 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isMinimumWords
 
 	this._updateValidationStatus(res, isWarning);
 
-	return (res == '');
+	return res == '';
 };
 
 
@@ -527,7 +526,7 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isNIF = functi
 
 	this._updateValidationStatus(res, isWarning);
 
-	return (res == '');
+	return res == '';
 };
 
 
@@ -577,7 +576,7 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isMinimumLengt
 
 	this._updateValidationStatus(res, isWarning);
 
-	return (res == '');
+	return res == '';
 };
 
 
@@ -663,7 +662,7 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isPhone = func
 
 	this._updateValidationStatus(res, isWarning);
 
-	return (res == '');
+	return res == '';
 };
 
 

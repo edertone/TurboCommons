@@ -202,14 +202,17 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 
 		hostName = hostName.split('.');
 
-		hostName.shift();
+		if(hostName.length > 2){
+
+			hostName.shift();
+		}
 
 		return hostName.join('.');
 	},
 
 
 	/**
-	 * Extracts the hostname (domain including subdomain) from a given url.
+	 * Extracts the hostname (domain + subdomain) from a given url.
 	 * For example: http://subdomain.google.com/test/ will result in 'subdomain.google.com'
 	 * 
 	 * @static
@@ -407,6 +410,43 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 
 
 	/**
+	 * Given an internet URL, this method extracts only the scheme part.
+	 * Example: "http://google.com" -> results in "http"
+	 * 
+	 * @static
+	 * 
+	 * @see StringUtils.formatUrl, ValidationManager.isUrl
+	 * 
+	 * @param {string} url A valid internet url
+	 *
+	 * @returns {string} ('ftp', 'http', ...) if the url is valid or '' if the url is invalid
+	 */
+	extractSchemeFromUrl : function(url){
+
+		var validationManager = new org_turbocommons_src_main_js_managers.ValidationManager();
+
+		if(url == null || url == undefined){
+
+			return '';
+		}
+
+		if(!validationManager.isString(url)){
+
+			throw new Error("StringUtils.extractSchemeFromUrl: Specified value must be a string");
+		}
+
+		if(!validationManager.isUrl(url)){
+
+			return '';
+		}
+
+		var res = url.split('://');
+
+		return (res.length === 2) ? res[0] : '';
+	},
+
+
+	/**
 	 * Given a raw string containing a file system path, this method will process it to obtain a path that
 	 * is 100% format valid for the current operating system.
 	 * Directory separators will be converted to the OS valid ones, no directory separator will be present
@@ -427,7 +467,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 
 		var osSeparator = org_turbocommons_src_main_js_utils.FileSystemUtils.getDirectorySeparator();
 
-		if(path == null){
+		if(path == null || path == undefined){
 
 			return '';
 		}
@@ -458,14 +498,48 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 
 
 	/**
-	 * TODO
+	 * Given a raw string containing an internet URL, this method will process it to obtain a URL that is 100% format valid.
+	 * 
+	 * A Uniform Resource Locator (URL), commonly informally termed a web address is a reference to a web resource that specifies 
+	 * its location on a computer network and a mechanism for retrieving it. URLs occur most commonly to reference web pages (http), 
+	 * but are also used for file transfer (ftp), email (mailto), database access (JDBC), and many other applications.
+	 * 
+	 * Every HTTP URL conforms to the syntax of a generic URI. A generic URI is of the form: scheme:[//[user:password@]host[:port]][/]path[?query][#fragment]
+	 * 
+	 * @see https://en.wikipedia.org/wiki/Uniform_Resource_Locator#Syntax
 	 * 
 	 * @static
-	 * 
+	 *
+	 * @returns {string} The formated url string or the original string if it was not a valid url
 	 */
 	formatUrl : function(url){
 
-		// TODO		
+		// Alias namespaces
+		var ut = org_turbocommons_src_main_js_utils;
+
+		var validationManager = new org_turbocommons_src_main_js_managers.ValidationManager();
+
+		if(url == null || url == undefined){
+
+			return '';
+		}
+
+		if(!validationManager.isString(url)){
+
+			throw new Error("StringUtils.formatUrl: Specified value must be a string");
+		}
+
+		if(!validationManager.isUrl(url)){
+
+			return url;
+		}
+
+		// get the url scheme
+		var scheme = ut.StringUtils.extractSchemeFromUrl(url);
+
+		return scheme + '://';
+
+		// TODO	- this method is not finished
 	},
 
 

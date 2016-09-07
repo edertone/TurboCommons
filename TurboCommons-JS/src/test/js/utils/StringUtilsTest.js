@@ -100,7 +100,7 @@ QUnit.test("extractDomainFromUrl", function(assert){
 	assert.ok(utils.StringUtils.extractDomainFromUrl(undefined) === '');
 	assert.ok(utils.StringUtils.extractDomainFromUrl('') === '');
 	assert.ok(utils.StringUtils.extractDomainFromUrl("aa....aa..") === '');
-	assert.ok(utils.StringUtils.extractDomainFromUrl('google.com') === 'google.com');
+	assert.ok(utils.StringUtils.extractDomainFromUrl('google.com') === '');
 	assert.ok(utils.StringUtils.extractDomainFromUrl('http://google.com') === 'google.com');
 	assert.ok(utils.StringUtils.extractDomainFromUrl('http://www.google.com') === 'google.com');
 	assert.ok(utils.StringUtils.extractDomainFromUrl('https://www.youtube.com/watch?v=Zs3im94FSpU') === 'youtube.com');
@@ -124,8 +124,8 @@ QUnit.test("extractHostNameFromUrl", function(assert){
 	assert.ok(utils.StringUtils.extractHostNameFromUrl(undefined) === '');
 	assert.ok(utils.StringUtils.extractHostNameFromUrl('') === '');
 	assert.ok(utils.StringUtils.extractHostNameFromUrl("aa....aa..") === '');
-	assert.ok(utils.StringUtils.extractHostNameFromUrl('google.com') === 'google.com');
-	assert.ok(utils.StringUtils.extractHostNameFromUrl('http://x.y') === 'x.y');
+	assert.ok(utils.StringUtils.extractHostNameFromUrl('google.com') === '');
+	assert.ok(utils.StringUtils.extractHostNameFromUrl('http://x.ye') === 'x.ye');
 	assert.ok(utils.StringUtils.extractHostNameFromUrl('http://google.com') === 'google.com');
 	assert.ok(utils.StringUtils.extractHostNameFromUrl('http://www.google.com') === 'www.google.com');
 	assert.ok(utils.StringUtils.extractHostNameFromUrl('|%$)"·/%') === '');
@@ -230,6 +230,35 @@ QUnit.test("extractFileExtension", function(assert){
 
 
 /**
+ * extractSchemeFromUrl
+ */
+QUnit.test("extractSchemeFromUrl", function(assert){
+
+	// Invalid urls
+	assert.ok(utils.StringUtils.extractSchemeFromUrl(null) === '');
+	assert.ok(utils.StringUtils.extractSchemeFromUrl(undefined) === '');
+	assert.ok(utils.StringUtils.extractSchemeFromUrl('') === '');
+	assert.ok(utils.StringUtils.extractSchemeFromUrl('adfadsf') === '');
+	assert.ok(utils.StringUtils.extractSchemeFromUrl('http://') === '');
+	assert.ok(utils.StringUtils.extractSchemeFromUrl('||@#~@#~·$%') === '');
+	assert.ok(utils.StringUtils.extractSchemeFromUrl('http://|@##~€#~€') === '');
+	assert.ok(utils.StringUtils.extractSchemeFromUrl('http:/youtube.org') === '');
+	assert.ok(utils.StringUtils.extractSchemeFromUrl('x.ye') === '');
+	assert.ok(utils.StringUtils.extractSchemeFromUrl('google.com') === '');
+
+	// Valid urls
+	assert.ok(utils.StringUtils.extractSchemeFromUrl('http://youtube.org') === 'http');
+	assert.ok(utils.StringUtils.extractSchemeFromUrl('https://yahoo.es') === 'https');
+	assert.ok(utils.StringUtils.extractSchemeFromUrl('ftp://user:password@host.com:8080/path') === 'ftp');
+	assert.ok(utils.StringUtils.extractSchemeFromUrl('http://www.example.com/a/b/c/d/e/f/g/h/i.html') === 'http');
+	assert.ok(utils.StringUtils.extractSchemeFromUrl('http://➡.ws/䨹') === 'http');
+	assert.ok(utils.StringUtils.extractSchemeFromUrl('http://-.~_!$&\'()*+,;=:%40:80%2f::::::@example.com') === 'http');
+	assert.ok(utils.StringUtils.extractSchemeFromUrl('https://223.255.255.254') === 'https');
+
+});
+
+
+/**
  * formatPath
  */
 QUnit.test("formatPath", function(assert){
@@ -257,7 +286,13 @@ QUnit.test("formatPath", function(assert){
  */
 QUnit.test("formatUrl", function(assert){
 
-	// TODO
+	assert.ok(utils.StringUtils.formatUrl(null) === '');
+	assert.ok(utils.StringUtils.formatUrl(undefined) === '');
+	assert.ok(utils.StringUtils.formatUrl('') === '');
+
+	// TODO - add all the missing tests here
+	assert.ok(utils.StringUtils.formatUrl('TODO - this method is not finished') === null);
+
 });
 
 
