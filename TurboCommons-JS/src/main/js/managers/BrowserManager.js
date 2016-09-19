@@ -246,12 +246,12 @@ org_turbocommons_src_main_js_managers.BrowserManager = {
 
 					if(x !== null && (!validationManager.isNumeric(x) || x < 0)){
 
-						throw new Error("BrowserUtils.scrollTo - x coordinate must be a positive number");
+						throw new Error("BrowserManager.scrollTo - x coordinate must be a positive number");
 					}
 
 					if(y !== null && (!validationManager.isNumeric(y) || y < 0)){
 
-						throw new Error("BrowserUtils.scrollTo - y coordinate must be a positive number");
+						throw new Error("BrowserManager.scrollTo - y coordinate must be a positive number");
 					}
 
 					// Perform scrolling

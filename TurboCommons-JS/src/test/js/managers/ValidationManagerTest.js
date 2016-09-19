@@ -224,6 +224,51 @@ QUnit.test("isArray", function(assert){
 
 
 /**
+ * isObject
+ */
+QUnit.test("isObject", function(assert){
+
+	var validationManager = new managers.ValidationManager();
+
+	assert.ok(validationManager.isObject({}));
+
+	assert.ok(validationManager.isObject({
+		1 : 1
+	}));
+
+	assert.ok(validationManager.isObject({
+		1 : '1'
+	}));
+
+	assert.ok(validationManager.isObject({
+		1 : '1',
+		5 : 5,
+		array : []
+	}));
+
+	assert.ok(validationManager.isObject({
+		novalue : null
+	}));
+
+	assert.ok(validationManager.isObject(new managers.ValidationManager()));
+	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_OK);
+
+	assert.ok(!validationManager.isObject(null, '', true));
+	assert.ok(!validationManager.isObject(undefined, '', true));
+	assert.ok(!validationManager.isObject([], '', true));
+	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_WARNING);
+	assert.ok(!validationManager.isObject(1));
+	assert.ok(!validationManager.isObject(''));
+	assert.ok(!validationManager.isObject('hello'));
+	assert.ok(!validationManager.isObject([1, 4, 5]));
+	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_ERROR);
+
+	validationManager.reset();
+	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_OK);
+});
+
+
+/**
  * isFilledIn
  */
 QUnit.test("isFilledIn", function(assert){
@@ -255,5 +300,61 @@ QUnit.test("isFilledIn", function(assert){
 	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_OK);
 });
 
+
+/**
+ * isDate
+ */
+QUnit.test("isDate", function(assert){
+
+	assert.ok(true);
+
+	// TODO
+});
+
+
+/**
+ * isMail
+ */
+QUnit.test("isMail", function(assert){
+
+	assert.ok(true);
+
+	// TODO
+});
+
+
+/**
+ * isEqualTo
+ */
+QUnit.test("isEqualTo", function(assert){
+
+	var validationManager = new managers.ValidationManager();
+
+	assert.ok(validationManager.isEqualTo(null, null));
+	assert.ok(validationManager.isEqualTo(undefined, undefined));
+	assert.ok(validationManager.isEqualTo('', ''));
+	assert.ok(validationManager.isEqualTo(123, 123));
+	assert.ok(validationManager.isEqualTo(1.56, 1.56));
+	assert.ok(validationManager.isEqualTo([], []));
+	assert.ok(validationManager.isEqualTo('hello', 'hello'));
+	assert.ok(validationManager.isEqualTo(new managers.ValidationManager(), new managers.ValidationManager()));
+	assert.ok(validationManager.isEqualTo([1, 6, 8, 4], [1, 6, 8, 4]));
+
+	assert.ok(!validationManager.isEqualTo(null, undefined));
+	assert.ok(!validationManager.isEqualTo('', 'hello'));
+	assert.ok(!validationManager.isEqualTo(124, 12454));
+	assert.ok(!validationManager.isEqualTo(1.45, 1));
+	assert.ok(!validationManager.isEqualTo([], {}));
+	assert.ok(!validationManager.isEqualTo('gobaby', 'hello'));
+	assert.ok(!validationManager.isEqualTo('hello', new managers.ValidationManager()));
+	assert.ok(!validationManager.isEqualTo([5, 2, 8, 5], [1, 6, 9, 5]));
+	assert.ok(!validationManager.isEqualTo({
+		a : 1,
+		b : 2
+	}, {
+		c : 1,
+		b : 3
+	}));
+});
 
 //TODO - Add all missing tests

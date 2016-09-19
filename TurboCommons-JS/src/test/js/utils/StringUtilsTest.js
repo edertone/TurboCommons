@@ -147,19 +147,19 @@ QUnit.test("extractHostNameFromUrl", function(assert){
  */
 QUnit.test("extractLines", function(assert){
 
-	assert.ok(utils.ArrayUtils.isEqual(utils.StringUtils.extractLines(null), []));
-	assert.ok(utils.ArrayUtils.isEqual(utils.StringUtils.extractLines(''), []));
-	assert.ok(utils.ArrayUtils.isEqual(utils.StringUtils.extractLines('          '), []));
-	assert.ok(utils.ArrayUtils.isEqual(utils.StringUtils.extractLines('single line'), ['single line']));
-	assert.ok(utils.ArrayUtils.isEqual(utils.StringUtils.extractLines("line1\nline2\nline3"), ['line1', 'line2', 'line3']));
-	assert.ok(utils.ArrayUtils.isEqual(utils.StringUtils.extractLines("line1\n        \nline2"), ['line1', 'line2']));
-	assert.ok(utils.ArrayUtils.isEqual(utils.StringUtils.extractLines("line1\n\n\n\t\r       \nline2"), ['line1', 'line2']));
-	assert.ok(utils.ArrayUtils.isEqual(utils.StringUtils.extractLines("line1\r\n   \r\nline2"), ['line1', 'line2']));
-	assert.ok(utils.ArrayUtils.isEqual(utils.StringUtils.extractLines("line1\n 1  \nline2"), ['line1', ' 1  ', 'line2']));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines(null), []));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines(''), []));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines('          '), []));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines('single line'), ['single line']));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines("line1\nline2\nline3"), ['line1', 'line2', 'line3']));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines("line1\n        \nline2"), ['line1', 'line2']));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines("line1\n\n\n\t\r       \nline2"), ['line1', 'line2']));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines("line1\r\n   \r\nline2"), ['line1', 'line2']));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines("line1\n 1  \nline2"), ['line1', ' 1  ', 'line2']));
 
-	assert.ok(utils.ArrayUtils.isEqual(utils.StringUtils.extractLines('          ', []), ['          ']));
-	assert.ok(utils.ArrayUtils.isEqual(utils.StringUtils.extractLines("line1\n   \nline2", []), ['line1', '   ', 'line2']));
-	assert.ok(utils.ArrayUtils.isEqual(utils.StringUtils.extractLines("line1\r\n   \r\nline2", []), ['line1', '   ', 'line2']));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines('          ', []), ['          ']));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines("line1\n   \nline2", []), ['line1', '   ', 'line2']));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines("line1\r\n   \r\nline2", []), ['line1', '   ', 'line2']));
 });
 
 

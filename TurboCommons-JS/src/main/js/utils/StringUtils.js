@@ -114,11 +114,8 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 		// Set optional parameters default values
 		wordSeparator = (wordSeparator === undefined) ? ' ' : wordSeparator;
 
-		// Alias namespaces
-		var ns = org_turbocommons_src_main_js_utils;
-
 		var count = 0;
-		var lines = ns.StringUtils.extractLines(string);
+		var lines = this.extractLines(string);
 
 		for(var i = 0; i < lines.length; i++){
 
@@ -126,7 +123,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 
 			for(var j = 0; j < words.length; j++){
 
-				if(!ns.StringUtils.isEmpty(words[j])){
+				if(!this.isEmpty(words[j])){
 
 					count++;
 				}
@@ -195,10 +192,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 */
 	extractDomainFromUrl : function(url){
 
-		// Alias namespaces
-		var ns = org_turbocommons_src_main_js_utils;
-
-		var hostName = ns.StringUtils.extractHostNameFromUrl(url);
+		var hostName = this.extractHostNameFromUrl(url);
 
 		hostName = hostName.split('.');
 
@@ -235,7 +229,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 		tmp.href = url;
 
 		// Validate domain contains a valid number of dots
-		var dotsCount = tmp.host.split(".").length - 1;
+		var dotsCount = (tmp.host.match(/\./g) || []).length;
 
 		if(dotsCount <= 0 || dotsCount > 2){
 
@@ -332,17 +326,14 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 */
 	extractFileNameWithExtension : function(path){
 
-		// Alias namespaces
-		var ns = org_turbocommons_src_main_js_utils;
-
 		var osSeparator = org_turbocommons_src_main_js_utils.FileSystemUtils.getDirectorySeparator();
 
-		if(ns.StringUtils.isEmpty(path)){
+		if(this.isEmpty(path)){
 
 			return '';
 		}
 
-		path = ns.StringUtils.formatPath(path);
+		path = this.formatPath(path);
 
 		if(path.indexOf(osSeparator) >= 0){
 
@@ -365,15 +356,12 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 */
 	extractFileNameWithoutExtension : function(path){
 
-		// Alias namespaces
-		var ns = org_turbocommons_src_main_js_utils;
-
-		if(ns.StringUtils.isEmpty(path)){
+		if(this.isEmpty(path)){
 
 			return '';
 		}
 
-		path = ns.StringUtils.extractFileNameWithExtension(path);
+		path = this.extractFileNameWithExtension(path);
 
 		if(path.indexOf('.') >= 0){
 
@@ -396,10 +384,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 */
 	extractFileExtension : function(path){
 
-		// Alias namespaces
-		var ns = org_turbocommons_src_main_js_utils;
-
-		if(ns.StringUtils.isEmpty(path)){
+		if(this.isEmpty(path)){
 
 			return '';
 		}
@@ -514,9 +499,6 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 */
 	formatUrl : function(url){
 
-		// Alias namespaces
-		var ut = org_turbocommons_src_main_js_utils;
-
 		var validationManager = new org_turbocommons_src_main_js_managers.ValidationManager();
 
 		if(url == null || url == undefined){
@@ -535,7 +517,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 		}
 
 		// get the url scheme
-		var scheme = ut.StringUtils.extractSchemeFromUrl(url);
+		var scheme = this.extractSchemeFromUrl(url);
 
 		return scheme + '://';
 

@@ -42,9 +42,7 @@ org_turbocommons_src_main_js_utils.CookiesUtils = {
 	 */
 	isCookie : function(key){
 
-		var ns = org_turbocommons_src_main_js_utils;
-
-		return (ns.CookiesUtils.getCookie(key) !== undefined);
+		return (this.getCookie(key) !== undefined);
 	},
 
 

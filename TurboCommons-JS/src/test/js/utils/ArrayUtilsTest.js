@@ -17,52 +17,72 @@ QUnit.module("ArrayUtilsTest");
 
 
 /**
- * isEqual
+ * isEqualTo
  */
-QUnit.test("isEqual", function(assert){
+QUnit.test("isEqualTo", function(assert){
 
 	// Test non array values must launch exception
 	assert.throws(function(){
 
-		utils.ArrayUtils.isEqual(null, null);
+		utils.ArrayUtils.isEqualTo(null, null);
 	});
 
 	assert.throws(function(){
 
-		utils.ArrayUtils.isEqual(1, 1);
+		utils.ArrayUtils.isEqualTo(1, 1);
 	});
 
 	assert.throws(function(){
 
-		utils.ArrayUtils.isEqual("asfasf1", "345345");
+		utils.ArrayUtils.isEqualTo("asfasf1", "345345");
 	});
 
 	// Test identic arrays
-	assert.ok(utils.ArrayUtils.isEqual([null], [null]));
-	assert.ok(utils.ArrayUtils.isEqual([], []));
-	assert.ok(utils.ArrayUtils.isEqual([[]], [[]]));
-	assert.ok(utils.ArrayUtils.isEqual([[1]], [[1]]));
-	assert.ok(utils.ArrayUtils.isEqual([1, 2, 3], [1, 2, 3]));
-	assert.ok(utils.ArrayUtils.isEqual([1, 2, 1, 2], [1, 2, 1, 2]));
-	assert.ok(utils.ArrayUtils.isEqual([1, 2, [3, 4]], [1, 2, [3, 4]]));
-	assert.ok(utils.ArrayUtils.isEqual(["hello world"], ["hello world"]));
+	assert.ok(utils.ArrayUtils.isEqualTo([null], [null]));
+	assert.ok(utils.ArrayUtils.isEqualTo([], []));
+	assert.ok(utils.ArrayUtils.isEqualTo([[]], [[]]));
+	assert.ok(utils.ArrayUtils.isEqualTo([[1]], [[1]]));
+	assert.ok(utils.ArrayUtils.isEqualTo([1, 2, 3], [1, 2, 3]));
+	assert.ok(utils.ArrayUtils.isEqualTo([1, 2, 1, 2], [1, 2, 1, 2]));
+	assert.ok(utils.ArrayUtils.isEqualTo([1, 2, [3, 4]], [1, 2, [3, 4]]));
+	assert.ok(utils.ArrayUtils.isEqualTo(["hello world"], ["hello world"]));
 
 	// Test different arrays
-	assert.ok(!utils.ArrayUtils.isEqual([null], []));
-	assert.ok(!utils.ArrayUtils.isEqual([1], ["1"]));
-	assert.ok(!utils.ArrayUtils.isEqual([1, 2, 3], [1, 3, 2]));
-	assert.ok(!utils.ArrayUtils.isEqual([1, "2,3"], [1, 2, 3]));
-	assert.ok(!utils.ArrayUtils.isEqual([1, 2, [3, 4]], [1, 2, [3, 2]]));
-	assert.ok(!utils.ArrayUtils.isEqual([1, 2, [3, [4]]], [1, 2, [3, ["4"]]]));
-	assert.ok(!utils.ArrayUtils.isEqual(["hello world"], ["hello worl1d"]));
+	assert.ok(!utils.ArrayUtils.isEqualTo([null], []));
+	assert.ok(!utils.ArrayUtils.isEqualTo([1], ["1"]));
+	assert.ok(!utils.ArrayUtils.isEqualTo([1, 2, 3], [1, 3, 2]));
+	assert.ok(!utils.ArrayUtils.isEqualTo([1, "2,3"], [1, 2, 3]));
+	assert.ok(!utils.ArrayUtils.isEqualTo([1, 2, [3, 4]], [1, 2, [3, 2]]));
+	assert.ok(!utils.ArrayUtils.isEqualTo([1, 2, [3, [4]]], [1, 2, [3, ["4"]]]));
+	assert.ok(!utils.ArrayUtils.isEqualTo(["hello world"], ["hello worl1d"]));
 
-	// Two diferent object instances are not equal, even if they have same key and values
-	assert.ok(!utils.ArrayUtils.isEqual([{
+	// Test identic objects
+	assert.ok(utils.ArrayUtils.isEqualTo([{
 		a : 1
 	}], [{
 		a : 1
 	}]));
 
+	assert.ok(utils.ArrayUtils.isEqualTo([{
+		a : 1,
+		b : [1, 2, 3],
+		c : 'hello'
+	}], [{
+		a : 1,
+		b : [1, 2, 3],
+		c : 'hello'
+	}]));
+
+	// Test different objects
+	assert.ok(!utils.ArrayUtils.isEqualTo([{
+		a : 1,
+		b : [1, 4, 3],
+		c : 'hello'
+	}], [{
+		a : 1,
+		b : [1, 2, 3],
+		c : 'hello'
+	}]));
 });
 
 
@@ -88,17 +108,17 @@ QUnit.test("removeElement", function(assert){
 	});
 
 	// Test several arrays
-	assert.ok(utils.ArrayUtils.isEqual(utils.ArrayUtils.removeElement([], null), []));
-	assert.ok(utils.ArrayUtils.isEqual(utils.ArrayUtils.removeElement([], 1), []));
-	assert.ok(utils.ArrayUtils.isEqual(utils.ArrayUtils.removeElement([1], 1), []));
-	assert.ok(utils.ArrayUtils.isEqual(utils.ArrayUtils.removeElement(["1"], 1), ["1"]));
-	assert.ok(utils.ArrayUtils.isEqual(utils.ArrayUtils.removeElement(["1"], "1"), []));
-	assert.ok(utils.ArrayUtils.isEqual(utils.ArrayUtils.removeElement([1, 2, 3, 4], 1), [2, 3, 4]));
-	assert.ok(utils.ArrayUtils.isEqual(utils.ArrayUtils.removeElement([1, 2, 3, 4], 8), [1, 2, 3, 4]));
-	assert.ok(utils.ArrayUtils.isEqual(utils.ArrayUtils.removeElement(["hello", "guys"], "guys"), ["hello"]));
-	assert.ok(utils.ArrayUtils.isEqual(utils.ArrayUtils.removeElement(["hello", 1, ["test"]], 1), ["hello", ["test"]]));
-	assert.ok(utils.ArrayUtils.isEqual(utils.ArrayUtils.removeElement(["hello", 1, ["test"]], ["test"]), ["hello", 1]));
-	assert.ok(utils.ArrayUtils.isEqual(utils.ArrayUtils.removeElement(["hello", 1, ["test", "array"], ["test"]], ["test", "array"]), ["hello", 1, ["test"]]));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.ArrayUtils.removeElement([], null), []));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.ArrayUtils.removeElement([], 1), []));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.ArrayUtils.removeElement([1], 1), []));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.ArrayUtils.removeElement(["1"], 1), ["1"]));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.ArrayUtils.removeElement(["1"], "1"), []));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.ArrayUtils.removeElement([1, 2, 3, 4], 1), [2, 3, 4]));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.ArrayUtils.removeElement([1, 2, 3, 4], 8), [1, 2, 3, 4]));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.ArrayUtils.removeElement(["hello", "guys"], "guys"), ["hello"]));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.ArrayUtils.removeElement(["hello", 1, ["test"]], 1), ["hello", ["test"]]));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.ArrayUtils.removeElement(["hello", 1, ["test"]], ["test"]), ["hello", 1]));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.ArrayUtils.removeElement(["hello", 1, ["test", "array"], ["test"]], ["test", "array"]), ["hello", 1, ["test"]]));
 
 
 });

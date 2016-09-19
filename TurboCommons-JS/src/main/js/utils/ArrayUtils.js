@@ -31,17 +31,20 @@ org_turbocommons_src_main_js_utils.ArrayUtils = {
 	 *
 	 * @returns boolean true if arrays are exactly the same, false if not
 	 */
-	isEqual : function(array1, array2){
+	isEqualTo : function(array1, array2){
+
+		// Alias namespaces
+		var ut = org_turbocommons_src_main_js_utils;
 
 		var validationManager = new org_turbocommons_src_main_js_managers.ValidationManager();
 
 		// Both provided values must be arrays or an exception will be launched
 		if(!validationManager.isArray(array1) || !validationManager.isArray(array2)){
 
-			throw new Error("ArrayUtils.isEqual: Provided parameters must be arrays");
+			throw new Error("ArrayUtils.isEqualTo: Provided parameters must be arrays");
 		}
 
-		// Compare lengths,can save a lot of time 
+		// Compare lengths can save a lot of time 
 		if(array1.length != array2.length){
 
 			return false;
@@ -50,18 +53,26 @@ org_turbocommons_src_main_js_utils.ArrayUtils = {
 		for(var i = 0, l = array1.length; i < l; i++){
 
 			// Check if we have nested arrays
-			if(array1[i] instanceof Array && array2[i] instanceof Array){
+			if(validationManager.isArray(array1[i]) && validationManager.isArray(array2[i])){
 
-				// recurse into the nested arrays
-				if(!this.isEqual(array1[i], array2[i])){
+				if(!this.isEqualTo(array1[i], array2[i])){
 
 					return false;
 				}
 
-			}else if(array1[i] !== array2[i]){
+			}else{
 
-				// Warning! Two different object instances will never be equal: {x:20} != {x:20}
-				return false;
+				if(validationManager.isObject(array1[i]) && validationManager.isObject(array2[i])){
+
+					if(!ut.ObjectUtils.isEqualTo(array1[i], array2[i])){
+
+						return false;
+					}
+
+				}else if(array1[i] !== array2[i]){
+
+					return false;
+				}
 			}
 		}
 
@@ -80,9 +91,6 @@ org_turbocommons_src_main_js_utils.ArrayUtils = {
 	 * @returns {array} The provided array but without the specified element (if found). Note that originally received array is not modified by this method
 	 */
 	removeElement : function(array, element){
-
-		// Alias namespaces
-		var ut = org_turbocommons_src_main_js_utils;
 
 		var validationManager = new org_turbocommons_src_main_js_managers.ValidationManager();
 
@@ -104,7 +112,7 @@ org_turbocommons_src_main_js_utils.ArrayUtils = {
 
 				}else{
 
-					if(!ut.ArrayUtils.isEqual(element, array[i])){
+					if(!this.isEqualTo(element, array[i])){
 
 						res.push(array[i]);
 					}

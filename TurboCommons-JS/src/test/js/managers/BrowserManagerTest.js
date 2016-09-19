@@ -87,7 +87,7 @@ QUnit.test("getScrollPosition", function(assert){
 
 	var browserManager = managers.BrowserManager.getInstance();
 
-	assert.ok(utils.ArrayUtils.isEqual(browserManager.getScrollPosition(), [0, 0]));
+	assert.ok(utils.ArrayUtils.isEqualTo(browserManager.getScrollPosition(), [0, 0]));
 });
 
 
@@ -118,22 +118,22 @@ QUnit.test("scrollTo", function(assert){
 
 	// Test the scroll movements
 	browserManager.scrollTo(0, 0, 0);
-	assert.ok(utils.ArrayUtils.isEqual(browserManager.getScrollPosition(), [0, 0]));
+	assert.ok(utils.ArrayUtils.isEqualTo(browserManager.getScrollPosition(), [0, 0]));
 
 	browserManager.scrollTo(0, 2000, 0);
-	assert.ok(utils.ArrayUtils.isEqual(browserManager.getScrollPosition(), [0, 2000]));
+	assert.ok(utils.ArrayUtils.isEqualTo(browserManager.getScrollPosition(), [0, 2000]));
 
 	browserManager.scrollTo(0, 0, 0);
-	assert.ok(utils.ArrayUtils.isEqual(browserManager.getScrollPosition(), [0, 0]));
+	assert.ok(utils.ArrayUtils.isEqualTo(browserManager.getScrollPosition(), [0, 0]));
 
 	browserManager.scrollTo(3000, 5000, 0);
-	assert.ok(utils.ArrayUtils.isEqual(browserManager.getScrollPosition(), [3000, 5000]));
+	assert.ok(utils.ArrayUtils.isEqualTo(browserManager.getScrollPosition(), [3000, 5000]));
 
 	browserManager.scrollTo(null, 8000, 0);
-	assert.ok(utils.ArrayUtils.isEqual(browserManager.getScrollPosition(), [3000, 8000]));
+	assert.ok(utils.ArrayUtils.isEqualTo(browserManager.getScrollPosition(), [3000, 8000]));
 
 	browserManager.scrollTo(0, 0, 0);
-	assert.ok(utils.ArrayUtils.isEqual(browserManager.getScrollPosition(), [0, 0]));
+	assert.ok(utils.ArrayUtils.isEqualTo(browserManager.getScrollPosition(), [0, 0]));
 
 	// Remove the test div
 	div.remove();
@@ -194,15 +194,15 @@ QUnit.test("setAnimatedScroll", function(assert){
 
 	// Test animations work as expected
 	anchorTestLink2.trigger("click");
-	assert.ok(utils.ArrayUtils.isEqual(browserManager.getScrollPosition(), [0, 500]));
+	assert.ok(utils.ArrayUtils.isEqualTo(browserManager.getScrollPosition(), [0, 500]));
 
 	anchorTestLink3.trigger("click");
-	assert.ok(utils.ArrayUtils.isEqual(browserManager.getScrollPosition(), [0, 7500]));
+	assert.ok(utils.ArrayUtils.isEqualTo(browserManager.getScrollPosition(), [0, 7500]));
 
 	browserManager.setAnimatedScroll(false);
 
 	browserManager.scrollTo(0, 0, 0);
-	assert.ok(utils.ArrayUtils.isEqual(browserManager.getScrollPosition(), [0, 0]));
+	assert.ok(utils.ArrayUtils.isEqualTo(browserManager.getScrollPosition(), [0, 0]));
 
 	// Remove the test div
 	div.remove();
