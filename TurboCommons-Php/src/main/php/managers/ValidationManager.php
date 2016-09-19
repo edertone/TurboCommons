@@ -13,6 +13,7 @@ namespace org\turbocommons\src\main\php\managers;
 
 use org\turbocommons\src\main\php\model\BaseStrictClass;
 use org\turbocommons\src\main\php\utils\StringUtils;
+use org\turbocommons\src\main\php\utils\ObjectUtils;
 
 
 /**
@@ -73,9 +74,7 @@ class ValidationManager extends BaseStrictClass{
 
 		$res = (!$value) ? $errorMessage : '';
 
-		$this->_updateValidationStatus($res, $isWarning);
-
-		return $res == '';
+		return $this->_updateValidationStatus($res, $isWarning);
 	}
 
 
@@ -95,9 +94,7 @@ class ValidationManager extends BaseStrictClass{
 
 		$res = !is_bool($value) ? $errorMessage : '';
 
-		$this->_updateValidationStatus($res, $isWarning);
-
-		return $res == '';
+		return $this->_updateValidationStatus($res, $isWarning);
 	}
 
 
@@ -117,9 +114,7 @@ class ValidationManager extends BaseStrictClass{
 
 		$res = (!is_numeric($value)) ? $errorMessage : '';
 
-		$this->_updateValidationStatus($res, $isWarning);
-
-		return $res == '';
+		return $this->_updateValidationStatus($res, $isWarning);
 	}
 
 
@@ -139,9 +134,7 @@ class ValidationManager extends BaseStrictClass{
 
 		$res = (!is_string($value)) ? $errorMessage : '';
 
-		$this->_updateValidationStatus($res, $isWarning);
-
-		return $res == '';
+		return $this->_updateValidationStatus($res, $isWarning);
 	}
 
 
@@ -170,9 +163,27 @@ class ValidationManager extends BaseStrictClass{
 
 		$res = (!is_array($value)) ? $errorMessage : '';
 
-		$this->_updateValidationStatus($res, $isWarning);
+		return $this->_updateValidationStatus($res, $isWarning);
+	}
 
-		return $res == '';
+
+	/**
+	 * Validation will fail if specified value is not an object
+	 *
+	 * @param object $value The object to validate
+	 * @param string $errorMessage The error message that will be generated if validation fails
+	 * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
+	 *
+	 * @returns boolean False in case the validation fails or true if validation succeeds.
+	 */
+	public function isObject($value, $errorMessage = '', $isWarning = false){
+
+		// Set optional parameters default values
+		$errorMessage = (StringUtils::isEmpty($errorMessage)) ? 'value is not an object' : $errorMessage;
+
+		$res = ($value == null || !is_object($value)) ? $errorMessage : '';
+
+		return $this->_updateValidationStatus($res, $isWarning);
 	}
 
 
@@ -206,7 +217,7 @@ class ValidationManager extends BaseStrictClass{
 	/**
 	 * TODO - translate from JS
 	 */
-	public function isEqualToValue(){
+	public function isEqualTo(){
 
 		// TODO - translate from JS
 	}
@@ -286,14 +297,14 @@ class ValidationManager extends BaseStrictClass{
 	 * @param string $errorMessage The error message that's been generated from a previously executed validation method
 	 * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
 	 *
-	 * @return void
+	 * @return boolean True if received errorMessage was '' (validation passed) or false if some error message was received (validation failed)
 	 */
 	private function _updateValidationStatus($errorMessage, $isWarning){
 
 		// If we are currently in an error state, nothing to do
 		if($this->validationStatus == self::VALIDATION_ERROR){
 
-			return;
+			return $errorMessage == '';
 		}
 
 		// If the validation fails, we must change the validation status
@@ -321,8 +332,9 @@ class ValidationManager extends BaseStrictClass{
 				$this->validationStatus = self::VALIDATION_ERROR;
 			}
 		}
-	}
 
+		return $errorMessage == '';
+	}
 }
 
 ?>

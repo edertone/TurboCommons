@@ -25,7 +25,7 @@ use org\turbocommons\src\main\php\utils\SerializationUtils;
  * - Supports several resourcebundle formats<br>
  * - A list of locales can be specified so the class will load them by order of preference if any tag is missing.<br>
  * - Supports diferent folder structures for the resourcebundles organization.<br>
- * - Uses a lazy method to load only the requested bundles and tries to minimize disk requests.
+ * - Uses a lazy method to load only the requested bundles and tries to minimize path requests.
  */
 class LocalesManager extends BaseSingletonClass{
 
@@ -224,6 +224,8 @@ class LocalesManager extends BaseSingletonClass{
 		$pathStructureArray = $this->pathStructure;
 
 		foreach ($this->paths as $path) {
+
+			$pathStructure = '';
 
 			// Process the path format string
 			if(count($pathStructureArray) > 0){

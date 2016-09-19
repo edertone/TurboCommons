@@ -13,6 +13,7 @@ namespace org\turbocommons\src\test\php\managers;
 
 use PHPUnit_Framework_TestCase;
 use org\turbocommons\src\main\php\managers\ValidationManager;
+use stdClass;
 
 
 /**
@@ -176,6 +177,54 @@ class ValidationManagerTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(!$validationManager->isArray(''));
 		$this->assertTrue(!$validationManager->isArray(new ValidationManager()));
 		$this->assertTrue(!$validationManager->isArray('hello'));
+		$this->assertTrue($validationManager->validationStatus === ValidationManager::VALIDATION_ERROR);
+
+		$validationManager->reset();
+		$this->assertTrue($validationManager->validationStatus === ValidationManager::VALIDATION_OK);
+	}
+
+
+	/**
+	 * testIsObject
+	 *
+	 * @return void
+	 */
+	public function testIsObject(){
+
+		$validationManager = new ValidationManager();
+
+		$this->assertTrue($validationManager->isObject(new stdClass()));
+
+		$this->assertTrue($validationManager->isObject((object) [
+			'1' => 1
+		]));
+
+		$this->assertTrue($validationManager->isObject((object) [
+			'1' => '1'
+		]));
+
+		$this->assertTrue($validationManager->isObject((object) [
+				'1' => '1',
+				'5' => 5,
+				'array' => []
+		]));
+
+		$this->assertTrue($validationManager->isObject((object) [
+				'novalue' => null
+		]));
+
+		$this->assertTrue($validationManager->isObject(new ValidationManager()));
+		$this->assertTrue($validationManager->validationStatus === ValidationManager::VALIDATION_OK);
+
+
+		$this->assertTrue(!$validationManager->isObject(null, '', true));
+		$this->assertTrue(!$validationManager->isObject([], '', true));
+		$this->assertTrue($validationManager->validationStatus === ValidationManager::VALIDATION_WARNING);
+
+		$this->assertTrue(!$validationManager->isObject(1));
+		$this->assertTrue(!$validationManager->isObject(''));
+		$this->assertTrue(!$validationManager->isObject('hello'));
+		$this->assertTrue(!$validationManager->isObject([1, 4, 5]));
 		$this->assertTrue($validationManager->validationStatus === ValidationManager::VALIDATION_ERROR);
 
 		$validationManager->reset();
