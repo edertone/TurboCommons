@@ -252,23 +252,23 @@ org_turbocommons_src_main_js_managers.ValidationManager.prototype.isObject = fun
  * @see Stringutils.isEmpty
  *
  * @param {string} value A text that must not be empty.
- * @param {array} otherEmptyKeys Optional array containing a list of string values that will be considered as empty for the given string. This can be useful in some cases when we want to consider a string like 'NULL' as an empty string.	 
+ * @param {array} emptyChars Optional array containing a list of string values that will be considered as empty for the given string. This can be useful in some cases when we want to consider a string like 'NULL' as an empty string.	 
  * @param {string} errorMessage The error message that will be generated if validation fails
  * @param {boolean} isWarning Tells if the validation fail will be processed as a validation error or a validation warning
  *
  * @returns {boolean} False in case the validation fails or true if validation succeeds.
  */
-org_turbocommons_src_main_js_managers.ValidationManager.prototype.isFilledIn = function(value, otherEmptyKeys, errorMessage, isWarning){
+org_turbocommons_src_main_js_managers.ValidationManager.prototype.isFilledIn = function(value, emptyChars, errorMessage, isWarning){
 
 	// Alias namespace
 	var ns = org_turbocommons_src_main_js_utils;
 
 	// Set optional parameters default values
-	otherEmptyKeys = (otherEmptyKeys === undefined) ? null : otherEmptyKeys;
+	emptyChars = (emptyChars === undefined) ? [] : emptyChars;
 	errorMessage = (ns.StringUtils.isEmpty(errorMessage)) ? 'value is required' : errorMessage;
 	isWarning = (isWarning === undefined) ? false : isWarning;
 
-	var res = ns.StringUtils.isEmpty(value, otherEmptyKeys) ? errorMessage : '';
+	var res = ns.StringUtils.isEmpty(value, emptyChars) ? errorMessage : '';
 
 	return this._updateValidationStatus(res, isWarning);
 };

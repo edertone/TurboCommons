@@ -38,7 +38,7 @@ QUnit.test("isEmpty", function(assert){
 	// Test non string value gives exception
 	assert.throws(function(){
 
-		assert.ok(utils.StringUtils.isEmpty(123) === '');
+		utils.StringUtils.isEmpty(123);
 	});
 });
 
@@ -290,9 +290,25 @@ QUnit.test("formatUrl", function(assert){
 	assert.ok(utils.StringUtils.formatUrl(undefined) === '');
 	assert.ok(utils.StringUtils.formatUrl('') === '');
 
-	// TODO - add all the missing tests here
-	assert.ok(utils.StringUtils.formatUrl('TODO - this method is not finished') === null);
+	// Format correct urls
+	assert.ok(utils.StringUtils.formatUrl('google.com') === 'http://google.com');
+	assert.ok(utils.StringUtils.formatUrl('www.google.com') === 'http://www.google.com');
+	assert.ok(utils.StringUtils.formatUrl('   google.es') === 'http://google.es');
+	assert.ok(utils.StringUtils.formatUrl('google.es   ') === 'http://google.es');
+	assert.ok(utils.StringUtils.formatUrl('   google.es   ') === 'http://google.es');
+	assert.ok(utils.StringUtils.formatUrl('http://www.example.com:8800') === 'http://www.example.com:8800');
+	assert.ok(utils.StringUtils.formatUrl('www.example.com:8800') === 'http://www.example.com:8800');
+	assert.ok(utils.StringUtils.formatUrl('foo.com/blah_blah/') === 'http://foo.com/blah_blah/');
+	assert.ok(utils.StringUtils.formatUrl('ftp://test.com   ') === 'ftp://test.com');
+	assert.ok(utils.StringUtils.formatUrl('http:\\\\test.com') === 'http://test.com');
 
+	// Format incorrect urls
+	assert.ok(utils.StringUtils.formatUrl('        ') === '        ');
+	assert.ok(utils.StringUtils.formatUrl('123f56ccaca') === '123f56ccaca');
+	assert.ok(utils.StringUtils.formatUrl('!$%&ERTdg4547') === '!$%&ERTdg4547');
+	assert.ok(utils.StringUtils.formatUrl('http://.32') === 'http://.32');
+	assert.ok(utils.StringUtils.formatUrl('http://10.1.1.255') === 'http://10.1.1.255');
+	assert.ok(utils.StringUtils.formatUrl('ftp:/google.es') === 'ftp:/google.es');
 });
 
 

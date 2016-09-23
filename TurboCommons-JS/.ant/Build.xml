@@ -117,6 +117,10 @@
 				
 				self.project.executeTarget("copyMainFiles");
 			
+				if(project.getProperty("Release.enabled") == "true"){
+					self.project.executeTarget("createReleaseVersion");
+				}
+						
 				if(project.getProperty("Test.Php.enabled") == "true"){
 			
 					if(project.getProperty("Test.Php.mode") == "localWebServer"){
@@ -129,13 +133,8 @@
 					}
 				}
 			
-				if(project.getProperty("Test.Js.enabled") == "true"){
-						
+				if(project.getProperty("Test.Js.enabled") == "true"){						
 					self.project.executeTarget("runJsTestsLocalServer");
-				}
-			
-				if(project.getProperty("Release.enabled") == "true"){
-					self.project.executeTarget("createReleaseVersion");
 				}
 			
 				if(project.getProperty("Build.createPhars") == "true"){
@@ -240,6 +239,34 @@
 	</target>
 	
 	
+	<!-- Auxiliary concat to append the release files to js unit tests -->
+	<target name="runJsTestsAuxConcatFromRelease">
+	
+		<concat destfile="${Test.Js.localServerPath}/${projectBaseName}-unitTests/js/index.js">
+					
+			<fileset dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main/js" casesensitive="false">
+				<include name="**/*.js" />
+			</fileset>
+	    
+		</concat>
+	
+	</target>
+	
+	
+	<!-- Auxiliary concat to append the non release files to js unit tests -->
+	<target name="runJsTestsAuxConcatFromBuild">
+	
+		<concat destfile="${Test.Js.localServerPath}/${projectBaseName}-unitTests/js/index.js">
+					
+			<fileset dir="${targetFolderPath}/${projectBaseName}/main/js" casesensitive="false">
+				<include name="**/*.js" />
+			</fileset>
+	    
+		</concat>
+	
+	</target>
+	
+	
 	<!-- Launch the Js unit tests via local web server -->
 	<target name="runJsTestsLocalServer">
 	
@@ -261,13 +288,20 @@
 		</copy>
 		
 		<!-- Append all the Js code to the index.js file -->
-		<concat destfile="${Test.Js.localServerPath}/${projectBaseName}-unitTests/js/index.js">
+		<script language="javascript">
+			<![CDATA[
+					      								
+				if(project.getProperty("Release.enabled") == "true"){
 			
-			<fileset dir="${targetFolderPath}/${projectBaseName}/main/js" casesensitive="false">
-				<include name="**/*.js" />
-			</fileset>
-	    
-		</concat>
+					self.project.executeTarget("runJsTestsAuxConcatFromRelease");
+							
+				}else{
+			
+					self.project.executeTarget("runJsTestsAuxConcatFromBuild");
+				}
+			
+		    ]]>
+		</script>
 		
 		<concat destfile="${Test.Js.localServerPath}/${projectBaseName}-unitTests/js/index.js" 
 				append="true">
@@ -280,6 +314,7 @@
 	    
 		</concat>
 		
+		<!-- Launch the tests on all the enabled browsers -->
 		<script language="javascript">
 			<![CDATA[
 			    
@@ -753,7 +788,12 @@
 	<!-- Generate a single JS file by merging all the js files on the target folder  -->
 	<target name="createMergedJs">
 
-		<concat destfile="${targetFolderPath}/${projectBaseName}/${projectBaseName}.js">
+		<echo file="${targetFolderPath}/${projectBaseName}/${projectBaseName}.js" 
+					  append="true" 
+					  message="/** ${projectBaseName} ${Build.versionNumber}.${build.number} */&#13;&#10;" />
+		
+		<concat destfile="${targetFolderPath}/${projectBaseName}/${projectBaseName}.js"
+				append="true">
 			
 			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false">
 				<include name="**/*.js" />

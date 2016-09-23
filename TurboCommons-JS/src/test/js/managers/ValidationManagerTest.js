@@ -164,6 +164,8 @@ QUnit.test("isUrl", function(assert){
 	assert.ok(!validationManager.isUrl('http://.www.foo.bar./'));
 	assert.ok(!validationManager.isUrl('http://.www.foo.bar/'));
 	assert.ok(!validationManager.isUrl('ftp://user:password@host:port/path'));
+	assert.ok(!validationManager.isUrl('/nfs/an/disks/jj/home/dir/file.txt'));
+	assert.ok(!validationManager.isUrl('C:\\Program Files (x86)'));
 
 	// good url cases
 	assert.ok(validationManager.isUrl('http://x.ye'));
@@ -276,7 +278,7 @@ QUnit.test("isFilledIn", function(assert){
 	var validationManager = new managers.ValidationManager();
 
 	// Test empty strings
-	assert.ok(!validationManager.isFilledIn(undefined, null, '', true));
+	assert.ok(!validationManager.isFilledIn(undefined, [], '', true));
 	assert.ok(validationManager.validationStatus === managers.ValidationManager.VALIDATION_WARNING);
 
 	assert.ok(!validationManager.isFilledIn(null));

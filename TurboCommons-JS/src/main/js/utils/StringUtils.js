@@ -501,7 +501,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 
 		var validationManager = new org_turbocommons_src_main_js_managers.ValidationManager();
 
-		if(url == null || url == undefined){
+		if(url == null || url == undefined || url == ''){
 
 			return '';
 		}
@@ -511,17 +511,28 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 			throw new Error("StringUtils.formatUrl: Specified value must be a string");
 		}
 
-		if(!validationManager.isUrl(url)){
+		if(!validationManager.isFilledIn(url)){
 
 			return url;
 		}
 
+		// Trim and replace all slashes on the url with the correct url slash
+		url = url.trim();
+		url = url.replace(/\//g, '/');
+		url = url.replace(/\\/g, '/');
+
 		// get the url scheme
 		var scheme = this.extractSchemeFromUrl(url);
 
-		return scheme + '://';
+		if(scheme === ''){
 
-		// TODO	- this method is not finished
+			if(validationManager.isUrl('http://' + url)){
+
+				return 'http://' + url;
+			}
+		}
+
+		return url;
 	},
 
 
