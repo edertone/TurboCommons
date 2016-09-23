@@ -24,7 +24,7 @@ use org\turbocommons\src\main\php\utils\StringUtils;
 class FilesManager extends BaseSingletonClass{
 
 
-	/** Defines if the class methods accept internet urls in addition to regular OS filesystem paths */
+	/** Defines if some of the class methods will accept internet urls in addition to regular OS filesystem paths as parameters */
 	public $acceptUrls = false;
 
 
@@ -44,10 +44,12 @@ class FilesManager extends BaseSingletonClass{
 
 
 	/**
-	 * Check if the specified path is a file or not.
-	 * Note: Checking urls can be a slow process, so use it carefully when enabling the acceptUrls flag.
+	 * Check if the specified path or url is a file or not.
 	 *
-	 * @param string $path The (supposed) file path. If $this->acceptUrls is enabled, an internet url can also be specified
+	 * Note: Internet urls will be also accepted if $this->acceptUrls is true.
+	 * Checking urls can be a slow process, so use it very carefully
+	 *
+	 * @param string $path An Operating system path or an internet url to test
 	 *
 	 * @return bool true if the path exists and is a file, false otherwise. If an url is provided, true will be returned if the url exists and contains information.
 	 */
@@ -64,7 +66,7 @@ class FilesManager extends BaseSingletonClass{
 
 				if(!ini_get('allow_url_fopen')){
 
-					throw new Exception('FileSystemUtils->isFile: allow_url_fopen flag must be set to TRUE on php.ini');
+					throw new Exception('FilesManager->isFile: allow_url_fopen flag must be set to TRUE on php.ini');
 				}
 
 				if(strlen(file_get_contents($path, null, null, null, 10)) != 0){
@@ -79,20 +81,38 @@ class FilesManager extends BaseSingletonClass{
 
 
 	/**
-	 * Check if the specified path is a directory or not
+	 * Check if the specified path is a directory or not.
 	 *
-	 * @param string $path The (supposed) directory path
+	 * Note: Internet urls will be also accepted if $this->acceptUrls is true.
+	 * Checking urls can be a slow process, so use it very carefully
 	 *
-	 * @return bool true if the path exists and is a directory, false otherwise.
+	 * @param string $path An Operating system path or an internet url to test
+	 *
+	 * @return bool true if the path exists and is a directory, false otherwise. If an url is provided, true will be returned if the url is valid and exists
 	 */
 	public function isDirectory($path){
 
-		return is_dir($path);
+		if(is_dir($path)){
+
+			return true;
+		}
+
+		if($this->acceptUrls){
+
+			if(HTTPUtils::urlExists($path)){
+
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 
 	/**
 	 * Checks that the specified folder is empty
+	 *
+	 * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
 	 *
 	 * @param string $path The path to the directory we want to check
 	 *
@@ -102,7 +122,7 @@ class FilesManager extends BaseSingletonClass{
 
 		if (!is_readable($path)){
 
-			throw new Exception('FileSystemUtils->isDirectoryEmpty: Path does not exist: '.$path);
+			throw new Exception('FilesManager->isDirectoryEmpty: Path does not exist: '.$path);
 		}
 
 		$handle = opendir($path);
@@ -140,6 +160,7 @@ class FilesManager extends BaseSingletonClass{
 	 * guarantee us that we have a unique directory name that does not collide with any other folder or file that currently exists on the path.
 	 *
 	 * NOTE: This method does not create any folder or alter the given path in any way.
+	 * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
 	 *
 	 * @param string $path The full path to the directoy we want to check for a unique folder name
 	 * @param string $desiredName We can specify a suggested name for the unique directory. This method will verify that it does not exist, or otherwise give us a name that is unique for the given path
@@ -173,6 +194,7 @@ class FilesManager extends BaseSingletonClass{
 	 * guarantee us that we have a unique file name that does not collide with any other file or folder that currently exists on the path.
 	 *
 	 * NOTE: This method does not create any file or alter the given path in any way.
+	 * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
 	 *
 	 * @param string $path The full path to the directoy we want to check for a unique file name
 	 * @param string $desiredName We can specify a suggested name for the unique file. This method will verify that it does not exist, or otherwise give us a name that is unique for the given path
@@ -256,6 +278,8 @@ class FilesManager extends BaseSingletonClass{
 	/**
 	 * Create a directory at the specified filesystem path
 	 *
+	 * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
+	 *
 	 * @param string $path The full path to the directoy we want to create
 	 * @param bool $recursive Allows the creation of nested directories specified in the pathname. Defaults to false.
 	 * @param int $mode Is 0755 by default, which means the widest possible access. Ignored on windows
@@ -303,6 +327,8 @@ class FilesManager extends BaseSingletonClass{
 	 * using it (This is specially important if the tmp folder contains sensitive data). Even so, this method tries to delete the generated tmp
 	 * folder by default when the application ends.
 	 *
+	 * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
+	 *
 	 * @param string $desiredName A name we want for the new directory to be created. If name is not available, a unique one (based on the given name) will be generated automatically.
 	 * @param boolean $deleteOnExecutionEnd Defines if the generated temp folder must be deleted after the current script execution finishes. Note that when files inside the folder are still used by the app or OS, exceptions or problems may happen, and it is not 100% guaranteed that the folder will be always deleted.
 	 *
@@ -316,7 +342,7 @@ class FilesManager extends BaseSingletonClass{
 
 		if(!self::createDirectory($tempDirectory)){
 
-			throw new Exception('FileSystemUtils->createTempDirectory: Could not create TMP directory '.$tempDirectory);
+			throw new Exception('FilesManager->createTempDirectory: Could not create TMP directory '.$tempDirectory);
 		}
 
 		// Add a shutdown function to try to delete the file when the current script execution ends
@@ -336,6 +362,8 @@ class FilesManager extends BaseSingletonClass{
 	 * Gives the list of items that are stored on the specified folder. It will give files and directories, and each element will be the item name, without the path to it.
 	 * The contents of any subfolder will not be listed. We must call this method for each child folder if we want to get it's list.
 	 * (The method ignores the . and .. items if exist).
+	 *
+	 * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
 	 *
 	 * @param string $path Full path to the directory we want to list
 	 * @param string $sort Specifies the sort for the result:<br>
@@ -408,6 +436,8 @@ class FilesManager extends BaseSingletonClass{
 	/**
 	 * Calculate the full size in bytes for a specified folder.
 	 *
+	 * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
+	 *
 	 * @param string $path Full path to the directory we want to calculate its size
 	 *
 	 * @return int the size of the file in bytes, or false (and generates an error of level E_WARNING) in case of an error.
@@ -445,6 +475,8 @@ class FilesManager extends BaseSingletonClass{
 
 	/**
 	 * Delete a directory from the filesystem and return a boolean telling if the directory delete success or not
+	 *
+	 * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
 	 *
 	 * @param string $path The path to the directory
 	 * @param string $deleteDirectoryItself Set it to true if the specified directory must also be deleted.
@@ -499,6 +531,8 @@ class FilesManager extends BaseSingletonClass{
 	/**
 	 * Create a file to the specified filesystem path and write the specified data to it.
 	 *
+	 * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
+	 *
 	 * @param string $path The full path where the file will be stored, including the full file name
 	 * @param string $fileData Information to store on the file (a string, a block of bytes, etc...)
 	 * @param int $permisions The file permisions. If not specified, the default system one will be used, (normally 0644)
@@ -545,6 +579,8 @@ class FilesManager extends BaseSingletonClass{
 	/**
 	 * Gets file size
 	 *
+	 * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
+	 *
 	 * @param string $path The file full path
 	 *
 	 * @return int the size of the file in bytes, or false (and generates an error of level E_WARNING) in case of an error.
@@ -564,16 +600,18 @@ class FilesManager extends BaseSingletonClass{
 	 */
 	public function readFile($path){
 
+		// TODO - this method must accept urls if $this->acceptUrls is true
+
 		if(!is_file($path)){
 
-			throw new Exception('FileSystemUtils->readFile: File not found - '.$path);
+			throw new Exception('FilesManager->readFile: File not found - '.$path);
 		}
 
 		$contents = file_get_contents($path, true);
 
 		if($contents === false){
 
-			throw new Exception('FileSystemUtils->readFile: Error reading file - '.$path);
+			throw new Exception('FilesManager->readFile: Error reading file - '.$path);
 		}
 
 		return $contents;
@@ -656,6 +694,8 @@ class FilesManager extends BaseSingletonClass{
 	/**
 	 * Copies a file from a source location to the defined destination
 	 *
+	 * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
+	 *
 	 * @param string $sourcePath The full path to the source file that must be copied (including the filename itself).
 	 * @param string $destPath The full path to the destination where the file must be copied (including the filename itself).
 	 *
@@ -670,6 +710,8 @@ class FilesManager extends BaseSingletonClass{
 
 	/**
 	 * Delete a filesystem file.
+	 *
+	 * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
 	 *
 	 * @param string $path	The file filesystem path
 	 *

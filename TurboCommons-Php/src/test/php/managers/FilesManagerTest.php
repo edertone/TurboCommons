@@ -74,6 +74,9 @@ class FilesManagerTest extends PHPUnit_Framework_TestCase {
 
 		$filesManager = FilesManager::getInstance();
 
+		// Test with urls disabled
+		$filesManager->acceptUrls = false;
+
 		// Create a temporary folder
 		$basePath = $filesManager->createTempDirectory('TurboCommons-Php');
 		$this->assertTrue($filesManager->isDirectoryEmpty($basePath));
@@ -87,6 +90,15 @@ class FilesManagerTest extends PHPUnit_Framework_TestCase {
 		// Test a created file
 		$filesManager->createFile($basePath.DIRECTORY_SEPARATOR.'File.txt', 'Hello baby');
 		$this->assertTrue(!$filesManager->isDirectory($basePath.DIRECTORY_SEPARATOR.'File.txt'));
+
+		// Test with urls enabled
+		$filesManager->acceptUrls = true;
+
+		$this->assertTrue(!$filesManager->isDirectory(null));
+		$this->assertTrue(!$filesManager->isDirectory(''));
+		$this->assertTrue(!$filesManager->isDirectory('49568456'));
+
+		$this->assertTrue($filesManager->isDirectory('https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'), 'Could not load url. Internet connection must be available');
 	}
 
 
@@ -230,6 +242,10 @@ class FilesManagerTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($filesManager->findUniqueFileName($basePath, 'NewFile.txt', 'copy', '-', false) == 'NewFile-copy-2.txt');
 		$this->assertTrue($filesManager->findUniqueFileName($basePath, 'NewFile.txt', 'copy', '-', true) == 'copy-1-NewFile.txt');
 	}
+
+
+	// TODO - Add all missing tests
+
 }
 
 ?>
