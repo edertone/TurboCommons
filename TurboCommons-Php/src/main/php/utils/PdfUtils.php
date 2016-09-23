@@ -12,6 +12,7 @@
 namespace org\turbocommons\src\main\php\utils;
 
 
+use org\turbocommons\src\main\php\managers\FilesManager;
 /**
  * PDF documents manipulation methods
  */
@@ -215,7 +216,7 @@ class PdfUtils {
 		}
 
 		// Make sure that the output folder is empty
-		if(count(FileSystemUtils::getDirectoryList($outputPath)) > 0){
+		if(count(FilesManager::getInstance()->getDirectoryList($outputPath)) > 0){
 
 			trigger_error('PdfUtils::generateDocumentJpgPictures Error: Specified output folder ('.$outputPath.') must be empty', E_USER_WARNING);
 
@@ -248,7 +249,7 @@ class PdfUtils {
 		}
 
 		// Verify that the output folder contains the generated pictures, and count their number
-		return count(FileSystemUtils::getDirectoryList($outputPath));
+		return count(FilesManager::getInstance()->getDirectoryList($outputPath));
 	}
 
 

@@ -9,28 +9,72 @@
  * CopyRight : -> Copyright 2015 Edertone Advanded Solutions (08211 Castellar del Vallès, Barcelona). http://www.edertone.com
  */
 
-namespace org\turbocommons\src\main\php\utils;
+namespace org\turbocommons\src\main\php\managers;
 
-use Exception;
+use org\turbocommons\src\main\php\model\BaseSingletonClass;
+use org\turbocommons\src\main\php\utils\HTTPUtils;
 use DirectoryIterator;
+use Exception;
+use org\turbocommons\src\main\php\utils\StringUtils;
 
 
 /**
- * Class that helps with the most common file system operations
+ * SINGLETON class containing common file system interaction functionalities
  */
-class FileSystemUtils{
+class FilesManager extends BaseSingletonClass{
+
+
+	/** Defines if the class methods accept internet urls in addition to regular OS filesystem paths */
+	public $acceptUrls = false;
 
 
 	/**
-	 * Check if the specified path is a file or not
+	 * Returns the global singleton instance.
 	 *
-	 * @param string $path The (supposed) file path
-	 *
-	 * @return bool true if the path exists and is a file, false otherwise.
+	 * @return FilesManager The singleton instance.
 	 */
-	public static function isFile($path){
+	public static function getInstance(){
 
-		return is_file($path);
+		// This method is overriden from the singleton one simply to get correct
+		// autocomplete annotations when returning the instance
+		 $instance = parent::getInstance();
+
+		 return $instance;
+	}
+
+
+	/**
+	 * Check if the specified path is a file or not.
+	 * Note: Checking urls can be a slow process, so use it carefully when enabling the acceptUrls flag.
+	 *
+	 * @param string $path The (supposed) file path. If $this->acceptUrls is enabled, an internet url can also be specified
+	 *
+	 * @return bool true if the path exists and is a file, false otherwise. If an url is provided, true will be returned if the url exists and contains information.
+	 */
+	public function isFile($path){
+
+		if(is_file($path)){
+
+			return true;
+		}
+
+		if($this->acceptUrls){
+
+			if(HTTPUtils::urlExists($path)){
+
+				if(!ini_get('allow_url_fopen')){
+
+					throw new Exception('FileSystemUtils->isFile: allow_url_fopen flag must be set to TRUE on php.ini');
+				}
+
+				if(strlen(file_get_contents($path, null, null, null, 10)) != 0){
+
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 
@@ -41,7 +85,7 @@ class FileSystemUtils{
 	 *
 	 * @return bool true if the path exists and is a directory, false otherwise.
 	 */
-	public static function isDirectory($path){
+	public function isDirectory($path){
 
 		return is_dir($path);
 	}
@@ -54,7 +98,7 @@ class FileSystemUtils{
 	 *
 	 * @return boolean True if directory is empty, false if not. If it does not exist or cannot be read, an exception will be generated
 	 */
-	public static function isDirectoryEmpty($path) {
+	public function isDirectoryEmpty($path) {
 
 		if (!is_readable($path)){
 
@@ -83,7 +127,7 @@ class FileSystemUtils{
 	 *
 	 * @return string The current OS directory separator character
 	 */
-	public static function getDirectorySeparator(){
+	public function getDirectorySeparator(){
 
 		return DIRECTORY_SEPARATOR;
 	}
@@ -105,7 +149,7 @@ class FileSystemUtils{
 	 *
 	 * @return string A directory name that can be safely created on the specified path, cause no one exists with the same name (No path is returned with this method, only a directory name. For example: 'folder-1', 'directoryName-5', etc..).
 	 */
-	public static function findUniqueDirectoryName($path, $desiredName = '', $text = '', $separator = '-', $isPrefix = false){
+	public function findUniqueDirectoryName($path, $desiredName = '', $text = '', $separator = '-', $isPrefix = false){
 
 		$i = 1;
 		$path = StringUtils::formatPath($path);
@@ -138,7 +182,7 @@ class FileSystemUtils{
 	 *
 	 * @return string A file name that can be safely created on the specified path, cause no one exists with the same name (No path is returned with this method, only a file name. For example: 'file-1', 'fileName-5', etc..).
 	 */
-	public static function findUniqueFileName($path, $desiredName = '', $text = '', $separator = '-', $isPrefix = false){
+	public function findUniqueFileName($path, $desiredName = '', $text = '', $separator = '-', $isPrefix = false){
 
 		$i = 1;
 		$path = StringUtils::formatPath($path);
@@ -172,7 +216,7 @@ class FileSystemUtils{
 	 *
 	 * @return string The generated name
 	 */
-	private static function _generateUniqueNameAux($i, $desiredName, $text, $separator, $isPrefix){
+	private function _generateUniqueNameAux($i, $desiredName, $text, $separator, $isPrefix){
 
 		$result = [];
 
@@ -218,7 +262,7 @@ class FileSystemUtils{
 	 *
 	 * @return bool Returns true on success or false if the folder already exists (an exception may be also thrown if a file exists with the same name).
 	 */
-	public static function createDirectory($path, $recursive = false, $mode = 0755){
+	public function createDirectory($path, $recursive = false, $mode = 0755){
 
 		// If folder already exists, nothing to do
 		if(is_dir($path)){
@@ -264,7 +308,7 @@ class FileSystemUtils{
 	 *
 	 * @return string The full path to the newly created temporary directory, including the directory itself. For example: C:\Users\Me\AppData\Local\Temp\MyDesiredName
 	 */
-	public static function createTempDirectory($desiredName, $deleteOnExecutionEnd = true) {
+	public function createTempDirectory($desiredName, $deleteOnExecutionEnd = true) {
 
 		$tempRoot = StringUtils::formatPath(sys_get_temp_dir());
 
@@ -303,7 +347,7 @@ class FileSystemUtils{
 	 *
 	 * @return array The list of item names inside the specified path sorted as requested, or an empty array if no items found inside the folder.
 	 */
-	public static function getDirectoryList($path, $sort = ''){
+	public function getDirectoryList($path, $sort = ''){
 
 		// If folder does not exist, we will throw an exception
 		if(!is_dir($path)){
@@ -368,7 +412,7 @@ class FileSystemUtils{
 	 *
 	 * @return int the size of the file in bytes, or false (and generates an error of level E_WARNING) in case of an error.
 	 */
-	public static function getDirectorySize($path){
+	public function getDirectorySize($path){
 
 		$result = 0;
 
@@ -407,7 +451,7 @@ class FileSystemUtils{
 	 *
 	 * @return bool Returns true on success or false on failure.
 	 */
-	public static function deleteDirectory($path, $deleteDirectoryItself = true){
+	public function deleteDirectory($path, $deleteDirectoryItself = true){
 
 		$path = StringUtils::formatPath($path);
 
@@ -461,7 +505,7 @@ class FileSystemUtils{
 	 *
 	 * @return bool Returns true on success or false on failure.
 	 */
-	public static function createFile($path, $fileData = '', $permisions = ''){
+	public function createFile($path, $fileData = '', $permisions = ''){
 
 		$fp = fopen($path, 'wb');
 
@@ -493,7 +537,7 @@ class FileSystemUtils{
 
 
 	/** TODO */
-	public static function createTempFile(){
+	public function createTempFile(){
 
 	}
 
@@ -505,7 +549,7 @@ class FileSystemUtils{
 	 *
 	 * @return int the size of the file in bytes, or false (and generates an error of level E_WARNING) in case of an error.
 	 */
-	public static function getFileSize($path){
+	public function getFileSize($path){
 
 		return filesize($path);
 	}
@@ -518,7 +562,7 @@ class FileSystemUtils{
 	 *
 	 * @return string The file contents (binary or string). If the file is not found or cannot be read, an exception will be thrown.
 	 */
-	public static function readFile($path){
+	public function readFile($path){
 
 		if(!is_file($path)){
 
@@ -547,7 +591,7 @@ class FileSystemUtils{
 	 *
 	 * @return int the number of bytes read from the file.
 	 */
-	public static function readFileBuffered($path, $downloadRateLimit = 0){
+	public function readFileBuffered($path, $downloadRateLimit = 0){
 
 		if(!is_file($path)){
 
@@ -572,12 +616,12 @@ class FileSystemUtils{
 
 		$handle = fopen($path, 'rb');
 
-	   	if($handle === false) {
+		if($handle === false) {
 
-	   		return $cnt;
-	   	}
+			return $cnt;
+		}
 
-	   	// Output the file chunk by chunk
+		// Output the file chunk by chunk
 		while(!feof($handle)){
 
 			$buffer = fread($handle, $chunkSize);
@@ -591,7 +635,7 @@ class FileSystemUtils{
 			}
 
 			// Forces a write of the data to the browser
-		    flush();
+			flush();
 
 			$cnt += strlen($buffer);
 
@@ -617,7 +661,7 @@ class FileSystemUtils{
 	 *
 	 * @return boolean Returns true on success or false on failure.
 	 */
-	public static function copyFile($sourcePath, $destPath){
+	public function copyFile($sourcePath, $destPath){
 
 		return copy($sourcePath, $destPath);
 
@@ -631,7 +675,7 @@ class FileSystemUtils{
 	 *
 	 * @return boolean Returns true on success or false on failure.
 	 */
-	public static function deleteFile($path){
+	public function deleteFile($path){
 
 		if(!is_file($path)){
 
@@ -641,7 +685,6 @@ class FileSystemUtils{
 		return unlink($path);
 
 	}
-
 }
 
 ?>

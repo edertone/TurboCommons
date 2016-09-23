@@ -22,12 +22,10 @@ class ArrayUtils {
 	/**
 	 * Check if two provided arrays are identical
 	 *
-	 * @static
+	 * @param array $array1 First array to compare
+	 * @param array $array2 Second array to compare
 	 *
-	 * @param {array} array1 First array to compare
-	 * @param {array} array2 Second array to compare
-	 *
-	 * @returns boolean true if arrays are exactly the same, false if not
+	 * @return boolean true if arrays are exactly the same, false if not
 	 */
 	public static function isEqualTo($array1, $array2){
 

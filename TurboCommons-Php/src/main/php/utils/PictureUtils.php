@@ -12,6 +12,7 @@
 namespace org\turbocommons\src\main\php\utils;
 
 
+use org\turbocommons\src\main\php\managers\FilesManager;
 /**
  * Image manipulation utils
  */
@@ -218,7 +219,7 @@ class PictureUtils{
 			throw new Exception('PictureUtils::compressJpgPictureFolder: Specified path ('.$imagesPath.') is not a folder');
 		}
 
-		$images = FileSystemUtils::getDirectoryList($imagesPath);
+		$images = FilesManager::getInstance()->getDirectoryList($imagesPath);
 
 		// Remove folder trailing separator if exists
 		if(substr($imagesPath, -1) == DIRECTORY_SEPARATOR){

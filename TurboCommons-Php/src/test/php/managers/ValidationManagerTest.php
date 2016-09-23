@@ -11,9 +11,9 @@
 
 namespace org\turbocommons\src\test\php\managers;
 
-use PHPUnit_Framework_TestCase;
 use org\turbocommons\src\main\php\managers\ValidationManager;
 use stdClass;
+use PHPUnit_Framework_TestCase;
 
 
 /**
@@ -65,7 +65,6 @@ class ValidationManagerTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($validationManager->isBoolean(false));
 		$this->assertTrue($validationManager->validationStatus === ValidationManager::VALIDATION_OK);
 
-		$this->assertTrue(!$validationManager->isBoolean(undefined));
 		$this->assertTrue(!$validationManager->isBoolean(null));
 		$this->assertTrue(!$validationManager->isBoolean([]));
 		$this->assertTrue($validationManager->validationStatus === ValidationManager::VALIDATION_ERROR);

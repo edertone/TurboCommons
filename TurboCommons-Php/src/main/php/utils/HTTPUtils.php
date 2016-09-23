@@ -70,7 +70,7 @@ class HTTPUtils{
 
 		foreach([404, 405] as $code){
 
-			if (is_numeric($code) and strpos($headers[0], strval($code)) !== false){
+			if (is_numeric($code) && strpos($headers[0], strval($code)) !== false){
 
 				return false;
 			}

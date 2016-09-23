@@ -13,9 +13,8 @@ namespace org\turbocommons\src\main\php\managers;
 
 use Exception;
 use org\turbocommons\src\main\php\model\BaseSingletonClass;
-use org\turbocommons\src\main\php\utils\FileSystemUtils;
-use org\turbocommons\src\main\php\utils\StringUtils;
 use org\turbocommons\src\main\php\utils\SerializationUtils;
+use org\turbocommons\src\main\php\utils\StringUtils;
 
 
 /**
@@ -235,9 +234,9 @@ class LocalesManager extends BaseSingletonClass{
 
 			$bundlePath = StringUtils::formatPath($path.DIRECTORY_SEPARATOR.$pathStructure);
 
-			if(FileSystemUtils::isFile($bundlePath)){
+			if(FilesManager::getInstance()->isFile($bundlePath)){
 
-				$bundleData = FileSystemUtils::readFile($bundlePath);
+				$bundleData = FilesManager::getInstance()->readFile($bundlePath);
 
 				$this->_loadedData[$bundle][$locale] = SerializationUtils::javaPropertiesToArray($bundleData);
 

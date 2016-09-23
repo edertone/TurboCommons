@@ -13,6 +13,7 @@ namespace org\turbocommons\src\main\php\utils;
 
 use Exception;
 use org\turbocommons\src\main\php\managers\ValidationManager;
+use org\turbocommons\src\main\php\managers\FilesManager;
 
 
 /**
@@ -286,7 +287,7 @@ class StringUtils {
 	 */
 	public static function extractFileNameWithExtension($path){
 
-		$osSeparator = FileSystemUtils::getDirectorySeparator();
+		$osSeparator = FilesManager::getInstance()->getDirectorySeparator();
 
 		if(self::isEmpty($path)){
 
@@ -374,7 +375,7 @@ class StringUtils {
      */
     public static function formatPath($path){
 
-    	$osSeparator = FileSystemUtils::getDirectorySeparator();
+    	$osSeparator = FilesManager::getInstance()->getDirectorySeparator();
 
     	if($path == null){
 
@@ -485,9 +486,9 @@ class StringUtils {
 	 * Converts all accent characters to ASCII characters on a given string.<br>
 	 * This method is based on the WordPress implementation called remove_Accents
 	 *
-	 * @see https://core.trac.wordpress.org/browser/tags/3.9/src/wp-includes/formatting.php#L682
-	 *
 	 * @param string $string Text from which accents must be cleaned
+	 *
+	 * @see https://core.trac.wordpress.org/browser/tags/3.9/src/wp-includes/formatting.php#L682
 	 *
 	 * @return string The given string with all accent and diacritics replaced by the respective ASCII characters.
 	 */

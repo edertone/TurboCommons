@@ -15,6 +15,7 @@ use PHPUnit_Framework_TestCase;
 use org\turbocommons\src\main\php\utils\FileSystemUtils;
 use org\turbocommons\src\main\php\utils\SerializationUtils;
 use org\turbocommons\src\main\php\managers\ValidationManager;
+use org\turbocommons\src\main\php\managers\FilesManager;
 
 
 /**
@@ -71,7 +72,7 @@ class SerializationUtilsTest extends PHPUnit_Framework_TestCase {
 		$basePath = __DIR__.'/../resources/utils/serializationUtils/javaPropertiesToArray';
 
 		// Test the properties file 1
-		$test = FileSystemUtils::readFile($basePath.'/Test1.properties');
+		$test = FilesManager::getInstance()->readFile($basePath.'/Test1.properties');
 		$test = SerializationUtils::javaPropertiesToArray($test);
 
 		$this->assertTrue(count($test) == 45);
@@ -90,7 +91,7 @@ class SerializationUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($test['reconcile'] == 'Y');
 
 		// Test the properties file 2
-		$test = FileSystemUtils::readFile($basePath.'/Test2.properties');
+		$test = FilesManager::getInstance()->readFile($basePath.'/Test2.properties');
 		$test = SerializationUtils::javaPropertiesToArray($test);
 
 		$this->assertTrue(count($test) == 11);
@@ -104,7 +105,7 @@ class SerializationUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($test['SOME_JAPANESE_TEXT_WITH_MILTILINES'] == "氨䛧 ちゅレ゜頨褤つ 栨プ\n\n詞ゞ黨 禺驩へ, なか䤥楯ティ 䨺礨背㛤騟 嶥䰧ツェ餣\nしょ 查ぴゃ秺 む難 びゃ\nきゃ ");
 
 		// Test the properties file 3
-		$test = FileSystemUtils::readFile($basePath.'/Test3.properties');
+		$test = FilesManager::getInstance()->readFile($basePath.'/Test3.properties');
 		$test = SerializationUtils::javaPropertiesToArray($test);
 
 		$this->assertTrue(count($test) == 5);
@@ -115,7 +116,7 @@ class SerializationUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($test['tab'] == "\t");
 
 		// Test the properties file 4
-		$test = FileSystemUtils::readFile($basePath.'/Test4.properties');
+		$test = FilesManager::getInstance()->readFile($basePath.'/Test4.properties');
 		$test = SerializationUtils::javaPropertiesToArray($test);
 
 		$this->assertTrue(count($test) == 6);
