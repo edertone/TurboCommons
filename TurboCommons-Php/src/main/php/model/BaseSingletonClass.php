@@ -15,12 +15,19 @@ namespace org\turbocommons\src\main\php\model;
 /**
  * A base class that implements the singleton pattern for PHP and can be extended to convert a class to a singleton object
  */
-class BaseSingletonClass extends BaseStrictClass{
+abstract class BaseSingletonClass extends BaseStrictClass{
+
+
+	/**
+	 * Contains all the singleton global instances (for all classes that extend this one).
+	 * In php we must do it this way to avoid singletons from returning wrong class objects.
+	 */
+	private static $_instances = [];
 
 
 	/**
 	 * Returns the *Singleton* instance of this class.
-	 * IMPORTANT: If you want eclipse to perform autocomplete for the returned instance, you can assign it to a variable using doc annotations like this:
+	 * IMPORTANT: If you want autocomplete for the returned instance, you can assign it to a variable using doc annotations like this:
 	 * /* @var $shoppingCartManager ShoppingCartManager *&#47;<br>$shoppingCartManager = ShoppingCartManager::getInstance();
 	 *
 	 * @staticvar Singleton $instance The *Singleton* instances of this class.
@@ -29,14 +36,14 @@ class BaseSingletonClass extends BaseStrictClass{
 	 */
 	public static function getInstance(){
 
-		static $instance = null;
+		$class = get_called_class();
 
-		if(null === $instance){
+		if(!isset(self::$_instances[$class])) {
 
-			$instance = new static();
+			self::$_instances[$class] = new $class();
 		}
 
-		return $instance;
+		return self::$_instances[$class];
 	}
 
 

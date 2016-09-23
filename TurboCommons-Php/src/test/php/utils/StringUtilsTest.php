@@ -46,9 +46,8 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(!StringUtils::isEmpty('EMPTY       void   hole    XX', ['EMPTY', 'void', 'hole']));
 
 		// Test non string value gives exception
-		// TODO - this test fails here but passes on JS!!
 		$this->setExpectedException('Exception');
-		$this->assertTrue(StringUtils::isEmpty(123) === '');
+		StringUtils::isEmpty(123);
 	}
 
 

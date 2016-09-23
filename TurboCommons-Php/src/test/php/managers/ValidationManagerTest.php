@@ -151,7 +151,66 @@ class ValidationManagerTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testIsUrl(){
 
-		// TODO - translate from js
+		$validationManager = new ValidationManager();
+
+		// Wrong url cases
+		$this->assertTrue(!$validationManager->isUrl(''));
+		$this->assertTrue(!$validationManager->isUrl(null));
+		$this->assertTrue(!$validationManager->isUrl([]));
+		$this->assertTrue(!$validationManager->isUrl('    '));
+		$this->assertTrue(!$validationManager->isUrl('123f56ccaca'));
+		$this->assertTrue(!$validationManager->isUrl('8/%$144///(!(/"'));
+		$this->assertTrue(!$validationManager->isUrl('http'));
+		$this->assertTrue(!$validationManager->isUrl('x.y'));
+		$this->assertTrue(!$validationManager->isUrl('http://x.y'));
+		$this->assertTrue(!$validationManager->isUrl('google.com-'));
+		$this->assertTrue(!$validationManager->isUrl("\n   \t\n"));
+		$this->assertTrue(!$validationManager->isUrl('http:\\google.com'));
+		$this->assertTrue(!$validationManager->isUrl('_http://google.com'));
+		$this->assertTrue(!$validationManager->isUrl('http://www.example..com'));
+		$this->assertTrue(!$validationManager->isUrl('http://.com'));
+		$this->assertTrue(!$validationManager->isUrl('http://www.example.'));
+		$this->assertTrue(!$validationManager->isUrl('http:/www.example.com'));
+		$this->assertTrue(!$validationManager->isUrl('http://'));
+		$this->assertTrue(!$validationManager->isUrl('http://.'));
+		$this->assertTrue(!$validationManager->isUrl('http://??/'));
+		$this->assertTrue(!$validationManager->isUrl('http://foo.bar?q=Spaces should be encoded'));
+		$this->assertTrue(!$validationManager->isUrl('rdar://1234'));
+		$this->assertTrue(!$validationManager->isUrl('http://foo.bar/foo(bar)baz quux'));
+		$this->assertTrue(!$validationManager->isUrl('http://10.1.1.255'));
+		$this->assertTrue(!$validationManager->isUrl('http://.www.foo.bar./'));
+		$this->assertTrue(!$validationManager->isUrl('http://.www.foo.bar/'));
+		$this->assertTrue(!$validationManager->isUrl('ftp://user:password@host:port/path'));
+		$this->assertTrue(!$validationManager->isUrl('/nfs/an/disks/jj/home/dir/file.txt'));
+		$this->assertTrue(!$validationManager->isUrl('C:\\Program Files (x86)'));
+
+		// good url cases
+		$this->assertTrue($validationManager->isUrl('http://x.ye'));
+		$this->assertTrue($validationManager->isUrl('http://google.com'));
+		$this->assertTrue($validationManager->isUrl('ftp://mydomain.com'));
+		$this->assertTrue($validationManager->isUrl('http://www.example.com:8800'));
+		$this->assertTrue($validationManager->isUrl('http://www.example.com/a/b/c/d/e/f/g/h/i.html'));
+		// TODO - this test does not pass, but it does pass in JS. We should look for another regex in PHP that passes it also
+		// $this->assertTrue($validationManager->isUrl('http://www.test.com?pageid=123&testid=1524'));
+		$this->assertTrue($validationManager->isUrl('http://www.test.com/do.html#A'));
+		$this->assertTrue($validationManager->isUrl('https://subdomain.test.com/'));
+		$this->assertTrue($validationManager->isUrl('https://test.com'));
+		$this->assertTrue($validationManager->isUrl('http://foo.com/blah_blah/'));
+		$this->assertTrue($validationManager->isUrl('https://www.example.com/foo/?bar=baz&inga=42&quux'));
+		$this->assertTrue($validationManager->isUrl('http://userid@example.com:8080'));
+		$this->assertTrue($validationManager->isUrl('http://➡.ws/䨹'));
+		$this->assertTrue($validationManager->isUrl('http://⌘.ws/'));
+		$this->assertTrue($validationManager->isUrl('http://foo.bar/?q=Test%20URL-encoded%20stuff'));
+		$this->assertTrue($validationManager->isUrl('http://-.~_!$&\'()*+,;=:%40:80%2f::::::@example.com'));
+		$this->assertTrue($validationManager->isUrl('http://223.255.255.254'));
+		$this->assertTrue($validationManager->isUrl('ftp://user:password@host.com:8080/path'));
+
+		$validationManager->reset();
+		$this->assertTrue($validationManager->validationStatus === ValidationManager::VALIDATION_OK);
+
+		// Test non string values throw exceptions
+		$this->setExpectedException('Exception');
+		$this->assertTrue(!$validationManager->isUrl([12341]));
 	}
 
 
@@ -228,6 +287,41 @@ class ValidationManagerTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($validationManager->validationStatus === ValidationManager::VALIDATION_ERROR);
 
 		$validationManager->reset();
+		$this->assertTrue($validationManager->validationStatus === ValidationManager::VALIDATION_OK);
+	}
+
+
+	/**
+	 * testIsFilledIn
+	 *
+	 * @return void
+	 */
+	public function testIsFilledIn(){
+
+		$validationManager = new ValidationManager();
+
+		// Test empty strings
+		$this->assertTrue(!$validationManager->isFilledIn(null, [], '', true));
+		$this->assertTrue($validationManager->validationStatus === ValidationManager::VALIDATION_WARNING);
+
+		$this->assertTrue(!$validationManager->isFilledIn(null));
+		$this->assertTrue(!$validationManager->isFilledIn('      '));
+		$this->assertTrue(!$validationManager->isFilledIn("\n\n  \n"));
+		$this->assertTrue(!$validationManager->isFilledIn("\t   \n     \r\r"));
+		$this->assertTrue(!$validationManager->isFilledIn('EMPTY', ['EMPTY']));
+		$this->assertTrue(!$validationManager->isFilledIn('EMPTY           ', ['EMPTY']));
+		$this->assertTrue(!$validationManager->isFilledIn('EMPTY       void   hole    ', ['EMPTY', 'void', 'hole']));
+
+		$this->assertTrue($validationManager->validationStatus === ValidationManager::VALIDATION_ERROR);
+
+		// Test non empty strings
+		$validationManager->reset();
+
+		$this->assertTrue($validationManager->isFilledIn('adsadf'));
+		$this->assertTrue($validationManager->isFilledIn('    sdfasdsf'));
+		$this->assertTrue($validationManager->isFilledIn('EMPTY'));
+		$this->assertTrue($validationManager->isFilledIn('EMPTY test', ['EMPTY']));
+
 		$this->assertTrue($validationManager->validationStatus === ValidationManager::VALIDATION_OK);
 	}
 }

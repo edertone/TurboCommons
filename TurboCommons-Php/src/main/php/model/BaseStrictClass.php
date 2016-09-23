@@ -17,7 +17,7 @@ use Exception;
 /**
  * A base class that can be extended to protect created objects from access/read to undefined properties, and all other defensive OOP best practices
  */
-class BaseStrictClass {
+abstract class BaseStrictClass {
 
 
 	/**

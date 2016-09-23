@@ -12,10 +12,76 @@
 namespace org\turbocommons\src\main\php\utils;
 
 
+use org\turbocommons\src\main\php\managers\ValidationManager;
 /**
  * This class contains a collection of methods that are related to the most common http operations.
  */
 class HTTPUtils{
+
+
+	/**
+	 * Test if the specified url exists by trying to connect to it.
+	 * Note that this method freezes the execution until the response is received from the given url so use it carefully.
+	 * Response will be longer for non existing urls cause it will wait till the request timeout completes.
+	 *
+	 * @param string $url An internet address to check
+	 *
+	 * @return boolean True if url exists and is accessible, false if the url could not be accessed.
+	 */
+	public static function urlExists($url){
+
+		if(StringUtils::isEmpty($url)){
+
+			return false;
+		}
+
+		$validationManager = new ValidationManager();
+
+		// Avoid performing an http request if the url is invalid
+		if(!$validationManager->isUrl($url)){
+
+			return false;
+		}
+
+		// Check that curl is available
+		if(!function_exists('curl_init')){
+
+			throw new Exception('HTTPUtils::urlExists: Curl must be enabled');
+		}
+
+		$handle = curl_init($url);
+
+        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($handle, CURLOPT_HEADER, true);
+        curl_setopt($handle, CURLOPT_NOBODY, true);
+        curl_setopt($handle, CURLOPT_USERAGENT, true);
+
+        $headers = curl_exec($handle);
+
+        curl_close($handle);
+
+        if(empty($headers)){
+
+			return false;
+		}
+
+		$headers = explode(PHP_EOL, $headers);
+
+		foreach([404, 405] as $code){
+
+			if (is_numeric($code) and strpos($headers[0], strval($code)) !== false){
+
+				return false;
+			}
+		}
+
+	    return true;
+	}
+
+
+	// TODO - Everything must be reviewed from here **************************************************
+
 
 
 	/**
@@ -41,22 +107,11 @@ class HTTPUtils{
 
 
 	/**
-	 * Get the current page domain, without the htt:// string. For example, if we are on http://test1.domain.com/home/1232, we will get: test1.domain.com.
-	 *
-	 * @return string
-	 */
-	public static function getDomain(){
-
-		return $_SERVER['HTTP_HOST'];
-	}
-
-
-	/**
 	 * Get the current page full url, including 'http://', domain and all the get parameters
 	 *
 	 * @return string
 	 */
-	public static function getFullURL(){
+	public static function getCurrentFullURL(){
 
 		return 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
 	}

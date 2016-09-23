@@ -14,6 +14,7 @@ namespace org\turbocommons\src\test\php\utils;
 use PHPUnit_Framework_TestCase;
 use org\turbocommons\src\main\php\utils\FileSystemUtils;
 use org\turbocommons\src\main\php\utils\SerializationUtils;
+use org\turbocommons\src\main\php\managers\ValidationManager;
 
 
 /**
@@ -25,17 +26,53 @@ class SerializationUtilsTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
-	 * testPropertiesToArray
+	 * testArrayToObject
 	 *
 	 * @return void
 	 */
-	public function testPropertiesToArray(){
+	public function testArrayToObject(){
 
-		$basePath = __DIR__.'/../resources/utils/serializationUtils/propertiesToArray';
+		// TODO
+	}
+
+
+	/**
+	 * testHashMapToClass
+	 *
+	 * @return void
+	 */
+	public function testHashMapToClass(){
+
+		$basePath = __DIR__.'/../resources/utils/serializationUtils/hashMapToClass';
+
+		$validationManager = new ValidationManager();
+
+		// TODO $this->assertTrue(false);
+		//$res = SerializationUtils::hashMapToClass([], new Customer());
+		//$this->assertTrue($validationManager->isEqualTo($res, new CustomerExpected()));
+
+
+		// Test exceptions
+		// TODO $this->assertTrue(SerializationUtils::hashMapToClass(null, null));
+
+	}
+
+
+	/**
+	 * testJavaPropertiesToArray
+	 *
+	 * @return void
+	 */
+	public function testJavaPropertiesToArray(){
+
+
+		// TODO - rename this method to propertiesToHashMap
+
+		$basePath = __DIR__.'/../resources/utils/serializationUtils/javaPropertiesToArray';
 
 		// Test the properties file 1
 		$test = FileSystemUtils::readFile($basePath.'/Test1.properties');
-		$test = SerializationUtils::propertiesToArray($test);
+		$test = SerializationUtils::javaPropertiesToArray($test);
 
 		$this->assertTrue(count($test) == 45);
 		$this->assertTrue($test['period.maintenance.InMillis'] == '86400000');
@@ -54,7 +91,7 @@ class SerializationUtilsTest extends PHPUnit_Framework_TestCase {
 
 		// Test the properties file 2
 		$test = FileSystemUtils::readFile($basePath.'/Test2.properties');
-		$test = SerializationUtils::propertiesToArray($test);
+		$test = SerializationUtils::javaPropertiesToArray($test);
 
 		$this->assertTrue(count($test) == 11);
 		$this->assertTrue($test['Currency_Converter'] == 'Chuyen doi tien te  ');
@@ -68,7 +105,7 @@ class SerializationUtilsTest extends PHPUnit_Framework_TestCase {
 
 		// Test the properties file 3
 		$test = FileSystemUtils::readFile($basePath.'/Test3.properties');
-		$test = SerializationUtils::propertiesToArray($test);
+		$test = SerializationUtils::javaPropertiesToArray($test);
 
 		$this->assertTrue(count($test) == 5);
 		$this->assertTrue($test['website'] == 'http://en.wikipedia.org/');
@@ -79,7 +116,7 @@ class SerializationUtilsTest extends PHPUnit_Framework_TestCase {
 
 		// Test the properties file 4
 		$test = FileSystemUtils::readFile($basePath.'/Test4.properties');
-		$test = SerializationUtils::propertiesToArray($test);
+		$test = SerializationUtils::javaPropertiesToArray($test);
 
 		$this->assertTrue(count($test) == 6);
 		$this->assertTrue($test['key with spaces'] == "This line contains lots ' of \" special # characers \\\\!#'=.::sooo");
@@ -88,6 +125,17 @@ class SerializationUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($test['key\with\slashes'] == 'value');
 		$this->assertTrue($test['multiplebackslashes'] == '\\\\\\value\\\\');
 		$this->assertTrue($test['multiline.backslashes'] == "value\n\n\\value");
+	}
+
+
+	/**
+	 * testJavaPropertiesToObject
+	 *
+	 * @return void
+	 */
+	public function testJavaPropertiesToObject(){
+
+		// TODO
 	}
 }
 

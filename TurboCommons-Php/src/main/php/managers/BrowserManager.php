@@ -40,7 +40,7 @@ class BrowserManager extends BaseSingletonClass{
 	 */
 	public function someMethod(){
 
-		// TODO: Move php code from the old library utils to this manager
+		// TODO: translate existing JS methods and Move php code from the old library utils to this manager
 
 	}
 }

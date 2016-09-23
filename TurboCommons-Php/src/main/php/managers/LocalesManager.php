@@ -239,7 +239,7 @@ class LocalesManager extends BaseSingletonClass{
 
 				$bundleData = FileSystemUtils::readFile($bundlePath);
 
-				$this->_loadedData[$bundle][$locale] = SerializationUtils::propertiesToArray($bundleData);
+				$this->_loadedData[$bundle][$locale] = SerializationUtils::javaPropertiesToArray($bundleData);
 
 				return;
 			}
