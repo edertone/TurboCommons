@@ -278,6 +278,11 @@ QUnit.test("formatPath", function(assert){
 
 		utils.StringUtils.formatPath(['1']);
 	});
+
+	assert.throws(function(){
+
+		utils.StringUtils.formatPath(1);
+	});
 });
 
 

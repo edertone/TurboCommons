@@ -23,6 +23,9 @@ QUnit.test("getKeys", function(assert){
 
 	assert.ok(utils.ArrayUtils.isEqualTo(utils.ObjectUtils.getKeys({}), []));
 	assert.ok(utils.ArrayUtils.isEqualTo(utils.ObjectUtils.getKeys({
+		1 : 1
+	}), ['1']));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.ObjectUtils.getKeys({
 		a : 1
 	}), ['a']));
 	assert.ok(utils.ArrayUtils.isEqualTo(utils.ObjectUtils.getKeys({
@@ -39,9 +42,27 @@ QUnit.test("getKeys", function(assert){
 		c : 3
 	}), ['a', 'b', 'c']));
 
-	// TODO: these tests must fail
-	//assert.ok(utils.ArrayUtils.isEqualTo(utils.ObjectUtils.getKeys(undefined), []));
-	//assert.ok(utils.ArrayUtils.isEqualTo(utils.ObjectUtils.getKeys(null), []));
+	// Test exceptions
+	assert.throws(function(){
+
+		utils.ObjectUtils.getKeys(undefined);
+	});
+
+	assert.throws(function(){
+
+		utils.ObjectUtils.getKeys(null);
+	});
+
+
+	assert.throws(function(){
+
+		utils.ObjectUtils.getKeys([]);
+	});
+
+	assert.throws(function(){
+
+		utils.ObjectUtils.getKeys([1, 2, 3]);
+	});
 });
 
 
@@ -53,14 +74,14 @@ QUnit.test("isEqualTo", function(assert){
 	// Test identic values
 	assert.ok(utils.ObjectUtils.isEqualTo({}, {}));
 	assert.ok(utils.ObjectUtils.isEqualTo({
-		1 : 1
+		hello : 'home'
 	}, {
-		1 : 1
+		hello : 'home'
 	}));
 	assert.ok(utils.ObjectUtils.isEqualTo({
-		hello : 'home'
+		1 : 1
 	}, {
-		hello : 'home'
+		1 : 1
 	}));
 	assert.ok(utils.ObjectUtils.isEqualTo({
 		hello : 'home',
@@ -77,6 +98,19 @@ QUnit.test("isEqualTo", function(assert){
 		hello : 'home',
 		number : 1,
 		array : [1, 2, 3]
+	}));
+	assert.ok(utils.ObjectUtils.isEqualTo({
+		hello : 'home',
+		array : {
+			hello : 'home',
+			number : 1
+		}
+	}, {
+		hello : 'home',
+		array : {
+			hello : 'home',
+			number : 1
+		}
 	}));
 
 	// Test different values	

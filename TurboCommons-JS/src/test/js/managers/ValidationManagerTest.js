@@ -193,7 +193,12 @@ QUnit.test("isUrl", function(assert){
 	// Test non string values throw exceptions
 	assert.throws(function(){
 
-		assert.ok(!validationManager.isUrl([12341]));
+		validationManager.isUrl([12341]);
+	});
+
+	assert.throws(function(){
+
+		validationManager.isUrl(12341);
 	});
 });
 
