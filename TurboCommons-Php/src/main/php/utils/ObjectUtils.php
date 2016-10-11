@@ -13,6 +13,9 @@ namespace org\turbocommons\src\main\php\utils;
 
 
 use org\turbocommons\src\main\php\managers\ValidationManager;
+use Exception;
+
+
 /**
  * Utilities to perform common object operations
  */
@@ -38,10 +41,55 @@ class ObjectUtils {
 
 		foreach($object as $key => $value){
 
-			array_push($res, $key);
+			array_push($res, (string)$key);
 		}
 
 		return $res;
+	}
+
+
+	/**
+	 * Check if two provided objects are identical
+	 *
+	 * @param object $object1 First object to compare
+	 * @param object $object2 Second object to compare
+	 *
+	 * @return boolean true if objects are exactly the same, false if not
+	 */
+	public static function isEqualTo($object1, $object2){
+
+		$validationManager = new ValidationManager();
+
+		// Both provided values must be objects or an exception will be launched
+		if(!$validationManager->isObject($object1) || !$validationManager->isObject($object2)){
+
+			throw new Exception('ObjectUtils->isEqualTo: Provided parameters must be objects');
+		}
+
+		$keys1 = self::getKeys($object1);
+		$keys2 = self::getKeys($object2);
+
+		// Compare keys can save a lot of time
+		if(!ArrayUtils::isEqualTo($keys1, $keys2)){
+
+			return false;
+		}
+
+		// Loop all the keys and verify values are identical
+		$keys1Len = count($keys1);
+
+		for($i = 0; $i < $keys1Len; $i++){
+
+			$o1 = (array)$object1;
+			$o2 = (array)$object2;
+
+			if(!$validationManager->isEqualTo($o1[$keys1[$i]], $o2[$keys2[$i]])){
+
+				return false;
+			}
+		}
+
+		return true;
 	}
 }
 

@@ -43,30 +43,12 @@ class HTTPUtils{
 			return false;
 		}
 
-		// Check that curl is available
-		if(!function_exists('curl_init')){
+		$headers = static::getUrlHeaders($url);
 
-			throw new Exception('HTTPUtils::urlExists: Curl must be enabled');
-		}
-
-		$handle = curl_init($url);
-
-        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($handle, CURLOPT_HEADER, true);
-        curl_setopt($handle, CURLOPT_NOBODY, true);
-        curl_setopt($handle, CURLOPT_USERAGENT, true);
-
-        $headers = curl_exec($handle);
-
-        curl_close($handle);
-
-        if(empty($headers)){
+        if($headers === null){
 
 			return false;
 		}
-
-		$headers = explode(PHP_EOL, $headers);
 
 		foreach([404, 405] as $code){
 
@@ -144,6 +126,42 @@ class HTTPUtils{
 
 		// Do the request and return it's result
 		return file_get_contents($url, false, stream_context_create($context_options));
+	}
+
+
+	/**
+	 * Get the Http headers for a given url.
+	 *
+	 * @param string $url The url that for which we want to get the http headers.
+	 *
+	 * @return array Url headers split by each line as an array element or null if no headers could be found
+	 */
+	public static function getUrlHeaders($url){
+
+		// Check that curl is available
+		if(!function_exists('curl_init')){
+
+			throw new Exception('HTTPUtils::getUrlHeaders: Curl must be enabled');
+		}
+
+		$handle = curl_init($url);
+
+		curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($handle, CURLOPT_HEADER, true);
+		curl_setopt($handle, CURLOPT_NOBODY, true);
+		curl_setopt($handle, CURLOPT_USERAGENT, true);
+
+		$headers = curl_exec($handle);
+
+		curl_close($handle);
+
+		if(empty($headers)){
+
+			return null;
+		}
+
+		return explode(PHP_EOL, $headers);
 	}
 
 

@@ -13,6 +13,9 @@ namespace org\turbocommons\src\test\php\managers;
 
 use org\turbocommons\src\main\php\managers\FilesManager;
 use PHPUnit_Framework_TestCase;
+use Exception;
+use org\turbocommons\src\main\php\managers\ValidationManager;
+use org\turbocommons\src\main\php\utils\ArrayUtils;
 
 
 /**
@@ -120,8 +123,20 @@ class FilesManagerTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(!$filesManager->isDirectoryEmpty($basePath));
 
 		// test that exception happens with non existant folder
-		$this->setExpectedException('Exception');
-		$filesManager->isDirectoryEmpty($basePath.DIRECTORY_SEPARATOR.'asdfwer');
+		try {
+			$filesManager->isDirectoryEmpty($basePath.DIRECTORY_SEPARATOR.'asdfwer');
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
+		try {
+			$filesManager->isDirectoryEmpty(null);
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
+		try {
+			$filesManager->isDirectoryEmpty('etrtert');
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
 	}
 
 
@@ -241,6 +256,171 @@ class FilesManagerTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($filesManager->findUniqueFileName($basePath, 'NewFile.txt', '', '-', true) == '1-NewFile.txt');
 		$this->assertTrue($filesManager->findUniqueFileName($basePath, 'NewFile.txt', 'copy', '-', false) == 'NewFile-copy-2.txt');
 		$this->assertTrue($filesManager->findUniqueFileName($basePath, 'NewFile.txt', 'copy', '-', true) == 'copy-1-NewFile.txt');
+	}
+
+
+	/**
+	 * testCreateDirectory
+	 *
+	 * @return void
+	 */
+	public function testCreateDirectory(){
+
+		$filesManager = FilesManager::getInstance();
+
+		// Create a temporary folder
+		$basePath = $filesManager->createTempDirectory('TurboCommons-Php');
+		$this->assertTrue($filesManager->isDirectoryEmpty($basePath));
+
+		// Test empty and wrong parameters
+		try {
+			$filesManager->createDirectory(null);
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
+		try {
+			$filesManager->createDirectory('');
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
+		try {
+			$filesManager->createDirectory('     ');
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
+		try {
+			$filesManager->createDirectory('234234234');
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
+		try {
+			$filesManager->createDirectory('\345\ertert');
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
+		// Test correct cases
+		$this->assertTrue($filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'test1'));
+		$this->assertTrue($filesManager->isDirectory($basePath.DIRECTORY_SEPARATOR.'test1'));
+
+		$this->assertTrue($filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'1234'));
+		$this->assertTrue($filesManager->isDirectory($basePath.DIRECTORY_SEPARATOR.'1234'));
+
+		$this->assertTrue($filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'-go-'));
+		$this->assertTrue($filesManager->isDirectory($basePath.DIRECTORY_SEPARATOR.'-go-'));
+
+		// Test already existing folders
+		$this->assertTrue(!$filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'test1'));
+		$this->assertTrue(!$filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'1234'));
+		$this->assertTrue(!$filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'-go-'));
+
+		// Test already existing files
+		$filesManager->createFile($basePath.DIRECTORY_SEPARATOR.'3', 'hello baby');
+		try {
+			$filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'3');
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
+		// Test creating recursive folders
+		try {
+			$filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'test55'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'tes5'.DIRECTORY_SEPARATOR.'t5');
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
+		$this->assertTrue($filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'test55'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'tes5'.DIRECTORY_SEPARATOR.'t5', true));
+		$this->assertTrue($filesManager->isDirectory($basePath.DIRECTORY_SEPARATOR.'test55'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'tes5'.DIRECTORY_SEPARATOR.'t5'));
+	}
+
+
+	/**
+	 * testCreateTempDirectory
+	 *
+	 * @return void
+	 */
+	public function testCreateTempDirectory(){
+
+		$filesManager = FilesManager::getInstance();
+
+		// Create a temporary folder
+		$basePath = $filesManager->createTempDirectory('TurboCommons-Php');
+		$this->assertTrue($filesManager->isDirectoryEmpty($basePath));
+		$this->assertTrue(strpos($basePath, 'TurboCommons-Php') !== false);
+
+		// Test wrong parameters
+		try {
+			$filesManager->createTempDirectory(null);
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
+		try {
+			$filesManager->createTempDirectory('');
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
+		try {
+			$filesManager->createTempDirectory([]);
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+	}
+
+
+	/**
+	 * testGetDirectoryList
+	 *
+	 * @return void
+	 */
+	public function testGetDirectoryList(){
+
+		$validationManager = new ValidationManager();
+		$filesManager = FilesManager::getInstance();
+
+		// Create a temporary folder
+		$basePath = $filesManager->createTempDirectory('TurboCommons-Php');
+		$this->assertTrue($filesManager->isDirectoryEmpty($basePath));
+
+		// Create some folders and files
+		$this->assertTrue($filesManager->createFile($basePath.DIRECTORY_SEPARATOR.'file.txt', 'hello baby'));
+		$this->assertTrue($filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'test1'));
+		$this->assertTrue($filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'1234'));
+		$this->assertTrue($filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'-go-'));
+
+		// Check that list is ok
+		$res = $filesManager->getDirectoryList($basePath);
+		$this->assertTrue($validationManager->isArray($res));
+		$this->assertTrue(count($res) == 4);
+		$this->assertTrue(in_array('file.txt', $res));
+		$this->assertTrue(in_array('test1', $res));
+		$this->assertTrue(in_array('1234', $res));
+		$this->assertTrue(in_array('-go-', $res));
+
+		// Check sorted lists
+		$res = $filesManager->getDirectoryList($basePath, 'nameAsc');
+		$this->assertTrue(ArrayUtils::isEqualTo($res, ['-go-', '1234', 'file.txt', 'test1']));
+
+		$res = $filesManager->getDirectoryList($basePath, 'nameDesc');
+		$this->assertTrue(ArrayUtils::isEqualTo($res, ['test1', 'file.txt', '1234', '-go-']));
+
+		//$res = $filesManager->getDirectoryList($basePath, 'mDateAsc');
+		//$this->assertTrue(ArrayUtils::isEqualTo($res, ['file.txt', 'test1', '1234', '-go-']));
+
+		//$res = $filesManager->getDirectoryList($basePath, 'mDateDesc');
+		//$this->assertTrue(ArrayUtils::isEqualTo($res, ['-go-', '1234', 'test1', 'file.txt']));
+
+		// Test wrong parameteres
+		try {
+			$filesManager->getDirectoryList(null);
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
+		try {
+			$filesManager->getDirectoryList('');
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
+		try {
+			$filesManager->getDirectoryList('wrtwrtyeyery');
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
 	}
 
 

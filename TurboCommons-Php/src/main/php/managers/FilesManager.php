@@ -284,40 +284,41 @@ class FilesManager extends BaseSingletonClass{
 	 * @param bool $recursive Allows the creation of nested directories specified in the pathname. Defaults to false.
 	 * @param int $mode Is 0755 by default, which means the widest possible access. Ignored on windows
 	 *
-	 * @return bool Returns true on success or false if the folder already exists (an exception may be also thrown if a file exists with the same name).
+	 * @return bool Returns true on success or false if the folder already exists (an exception may be thrown if a file exists with the same name or folder cannot be created).
 	 */
-	public function createDirectory($path, $recursive = false, $mode = 0755){
+	public function createDirectory($path, $recursive = false){
 
-		// If folder already exists, nothing to do
+		// If folder already exists we won't create it
 		if(is_dir($path)){
 
 			return false;
 		}
 
-		// If folder exists but is a file, we must launch a warning
+		// If specified folder exists as a file, exception will happen
 		if(is_file($path)){
 
-			trigger_error('Specified path <'.$path.'> is an existing file', E_USER_WARNING);
-			return false;
+			throw new Exception('FilesManager->createDirectory: specified path is an existing file '.$path);
 		}
 
 		// Create the requested folder
 		try{
 
-			mkdir($path, $mode, $recursive);
+			mkdir($path, null, $recursive);
 
 		}catch(Exception $e){
 
-			// It is possible that multiple concurrent calls create the same folder. To prevent unwanted warnings for this situation (that in fact is not a problem), we
-			// will check that the folder is still not created. If it exists, another concurrent call created it, so we have no problem with it.
+			// It is possible that multiple concurrent calls create the same folder at the same time.
+			// We will ignore those exceptions cause there's no problen with this situation, the first of the calls creates it and we are ok with it.
+			// But if the folder to create does not exist at the time of catching the exception, we will throw it, cause it will be another kind of error.
 			if(!is_dir($path)){
 
-				trigger_error($e->getMessage(), E_USER_WARNING);
-				return false;
+				throw $e;
 			}
+
+			return false;
 		}
 
-		return chmod($path, $mode);
+		return true;
 	}
 
 
@@ -332,7 +333,7 @@ class FilesManager extends BaseSingletonClass{
 	 * @param string $desiredName A name we want for the new directory to be created. If name is not available, a unique one (based on the given name) will be generated automatically.
 	 * @param boolean $deleteOnExecutionEnd Defines if the generated temp folder must be deleted after the current script execution finishes. Note that when files inside the folder are still used by the app or OS, exceptions or problems may happen, and it is not 100% guaranteed that the folder will be always deleted.
 	 *
-	 * @return string The full path to the newly created temporary directory, including the directory itself. For example: C:\Users\Me\AppData\Local\Temp\MyDesiredName
+	 * @return string The full path to the newly created temporary directory, including the directory itself (without a trailing slash). For example: C:\Users\Me\AppData\Local\Temp\MyDesiredName
 	 */
 	public function createTempDirectory($desiredName, $deleteOnExecutionEnd = true) {
 
@@ -385,6 +386,7 @@ class FilesManager extends BaseSingletonClass{
 
 		// Get all the folder contents
 		$result = [];
+		$sortRes = [];
 
 		if($path != ''){
 
@@ -398,7 +400,7 @@ class FilesManager extends BaseSingletonClass{
 
 						case 'mDateAsc':
 						case 'mDateDesc':
-							$result[$fileInfo->getMTime()] = $fileInfo->getFilename();
+							$sortRes[$fileInfo->getMTime()] = $fileInfo->getFilename();
 							break;
 
 						default:
@@ -421,11 +423,21 @@ class FilesManager extends BaseSingletonClass{
 				break;
 
 			case 'mDateAsc':
-				$result = call_user_func_array('array_merge', ksort($result));
+				ksort($sortRes);
+
+				foreach ($sortRes as $value) {
+
+					array_push($result, $value);
+				}
 				break;
 
 			case 'mDateDesc':
-				$result = call_user_func_array('array_merge', krsort($result));
+				krsort($result);
+
+				foreach ($sortRes as $value) {
+
+					array_push($result, $value);
+				}
 				break;
 		}
 
@@ -592,24 +604,44 @@ class FilesManager extends BaseSingletonClass{
 
 
 	/**
-	 * Read and return a filesystem file contents. Not suitable for big files (More than 5 MB)
+	 * Read and return the content of a file. Not suitable for big files (More than 5 MB) cause the script memory
+	 * may get full and the execution fail
 	 *
-	 * @param string $path The file full or relative path
+	 * Note: Internet urls will be also accepted if $this->acceptUrls is true.
+	 * Reading urls can be a slow process, so use it very carefully
+	 *
+	 * @param string $path An Operating system full or relative path or an internet url containing some file
 	 *
 	 * @return string The file contents (binary or string). If the file is not found or cannot be read, an exception will be thrown.
 	 */
 	public function readFile($path){
 
-		// TODO - this method must accept urls if $this->acceptUrls is true
+		$fileFound = true;
 
 		if(!is_file($path)){
+
+			$fileFound = false;
+
+			if($this->acceptUrls){
+
+				if(HTTPUtils::urlExists($path)){
+
+					if(!ini_get('allow_url_fopen')){
+
+						throw new Exception('FilesManager->readFile: allow_url_fopen flag must be set to TRUE on php.ini');
+					}
+
+					$fileFound = true;
+				}
+			}
+		}
+
+		if(!$fileFound){
 
 			throw new Exception('FilesManager->readFile: File not found - '.$path);
 		}
 
-		$contents = file_get_contents($path, true);
-
-		if($contents === false){
+		if(($contents = file_get_contents($path, true)) === false){
 
 			throw new Exception('FilesManager->readFile: Error reading file - '.$path);
 		}

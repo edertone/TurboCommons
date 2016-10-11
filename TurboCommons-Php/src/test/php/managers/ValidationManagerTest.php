@@ -14,6 +14,7 @@ namespace org\turbocommons\src\test\php\managers;
 use org\turbocommons\src\main\php\managers\ValidationManager;
 use stdClass;
 use PHPUnit_Framework_TestCase;
+use Exception;
 
 
 /**
@@ -208,8 +209,15 @@ class ValidationManagerTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($validationManager->validationStatus === ValidationManager::VALIDATION_OK);
 
 		// Test non string values throw exceptions
-		$this->setExpectedException('Exception');
-		$this->assertTrue(!$validationManager->isUrl([12341]));
+		try {
+			$validationManager->isUrl([12341]);
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
+		try {
+			$validationManager->isUrl(12341);
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
 	}
 
 
@@ -323,8 +331,64 @@ class ValidationManagerTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertTrue($validationManager->validationStatus === ValidationManager::VALIDATION_OK);
 	}
+
+
+	/**
+	 * testIsDate
+	 *
+	 * @return void
+	 */
+	public function testIsDate(){
+
+		// TODO - copy from js
+	}
+
+
+	/**
+	 * testIsMail
+	 *
+	 * @return void
+	 */
+	public function testIsMail(){
+
+		// TODO - copy from js
+	}
+
+
+	/**
+	 * testIsEqualTo
+	 *
+	 * @return void
+	 */
+	public function testIsEqualTo(){
+
+		$validationManager = new ValidationManager();
+
+		$this->assertTrue($validationManager->isEqualTo(null, null));
+		$this->assertTrue($validationManager->isEqualTo('', ''));
+		$this->assertTrue($validationManager->isEqualTo(123, 123));
+		$this->assertTrue($validationManager->isEqualTo(1.56, 1.56));
+		$this->assertTrue($validationManager->isEqualTo([], []));
+		$this->assertTrue($validationManager->isEqualTo('hello', 'hello'));
+		$this->assertTrue($validationManager->isEqualTo(new ValidationManager(), new ValidationManager()));
+		$this->assertTrue($validationManager->isEqualTo([1, 6, 8, 4], [1, 6, 8, 4]));
+
+		$this->assertTrue(!$validationManager->isEqualTo(null, []));
+		$this->assertTrue(!$validationManager->isEqualTo('', 'hello'));
+		$this->assertTrue(!$validationManager->isEqualTo(124, 12454));
+		$this->assertTrue(!$validationManager->isEqualTo(1.45, 1));
+		$this->assertTrue(!$validationManager->isEqualTo([], new stdClass()));
+		$this->assertTrue(!$validationManager->isEqualTo('gobaby', 'hello'));
+		$this->assertTrue(!$validationManager->isEqualTo('hello', new ValidationManager()));
+		$this->assertTrue(!$validationManager->isEqualTo([5, 2, 8, 5], [1, 6, 9, 5]));
+
+		$this->assertTrue(!$validationManager->isEqualTo(((object) [
+				'a' => 1,
+				'b' => 2
+		]), ((object) [
+				'c' => 1,
+				'b' => 3
+		])));
+	}
 }
-
-
-// TODO - Add all missing tests from javascript
 ?>

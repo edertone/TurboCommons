@@ -13,6 +13,7 @@ namespace org\turbocommons\src\test\php\utils;
 
 use PHPUnit_Framework_TestCase;
 use org\turbocommons\src\main\php\utils\StringUtils;
+use Exception;
 
 
 /**
@@ -46,8 +47,10 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(!StringUtils::isEmpty('EMPTY       void   hole    XX', ['EMPTY', 'void', 'hole']));
 
 		// Test non string value gives exception
-		$this->setExpectedException('Exception');
-		StringUtils::isEmpty(123);
+		try {
+			StringUtils::isEmpty(123);
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
 	}
 
 
@@ -96,8 +99,10 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(StringUtils::limitLen('hello dear how are you', 50) === 'hello dear how are you');
 
 		// Test non numeric limit value gives exception
-		$this->setExpectedException('Exception');
-		$this->assertTrue(StringUtils::limitLen('hello', null) === '');
+		try {
+			$this->assertTrue(StringUtils::limitLen('hello', null) === '');
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
 	}
 
 
@@ -251,8 +256,15 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(StringUtils::formatPath('test\\test/hello\\\\') == 'test'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'hello');
 
 		// Test non string paths throw exception
-		$this->setExpectedException('Exception');
-		StringUtils::formatPath(['1']);
+		try {
+			StringUtils::formatPath(['1']);
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
+		try {
+			StringUtils::formatPath(1);
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
 	}
 
 

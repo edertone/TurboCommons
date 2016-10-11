@@ -11,8 +11,10 @@
 
 namespace org\turbocommons\src\main\php\utils;
 
-
 use org\turbocommons\src\main\php\managers\ValidationManager;
+use Exception;
+
+
 /**
  * Utilities to perform common array operations
  */

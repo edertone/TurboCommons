@@ -15,6 +15,7 @@ use PHPUnit_Framework_TestCase;
 use org\turbocommons\src\main\php\utils\ArrayUtils;
 use org\turbocommons\src\main\php\utils\ObjectUtils;
 use stdClass;
+use Exception;
 
 
 /**
@@ -34,6 +35,9 @@ class ObjectUtilsTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertTrue(ArrayUtils::isEqualTo(ObjectUtils::getKeys(new stdClass()), []));
 		$this->assertTrue(ArrayUtils::isEqualTo(ObjectUtils::getKeys(((object) [
+				'1' => 1
+		])), ['1']));
+		$this->assertTrue(ArrayUtils::isEqualTo(ObjectUtils::getKeys(((object) [
 			'a' => 1
 		])), ['a']));
 		$this->assertTrue(ArrayUtils::isEqualTo(ObjectUtils::getKeys(((object) [
@@ -50,9 +54,117 @@ class ObjectUtilsTest extends PHPUnit_Framework_TestCase {
 				'c' => 3
 		])), ['a', 'b', 'c']));
 
+		// Test exceptions
+		try {
+			ObjectUtils::getKeys(null);
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
 
-		// TODO: these tests must fail
-		// $this->assertTrue(ArrayUtils::isEqualTo(ObjectUtils::getKeys(null), []));
+		try {
+			ObjectUtils::getKeys([]);
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
+		try {
+			ObjectUtils::getKeys([1, 2, 3]);
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+	}
+
+
+	/**
+	 * testIsEqualTo
+	 *
+	 * @return void
+	 */
+	public function testIsEqualTo(){
+
+		// Test identic values
+		$this->assertTrue(ObjectUtils::isEqualTo(new stdClass(), new stdClass()));
+		$this->assertTrue(ObjectUtils::isEqualTo(((object) [
+				'hello' => 'home'
+		]), ((object) [
+				'hello' => 'home'
+		])));
+		$this->assertTrue(ObjectUtils::isEqualTo(((object) [
+			'1' => 1
+		]), ((object) [
+			'1' => 1
+		])));
+		$this->assertTrue(ObjectUtils::isEqualTo(((object) [
+				'hello' => 'home',
+				'number' => 1
+		]), ((object) [
+				'hello' => 'home',
+				'number' => 1
+		])));
+		$this->assertTrue(ObjectUtils::isEqualTo(((object) [
+				'hello' => 'home',
+				'number' => 1,
+				'array' => [1, 2, 3]
+		]), ((object) [
+				'hello' => 'home',
+				'number' => 1,
+				'array' => [1, 2, 3]
+		])));
+		$this->assertTrue(ObjectUtils::isEqualTo(((object) [
+				'hello' => 'home',
+				'array' => ((object) [
+						'hello' => 'home',
+						'number' => 1
+				])
+		]), ((object) [
+				'hello' => 'home',
+				'array' => ((object) [
+						'hello' => 'home',
+						'number' => 1
+				])
+		])));
+
+		// Test different values
+		$this->assertTrue(!ObjectUtils::isEqualTo(new stdClass(), ((object) [
+				'1' => 1
+		])));
+		$this->assertTrue(!ObjectUtils::isEqualTo(((object) [
+				'1' => 1
+		]), ((object) [
+				'1' => 2
+		])));
+		$this->assertTrue(!ObjectUtils::isEqualTo(((object) [
+				'hello' => 'guys'
+		]), ((object) [
+				'1' => 2
+		])));
+		$this->assertTrue(!ObjectUtils::isEqualTo(((object) [
+				'hello' => 'guys'
+		]), ((object) [
+				'hell' => 'guys'
+		])));
+		$this->assertTrue(!ObjectUtils::isEqualTo(((object) [
+				'hello' => 'home',
+				'number' => 1,
+				'array' => [1, 3]
+		]), ((object) [
+				'hello' => 'home',
+				'number' => 1,
+				'array' => [1, 2, 3]
+		])));
+
+		// Test exceptions with non objects
+		try {
+			ObjectUtils::isEqualTo(null, null);
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
+		try {
+			ObjectUtils::isEqualTo([], []);
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
+		try {
+			ObjectUtils::isEqualTo("hello", "hello");
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
 	}
 }
 

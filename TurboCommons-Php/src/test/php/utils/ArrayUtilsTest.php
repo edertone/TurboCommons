@@ -11,9 +11,9 @@
 
 namespace org\turbocommons\src\test\php\utils;
 
-use PHPUnit_Framework_TestCase;
 use org\turbocommons\src\main\php\utils\ArrayUtils;
-use org\turbocommons\src\main\php\utils\ObjectUtils;
+use PHPUnit_Framework_TestCase;
+use Exception;
 
 
 /**
@@ -31,8 +31,78 @@ class ArrayUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testIsEqualTo(){
 
-		// TODO - copy from js
+		// Test non array values must launch exception
+		try {
+			ArrayUtils::isEqualTo(null, null);
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
 
+		try {
+			ArrayUtils::isEqualTo(1, 1);
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
+		try {
+			ArrayUtils::isEqualTo("asfasf1", "345345");
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
+		// Test identic arrays
+		$this->assertTrue(ArrayUtils::isEqualTo([null], [null]));
+		$this->assertTrue(ArrayUtils::isEqualTo([], []));
+		$this->assertTrue(ArrayUtils::isEqualTo([[]], [[]]));
+		$this->assertTrue(ArrayUtils::isEqualTo([[1]], [[1]]));
+		$this->assertTrue(ArrayUtils::isEqualTo([1, 2, 3], [1, 2, 3]));
+		$this->assertTrue(ArrayUtils::isEqualTo([1, 2, 1, 2], [1, 2, 1, 2]));
+		$this->assertTrue(ArrayUtils::isEqualTo([1, 2, [3, 4]], [1, 2, [3, 4]]));
+		$this->assertTrue(ArrayUtils::isEqualTo(["hello world"], ["hello world"]));
+
+		// Test different arrays
+		$this->assertTrue(!ArrayUtils::isEqualTo([null], []));
+		$this->assertTrue(!ArrayUtils::isEqualTo([1], ["1"]));
+		$this->assertTrue(!ArrayUtils::isEqualTo([1, 2, 3], [1, 3, 2]));
+		$this->assertTrue(!ArrayUtils::isEqualTo([1, "2,3"], [1, 2, 3]));
+		$this->assertTrue(!ArrayUtils::isEqualTo([1, 2, [3, 4]], [1, 2, [3, 2]]));
+		$this->assertTrue(!ArrayUtils::isEqualTo([1, 2, [3, [4]]], [1, 2, [3, ["4"]]]));
+		$this->assertTrue(!ArrayUtils::isEqualTo(["hello world"], ["hello worl1d"]));
+
+		// Test identic objects
+		$this->assertTrue(ArrayUtils::isEqualTo([(object) [
+				'a' => 1
+		]], [(object) [
+				'a' => 1
+		]]));
+
+		$this->assertTrue(ArrayUtils::isEqualTo([(object) [
+				'a' => 1,
+				'b' => [1, 2, 3],
+				'c' => 'hello'
+		]], [(object) [
+				'a' => 1,
+				'b' => [1, 2, 3],
+				'c' => 'hello'
+		]]));
+
+		// Test different objects
+		$this->assertTrue(!ArrayUtils::isEqualTo([(object) [
+				'a' => 1,
+				'b' => [1, 4, 3],
+				'c' => 'hello'
+		]], [(object) [
+				'a' => 1,
+				'b' => [1, 2, 3],
+				'c' => 'hello'
+		]]));
+	}
+
+	/**
+	 * testRemoveElement
+	 *
+	 * @return void
+	 */
+	public function testRemoveElement(){
+
+		// TODO - Translate from JS
 	}
 }
 

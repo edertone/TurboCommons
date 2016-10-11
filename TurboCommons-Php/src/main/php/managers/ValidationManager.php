@@ -13,6 +13,8 @@ namespace org\turbocommons\src\main\php\managers;
 
 use org\turbocommons\src\main\php\model\BaseStrictClass;
 use org\turbocommons\src\main\php\utils\StringUtils;
+use org\turbocommons\src\main\php\utils\ArrayUtils;
+use org\turbocommons\src\main\php\utils\ObjectUtils;
 
 
 /**
@@ -260,11 +262,45 @@ class ValidationManager extends BaseStrictClass{
 
 
 	/**
-	 * TODO - translate from JS
+	 * Validation will fail if specified elements are not identical.
+	 *
+	 * @param  object $value First of the two objects to compare. Almost any type can be provided: ints, strings, arrays...
+	 * @param object $value2 Second of the two objects to compare. Almost any type can be provided: ints, strings, arrays...
+	 * @param string $errorMessage The error message that will be generated if validation fails
+	 * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
+	 *
+	 * @return boolean False in case the validation fails or true if validation succeeds.
 	 */
-	public function isEqualTo(){
+	public function isEqualTo($value, $value2, $errorMessage = '', $isWarning = false){
 
-		// TODO - translate from JS
+		// Set optional parameters default values
+		$errorMessage = (StringUtils::isEmpty($errorMessage)) ? 'values are not equal' : $errorMessage;
+
+		$validationManager = new ValidationManager();
+
+		$res = $errorMessage;
+
+		// Compare elements depending on its type
+		if($validationManager->isArray($value) && $validationManager->isArray($value2)){
+
+			$res = ArrayUtils::isEqualTo($value, $value2) ? '' : $res;
+
+		}else{
+
+			if($validationManager->isObject($value) && $validationManager->isObject($value2)){
+
+				$res = ObjectUtils::isEqualTo($value, $value2) ? '' : $res;
+
+			}else{
+
+				if($value === $value2){
+
+					$res = '';
+				}
+			}
+		}
+
+		return $this->_updateValidationStatus($res, $isWarning);
 	}
 
 

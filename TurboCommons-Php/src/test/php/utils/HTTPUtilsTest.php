@@ -11,8 +11,44 @@
 
 namespace org\turbocommons\src\test\php\utils;
 
-use PHPUnit_Framework_TestCase;
 use org\turbocommons\src\main\php\utils\HTTPUtils;
+use PHPUnit_Framework_TestCase;
+use Exception;
+
+
+/**
+ * MOCK class to prevent real url http calls
+ */
+class HTTPUtilsMocked extends HTTPUtils{
+
+
+	/**
+	 * Overrides original method so it mocks internet addresses calls
+	 *
+	 * @param string $url an url
+	 *
+	 * @return array mocked values
+	 */
+	public static function getUrlHeaders($url){
+
+		switch ($url){
+
+			case 'http://facebook.com':
+				return ['200'];
+				break;
+
+			case 'http://google.com':
+				return ['200'];
+				break;
+
+			case 'https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js':
+				return ['200'];
+				break;
+		}
+
+		return ['404'];
+	}
+}
 
 
 /**
@@ -31,20 +67,27 @@ class HTTPUtilsTest extends PHPUnit_Framework_TestCase {
 	public function testUrlExists(){
 
 		// Invalid urls
-		$this->assertTrue(!HTTPUtils::urlExists(null));
-		$this->assertTrue(!HTTPUtils::urlExists(''));
-		$this->assertTrue(!HTTPUtils::urlExists('         '));
-		$this->assertTrue(!HTTPUtils::urlExists('dsgsdfgdfg'));
-		$this->assertTrue(!HTTPUtils::urlExists('http://ertwertert.com/er3453566767terter.pdf'));
+		$this->assertTrue(!HTTPUtilsMocked::urlExists(null));
+		$this->assertTrue(!HTTPUtilsMocked::urlExists(''));
+		$this->assertTrue(!HTTPUtilsMocked::urlExists('         '));
+		$this->assertTrue(!HTTPUtilsMocked::urlExists('dsgsdfgdfg'));
+		$this->assertTrue(!HTTPUtilsMocked::urlExists('http://ertwertert.com/er3453566767terter.pdf'));
 
 		// Valid urls
-		$this->assertTrue(HTTPUtils::urlExists('http://facebook.com'), 'Could not load url. Internet connection must be available');
-		$this->assertTrue(HTTPUtils::urlExists('http://google.com'), 'Could not load url. Internet connection must be available');
-		$this->assertTrue(HTTPUtils::urlExists('https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'), 'Could not load url. Internet connection must be available');
+		$this->assertTrue(HTTPUtilsMocked::urlExists('http://facebook.com'));
+		$this->assertTrue(HTTPUtilsMocked::urlExists('http://google.com'));
+		$this->assertTrue(HTTPUtilsMocked::urlExists('https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'));
 
 		// Test non string value gives exception
-		$this->setExpectedException('Exception');
-		HTTPUtils::urlExists(123);
+		try {
+			HTTPUtilsMocked::urlExists(123);
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
+		try {
+			HTTPUtilsMocked::urlExists([]);
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
 	}
 
 	// TODO - add all missing tests

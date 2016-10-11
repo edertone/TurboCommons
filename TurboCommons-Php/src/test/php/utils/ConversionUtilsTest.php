@@ -13,6 +13,8 @@ namespace org\turbocommons\src\test\php\utils;
 
 use PHPUnit_Framework_TestCase;
 use org\turbocommons\src\main\php\utils\ConversionUtils;
+use org\turbocommons\src\main\php\managers\ValidationManager;
+use Exception;
 
 
 /**
@@ -45,10 +47,20 @@ class ConversionUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(ConversionUtils::stringToBase64('AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz') === 'QWFCYkNjRGRFZUZmR2dIaElpSmpLa0xsTW1Obk9vUHBRcVJyU3NUdFV1VnZXd1h4WXlaeg==');
 
 		// Try some wrong values
-		$this->setExpectedException('Exception');
-		ConversionUtils::stringToBase64([]);
+		try {
+			ConversionUtils::stringToBase64([]);
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
 
-		// No more values are tested 'cause only a single exception can be tested inside a method
+		try {
+			ConversionUtils::stringToBase64(98345);
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
+		try {
+			ConversionUtils::stringToBase64(new ValidationManager());
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
 	}
 
 
@@ -79,10 +91,20 @@ class ConversionUtilsTest extends PHPUnit_Framework_TestCase {
 		}
 
 		// Try some wrong values
-		$this->setExpectedException('Exception');
-		ConversionUtils::base64ToString([]);
+		try {
+			ConversionUtils::base64ToString([]);
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
 
-		// No more values are tested 'cause only a single exception can be tested inside a method
+		try {
+			ConversionUtils::base64ToString(98345);
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
+
+		try {
+			ConversionUtils::base64ToString(new ValidationManager());
+			$this->fail('Expected exception');
+		} catch (Exception $e) {}
 	}
 }
 
