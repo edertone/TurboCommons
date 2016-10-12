@@ -53,4 +53,4 @@ Coming soon, you will be able to download the JS and PHP versions of the library
 The official site http://turbocommons.org is under development. Here you'll find examples, tutorials, and tons of documentation for all the library classes and methods. Stay tuned!
 
 ### Support or Contact
-We will be really pleased to receive any help, support and comments!
+We will be really pleased to receive any help, support, comments, and donations to help us improve this library.
