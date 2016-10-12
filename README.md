@@ -48,5 +48,9 @@ Coming soon, you will be able to download the JS and PHP versions of the library
 
 - Php: A phar file containing all you need to start using the library
 
+### Coming soon
+
+The official site turbocommons.org is under development. Here you'll find examples, tutorials, and tons of documentation for all the library classes and methods. Stay tuned!
+
 ### Support or Contact
 We will be really pleased to receive any help, support and comments!
