@@ -4,7 +4,7 @@ Devs around the world do the same things every day, but with different languages
 So why should they learn new ways of doing the same thing every time they switch?
 Wouldn't it be nice to perform the same tasks exactly the same way, no matter the language?
 
-At the end, reading a file, validating an email addres, counting the words in a string... is done the same way on all languages. So why not create a global library that does it exactly the same way on any language?
+At the end, reading a file, validating an email addres, counting the words in a string... is done the same way on all languages. So why not create a global library that does it exactly the same way on any language? And that is heavily unit tested, to guarantee that it does what it says?
 
 ### Introducing Turbo Commons!
  
