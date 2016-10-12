@@ -19,16 +19,22 @@ If we want to create a library that does this magic, we must be really strict. T
  
 - A class, method or utility that is defined on the library must solve a generic problem that can be implemented on any programming language.
 
-- Any function that is defined on the library must give exactly the same result for a given set of parameters, no matter in which language is coded. This is really important, and to make sure this is true as possible we code the same exact unit tests for all the classes and methods for all the different languages in which the library is coded.
+- Any function that is defined on the library must give exactly the same result for a given set of parameters, no matter in which language is coded. This is really important, and to make sure this is as true as possible we code the same exact unit tests for all the classes and methods for all the different languages.
 
 - As said before, but to make it clear: Any class or method that is coded in any language for this library must give the exact same results on the same exact unit tests.
 
-- All methods on the library must be translated from one language to another, so they keep the same structure as closely as possible.
+- All methods on the library must be translated from one language to another, and try to keep the same structure when possible.
 	
 ### How many languages does it support	 
-Currently, turbocommons is written in php and javascript, but we want to port it to as many languages as possible. There's an early pre alpha java version too.
+Currently, TurboCommons is written in php and javascript, but we want to port it to as many languages as possible. There's an early pre alpha java version too.
 
 So if you want to translate the library to your language of choice, please contact us and help us build the most standard cross language development library in the world! We're starting so we need your help to port this library to as many languages as possible, and more important, we need to code the same unit tests across the different languages.
+
+### Does it really help?
+
+We are 100% active users of the library, and we can tell you, it really helps! nowadays, everybody works with more than one languages on an average development project. This library helps a lot to have a uniform project and code.
+
+For example: Isn't it wonderful that you serialize an object or class in php, and de-serialize it again in JS? cross language serialization? YEAH! Just a small taste of all the things that can be done when your code works the same on all your project layers.
 
 ### Current state
 The library is currently in an alpha state, so it is possible that lots of things change, but even now contains lots of useful code and solutions to multiple day to day development tasks. 
