@@ -43,10 +43,7 @@ We are 100% active users of the library, and we can tell you it really helps! No
 
 For example: You can serialize an object or class in php, and de-serialize it again in JS, to get exactly the same information. Cross language serialization? YEAH! Just a small taste of all the things that can be done when your code works the same on all your different project layers.
 
-### Current state
-The library is currently in an alpha state, so it is possible that lots of things change, but even now it contains lots of useful code and solutions to multiple day to day development tasks.
-
-For example: do you know that the 'isUrl' method on the library ValidationManager class works exactly the same in JS and PHP? Or that you can call 'removeAccents' on the StringUtils class and have exactly the same result on PHP and JS? Yes, right now it works.
+Learn once, code forever
 
 ### Documentation
 - Javascript: http://turbocommons.org/resources/shared/html/doc-js
@@ -65,5 +62,7 @@ The main goal for this library is to have zero dependencies, but sometimes this 
 ### Coming soon
 The official site http://turbocommons.org is under development. Here you'll find examples, tutorials, and tons of documentation for all the library classes and methods. Stay tuned!
 
-### Support or Contact
-We will be really pleased to receive any help, support, comments, and donations to help us improve this library.
+### Support
+Turbo Commons is 100% free and open source. But we will be really pleased to receive any help, support, comments or donations to help us improve this library. If you like it, spread the word!
+
+[![Donate](http://turbocommons.org/resources/shared/images/DonateButton.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=53MJ6SY66WZZ2&lc=ES&item_name=TurboCommons&no_note=0&cn=A%c3%b1adir%20instrucciones%20especiales%20para%20el%20vendedor%3a&no_shipping=2&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
