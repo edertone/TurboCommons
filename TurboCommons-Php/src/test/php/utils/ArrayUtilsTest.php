@@ -32,20 +32,27 @@ class ArrayUtilsTest extends PHPUnit_Framework_TestCase {
 	public function testIsEqualTo(){
 
 		// Test non array values must launch exception
+		$exceptionMessage = '';
+
 		try {
 			ArrayUtils::isEqualTo(null, null);
-			$this->fail('Expected exception');
+			$exceptionMessage = 'null did not cause exception';
 		} catch (Exception $e) {}
 
 		try {
 			ArrayUtils::isEqualTo(1, 1);
-			$this->fail('Expected exception');
+			$exceptionMessage = '1 did not cause exception';
 		} catch (Exception $e) {}
 
 		try {
 			ArrayUtils::isEqualTo("asfasf1", "345345");
-			$this->fail('Expected exception');
+			$exceptionMessage = 'asfasf1 did not cause exception';
 		} catch (Exception $e) {}
+
+		if($exceptionMessage != ''){
+
+			$this->fail($exceptionMessage);
+		}
 
 		// Test identic arrays
 		$this->assertTrue(ArrayUtils::isEqualTo([null], [null]));

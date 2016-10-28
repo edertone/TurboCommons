@@ -55,20 +55,27 @@ class ObjectUtilsTest extends PHPUnit_Framework_TestCase {
 		])), ['a', 'b', 'c']));
 
 		// Test exceptions
+		$exceptionMessage = '';
+
 		try {
 			ObjectUtils::getKeys(null);
-			$this->fail('Expected exception');
+			$exceptionMessage = 'null did not cause exception';
 		} catch (Exception $e) {}
 
 		try {
 			ObjectUtils::getKeys([]);
-			$this->fail('Expected exception');
+			$exceptionMessage = '[] did not cause exception';
 		} catch (Exception $e) {}
 
 		try {
 			ObjectUtils::getKeys([1, 2, 3]);
-			$this->fail('Expected exception');
+			$exceptionMessage = '[1, 2, 3] did not cause exception';
 		} catch (Exception $e) {}
+
+		if($exceptionMessage != ''){
+
+			$this->fail($exceptionMessage);
+		}
 	}
 
 
@@ -151,20 +158,27 @@ class ObjectUtilsTest extends PHPUnit_Framework_TestCase {
 		])));
 
 		// Test exceptions with non objects
+		$exceptionMessage = '';
+
 		try {
 			ObjectUtils::isEqualTo(null, null);
-			$this->fail('Expected exception');
+			$exceptionMessage = 'null did not cause exception';
 		} catch (Exception $e) {}
 
 		try {
 			ObjectUtils::isEqualTo([], []);
-			$this->fail('Expected exception');
+			$exceptionMessage = '[] did not cause exception';
 		} catch (Exception $e) {}
 
 		try {
 			ObjectUtils::isEqualTo("hello", "hello");
-			$this->fail('Expected exception');
+			$exceptionMessage = 'hello did not cause exception';
 		} catch (Exception $e) {}
+
+		if($exceptionMessage != ''){
+
+			$this->fail($exceptionMessage);
+		}
 	}
 }
 

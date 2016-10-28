@@ -209,15 +209,22 @@ class ValidationManagerTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($validationManager->validationStatus === ValidationManager::VALIDATION_OK);
 
 		// Test non string values throw exceptions
+		$exceptionMessage = '';
+
 		try {
 			$validationManager->isUrl([12341]);
-			$this->fail('Expected exception');
+			$exceptionMessage = '[12341] did not cause exception';
 		} catch (Exception $e) {}
 
 		try {
 			$validationManager->isUrl(12341);
-			$this->fail('Expected exception');
+			$exceptionMessage = '12341 did not cause exception';
 		} catch (Exception $e) {}
+
+		if($exceptionMessage != ''){
+
+			$this->fail($exceptionMessage);
+		}
 	}
 
 

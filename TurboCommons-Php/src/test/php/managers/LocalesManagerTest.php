@@ -70,10 +70,17 @@ class LocalesManagerTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($localesManager->pathStructure === ['$locale/$bundle.properties']);
 
 		// Test tag that is missing everywhere
+		$exceptionMessage = '';
+
 		try {
 			$localesManager->get('NOT_TO_BE_FOUND', 'Locales');
-			$this->fail('Expected exception');
+			$exceptionMessage = 'locale not found did not cause exception';
 		} catch (Exception $e) {}
+
+		if($exceptionMessage != ''){
+
+			$this->fail($exceptionMessage);
+		}
 	}
 }
 

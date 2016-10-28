@@ -70,6 +70,7 @@ class HTTPUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(!HTTPUtilsMocked::urlExists(null));
 		$this->assertTrue(!HTTPUtilsMocked::urlExists(''));
 		$this->assertTrue(!HTTPUtilsMocked::urlExists('         '));
+		$this->assertTrue(!HTTPUtilsMocked::urlExists([]));
 		$this->assertTrue(!HTTPUtilsMocked::urlExists('dsgsdfgdfg'));
 		$this->assertTrue(!HTTPUtilsMocked::urlExists('http://ertwertert.com/er3453566767terter.pdf'));
 
@@ -79,15 +80,17 @@ class HTTPUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(HTTPUtilsMocked::urlExists('https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'));
 
 		// Test non string value gives exception
-		try {
-			HTTPUtilsMocked::urlExists(123);
-			$this->fail('Expected exception');
-		} catch (Exception $e) {}
+		$exceptionMessage = '';
 
 		try {
-			HTTPUtilsMocked::urlExists([]);
-			$this->fail('Expected exception');
+			HTTPUtilsMocked::urlExists(123);
+			$exceptionMessage = '123 did not cause exception';
 		} catch (Exception $e) {}
+
+		if($exceptionMessage != ''){
+
+			$this->fail($exceptionMessage);
+		}
 	}
 
 	// TODO - add all missing tests

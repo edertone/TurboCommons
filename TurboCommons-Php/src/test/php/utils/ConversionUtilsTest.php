@@ -47,20 +47,27 @@ class ConversionUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(ConversionUtils::stringToBase64('AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz') === 'QWFCYkNjRGRFZUZmR2dIaElpSmpLa0xsTW1Obk9vUHBRcVJyU3NUdFV1VnZXd1h4WXlaeg==');
 
 		// Try some wrong values
+		$exceptionMessage = '';
+
 		try {
 			ConversionUtils::stringToBase64([]);
-			$this->fail('Expected exception');
+			$exceptionMessage = '[] did not cause exception';
 		} catch (Exception $e) {}
 
 		try {
 			ConversionUtils::stringToBase64(98345);
-			$this->fail('Expected exception');
+			$exceptionMessage = '98345 did not cause exception';
 		} catch (Exception $e) {}
 
 		try {
 			ConversionUtils::stringToBase64(new ValidationManager());
-			$this->fail('Expected exception');
+			$exceptionMessage = 'ValidationManager did not cause exception';
 		} catch (Exception $e) {}
+
+		if($exceptionMessage != ''){
+
+			$this->fail($exceptionMessage);
+		}
 	}
 
 
@@ -91,20 +98,27 @@ class ConversionUtilsTest extends PHPUnit_Framework_TestCase {
 		}
 
 		// Try some wrong values
+		$exceptionMessage = '';
+
 		try {
 			ConversionUtils::base64ToString([]);
-			$this->fail('Expected exception');
+			$exceptionMessage = '[] did not cause exception';
 		} catch (Exception $e) {}
 
 		try {
 			ConversionUtils::base64ToString(98345);
-			$this->fail('Expected exception');
+			$exceptionMessage = '98345 did not cause exception';
 		} catch (Exception $e) {}
 
 		try {
 			ConversionUtils::base64ToString(new ValidationManager());
-			$this->fail('Expected exception');
+			$exceptionMessage = 'ValidationManager did not cause exception';
 		} catch (Exception $e) {}
+
+		if($exceptionMessage != ''){
+
+			$this->fail($exceptionMessage);
+		}
 	}
 }
 

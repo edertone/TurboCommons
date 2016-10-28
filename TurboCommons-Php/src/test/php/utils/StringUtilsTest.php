@@ -47,10 +47,17 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(!StringUtils::isEmpty('EMPTY       void   hole    XX', ['EMPTY', 'void', 'hole']));
 
 		// Test non string value gives exception
+		$exceptionMessage = '';
+
 		try {
 			StringUtils::isEmpty(123);
-			$this->fail('Expected exception');
+			$exceptionMessage = '123 did not cause exception';
 		} catch (Exception $e) {}
+
+		if($exceptionMessage != ''){
+
+			$this->fail($exceptionMessage);
+		}
 	}
 
 
@@ -99,10 +106,17 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(StringUtils::limitLen('hello dear how are you', 50) === 'hello dear how are you');
 
 		// Test non numeric limit value gives exception
+		$exceptionMessage = '';
+
 		try {
 			$this->assertTrue(StringUtils::limitLen('hello', null) === '');
-			$this->fail('Expected exception');
+			$exceptionMessage = 'hello did not cause exception';
 		} catch (Exception $e) {}
+
+		if($exceptionMessage != ''){
+
+			$this->fail($exceptionMessage);
+		}
 	}
 
 
@@ -256,15 +270,22 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(StringUtils::formatPath('test\\test/hello\\\\') == 'test'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'hello');
 
 		// Test non string paths throw exception
+		$exceptionMessage = '';
+
 		try {
 			StringUtils::formatPath(['1']);
-			$this->fail('Expected exception');
+			$exceptionMessage = '[1] did not cause exception';
 		} catch (Exception $e) {}
 
 		try {
 			StringUtils::formatPath(1);
-			$this->fail('Expected exception');
+			$exceptionMessage = '1 did not cause exception';
 		} catch (Exception $e) {}
+
+		if($exceptionMessage != ''){
+
+			$this->fail($exceptionMessage);
+		}
 	}
 
 
