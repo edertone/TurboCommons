@@ -41,7 +41,7 @@ class FTPManager extends BaseStrictClass {
 	 * @param int $port This parameter specifies an alternate port to connect to. If it is omitted or set to zero, then the default FTP port, 21, will be used.
 	 * @param int $timeout This parameter specifies the timeout for all subsequent network operations. If omitted, the default value is 90 seconds. The timeout can be changed and queried at any time
 	 */
-	public function FTPManager($userName, $psw, $host, $port = null, $timeout = 90){
+	public function __construct($userName, $psw, $host, $port = null, $timeout = 90){
 
 		// Initialize and store the ftp connection
 		$this->_connectionId = ftp_connect($host, $port, $timeout);
