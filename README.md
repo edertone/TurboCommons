@@ -3,7 +3,7 @@ Devs around the world do the same things every day with different languages. The
 
 ¿Why must they learn new ways of doing the same thing every time they move to a new language?
 
-Reading a file, validating an email addres, counting the words in a string... we do it more or less the same way on all languages. So why not create a global library that does it exactly the same way on all languages? A library that is heavily unit tested to guarantee that it really delivers the promise?
+Reading a file, validating an email addres, counting the words in a string... we do it more or less the same way on all languages. So why not create a global library that does it exactly the same way on all languages? A library that has the same class and function names, the same variables, the same namespaces and delivers exactly the same behaviour on any language?
 
 ### Introducing Turbo Commons!
 TurboCommons tries to standarize all those common operations so they are performed the same way across all possible languages. There's a set of well known common problems, with a set of well known common solutions that are the same for all the programming languages in the world. Our goal is that any developer who knows this library can start doing the same things with JS, Java or C# without having to learn something new. In brief, make our coding lifes easier!
