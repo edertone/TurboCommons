@@ -775,11 +775,14 @@
 	<!-- Generate the release version phars -->
 	<target name="createPharsRelease">
 
+		<!--Define the contents for the stub file that will be autoexecuted when the phar file is included -->
+		<property name="phpStubFileRelease" value="&lt;?php Phar::mapPhar(); include \'phar://${projectBaseName}-${Build.versionNumber}.${build.number}.phar/php/AutoLoader.php\'; __HALT_COMPILER(); ?>"/>
+				
 		<!-- Create the phar using the current project name and version -->
 		<exec executable="${Tools.phpPath}" failonerror="true">
 			<arg value="-d display_errors" />
 			<arg value="-r" />
-			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/${projectBaseName}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}-${Build.versionNumber}.${build.number}.phar'); $p->startBuffering(); $p->setStub('${phpStubFile}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main'); $p->compressFiles(Phar::GZ); $p->stopBuffering();" />
+			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/${projectBaseName}-${Build.versionNumber}.${build.number}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}-${Build.versionNumber}.${build.number}.phar'); $p->startBuffering(); $p->setStub('${phpStubFileRelease}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main'); $p->compressFiles(Phar::GZ); $p->stopBuffering();" />
 		</exec>
 			
 	</target>

@@ -8,5 +8,6 @@ suspend=false
 vals/org.eclipse.php.core.org.eclipse.php.core.PHPTaskValidator/groups=0107include01111contentType130org.eclipse.php.core.phpsourceT0107exclude0104file07target/F03
 vals/org.eclipse.php.ui.HTMLValidatorForPHP/groups=0107include01111contentType130org.eclipse.php.core.phpsourceT0107exclude0104file07target/F03
 vals/org.eclipse.wst.html.core.HTMLValidator/groups=0107include06111contentType136org.eclipse.wst.html.core.htmlsourceT07fileext04htmlF07fileext05xhtmlF07fileext03htmF07fileext04htplF07fileext03wmlF0107exclude0104file07target/F03
+vals/org.eclipse.wst.jsdt.core.JsValidator/groups=0107include01113projectNature134org.eclipse.wst.jsdt.core.jsNature0107include02111contentType134org.eclipse.wst.jsdt.core.jsSourceT07fileext02jsF0107exclude0104file07target/F01
 vals/org.phpsrc.eclipse.pti.tools.codesniffer.CodeSnifferValidatorForPHP/groups=0107include01111contentType130org.eclipse.php.core.phpsourceT0107exclude0404file07target/F0304file117src/main/php/libsF0204file118src/main/resourcesF0204file117src/test/php/libsF02
 vf.version=3
