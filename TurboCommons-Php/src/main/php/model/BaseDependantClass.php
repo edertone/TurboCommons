@@ -30,7 +30,7 @@ abstract class BaseDependantClass extends BaseStrictClass {
 	/**
 	 * Class constructor initializes required objects
 	 */
-	function __construct() {
+	public function __construct() {
 
 		$this->_reflectionClass = new ReflectionClass($this);
 	}

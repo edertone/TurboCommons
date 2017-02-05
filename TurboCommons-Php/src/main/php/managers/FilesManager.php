@@ -282,7 +282,6 @@ class FilesManager extends BaseSingletonClass{
 	 *
 	 * @param string $path The full path to the directoy we want to create
 	 * @param bool $recursive Allows the creation of nested directories specified in the pathname. Defaults to false.
-	 * @param int $mode Is 0755 by default, which means the widest possible access. Ignored on windows
 	 *
 	 * @return bool Returns true on success or false if the folder already exists (an exception may be thrown if a file exists with the same name or folder cannot be created).
 	 */
