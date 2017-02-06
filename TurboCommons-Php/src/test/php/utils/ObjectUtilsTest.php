@@ -60,17 +60,23 @@ class ObjectUtilsTest extends PHPUnit_Framework_TestCase {
 		try {
 			ObjectUtils::getKeys(null);
 			$exceptionMessage = 'null did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		try {
 			ObjectUtils::getKeys([]);
 			$exceptionMessage = '[] did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		try {
 			ObjectUtils::getKeys([1, 2, 3]);
 			$exceptionMessage = '[1, 2, 3] did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		if($exceptionMessage != ''){
 
@@ -163,17 +169,23 @@ class ObjectUtilsTest extends PHPUnit_Framework_TestCase {
 		try {
 			ObjectUtils::isEqualTo(null, null);
 			$exceptionMessage = 'null did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		try {
 			ObjectUtils::isEqualTo([], []);
 			$exceptionMessage = '[] did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		try {
-			ObjectUtils::isEqualTo("hello", "hello");
+			ObjectUtils::isEqualTo('hello', 'hello');
 			$exceptionMessage = 'hello did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		if($exceptionMessage != ''){
 

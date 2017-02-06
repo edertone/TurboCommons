@@ -128,17 +128,23 @@ class FilesManagerTest extends PHPUnit_Framework_TestCase {
 		try {
 			$filesManager->isDirectoryEmpty($basePath.DIRECTORY_SEPARATOR.'asdfwer');
 			$exceptionMessage = 'asdfwer did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		try {
 			$filesManager->isDirectoryEmpty(null);
 			$exceptionMessage = 'Null did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		try {
 			$filesManager->isDirectoryEmpty('etrtert');
 			$exceptionMessage = 'etrtert did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		if($exceptionMessage != ''){
 
@@ -285,22 +291,30 @@ class FilesManagerTest extends PHPUnit_Framework_TestCase {
 		try {
 			$filesManager->createDirectory(null);
 			$exceptionMessage = 'Null did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		try {
 			$filesManager->createDirectory('');
 			$exceptionMessage = '"" did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		try {
 			$filesManager->createDirectory('     ');
 			$exceptionMessage = '"     " did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		try {
 			$filesManager->createDirectory('\345\ertert');
 			$exceptionMessage = '\345\ertert did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		// Test correct cases
 		$this->assertTrue($filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'test1'));
@@ -322,13 +336,17 @@ class FilesManagerTest extends PHPUnit_Framework_TestCase {
 		try {
 			$filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'3');
 			$exceptionMessage = 'basepath did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		// Test creating recursive folders
 		try {
 			$filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'test55'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'tes5'.DIRECTORY_SEPARATOR.'t5');
 			$exceptionMessage = 'test55 did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		$this->assertTrue($filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'test55'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'tes5'.DIRECTORY_SEPARATOR.'t5', true));
 		$this->assertTrue($filesManager->isDirectory($basePath.DIRECTORY_SEPARATOR.'test55'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'tes5'.DIRECTORY_SEPARATOR.'t5'));
@@ -368,7 +386,9 @@ class FilesManagerTest extends PHPUnit_Framework_TestCase {
 		try {
 			$filesManager->createTempDirectory([]);
 			$exceptionMessage = '[] did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		if($exceptionMessage != ''){
 
@@ -425,17 +445,23 @@ class FilesManagerTest extends PHPUnit_Framework_TestCase {
 		try {
 			$filesManager->getDirectoryList(null);
 			$exceptionMessage = 'null did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		try {
 			$filesManager->getDirectoryList('');
 			$exceptionMessage = '"" did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		try {
 			$filesManager->getDirectoryList('wrtwrtyeyery');
 			$exceptionMessage = 'wrtwrtyeyery did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		if($exceptionMessage != ''){
 

@@ -11,44 +11,10 @@
 
 namespace org\turbocommons\src\test\php\utils;
 
+use Exception;
 use org\turbocommons\src\main\php\utils\HTTPUtils;
 use PHPUnit_Framework_TestCase;
-use Exception;
-
-
-/**
- * MOCK class to prevent real url http calls
- */
-class HTTPUtilsMocked extends HTTPUtils{
-
-
-	/**
-	 * Overrides original method so it mocks internet addresses calls
-	 *
-	 * @param string $url an url
-	 *
-	 * @return array mocked values
-	 */
-	public static function getUrlHeaders($url){
-
-		switch ($url){
-
-			case 'http://facebook.com':
-				return ['200'];
-				break;
-
-			case 'http://google.com':
-				return ['200'];
-				break;
-
-			case 'https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js':
-				return ['200'];
-				break;
-		}
-
-		return ['404'];
-	}
-}
+use org\turbocommons\src\test\php\resources\utils\httpUtils\HTTPUtilsMocked;
 
 
 /**
@@ -85,7 +51,9 @@ class HTTPUtilsTest extends PHPUnit_Framework_TestCase {
 		try {
 			HTTPUtilsMocked::urlExists(123);
 			$exceptionMessage = '123 did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		if($exceptionMessage != ''){
 

@@ -75,7 +75,9 @@ class LocalesManagerTest extends PHPUnit_Framework_TestCase {
 		try {
 			$localesManager->get('NOT_TO_BE_FOUND', 'Locales');
 			$exceptionMessage = 'locale not found did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		if($exceptionMessage != ''){
 

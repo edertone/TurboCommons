@@ -52,17 +52,23 @@ class ConversionUtilsTest extends PHPUnit_Framework_TestCase {
 		try {
 			ConversionUtils::stringToBase64([]);
 			$exceptionMessage = '[] did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		try {
 			ConversionUtils::stringToBase64(98345);
 			$exceptionMessage = '98345 did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		try {
 			ConversionUtils::stringToBase64(new ValidationManager());
 			$exceptionMessage = 'ValidationManager did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		if($exceptionMessage != ''){
 
@@ -103,17 +109,23 @@ class ConversionUtilsTest extends PHPUnit_Framework_TestCase {
 		try {
 			ConversionUtils::base64ToString([]);
 			$exceptionMessage = '[] did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		try {
 			ConversionUtils::base64ToString(98345);
 			$exceptionMessage = '98345 did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		try {
 			ConversionUtils::base64ToString(new ValidationManager());
 			$exceptionMessage = 'ValidationManager did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		if($exceptionMessage != ''){
 

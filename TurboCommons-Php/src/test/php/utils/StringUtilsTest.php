@@ -52,7 +52,9 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		try {
 			StringUtils::isEmpty(123);
 			$exceptionMessage = '123 did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		if($exceptionMessage != ''){
 
@@ -111,7 +113,9 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		try {
 			$this->assertTrue(StringUtils::limitLen('hello', null) === '');
 			$exceptionMessage = 'hello did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		if($exceptionMessage != ''){
 
@@ -275,12 +279,16 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		try {
 			StringUtils::formatPath(['1']);
 			$exceptionMessage = '[1] did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		try {
 			StringUtils::formatPath(1);
 			$exceptionMessage = '1 did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		if($exceptionMessage != ''){
 

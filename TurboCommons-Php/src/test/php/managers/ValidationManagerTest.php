@@ -214,12 +214,16 @@ class ValidationManagerTest extends PHPUnit_Framework_TestCase {
 		try {
 			$validationManager->isUrl([12341]);
 			$exceptionMessage = '[12341] did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		try {
 			$validationManager->isUrl(12341);
 			$exceptionMessage = '12341 did not cause exception';
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
 
 		if($exceptionMessage != ''){
 
