@@ -41,6 +41,18 @@ org_turbocommons_src_main_js_utils.SerializationUtils = {
 	javaPropertiesToObject : function(){
 
 		// TODO - copy from php
-	}
+	},
+
+
+	stringToXml : function(){
+
+		// TODO - copy from php
+	},
+
+
+	xmlToString : function(){
+
+		// TODO - copy from php
+	},
 
 };
