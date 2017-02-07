@@ -12,9 +12,9 @@
 namespace org\turbocommons\src\main\php\utils;
 
 use Exception;
-
-
 use org\turbocommons\src\main\php\managers\ValidationManager;
+
+
 /**
  * The most common conversion utilities to change the data from a simple type to another one.
  * To convert complex classes or structures, use SerializationUtils class.

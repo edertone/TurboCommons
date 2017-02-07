@@ -11,6 +11,7 @@
 
 namespace org\turbocommons\src\test\php\utils;
 
+use Exception;
 use org\turbocommons\src\main\php\managers\FilesManager;
 use org\turbocommons\src\main\php\managers\ValidationManager;
 use org\turbocommons\src\main\php\utils\SerializationUtils;
@@ -65,8 +66,7 @@ class SerializationUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testJavaPropertiesToArray(){
 
-
-		// TODO - rename this method to propertiesToHashMap
+		// TODO - rename this method to propertiesToHashMap ???
 
 		$basePath = __DIR__.'/../resources/utils/serializationUtils/javaPropertiesToArray';
 
@@ -134,6 +134,83 @@ class SerializationUtilsTest extends PHPUnit_Framework_TestCase {
 	 * @return void
 	 */
 	public function testJavaPropertiesToObject(){
+
+		// TODO
+	}
+
+
+	/**
+	 * testStringToXml
+	 *
+	 * @return void
+	 */
+	public function testStringToXml(){
+
+		$basePath = __DIR__.'/../resources/utils/serializationUtils/stringToXml';
+
+		// test empty cases
+		$this->assertTrue(SerializationUtils::stringToXml(null) === null);
+		$this->assertTrue(SerializationUtils::stringToXml('') === null);
+		$this->assertTrue(SerializationUtils::stringToXml('     ') === null);
+
+		// test incorrect cases
+		$exceptionMessage = '';
+
+		try {
+			SerializationUtils::stringToXml(1);
+			$exceptionMessage = '1 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			SerializationUtils::stringToXml('sdafgsdt4567');
+			$exceptionMessage = 'sdafgsdt4567 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			SerializationUtils::stringToXml('<caca>');
+			$exceptionMessage = '<caca> did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			SerializationUtils::stringToXml([1,2,3,4]);
+			$exceptionMessage = '[1,2,3,4] did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		// Test correct cases
+		$filesManager = FilesManager::getInstance();
+
+		$xmlData1 = $filesManager->readFile($basePath.$filesManager->getDirectorySeparator().'Test1.xml');
+		$xmlData2 = $filesManager->readFile($basePath.$filesManager->getDirectorySeparator().'Test2.xml');
+		$xmlData3 = $filesManager->readFile($basePath.$filesManager->getDirectorySeparator().'Test3.xml');
+		$xmlData4 = $filesManager->readFile($basePath.$filesManager->getDirectorySeparator().'Test4.xml');
+
+		$this->assertTrue(get_class(SerializationUtils::stringToXml($xmlData1)) == 'SimpleXMLElement');
+		$this->assertTrue(get_class(SerializationUtils::stringToXml($xmlData2)) == 'SimpleXMLElement');
+		$this->assertTrue(get_class(SerializationUtils::stringToXml($xmlData3)) == 'SimpleXMLElement');
+		$this->assertTrue(get_class(SerializationUtils::stringToXml($xmlData4)) == 'SimpleXMLElement');
+
+		// This case deliverately adds empty spaces at the beginning of the xml string. It is not well formed,
+		// but the stringToXml method handles it by trimming the received string
+		$xmlData5 = '      '.$filesManager->readFile($basePath.$filesManager->getDirectorySeparator().'Test2.xml').'       ';
+		$this->assertTrue(get_class(SerializationUtils::stringToXml($xmlData5)) == 'SimpleXMLElement');
+
+	}
+
+
+	/**
+	 * testXmlToString
+	 *
+	 * @return void
+	 */
+	public function testXmlToString(){
 
 		// TODO
 	}

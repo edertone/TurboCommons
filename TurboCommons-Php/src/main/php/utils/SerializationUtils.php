@@ -11,6 +11,9 @@
 
 namespace org\turbocommons\src\main\php\utils;
 
+use Exception;
+use SimpleXMLElement;
+
 
 /**
  * Contains methods that allow us to convert data from one data format or type to another data format or type
@@ -21,7 +24,7 @@ class SerializationUtils{
 	/**
 	 * TODO fer aixo
 	 */
-	public static function arrayToObject($str){
+	public static function arrayToObject($string){
 
 		// TODO fer aixo
 	}
@@ -57,18 +60,18 @@ class SerializationUtils{
 	 * Note that the input string must be encoded with ISO-8859-1 and strictly follow the Java
 	 * properties file format (Otherwise results may not be correct).
 	 *
-	 * @param string $str String containing the contents of a .properties Java file
+	 * @param string $string String containing the contents of a .properties Java file
 	 *
 	 * @return array The properties format parsed as an associative array
 	 */
-	public static function javaPropertiesToArray($str){
+	public static function javaPropertiesToArray($string){
 
 		$key = '';
 		$result = [];
 		$isWaitingOtherLine = false;
 
 		// Generate an array with the properties lines, ignoring blank lines and comments
-		$lines = StringUtils::extractLines($str, ['/\s+/', '/ *#.*| *!.*/']);
+		$lines = StringUtils::extractLines($string, ['/\s+/', '/ *#.*| *!.*/']);
 
 		foreach($lines as $i=>$line) {
 
@@ -124,9 +127,47 @@ class SerializationUtils{
 	/**
 	 * TODO fer aixo
 	 */
-	public static function javaPropertiesToObject($str){
+	public static function javaPropertiesToObject($string){
 
 		// TODO fer aixo
+	}
+
+
+	/**
+	 * Convert a string containing a well formed XML structure to a SimpleXmlElement instance
+	 *
+	 * @param string $string A string containing xml data
+	 *
+	 * @return SimpleXMLElement The representation of the given string as an xml object
+	 */
+	public static function stringToXml($string){
+
+		if(StringUtils::isEmpty($string)){
+
+			return null;
+		}
+
+		$xml = simplexml_load_string(trim($string));
+
+		if(!$xml){
+
+			throw new Exception('SerializationUtils->stringToXml could not convert string to SimpleXMLElement');
+		}
+
+		return $xml;
+	}
+
+
+	/**
+	 * Convert an Xml object to its string representation
+	 *
+	 * @param SimpleXMLElement $xml An instance of an xml element
+	 *
+	 * @return string The textual representation of the given xml data
+	 */
+	public static function xmlToString(SimpleXMLElement $xml){
+
+		return $xml->asXML();
 	}
 }
 
