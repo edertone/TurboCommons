@@ -64,7 +64,6 @@ class FilesManagerTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(!$filesManager->isFile('http://www.adkgadsifi.com/ieriteroter3453458852t.pdf'));
 
 		$this->assertTrue($filesManager->isFile($basePath.DIRECTORY_SEPARATOR.'File.txt'));
-		$this->assertTrue($filesManager->isFile('https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'), 'Could not load url. Internet connection must be available');
 	}
 
 
@@ -100,8 +99,6 @@ class FilesManagerTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(!$filesManager->isDirectory(null));
 		$this->assertTrue(!$filesManager->isDirectory(''));
 		$this->assertTrue(!$filesManager->isDirectory('49568456'));
-
-		$this->assertTrue($filesManager->isDirectory('https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'), 'Could not load url. Internet connection must be available');
 	}
 
 

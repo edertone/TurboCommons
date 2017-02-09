@@ -161,11 +161,21 @@ class SerializationUtils{
 	/**
 	 * Convert an Xml object to its string representation
 	 *
-	 * @param SimpleXMLElement $xml An instance of an xml element
+	 * @param object $xml An instance of an xml element or an xml string
 	 *
-	 * @return string The textual representation of the given xml data
+	 * @return string The textual valid representation of the given xml data
 	 */
-	public static function xmlToString(SimpleXMLElement $xml){
+	public static function xmlToString($xml){
+
+		if(StringUtils::isEmpty($xml)){
+
+			return '';
+		}
+
+		if(is_string($xml)){
+
+			$xml = self::stringToXml($xml);
+		}
 
 		return $xml->asXML();
 	}

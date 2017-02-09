@@ -16,6 +16,7 @@ use org\turbocommons\src\main\php\managers\FilesManager;
 use org\turbocommons\src\main\php\managers\ValidationManager;
 use org\turbocommons\src\main\php\utils\SerializationUtils;
 use PHPUnit_Framework_TestCase;
+use org\turbocommons\src\main\php\utils\XmlUtils;
 
 
 /**
@@ -184,7 +185,15 @@ class SerializationUtilsTest extends PHPUnit_Framework_TestCase {
 			// We expect an exception to happen
 		}
 
+		if($exceptionMessage != ''){
+
+			$this->fail($exceptionMessage);
+		}
+
 		// Test correct cases
+		$this->assertTrue(get_class(SerializationUtils::stringToXml('<document><from>Joe</from></document>')) == 'SimpleXMLElement');
+		$this->assertTrue(get_class(SerializationUtils::stringToXml("<?xml version='1.0'?><document><from>Joe</from></document>")) == 'SimpleXMLElement');
+
 		$filesManager = FilesManager::getInstance();
 
 		$xmlData1 = $filesManager->readFile($basePath.$filesManager->getDirectorySeparator().'Test1.xml');
@@ -212,7 +221,50 @@ class SerializationUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testXmlToString(){
 
-		// TODO
+		// Test empty cases
+		$this->assertTrue(SerializationUtils::xmlToString(null) === '');
+		$this->assertTrue(SerializationUtils::xmlToString('') === '');
+		$this->assertTrue(SerializationUtils::xmlToString('     ') === '');
+
+		// Test correct cases
+		$this->assertTrue(XmlUtils::isEqualTo(SerializationUtils::xmlToString('<root t="1"><a>1</a></root>'), '<root t="1"><a>1</a></root>'));
+		$this->assertTrue(XmlUtils::isEqualTo(SerializationUtils::xmlToString('<root><a>1</a><b>1</b></root>'), "<?xml version='1.0'?><root><a>1</a><b>1</b></root>"));
+
+		// Test Test exceptions
+		$exceptionMessage = '';
+
+		try {
+			SerializationUtils::xmlToString(1);
+			$exceptionMessage = '1 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			SerializationUtils::xmlToString('sdafgsdt4567');
+			$exceptionMessage = 'sdafgsdt4567 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			SerializationUtils::xmlToString('<caca>');
+			$exceptionMessage = '<caca> did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			SerializationUtils::xmlToString([1,2,3,4]);
+			$exceptionMessage = '[1,2,3,4] did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		if($exceptionMessage != ''){
+
+			$this->fail($exceptionMessage);
+		}
 	}
 }
 
