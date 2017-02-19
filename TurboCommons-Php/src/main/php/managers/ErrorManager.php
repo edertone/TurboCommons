@@ -149,15 +149,12 @@ class ErrorManager extends BaseSingletonClass{
 		switch (ini_get('display_errors')) {
 
 			case '1':
-				$displayErrors = true;
-				break;
-
 			case 'On':
-				$displayErrors = true;
-				break;
-
 			case 'true':
 				$displayErrors = true;
+				break;
+
+			default:
 				break;
 		}
 
