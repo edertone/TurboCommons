@@ -1,10 +1,15 @@
-# Custom project files
+# This ignore file must be placed at the root of your git repository to
+# prevent unwanted files or folders to be commited. It must be renamed to .gitignore
+
+
+# Turbo Builder files and folders to ignore
 target/
 bin/
 cache.properties
-Setup-Release.txt
+TurboBuilder-Release.txt
 
-# OS generated files
+
+# Operating system common files to ignore
 .DS_Store
 .DS_Store?
 .Spotlight-V100
