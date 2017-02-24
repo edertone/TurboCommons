@@ -6,7 +6,7 @@
 target/
 bin/
 cache.properties
-TurboBuilder-Release.txt
+TurboBuilder-OneTime.properties
 
 
 # Operating system common files to ignore

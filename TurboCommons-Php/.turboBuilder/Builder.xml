@@ -62,8 +62,8 @@
 		    ]]>
 		</script>
 		
-		<!-- Load the Release.enabled property if defined on the TurboBuilder-Release.txt file -->
-		<property file="../TurboBuilder-Release.txt" />
+		<!-- Load the properties that are defined on the TurboBuilder-OneTime.properties file -->
+		<property file="../TurboBuilder-OneTime.properties" />
 		
 		<!-- Set default values for some properties in case they are not specified on the TurboBuilder.xml -->
 		<property name="Build.versionNumber" value="0.0" />
@@ -71,7 +71,7 @@
 		<property name="Build.Js.createMergedJs" value="false" />
 		<property name="Build.keepUnPackedFiles" value="false" />
 				
-		<property name="Release.enabled" value="false" />
+		<property name="Release.generate" value="false" />
 		<property name="Release.phpDoc" value="false" />
 		<property name="Release.jsDoc" value="false" />
 		<property name="Release.gitChangeLog" value="false" />
@@ -108,6 +108,30 @@
 	<!-- The main build task that executes all the build tasks as defined on the TurboBuilder.xml file -->
 	<target name="build" depends="defineGlobalProperties">
 
+		<!-- Update TurboBuilder if necessary or run the build process -->
+		<script language="javascript">
+			<![CDATA[
+				
+				if(project.getProperty("Update.builder") == "true"){
+					
+					self.project.executeTarget("updateTurboBuilder");
+			
+				}else{
+				
+					self.project.executeTarget("buildFullProcess");				
+				}
+		    ]]>
+		</script>
+	
+		<!-- Reset the TurboBuilder-OneTime.properties file -->
+		<echo file="../TurboBuilder-OneTime.properties" message="# The values on this file are always restored after each build, so it is guaranteed that any modification done here will run only once${line.separator}${line.separator}${line.separator}# Activate the release build version generation${line.separator}Release.generate = false${line.separator}${line.separator}# Replace the current project TurboBuilder files with the latest available version${line.separator}Update.builder = false" />
+				
+	</target>
+	
+		
+	<!-- Continues the build execution after update verification is performed -->
+	<target name="buildFullProcess">
+		
 		<!-- TurboBuilder-Tools folder must exist and contain at least one of the expected tools -->
 		<fail message="TurboBuilder-Tools NOT found. These tools are required to perform most of the builder tasks. Make sure the folder '${Tools.path}' exists and contains all the turbobuilder required command line executables: Minifiers, compressors, optimizers...">
 		    <condition>
@@ -133,7 +157,7 @@
 				
 				self.project.executeTarget("copyMainFiles");
 			
-				if(project.getProperty("Release.enabled") == "true"){
+				if(project.getProperty("Release.generate") == "true"){
 					self.project.executeTarget("createReleaseVersion");
 				}
 						
@@ -176,9 +200,8 @@
 		    ]]>
 		</script>		
 
-		<!-- Reset the TurboBuilder-Release.txt file so release build is not generated again the next time build is executed -->
-		<echo file="../TurboBuilder-Release.txt" message="Release.enabled = false" />
-				
+		<antcall target="resetTurboBuilderOneTime" />
+	
 	</target>
 	
 	
@@ -307,7 +330,7 @@
 		<script language="javascript">
 			<![CDATA[
 					      								
-				if(project.getProperty("Release.enabled") == "true"){
+				if(project.getProperty("Release.generate") == "true"){
 			
 					self.project.executeTarget("runJsTestsAuxConcatFromRelease");
 							
@@ -778,7 +801,7 @@
 		<script language="javascript">
 			<![CDATA[
 				
-				if(project.getProperty("Release.enabled") == "true"){
+				if(project.getProperty("Release.generate") == "true"){
 					self.project.executeTarget("createPharsRelease");
 				}
 			
@@ -823,7 +846,7 @@
 		<script language="javascript">
 			<![CDATA[
 				
-				if(project.getProperty("Release.enabled") == "true"){
+				if(project.getProperty("Release.generate") == "true"){
 					self.project.executeTarget("createMergedJsRelease");
 				}
 			
@@ -929,4 +952,14 @@
 
 	</target>
 		
+
+	<!-- Update the TurboBuilder project files -->
+	<target name="updateTurboBuilder">
+		
+		<ant antfile="Update.xml" />
+		
+		<echo message="TURBOBUILDER UPDATED!" />
+		
+	</target>
+			
 </project>
