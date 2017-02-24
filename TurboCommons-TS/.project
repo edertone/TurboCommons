@@ -10,7 +10,7 @@
 			<arguments>
 				<dictionary>
 					<key>LaunchConfigHandle</key>
-					<value>&lt;project&gt;/.externalToolBuilders/TurboFramework Builder.launch</value>
+					<value>&lt;project&gt;/.externalToolBuilders/TurboBuilder.launch</value>
 				</dictionary>
 				<dictionary>
 					<key>incclean</key>

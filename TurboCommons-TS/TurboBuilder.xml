@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<SetupBuild xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-			xsi:noNamespaceSchemaLocation=".ant/BuildSetupSchema.xsd">
+<TurboBuilder xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/edertone/TurboBuilder/master/TurboBuilder-Ant/turboBuilder/BuilderSetupSchema.xsd">
 
-	<Build createMergedJs="true"
-		   createPhars="false" />
+	<Build>
+	
+		<Php createPhars="false" />	   
+		
+		<Js createMergedJs="true" />
+		   
+	</Build>
 
 	<Release gitChangeLog="true"
 			 jsDoc="true" />
@@ -29,4 +34,4 @@
 	
 	</Test>
 				
-</SetupBuild>
+</TurboBuilder>

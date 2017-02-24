@@ -12,7 +12,7 @@
 		
 
 	<!-- DEFINITION FOR THE ROOT SETUP ELEMENT -->
-	<xs:element name="SetupBuild">
+	<xs:element name="TurboBuilder">
 		
 		<xs:annotation>
 			<xs:documentation>Contains all the parameters that are used with the build process of the current project</xs:documentation>
@@ -31,28 +31,97 @@
 					
 					<xs:complexType>
 					
+						<xs:sequence>
+					
+							<!-- Php element -->
+							<xs:element name="Php" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>Contains the build process configuration related to Php files</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+								
+									<xs:attribute name="createPhars" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												Specifies if all the Php files that are deployed to the target folder by the build process 
+												must be packed on a phar file or not. This file will have the same name as the current project.
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+																	
+								</xs:complexType>
+								
+							</xs:element>
+							
+							<!-- Js element -->
+							<xs:element name="Js" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>Contains the build process configuration related to Javascript files</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+								
+									<xs:attribute name="createMergedJs" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>Generate a .js file on the target folder containing all the project javascript files merged. This file can then be easily distributed or used on other projects.</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+																	
+								</xs:complexType>
+								
+							</xs:element>
+							
+							<!-- Ts element -->
+							<xs:element name="Ts" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>Contains the build process configuration related to Typescript files</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+								
+									<xs:attribute name="alwaysStrict" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>TODO</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="sourceMap" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>TODO</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="target" use="required" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>TODO</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+																											
+								</xs:complexType>
+								
+							</xs:element>
+												
+						</xs:sequence>
+					
 						<xs:attribute name="versionNumber" default="0.0" type="xs:string">
 							<xs:annotation>
-								<xs:documentation>Version number is retrieved automatically from the latest GIT Tag. But if we want to define it manually we can define it here and this value will override the one from GIT.&lt;br&gt;&lt;br&gt;
-									NOTE: The build number will be always added automatically after the versionNumber. For example, if versionNumber is 1.4, the final value will be '1.4.buildnumber'</xs:documentation>
+								<xs:documentation>
+									Version number is retrieved automatically from the latest GIT Tag. But if we want to define it manually we can define it here and this value will override the one from GIT.&lt;br&gt;&lt;br&gt;
+									NOTE: The build number will be always added automatically after the versionNumber. For example, if versionNumber is 1.4, the final value will be '1.4.buildnumber'
+								</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
 						
-						<xs:attribute name="createPhars" default="true" type="xs:boolean">
-							<xs:annotation>
-								<xs:documentation>Specifies if the files generated on the target folder by the build process must be packed on a phar file or not.</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>	
-						
-						<xs:attribute name="createMergedJs" default="false" type="xs:boolean">
-							<xs:annotation>
-								<xs:documentation>Generate a .js file on the target folder containing all the project javascript files merged so it can be easily included on other projects.</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>	
-						
 						<xs:attribute name="keepUnPackedFiles" default="false" type="xs:boolean">
 							<xs:annotation>
-								<xs:documentation>If set to false, all the files that are copied to the target/ProjectName/ folder will be removed. Otherwise they will be kept on the folder.</xs:documentation>
+								<xs:documentation>
+									If set to false, all the files that are copied to the target/ProjectName/ folder will be removed. Otherwise they will be kept on the folder.
+									This is useful when we are packing all the target contents inside a jar or merged js file, and we don't need the unpacked files.
+								</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>						
 						
@@ -65,7 +134,7 @@
 				<xs:element name="Release" minOccurs="1" maxOccurs="1">
 		
 					<xs:annotation>
-						<xs:documentation>Options related to the release production build version generation. To enable the release build version of the project and use these parameters, a file named Setup-Release.txt must exist on the root of the project folder, containing the following line: Release.enabled=true.&lt;br&gt;&lt;br&gt;After a release build is complete, the Release.enabled property will be set to false automatically, to prevent multiple release builds to be generated. If the Setup-Release.txt file does not exist, it will be auto generated by the build process wih the Release.enabled property set to false.</xs:documentation>
+						<xs:documentation>Options related to the release production build version generation. To enable the release build version of the project and use these parameters, a file named TurboBuilder-OneTime.properties must exist on the root of the project folder, containing the following line: Release.generate=true.&lt;br&gt;&lt;br&gt;After a release build is complete, the Release.generate property will be set to false automatically, to prevent multiple release builds to be generated. If the TurboBuilder-OneTime.properties file does not exist, it will be auto generated by the build process wih the Release.generate property set to false.</xs:documentation>
 					</xs:annotation>
 					
 					<xs:complexType>
@@ -400,59 +469,23 @@
 				<xs:element name="Tools" minOccurs="0" maxOccurs="1">
 		
 					<xs:annotation>
-						<xs:documentation>Paths to the executables and applications that are required to perform some of the build actions</xs:documentation>
+						<xs:documentation>Paths to the executables and applications that are required to perform most of the build actions</xs:documentation>
 					</xs:annotation>
 					
 					<xs:complexType>
 					
-						<xs:attribute name="minifierPath" default="C:/BuildTools/yuicompressor-2.4.7/build/yuicompressor-2.4.7.jar" type="xs:string">
+						<xs:attribute name="toolsPath" type="xs:string">
 							<xs:annotation>
-								<xs:documentation>Path where the minifier tool is located on this computer. It will take care of compressing js and css files when release version is enabled</xs:documentation>
+								<xs:documentation>Path where all the turbo builder tools are located. These tools are required by turbo builder and include minifiers, compressors, encoders and other command line utilities. If this value is not specified, the OS_USER_HOME/TurboBuilder-Tools/ folder will be used by default.</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
-						
-						<xs:attribute name="htmlCompressorPath" default="C:/BuildTools/htmlcompressor/htmlcompressor-1.5.3.jar" type="xs:string">
-							<xs:annotation>
-								<xs:documentation>Path where the html compressor tool is located on this computer. It will take care of compressing php and html files when release version is enabled</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>
-						
-						<xs:attribute name="pngQuantPath" default="C:/BuildTools/pngquant-windows/pngquant.exe" type="xs:string">
-							<xs:annotation>
-								<xs:documentation>Path where the pngquant tool is located on this computer. It will take care of compressing png files when release version is enabled</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>
-						
-						<xs:attribute name="pngOptimizerPath" default="C:/BuildTools/optipng-0.7.4-win32/optipng.exe" type="xs:string">
-							<xs:annotation>
-								<xs:documentation>Path where the optipng tool is located on this computer. It will take care of compressing png files when release version is enabled</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>
-						
-						<xs:attribute name="jpgOptimizerPath" default="C:/BuildTools/jpegtran/jpegtran.exe" type="xs:string">
-							<xs:annotation>
-								<xs:documentation>Path where the jpegtran tool is located on this computer. It will take care of compressing jpg files when release version is enabled</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>
-						
-						<xs:attribute name="cssValidatorPath" default="C:/BuildTools/W3c-css-validator/css-validator.jar" type="xs:string">
-							<xs:annotation>
-								<xs:documentation>Path where the w3c css validator tool is located on this computer. It will take care of validating the syntax for the css files on the project when release version is enabled</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>
-						
+												
 						<xs:attribute name="mysqlPath" default="C:/xampp/mysql/bin/mysql.exe" type="xs:string">
 							<xs:annotation>
 								<xs:documentation>Path where the mysql.exe tool is located on this computer. It is used to automate database operations like create and delete</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>	
-						
-						<xs:attribute name="phpDocPath" default="C:/BuildTools/PhpDocumentor/phpDocumentor.phar" type="xs:string">
-							<xs:annotation>
-								<xs:documentation>Path where the phpdoc library 'phpDocumentor.phar' file is located</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>
-						
+												
 						<xs:attribute name="jsDocPath" default="C:/Program Files/nodejs/node_modules/.bin/jsdoc.cmd" type="xs:string">
 							<xs:annotation>
 								<xs:documentation>Path where the jsdoc executor is located. Note that jsdoc needs to be installed on our system via node.js</xs:documentation>

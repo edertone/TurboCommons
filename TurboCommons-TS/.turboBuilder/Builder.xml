@@ -5,19 +5,20 @@
 
 	<description>
 	
-		Turbo Framework project builder.
-		Used to automatize the most common development build operations related to turbo framework projects.
-		Recommended for eclipse, but may work well on other ides. 
+		Turbo builder main project.
+		Used to automatize the most common development build operations. 
 			
-		VERY IMPORTANT - Eclipse setup !! 
+		VERY IMPORTANT!! 
 		An extra library is required to execute FTP operations with ant. Download it here:	http://commons.apache.org/net/index.html
-		and copy it to:	C:\Program Files\eclipse\plugins\org.apache.ant_1.8.2.v20110505-1300\lib
-		Then go to "Window/Preferences/Ant/Runtime/ClassPath" and add this lib as an external jar to "Ant home entries" (Say yes to ignore possible problem if prompted)
+		
+		To set it up with eclipse:
+			- Copy it to:	C:\Program Files\eclipse\plugins\org.apache.ant_1.8.2.v20110505-1300\lib
+			- Then go to "Window/Preferences/Ant/Runtime/ClassPath" and add this lib as an external jar to "Ant home entries" (Say yes to ignore possible problem if prompted)
 	
 	</description>
 		
 	
-	<!-- Define all the build global properties and load the build configuration from the Setup-build.xml file -->
+	<!-- Define all the build global properties and load the build configuration from the TurboBuilder.xml file -->
 	<target name="defineGlobalProperties" >
 	
 		<!-- Create a property containing the current project name, based on the root project folder -->
@@ -35,17 +36,17 @@
 		<!-- The location for the cache file, which contains modified files since last build. This path can be overwritten by external builds that want to execute this project build but track the cache externally -->
 		<property name="cacheFilePath" location="cache.properties" />
 	
-		<fail message="Setup-Build.xml not found">
+		<fail message="TurboBuilder.xml not found">
 		    <condition>
 		    	<not>
-		    		<available file="${srcFolderPath}/../Setup-Build.xml" />
+		    		<available file="${srcFolderPath}/../TurboBuilder.xml" />
 		    	</not>
 		    </condition>
 		</fail>
 		
-		<xmlproperty file="${srcFolderPath}/../Setup-Build.xml" keepRoot="false" semanticattributes="true" />
+		<xmlproperty file="${srcFolderPath}/../TurboBuilder.xml" keepRoot="false" semanticattributes="true" />
 		
-		<!-- Get the latest tag if defined on GIT and not specified on Setup-Build.xml -->
+		<!-- Get the latest tag if defined on GIT and not specified on TurboBuilder.xml -->
 		<exec executable="git" failonerror="false" resultproperty="gitLatestTagResult" outputproperty="gitLatestTag" >
 	    	<arg line="describe --abbrev=0 --tags"/>
 	    </exec> 
@@ -61,16 +62,16 @@
 		    ]]>
 		</script>
 		
-		<!-- Load the Release.enabled property if defined on the Setup-Release.txt file -->
-		<property file="../Setup-Release.txt" />
+		<!-- Load the properties that are defined on the TurboBuilder-OneTime.properties file -->
+		<property file="../TurboBuilder-OneTime.properties" />
 		
-		<!-- Set default values for some properties in case they are not specified on the Setup-build.xml -->
+		<!-- Set default values for some properties in case they are not specified on the TurboBuilder.xml -->
 		<property name="Build.versionNumber" value="0.0" />
-		<property name="Build.createPhars" value="true" />
-		<property name="Build.createMergedJs" value="false" />
+		<property name="Build.Php.createPhars" value="true" />
+		<property name="Build.Js.createMergedJs" value="false" />
 		<property name="Build.keepUnPackedFiles" value="false" />
 				
-		<property name="Release.enabled" value="false" />
+		<property name="Release.generate" value="false" />
 		<property name="Release.phpDoc" value="false" />
 		<property name="Release.jsDoc" value="false" />
 		<property name="Release.gitChangeLog" value="false" />
@@ -87,37 +88,78 @@
 		<property name="Test.Php.mode" value="commandLine" />
 		<property name="Test.Js.enabled" value="false" />	
 				
-		<property name="Tools.minifierPath" value="C:/BuildTools/yuicompressor-2.4.7/build/yuicompressor-2.4.7.jar" />
-		<property name="Tools.htmlCompressorPath" value="C:/BuildTools/htmlcompressor/htmlcompressor-1.5.3.jar" />
-		<property name="Tools.pngQuantPath" value="C:/BuildTools/pngquant-windows/pngquant.exe" />
-		<property name="Tools.pngOptimizerPath" value="C:/BuildTools/optipng-0.7.4-win32/optipng.exe" />
-		<property name="Tools.jpgOptimizerPath" value="C:/BuildTools/jpegtran/jpegtran.exe" />
-		<property name="Tools.cssValidatorPath" value="C:/BuildTools/W3c-css-validator/css-validator.jar" />
+		<property name="Tools.path" value="${user.home}/TurboBuilder-Tools" />
+		<property name="Tools.minifierPath" value="${Tools.path}/yuicompressor-2.4.7/build/yuicompressor-2.4.7.jar" />
+		<property name="Tools.htmlCompressorPath" value="${Tools.path}/htmlcompressor/htmlcompressor-1.5.3.jar" />
+		<property name="Tools.pngQuantPath" value="${Tools.path}/pngquant-windows/pngquant.exe" />
+		<property name="Tools.pngOptimizerPath" value="${Tools.path}/optipng-0.7.4-win32/optipng.exe" />
+		<property name="Tools.jpgOptimizerPath" value="${Tools.path}/jpegtran/jpegtran.exe" />
+		<property name="Tools.cssValidatorPath" value="${Tools.path}/W3c-css-validator/css-validator.jar" />
+		<property name="Tools.phpDocPath" value="${Tools.path}/PhpDocumentor/phpDocumentor.phar" />
+		
 		<property name="Tools.mysqlPath" value="C:/xampp/mysql/bin/mysql.exe" />	
-		<property name="Tools.phpDocPath" value="C:/BuildTools/PhpDocumentor/phpDocumentor.phar" />
 		<property name="Tools.jsDocPath" value="C:/Program Files/nodejs/node_modules/.bin/jsdoc.cmd" />
 		<property name="Tools.jsDocTemplatePath" value="C:/Program Files/nodejs/node_modules/ink-docstrap/template" />
 		<property name="Tools.phpPath" value="C:/xampp/php/php.exe" />
+		
+		<property name="Update.builder" value="false" />
 				
 	</target>
 	
 	
-	<!-- The main build task that executes all the build tasks as defined on the setup-build.xml file -->
+	<!-- The main build task that executes all the build tasks as defined on the TurboBuilder.xml file -->
 	<target name="build" depends="defineGlobalProperties">
 
-		<!-- Get the current build number from the build.number file and store it on the ${build.number} property -->
-		<loadproperties srcFile="build.number"/>
+		<!-- Update TurboBuilder if necessary or run the build process -->
+		<script language="javascript">
+			<![CDATA[
+				
+				if(project.getProperty("Update.builder") == "true"){
+					
+					self.project.executeTarget("updateTurboBuilder");
+			
+				}else{
+				
+					self.project.executeTarget("buildFullProcess");				
+				}
+		    ]]>
+		</script>
+	
+		<!-- Reset the TurboBuilder-OneTime.properties file -->
+		<echo file="../TurboBuilder-OneTime.properties" message="# The values on this file are always restored after each build, so it is guaranteed that any modification done here will run only once${line.separator}${line.separator}${line.separator}# Activate the release build version generation${line.separator}Release.generate = false${line.separator}${line.separator}# Replace the current project TurboBuilder files with the latest available version${line.separator}Update.builder = false" />
+				
+	</target>
+	
 		
-		<!-- Increase the project build number. We will increase it even if the build fails, to prevent overlapping files from different builds -->
+	<!-- Continues the build execution after update verification is performed -->
+	<target name="buildFullProcess">
+		
+		<!-- TurboBuilder-Tools folder must exist and contain at least one of the expected tools -->
+		<fail message="TurboBuilder-Tools NOT found. These tools are required to perform most of the builder tasks. Make sure the folder '${Tools.path}' exists and contains all the turbobuilder required command line executables: Minifiers, compressors, optimizers...">
+		    <condition>
+		    	<not>
+		    		<available file="${Tools.minifierPath}" />
+		    	</not>
+		    </condition>
+		</fail>
+		
+		<!-- 
+			Increase the project build number. 
+			We will increase it even if the build fails, to prevent overlapping files from different builds.
+			(Note that this file will be auto generated if it does not exist)
+		-->
 		<buildnumber/>
 			
+		<!-- Get the current build number from the build.number file and store it on the ${build.number} property -->
+		<loadproperties srcFile="build.number"/>
+				
 		<!-- Perform all the build tasks -->
 		<script language="javascript">
 			<![CDATA[
 				
 				self.project.executeTarget("copyMainFiles");
 			
-				if(project.getProperty("Release.enabled") == "true"){
+				if(project.getProperty("Release.generate") == "true"){
 					self.project.executeTarget("createReleaseVersion");
 				}
 						
@@ -137,11 +179,11 @@
 					self.project.executeTarget("runJsTestsLocalServer");
 				}
 			
-				if(project.getProperty("Build.createPhars") == "true"){
+				if(project.getProperty("Build.Php.createPhars") == "true"){
 					self.project.executeTarget("createPhars");
 				}
 			
-				if(project.getProperty("Build.createMergedJs") == "true"){
+				if(project.getProperty("Build.Js.createMergedJs") == "true"){
 					self.project.executeTarget("createMergedJs");
 				}
 			
@@ -159,10 +201,7 @@
 			
 		    ]]>
 		</script>		
-
-		<!-- Reset the Setup-Release.txt file so release build is not generated again if enabled -->
-		<echo file="../Setup-Release.txt" message="Release.enabled = false" />
-				
+	
 	</target>
 	
 	
@@ -291,7 +330,7 @@
 		<script language="javascript">
 			<![CDATA[
 					      								
-				if(project.getProperty("Release.enabled") == "true"){
+				if(project.getProperty("Release.generate") == "true"){
 			
 					self.project.executeTarget("runJsTestsAuxConcatFromRelease");
 							
@@ -762,7 +801,7 @@
 		<script language="javascript">
 			<![CDATA[
 				
-				if(project.getProperty("Release.enabled") == "true"){
+				if(project.getProperty("Release.generate") == "true"){
 					self.project.executeTarget("createPharsRelease");
 				}
 			
@@ -807,7 +846,7 @@
 		<script language="javascript">
 			<![CDATA[
 				
-				if(project.getProperty("Release.enabled") == "true"){
+				if(project.getProperty("Release.generate") == "true"){
 					self.project.executeTarget("createMergedJsRelease");
 				}
 			
@@ -866,21 +905,36 @@
 	
 	<!-- Clean all the project elements -->
 	<target name="clean" depends="defineGlobalProperties">
+		
 		<delete file="${cacheFilePath}" failonerror="true" />
 		<delete dir="${targetFolderPath}" failonerror="true" />
-		<antcall target="cleanFtp" />
-		<antcall target="cleanLocalHost" />
+				
+		<!-- Perform all the build tasks -->
+		<script language="javascript">
+			<![CDATA[
+				
+				if(project.getProperty("Deploy.Ftp.enabled") == "true"){						
+					self.project.executeTarget("cleanFtp");
+				}
+			
+				if(project.getProperty("Deploy.LocalHost.enabled") == "true"){
+					self.project.executeTarget("cleanLocalHost");
+				}
+			
+		    ]]>
+		</script>
+		
 	</target>
 
 
 	<!-- Delete the localhost files if necessary -->
-	<target name="cleanLocalHost" if="${Deploy.LocalHost.enabled}">
+	<target name="cleanLocalHost">
 		<delete dir="${Deploy.LocalHost.destPath}" />
 	</target>
 	
 	
 	<!-- Clean the files on the ftp remote location if FTP deploy is enabled -->
-	<target name="cleanFtp" if="${Deploy.Ftp.enabled}">
+	<target name="cleanFtp">
 
 		<!-- Delete the remote ftp files -->
 		<ftp verbose="true" passive="true" action="delete" userid="${Deploy.Ftp.user}" password="${Deploy.Ftp.psw}" server="${Deploy.Ftp.server}" remotedir="/turbotest">
@@ -898,4 +952,14 @@
 
 	</target>
 		
+
+	<!-- Update the TurboBuilder project files -->
+	<target name="updateTurboBuilder">
+		
+		<ant antfile="Update.xml" />
+		
+		<echo message="TURBOBUILDER UPDATED!" />
+		
+	</target>
+			
 </project>
