@@ -39,7 +39,8 @@
 
 		<!-- First download and override the latest version of this update script -->
 		<get src="https://raw.githubusercontent.com/edertone/TurboBuilder/master/TurboBuilder-Ant/turboBuilder/Update.xml"
-			 dest="Update.xml"/>
+			 dest="Update.xml"
+			 httpusecaches="false" />
 
 		<!-- Call the downloaded update file -->
 		<ant antfile="Update.xml">
@@ -56,10 +57,12 @@
 
 		<!-- Update the builder files -->
 		<get src="https://raw.githubusercontent.com/edertone/TurboBuilder/master/TurboBuilder-Ant/turboBuilder/Builder.xml"
-			 dest="Builder.xml"/>
+			 dest="Builder.xml"
+			 httpusecaches="false" />
 
 		<get src="https://raw.githubusercontent.com/edertone/TurboBuilder/master/TurboBuilder-Ant/turboBuilder/BuilderSetupSchema.xsd"
-			 dest="BuilderSetupSchema.xsd"/>
+			 dest="BuilderSetupSchema.xsd"
+			 httpusecaches="false" />
 
 	</target>
 

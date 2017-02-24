@@ -101,6 +101,8 @@
 		<property name="Tools.jsDocPath" value="C:/Program Files/nodejs/node_modules/.bin/jsdoc.cmd" />
 		<property name="Tools.jsDocTemplatePath" value="C:/Program Files/nodejs/node_modules/ink-docstrap/template" />
 		<property name="Tools.phpPath" value="C:/xampp/php/php.exe" />
+		
+		<property name="Update.builder" value="false" />
 				
 	</target>
 	
@@ -199,8 +201,6 @@
 			
 		    ]]>
 		</script>		
-
-		<antcall target="resetTurboBuilderOneTime" />
 	
 	</target>
 	
