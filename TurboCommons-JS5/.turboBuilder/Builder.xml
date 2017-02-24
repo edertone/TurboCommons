@@ -1,0 +1,965 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project>
+<project name="Build" basedir=".">
+
+
+	<description>
+	
+		Turbo builder main project.
+		Used to automatize the most common development build operations. 
+			
+		VERY IMPORTANT!! 
+		An extra library is required to execute FTP operations with ant. Download it here:	http://commons.apache.org/net/index.html
+		
+		To set it up with eclipse:
+			- Copy it to:	C:\Program Files\eclipse\plugins\org.apache.ant_1.8.2.v20110505-1300\lib
+			- Then go to "Window/Preferences/Ant/Runtime/ClassPath" and add this lib as an external jar to "Ant home entries" (Say yes to ignore possible problem if prompted)
+	
+	</description>
+		
+	
+	<!-- Define all the build global properties and load the build configuration from the TurboBuilder.xml file -->
+	<target name="defineGlobalProperties" >
+	
+		<!-- Create a property containing the current project name, based on the root project folder -->
+		<basename property="projectBaseName" file="../" />
+		
+		<!-- The location for the project source folder -->
+		<property name="srcFolderPath" location="../src" />
+
+		<!-- The loaction for the project main folder -->
+		<property name="mainFolderPath" location="../src/main" />
+
+		<!-- The location for the target folder -->
+		<property name="targetFolderPath" location="../target" />
+
+		<!-- The location for the cache file, which contains modified files since last build. This path can be overwritten by external builds that want to execute this project build but track the cache externally -->
+		<property name="cacheFilePath" location="cache.properties" />
+	
+		<fail message="TurboBuilder.xml not found">
+		    <condition>
+		    	<not>
+		    		<available file="${srcFolderPath}/../TurboBuilder.xml" />
+		    	</not>
+		    </condition>
+		</fail>
+		
+		<xmlproperty file="${srcFolderPath}/../TurboBuilder.xml" keepRoot="false" semanticattributes="true" />
+		
+		<!-- Get the latest tag if defined on GIT and not specified on TurboBuilder.xml -->
+		<exec executable="git" failonerror="false" resultproperty="gitLatestTagResult" outputproperty="gitLatestTag" >
+	    	<arg line="describe --abbrev=0 --tags"/>
+	    </exec> 
+		
+		<script language="javascript">
+			<![CDATA[
+				
+				if(gitLatestTagResult == "0" && project.getProperty("Build.versionNumber") == null){
+			
+					project.setProperty("Build.versionNumber", project.getProperty("gitLatestTag"));				
+				}
+			
+		    ]]>
+		</script>
+		
+		<!-- Load the properties that are defined on the TurboBuilder-OneTime.properties file -->
+		<property file="../TurboBuilder-OneTime.properties" />
+		
+		<!-- Set default values for some properties in case they are not specified on the TurboBuilder.xml -->
+		<property name="Build.versionNumber" value="0.0" />
+		<property name="Build.Php.createPhars" value="true" />
+		<property name="Build.Js.createMergedJs" value="false" />
+		<property name="Build.keepUnPackedFiles" value="false" />
+				
+		<property name="Release.generate" value="false" />
+		<property name="Release.phpDoc" value="false" />
+		<property name="Release.jsDoc" value="false" />
+		<property name="Release.gitChangeLog" value="false" />
+		<property name="Release.gitChangeLogCount" value="5" />
+		<property name="Release.optimizePictures" value="true" />
+		<property name="Release.optimizePhp" value="false" />
+		<property name="Release.optimizeJs" value="true" />
+		<property name="Release.optimizeCss" value="true" />
+								
+		<property name="Validate.checkProjectStructure" value="true" />
+		<property name="Validate.validateCss" value="true" />
+				
+		<property name="Test.Php.enabled" value="false" />
+		<property name="Test.Php.mode" value="commandLine" />
+		<property name="Test.Js.enabled" value="false" />	
+				
+		<property name="Tools.path" value="${user.home}/TurboBuilder-Tools" />
+		<property name="Tools.minifierPath" value="${Tools.path}/yuicompressor-2.4.7/build/yuicompressor-2.4.7.jar" />
+		<property name="Tools.htmlCompressorPath" value="${Tools.path}/htmlcompressor/htmlcompressor-1.5.3.jar" />
+		<property name="Tools.pngQuantPath" value="${Tools.path}/pngquant-windows/pngquant.exe" />
+		<property name="Tools.pngOptimizerPath" value="${Tools.path}/optipng-0.7.4-win32/optipng.exe" />
+		<property name="Tools.jpgOptimizerPath" value="${Tools.path}/jpegtran/jpegtran.exe" />
+		<property name="Tools.cssValidatorPath" value="${Tools.path}/W3c-css-validator/css-validator.jar" />
+		<property name="Tools.phpDocPath" value="${Tools.path}/PhpDocumentor/phpDocumentor.phar" />
+		
+		<property name="Tools.mysqlPath" value="C:/xampp/mysql/bin/mysql.exe" />	
+		<property name="Tools.jsDocPath" value="C:/Program Files/nodejs/node_modules/.bin/jsdoc.cmd" />
+		<property name="Tools.jsDocTemplatePath" value="C:/Program Files/nodejs/node_modules/ink-docstrap/template" />
+		<property name="Tools.phpPath" value="C:/xampp/php/php.exe" />
+		
+		<property name="Update.builder" value="false" />
+				
+	</target>
+	
+	
+	<!-- The main build task that executes all the build tasks as defined on the TurboBuilder.xml file -->
+	<target name="build" depends="defineGlobalProperties">
+
+		<!-- Update TurboBuilder if necessary or run the build process -->
+		<script language="javascript">
+			<![CDATA[
+				
+				if(project.getProperty("Update.builder") == "true"){
+					
+					self.project.executeTarget("updateTurboBuilder");
+			
+				}else{
+				
+					self.project.executeTarget("buildFullProcess");				
+				}
+		    ]]>
+		</script>
+	
+		<!-- Reset the TurboBuilder-OneTime.properties file -->
+		<echo file="../TurboBuilder-OneTime.properties" message="# The values on this file are always restored after each build, so it is guaranteed that any modification done here will run only once${line.separator}${line.separator}${line.separator}# Activate the release build version generation${line.separator}Release.generate = false${line.separator}${line.separator}# Replace the current project TurboBuilder files with the latest available version${line.separator}Update.builder = false" />
+				
+	</target>
+	
+		
+	<!-- Continues the build execution after update verification is performed -->
+	<target name="buildFullProcess">
+		
+		<!-- TurboBuilder-Tools folder must exist and contain at least one of the expected tools -->
+		<fail message="TurboBuilder-Tools NOT found. These tools are required to perform most of the builder tasks. Make sure the folder '${Tools.path}' exists and contains all the turbobuilder required command line executables: Minifiers, compressors, optimizers...">
+		    <condition>
+		    	<not>
+		    		<available file="${Tools.minifierPath}" />
+		    	</not>
+		    </condition>
+		</fail>
+		
+		<!-- 
+			Increase the project build number. 
+			We will increase it even if the build fails, to prevent overlapping files from different builds.
+			(Note that this file will be auto generated if it does not exist)
+		-->
+		<buildnumber/>
+			
+		<!-- Get the current build number from the build.number file and store it on the ${build.number} property -->
+		<loadproperties srcFile="build.number"/>
+				
+		<!-- Perform all the build tasks -->
+		<script language="javascript">
+			<![CDATA[
+				
+				self.project.executeTarget("copyMainFiles");
+			
+				if(project.getProperty("Release.generate") == "true"){
+					self.project.executeTarget("createReleaseVersion");
+				}
+						
+				if(project.getProperty("Test.Php.enabled") == "true"){
+			
+					if(project.getProperty("Test.Php.mode") == "localWebServer"){
+			
+						self.project.executeTarget("runPhpTestsLocalServer");
+			
+					}else{
+			
+						self.project.executeTarget("runPhpTestsCmd");
+					}
+				}
+			
+				if(project.getProperty("Test.Js.enabled") == "true"){						
+					self.project.executeTarget("runJsTestsLocalServer");
+				}
+			
+				if(project.getProperty("Build.Php.createPhars") == "true"){
+					self.project.executeTarget("createPhars");
+				}
+			
+				if(project.getProperty("Build.Js.createMergedJs") == "true"){
+					self.project.executeTarget("createMergedJs");
+				}
+			
+				if(project.getProperty("Build.keepUnPackedFiles") != "true"){
+					self.project.executeTarget("removeUnpackedFiles");
+				}
+			
+				if(project.getProperty("Deploy.LocalHost.enabled") == "true"){
+					self.project.executeTarget("deployLocalHost");
+				}
+			
+				if(project.getProperty("Deploy.Ftp.enabled") == "true"){
+					self.project.executeTarget("deployFtp");
+				}
+			
+		    ]]>
+		</script>		
+	
+	</target>
+	
+	
+	<!-- Copy all the project src/main files to the target folder. Any unwanted files/folders are excluded -->
+	<target name="copyMainFiles">
+		
+		<!-- Delete all files inside the target/projectName except the main folder one -->
+		<delete failonerror="false" includeemptydirs="true">
+			<fileset dir="${targetFolderPath}/${projectBaseName}" casesensitive="false">
+				<include name="**/*"/>
+				<exclude name="main/"/>
+			</fileset>			
+		</delete>
+		
+		<!-- Update the target/projectName/main folder with the current project state -->
+		<sync todir="${targetFolderPath}/${projectBaseName}/main" overwrite="true">
+			<fileset dir="${mainFolderPath}" casesensitive="false">
+				<exclude name="**/thumbs.db**" />
+				<exclude name="**/.svn/**" />
+				<exclude name="**/.git**" />
+			</fileset>
+		</sync>
+		
+		<!-- Replace the string @@package-build-version@@ on all the files with the real build version number -->
+		<replace dir="${targetFolderPath}/${projectBaseName}" token="@@package-build-version@@" value="${Build.versionNumber}.${build.number}" >
+			<exclude name="**/resources/"/>
+		</replace>
+		
+	</target>
+	
+	
+	<!-- Launch the PHP unit tests via Command line -->
+	<target name="runPhpTestsCmd">
+
+		<copy todir="${targetFolderPath}/${projectBaseName}/test" overwrite="true">
+			<fileset dir="${srcFolderPath}/test" casesensitive="false" />
+		</copy>
+
+		<exec executable="${Tools.phpPath}" failonerror="true" >
+			<arg value="${targetFolderPath}/${projectBaseName}/test/php/index.php" />
+		</exec>
+		
+		<delete dir="${targetFolderPath}/${projectBaseName}/test" failonerror="true" />
+
+	</target>
+	
+	
+	<!-- Launch the PHP unit tests via local web server -->
+	<target name="runPhpTestsLocalServer">
+	
+		<!-- Test.Php.localServerPath must exist -->
+		<fail message="Test.Php.localServerPath not found. A local server folder is required to run unit tests. Create it if not exists">
+		    <condition>
+		    	<not>
+		    		<available file="${Test.Php.localServerPath}" />
+		    	</not>
+		    </condition>
+		</fail>
+
+		<copy todir="${Test.Php.localServerPath}/${projectBaseName}-unitTests/php/main" overwrite="true">
+			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false" />
+		</copy>
+			
+		<copy todir="${Test.Php.localServerPath}/${projectBaseName}-unitTests/php/test" overwrite="true">
+			<fileset dir="${srcFolderPath}/test" casesensitive="false" />
+		</copy>
+		
+		<exec executable="${Tools.phpPath}" failonerror="true" >
+			<arg value="${Test.Php.localServerPath}/${projectBaseName}-unitTests/php/test/index.php" />
+		</exec>
+
+		<delete dir="${Test.Php.localServerPath}/${projectBaseName}-unitTests/php" failonerror="true" />
+		
+	</target>
+	
+	
+	<!-- Auxiliary concat to append the release files to js unit tests -->
+	<target name="runJsTestsAuxConcatFromRelease">
+	
+		<concat destfile="${Test.Js.localServerPath}/${projectBaseName}-unitTests/js/index.js">
+					
+			<fileset dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main/js" casesensitive="false">
+				<include name="**/*.js" />
+			</fileset>
+	    
+		</concat>
+	
+	</target>
+	
+	
+	<!-- Auxiliary concat to append the non release files to js unit tests -->
+	<target name="runJsTestsAuxConcatFromBuild">
+	
+		<concat destfile="${Test.Js.localServerPath}/${projectBaseName}-unitTests/js/index.js">
+					
+			<fileset dir="${targetFolderPath}/${projectBaseName}/main/js" casesensitive="false">
+				<include name="**/*.js" />
+			</fileset>
+	    
+		</concat>
+	
+	</target>
+	
+	
+	<!-- Launch the Js unit tests via local web server -->
+	<target name="runJsTestsLocalServer">
+	
+		<!-- Test.Js.localServerPath must exist -->
+		<fail message="Test.Js.localServerPath not found. A local server folder is required to run unit tests. Create it if not exists">
+		    <condition>
+		    	<not>
+		    		<available file="${Test.Js.localServerPath}" />
+		    	</not>
+		    </condition>
+		</fail>
+
+		<!-- Clear the destination folder -->
+		<delete dir="${Test.Js.localServerPath}/${projectBaseName}-unitTests" failonerror="true" />
+				
+		<!-- Copy all the test files to local server -->
+		<copy todir="${Test.Js.localServerPath}/${projectBaseName}-unitTests/js" overwrite="true">
+			<fileset dir="${srcFolderPath}/test/js" casesensitive="false" />
+		</copy>
+		
+		<!-- Append all the Js code to the index.js file -->
+		<script language="javascript">
+			<![CDATA[
+					      								
+				if(project.getProperty("Release.generate") == "true"){
+			
+					self.project.executeTarget("runJsTestsAuxConcatFromRelease");
+							
+				}else{
+			
+					self.project.executeTarget("runJsTestsAuxConcatFromBuild");
+				}
+			
+		    ]]>
+		</script>
+		
+		<concat destfile="${Test.Js.localServerPath}/${projectBaseName}-unitTests/js/index.js" 
+				append="true">
+					
+			<fileset dir="${srcFolderPath}/test/js" casesensitive="false">
+				<include name="**/*.js" />
+				<exclude name="libs/" />
+				<exclude name="index.js" />
+			</fileset>
+	    
+		</concat>
+		
+		<!-- Launch the tests on all the enabled browsers -->
+		<script language="javascript">
+			<![CDATA[
+			    
+				var browsersEnabled = project.getProperty("Test.Js.Browser.enabled").split(",");
+				var browserPaths = project.getProperty("Test.Js.Browser.osPath").split(",");
+				var url = project.getProperty("Test.Js.localServerUrl") + "/" + project.getProperty("projectBaseName") + "-unitTests/js/index.html";
+			
+				for(var i=0; i < browserPaths.length; i++){
+					
+					if(browsersEnabled[i] === "true"){
+			
+						var exec = project.createTask("exec");
+						exec.setExecutable(browserPaths[i]);
+						exec.setSpawn(true);
+					
+						exec.createArg().setLine(encodeURI(url));
+						
+						exec.perform();
+					}						
+				}				
+			]]>
+		</script>
+				
+	</target>
+		
+	
+	<!-- Create the optimized release version and tag it with the current version and build number -->
+	<target name="createReleaseVersion">
+
+		<mkdir dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}"/>
+				
+		<script language="javascript">
+			<![CDATA[
+					
+				// Java 8 requires to load a compatibility library for some imports to work
+				var version = java.lang.System.getProperty("java.version");
+				if (version.startsWith("1.8.0")) {
+				    load("nashorn:mozilla_compat.js");
+				}
+				
+				importPackage(Packages.org.apache.tools.ant.types);
+			   	importClass(java.io.File);
+			
+				var targetFolderPath = project.getProperty("targetFolderPath");
+				var projectBaseName = project.getProperty("projectBaseName");
+				var buildVersionNumber = project.getProperty("Build.versionNumber");
+				var buildNumber = project.getProperty("build.number");
+				var releaseOptimizePictures = project.getProperty("Release.optimizePictures");
+				var releaseOptimizePhp = project.getProperty("Release.optimizePhp");
+				var releaseOptimizeHtml = project.getProperty("Release.optimizeHtml");
+				var releaseOptimizeJs = project.getProperty("Release.optimizeJs");
+				var releaseOptimizeCss = project.getProperty("Release.optimizeCss");
+									
+				var fs = new FileSet();
+		      	fs.setDir(new File(targetFolderPath + "/" + projectBaseName));
+				fs.setCaseSensitive(false);
+			
+				var fsExcludes = [];
+			
+				if(project.getProperty("Release.phpDoc") == "true"){
+					self.project.executeTarget("createPhpDoc");
+				}
+			
+				if(project.getProperty("Release.jsDoc") == "true"){
+					self.project.executeTarget("createJsDoc");
+				}
+			
+				if(project.getProperty("Release.gitChangeLog") == "true"){
+					self.project.executeTarget("createGitChangeLog");
+				}
+			
+				if(releaseOptimizePictures == "true"){
+					fsExcludes.push("**/*.png");
+					fsExcludes.push("**/*.jpg");
+				}
+
+				if(releaseOptimizePhp == "true"){					
+					fsExcludes.push("**/*.php");
+				}
+			
+				if(releaseOptimizeHtml == "true"){					
+					// TODO
+				}
+						
+				if(releaseOptimizeJs == "true"){				
+					fsExcludes.push("**/*.js");
+				}
+			
+				if(releaseOptimizeCss == "true"){							
+					fsExcludes.push("**/*.css");
+				}
+						
+				fs.setExcludes(fsExcludes.join(" "));
+			   			
+				var c = project.createTask("copy");
+				c.setTodir(new File(targetFolderPath + "/" + projectBaseName + "-" + buildVersionNumber + "." + buildNumber));
+				c.setOverwrite(true);
+		
+				c.addFileset(fs);
+				c.execute();
+			
+				// Call the ant tasks
+				if(releaseOptimizePictures == "true"){
+					
+					self.project.executeTarget("minifyPNG");
+					self.project.executeTarget("minifyJPG");
+				}
+			
+				if(releaseOptimizePhp == "true"){
+					self.project.executeTarget("minifyPHP");
+				}
+			
+				if(releaseOptimizeHtml == "true"){
+					self.project.executeTarget("minifyHTML");
+				}
+			
+				if(releaseOptimizeJs == "true"){
+					self.project.executeTarget("minifyJS");
+				}
+			
+				if(releaseOptimizeCss == "true"){
+					self.project.executeTarget("minifyCSS");
+				}
+			
+		    ]]>
+		</script>
+		
+	</target>
+	
+	
+	<!-- Generate the php documentation from source code -->
+	<target name="createPhpDoc">
+
+		<mkdir dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/doc/php"/>
+		
+		<exec executable="${Tools.phpPath}" failonerror="true" outputproperty="createPhpDocOutputRedir">
+			<arg value="${Tools.phpDocPath}" />
+			<arg value="--template=&quot;responsive-twig&quot;" />
+			<arg value="--visibility=&quot;public&quot;" />
+			<arg value="--title=&quot;${projectBaseName}-${Build.versionNumber}.${build.number}&quot;" />
+			<arg value="-i" />
+			<arg value="${targetFolderPath}/${projectBaseName}/main/php/libs,AutoLoader.php" />
+			<arg value="-d" />
+			<arg value="${targetFolderPath}/${projectBaseName}/main/php" />
+			<arg value="-t" />
+			<arg value="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/doc/php" />
+		</exec>
+		
+	</target>
+	
+	
+	<!-- Generate the js documentation from source code -->
+	<target name="createJsDoc">
+
+		<mkdir dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/doc/js"/>
+
+		<exec executable="${Tools.jsDocPath}" failonerror="true" outputproperty="createJsDocOutputRedir">
+			<arg value="${targetFolderPath}/${projectBaseName}/main/js" />
+			<arg value="-t" />
+			<arg value="${Tools.jsDocTemplatePath}" />
+			<arg value="-r" />
+			<arg value="-d" />
+			<arg value="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/doc/js" />
+		</exec>
+
+	</target>
+	
+	
+	<!-- Create changelog based on a git repository -->
+	<target name="createGitChangeLog">
+
+		<!-- Create the changelog file -->
+		<property name="changeLogFilePath" value="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/Changelog.txt" />
+		<touch file="${changeLogFilePath}"/>
+		
+		<!-- Write the changelog file header -->
+		<echo file="${changeLogFilePath}" append="true" message="${projectBaseName}-${Build.versionNumber}.${build.number} CHANGELOG ---------------------------------------------" />
+		
+		<!-- Get the GIT tags sorted by date ascending -->
+		<exec executable="git" failonerror="true" outputproperty="gitTagsList">
+	    	<arg line="tag --sort version:refname"/>
+	    </exec> 
+		
+		<!-- Split the tags and generate the respective output for the latest ${Release.gitChangeLogCount} number of versions -->
+		<script language="javascript"><![CDATA[
+			
+			// Java 8 requires to load a compatibility library for some imports to work
+			var version = java.lang.System.getProperty("java.version");
+			if (version.startsWith("1.8.0")) {
+			    load("nashorn:mozilla_compat.js");
+			}
+			
+			importClass(java.io.File);
+			
+			// get the list of tags on the git repo and clean up any unwanted character
+			var tags = project.getProperty("gitTagsList").split("\n").reverse();
+			
+			for(var i=0; i < tags.length; i++){
+			
+				tags[i] = tags[i].replace(/\r?\n|\r/g, "");
+			}
+			
+			var changeLogFile = new File(project.getProperty("changeLogFilePath"));
+	        
+			var echo = project.createTask("echo");
+			echo.setFile(changeLogFile);
+			echo.setAppend(true);
+			
+			echo.setMessage("\n\n");
+			echo.perform();	
+			
+			// Log the changes from the newest defined tag to the current repo state
+			
+			var exec = project.createTask("exec");
+			exec.setExecutable("git");
+			exec.setFailonerror(true);
+			exec.setOutputproperty("changeLogTagProperty");
+		
+			exec.createArg().setLine("log " + tags[0] + "..HEAD --oneline --pretty=format:'%ad: %s%n%b%n' --date=short");
+			
+			exec.perform();	
+			
+			echo.setMessage(project.getProperty("changeLogTagProperty"));
+			echo.perform();	
+			
+			// Log all the changes for each one of the defined tags
+			
+			for(var i=0; i < Math.min(project.getProperty("Release.gitChangeLogCount"), tags.length); i++){
+			
+				echo.setMessage("\n\n\nVERSION: " + tags[i] + " ---------------------------------------------\n\n");
+				echo.perform();	
+			
+				var exec = project.createTask("exec");
+				exec.setExecutable("git");
+				exec.setFailonerror(true);
+				exec.setOutputproperty("changeLogTagProperty" + i.toString());
+			
+				if(i >= (tags.length - 1)){
+			
+					exec.createArg().setLine("log " + tags[i] + " --oneline --pretty=format:'%ad: %s%n%b%n' --date=short");
+			
+				}else{
+			
+					exec.createArg().setLine("log " + tags[i+1] + ".." + tags[i] + " --oneline --pretty=format:'%ad: %s%n%b%n' --date=short");
+				}
+				
+				exec.perform();	
+			
+				echo.setMessage(project.getProperty("changeLogTagProperty" + i.toString()));
+				echo.perform();	
+			}
+	       
+	    ]]></script>
+				
+	</target>
+	
+	
+	<!-- Apply minification to all the PNG files -->
+	<target name="minifyPNG">
+
+		<!-- 
+			Apply the massively powerful pngquant compression tool: Override the png files on the target folder with an optimized version.
+			If the optimizer cannot generate an optimized version of the specified quality, the original will remain untouched
+		 -->
+		<apply executable="${Tools.pngQuantPath}" failonerror="false">
+
+			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false">
+				<include name="**/*.png" />
+			</fileset>
+
+			<arg line="-f" />
+			<arg line="--ext .png" />
+			<arg line="--speed 1" />
+			<arg line="--quality=60-98" />
+
+		</apply>
+
+		<!-- Apply the optipng compression tool to the target folder pngs, and copy them to the release folder -->
+		<apply executable="${Tools.pngOptimizerPath}" failonerror="true">
+
+			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false">
+				<include name="**/*.png" />
+			</fileset>
+
+			<arg value="-quiet" />
+			<arg value="-o7" />
+			<srcfile />
+			<arg value="-out" />
+			<targetfile />
+			
+			<mapper type="glob" from="*.png" to="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main/*.png" />
+
+		</apply>
+
+	</target>
+	
+	
+	<!-- Apply minification to all the JPG files -->
+	<target name="minifyJPG">
+
+		<apply executable="${Tools.jpgOptimizerPath}" failonerror="true">
+
+			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false">
+				<include name="**/*.jpg" />
+			</fileset>
+
+			<arg value="-copy" />
+			<arg value="none" />
+			<arg value="-optimize" />
+			<arg value="-outfile" />
+			<targetfile />
+			<srcfile />
+
+			<mapper type="glob" from="*.jpg" to="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main/*.jpg" />
+
+		</apply>
+
+	</target>
+
+
+	<!-- Apply minification to all the PHP files -->
+	<target name="minifyPHP">
+
+		<!-- Php files may contain html code. They are stored with .phpTemp extension so we can process them next with the html minifier -->
+		<apply executable="${Tools.phpPath}" failonerror="true" outputproperty="minifyPHPOutputRedir">
+
+			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false">
+				<include name="**/*.php" />
+			</fileset>
+
+			<arg value="-w" />
+			<srcfile />
+
+			<redirector>
+				<outputmapper id="out" type="glob" from="*.php" to="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main/*.phpTemp" />
+			</redirector>
+
+		</apply>
+
+		<!-- Apply the html minifier to the temp php files, and copy the result with the correct .php extension -->
+		<apply executable="java" failonerror="true">
+
+			<fileset dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main">
+				<include name="**/*.phpTemp" />
+			</fileset>
+
+			<mapper type="glob" from="*.phpTemp" to="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main/*.php" />
+
+			<arg line="-jar" />
+			<arg path="${Tools.htmlCompressorPath}" />
+			<arg line="--preserve-php" />
+			<arg line="-o" />
+			<targetfile />
+			<srcfile />
+
+		</apply>
+
+		<!-- Clean the phpTemp marked files -->
+		<delete>
+			<fileset dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main">
+				<include name="**/*.phpTemp" />
+			</fileset>
+		</delete>
+
+	</target>
+	
+	<!-- Compress html and php files that may contain inlined html. Those are marked with .phpTemp extension -->
+	<target name="minifyHTML">
+
+		<!-- TODO -->		
+
+	</target>
+	
+	
+	<!-- Apply minification to the js files -->
+	<target name="minifyJS">
+
+		<apply executable="java" failonerror="true">
+
+			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false">
+				<include name="**/*.js" />
+			</fileset>
+
+			<mapper type="glob" from="*.js" to="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main/*.js" />
+
+			<arg line="-jar" />
+			<arg line="-Xss64m" />
+			<arg path="${Tools.minifierPath}" />
+			<arg line="--charset UTF-8" />
+			<srcfile />
+			<arg line="-o" />
+			<targetfile />
+
+		</apply>
+
+	</target>
+
+
+	<!-- Apply minification to the css files -->
+	<target name="minifyCSS">
+
+		<apply executable="java" failonerror="true">
+
+			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false">
+				<include name="**/*.css" />
+			</fileset>
+
+			<mapper type="glob" from="*.css" to="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main/*.css" />
+
+			<arg line="-jar" />
+			<arg line="-Xss64m" />
+			<arg path="${Tools.minifierPath}" />
+			<arg line="--charset UTF-8" />
+			<srcfile />
+			<arg line="-o" />
+			<targetfile />
+
+		</apply>
+
+	</target>
+	
+	
+	<!-- Generate the phar file from the files on the target folder if phar generation is enabled on setup build xml -->
+	<target name="createPhars">
+
+		<!-- Autoloader.php must exist on src/main/php/ for the phar to be correctly generated -->
+		<fail message="src/main/php/AutoLoader.php not found. This is required to create a phar that loads classes automatically">
+		    <condition>
+		    	<not>
+		    		<available file="${mainFolderPath}/php/AutoLoader.php" />
+		    	</not>
+		    </condition>
+		</fail>
+		
+		<!--Define the contents for the stub file that will be autoexecuted when the phar file is included -->
+		<property name="phpStubFile" value="&lt;?php Phar::mapPhar(); include \'phar://${projectBaseName}.phar/php/AutoLoader.php\'; __HALT_COMPILER(); ?>"/>
+		
+		<!-- Create the phar using the current project name -->
+		<exec executable="${Tools.phpPath}" failonerror="true">
+			<arg value="-d display_errors" />
+			<arg value="-r" />
+			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}/${projectBaseName}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}.phar'); $p->startBuffering(); $p->setStub('${phpStubFile}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}/main'); $p->compressFiles(Phar::GZ); $p->stopBuffering();" />
+		</exec>
+		
+		<script language="javascript">
+			<![CDATA[
+				
+				if(project.getProperty("Release.generate") == "true"){
+					self.project.executeTarget("createPharsRelease");
+				}
+			
+		    ]]>
+		</script>
+		
+	</target>
+	
+	
+	<!-- Generate the release version phars -->
+	<target name="createPharsRelease">
+
+		<!--Define the contents for the stub file that will be autoexecuted when the phar file is included -->
+		<property name="phpStubFileRelease" value="&lt;?php Phar::mapPhar(); include \'phar://${projectBaseName}-${Build.versionNumber}.${build.number}.phar/php/AutoLoader.php\'; __HALT_COMPILER(); ?>"/>
+				
+		<!-- Create the phar using the current project name and version -->
+		<exec executable="${Tools.phpPath}" failonerror="true">
+			<arg value="-d display_errors" />
+			<arg value="-r" />
+			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/${projectBaseName}-${Build.versionNumber}.${build.number}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}-${Build.versionNumber}.${build.number}.phar'); $p->startBuffering(); $p->setStub('${phpStubFileRelease}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main'); $p->compressFiles(Phar::GZ); $p->stopBuffering();" />
+		</exec>
+			
+	</target>
+	
+	
+	<!-- Generate a single JS file by merging all the js files on the target folder  -->
+	<target name="createMergedJs">
+
+		<echo file="${targetFolderPath}/${projectBaseName}/${projectBaseName}.js" 
+					  append="true" 
+					  message="/** ${projectBaseName} ${Build.versionNumber}.${build.number} */&#13;&#10;" />
+		
+		<concat destfile="${targetFolderPath}/${projectBaseName}/${projectBaseName}.js"
+				append="true">
+			
+			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false">
+				<include name="**/*.js" />
+			</fileset>
+	    
+		</concat>
+		
+		<script language="javascript">
+			<![CDATA[
+				
+				if(project.getProperty("Release.generate") == "true"){
+					self.project.executeTarget("createMergedJsRelease");
+				}
+			
+		    ]]>
+		</script>
+				
+	</target>
+	
+	
+	<!-- Generate a release version of the single JS file -->
+	<target name="createMergedJsRelease">
+
+		<echo file="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/${projectBaseName}-${Build.versionNumber}.${build.number}.js" 
+			  append="true" 
+			  message="/** ${projectBaseName} ${Build.versionNumber}.${build.number} */&#13;&#10;" />
+				
+		<concat destfile="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/${projectBaseName}-${Build.versionNumber}.${build.number}.js"
+				append="true">
+					
+			<fileset dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main" casesensitive="false">
+				<include name="**/*.js" />
+			</fileset>
+	    
+		</concat>
+				
+	</target>
+	
+	
+	<!-- Removes all the unpacked files on the target folder -->
+	<target name="removeUnpackedFiles">		
+		<delete dir="${targetFolderPath}/${projectBaseName}/main" failonerror="true" />
+		<delete dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main" failonerror="false" />
+	</target>
+	
+	
+	<!-- Deploy project files to the specified localhost location -->
+	<target name="deployLocalHost">
+		<sync todir="${Deploy.LocalHost.destPath}" overwrite="true">
+			<fileset dir="${targetFolderPath}/${projectBaseName}/main" casesensitive="false">
+			</fileset>
+		</sync>
+	</target>
+	
+	
+	<!-- Deploy project files to the specified remote ftp location -->
+	<target name="deployFtp">
+		<ftp verbose="true" passive="true" userid="${Deploy.Ftp.user}" password="${Deploy.Ftp.psw}" server="${Deploy.Ftp.server}" remotedir="${Deploy.Ftp.destPath}" >
+			<fileset dir="${targetFolderPath}/${projectBaseName}/main" excludes="${Deploy.Ftp.ignore}">
+				<modified cache="propertyfile">
+					<param name="cache.cachefile" value="${cacheFilePath}" />
+				</modified>
+			</fileset>
+		</ftp>	
+	</target>
+	
+	
+	<!-- Clean all the project elements -->
+	<target name="clean" depends="defineGlobalProperties">
+		
+		<delete file="${cacheFilePath}" failonerror="true" />
+		<delete dir="${targetFolderPath}" failonerror="true" />
+				
+		<!-- Perform all the build tasks -->
+		<script language="javascript">
+			<![CDATA[
+				
+				if(project.getProperty("Deploy.Ftp.enabled") == "true"){						
+					self.project.executeTarget("cleanFtp");
+				}
+			
+				if(project.getProperty("Deploy.LocalHost.enabled") == "true"){
+					self.project.executeTarget("cleanLocalHost");
+				}
+			
+		    ]]>
+		</script>
+		
+	</target>
+
+
+	<!-- Delete the localhost files if necessary -->
+	<target name="cleanLocalHost">
+		<delete dir="${Deploy.LocalHost.destPath}" />
+	</target>
+	
+	
+	<!-- Clean the files on the ftp remote location if FTP deploy is enabled -->
+	<target name="cleanFtp">
+
+		<!-- Delete the remote ftp files -->
+		<ftp verbose="true" passive="true" action="delete" userid="${Deploy.Ftp.user}" password="${Deploy.Ftp.psw}" server="${Deploy.Ftp.server}" remotedir="/turbotest">
+			<fileset excludes="${Deploy.Ftp.ignore}">
+				<include name="/**" />
+			</fileset>
+		</ftp>
+
+		<!-- Delete the remote ftp folders -->
+		<ftp verbose="true" passive="true" action="rmdir" userid="${Deploy.Ftp.user}" password="${Deploy.Ftp.psw}" server="${Deploy.Ftp.server}" remotedir="/turbotest">
+			<fileset excludes="${Deploy.Ftp.ignore}">
+				<include name="/**" />
+			</fileset>
+		</ftp>
+
+	</target>
+		
+
+	<!-- Update the TurboBuilder project files -->
+	<target name="updateTurboBuilder">
+		
+		<ant antfile="Update.xml" />
+		
+		<echo message="TURBOBUILDER UPDATED!" />
+		
+	</target>
+			
+</project>

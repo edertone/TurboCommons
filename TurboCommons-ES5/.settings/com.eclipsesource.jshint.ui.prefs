@@ -1,3 +1,0 @@
-eclipse.preferences.version=1
-excluded=.ant//*\://*.min.js\:src/main/css/libs//*\:src/main/js/libs//*\:src/test/js/libs//*\:target//*
-included=//*.js
