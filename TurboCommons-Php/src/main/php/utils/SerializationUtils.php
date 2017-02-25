@@ -22,11 +22,11 @@ class SerializationUtils{
 
 
 	/**
-	 * TODO fer aixo
+	 * TODO
 	 */
 	public static function arrayToObject($string){
 
-		// TODO fer aixo
+		// TODO
 	}
 
 
@@ -147,12 +147,18 @@ class SerializationUtils{
 			return null;
 		}
 
+		$previous = libxml_use_internal_errors(true);
+
 		$xml = simplexml_load_string(trim($string));
 
-		if(!$xml){
+		if(!$xml) {
+
+			libxml_clear_errors();
 
 			throw new Exception('SerializationUtils->stringToXml could not convert string to SimpleXMLElement');
 		}
+
+		libxml_use_internal_errors($previous);
 
 		return $xml;
 	}

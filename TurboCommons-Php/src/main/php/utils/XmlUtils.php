@@ -22,19 +22,53 @@ class XmlUtils{
 
 
 	/**
+	 * Check if the provided object contains valid xml information.
+	 *
+	 * @param object $value Object to test for valid XML data. Accepted values are: Strings containing XML data and SimpleXMLElements
+	 *
+	 * @return boolean True if the received object represent valid XML data. False otherwise.
+	 */
+	public static function isValidXML($value){
+
+		if(is_string($value)){
+
+			try {
+
+				$value = SerializationUtils::stringToXml($value);
+
+			} catch (Exception $e) {
+
+				return false;
+			}
+		}
+
+		if(!is_object($value)){
+
+			return false;
+		}
+
+		return get_class($value) == 'SimpleXMLElement';
+	}
+
+
+	/**
 	 * Check if two provided xml structures represent the same data
 	 *
 	 * @param object $xml1 A valid string or xml object to compare with the other one
 	 * @param object $xml2 A valid string or xml object to compare with the other one
-	 * @param boolean $IgnoreChildrenOrder Set it to true if the two xml elements can be considered
-	 * equal if their children are the same but ordered differently (true is the default value).
-	 * @param boolean $IgnoreAttributeOrder Set it to true if the two xml elements can be considered
-	 * equal even if their attributes are the same but ordered differently (true is the default value).
+	 * @param boolean $strictChildOrder Set it to true if both xml elements must have the children in the same order to be considered equal. False is the default value which means that having the same children in a different order accepted to consider the two elements equal.
+	 * @param boolean $strictAttributeOrder Same as $strictChildOrder but with xml attributes. Defaults to false.
 	 * @param boolean $ignoreCase Set it to true to ignore letter case when comparing the two elements (false by default).
 	 *
-	 * @return boolean true if the two xml elements are equal, false if not
+	 * @return boolean true if the two xml elements are considered equal, false if not
 	 */
-	public static function isEqualTo($xml1, $xml2, $IgnoreChildrenOrder = true, $IgnoreAttributeOrder = true, $ignoreCase = false){
+	public static function isEqualTo($xml1, $xml2, $strictChildOrder = false, $strictAttributeOrder = false, $ignoreCase = false){
+
+		// Non xml elements must throw an exception
+		if(!self::isValidXML($xml1) || !self::isValidXML($xml2)){
+
+			throw new Exception('XmlUtils->isEqualTo parameters must contain valid xml data');
+		}
 
 		// Convert both elements to simplexml elements if strings are received
 		if(is_string($xml1)){
@@ -47,17 +81,11 @@ class XmlUtils{
 			$xml2 = SerializationUtils::stringToXml($xml2);
 		}
 
-		// Non xml elements must throw an exception
-		if(get_class($xml1) != 'SimpleXMLElement' || get_class($xml2) != 'SimpleXMLElement'){
-
-			throw new Exception('XmlUtils->isEqualTo parameters must contain valid xml data');
-		}
-
 		// Check that the root element name and value is the same on both xmls
-		$xml1RootName = ($ignoreCase) ?strtolower($xml1->getName()) : $xml1->getName();
-		$xml2RootName = ($ignoreCase) ?strtolower($xml2->getName()) : $xml2->getName();
-		$xml1RootValue = ($ignoreCase) ?strtolower((string)$xml1) : (string)$xml1;
-		$xml2RootValue = ($ignoreCase) ?strtolower((string)$xml2) : (string)$xml2;
+		$xml1RootName = ($ignoreCase) ? strtolower($xml1->getName()) : $xml1->getName();
+		$xml2RootName = ($ignoreCase) ? strtolower($xml2->getName()) : $xml2->getName();
+		$xml1RootValue = ($ignoreCase) ? strtolower((string)$xml1) : (string)$xml1;
+		$xml2RootValue = ($ignoreCase) ? strtolower((string)$xml2) : (string)$xml2;
 
 		if($xml1RootName != $xml2RootName || $xml1RootValue != $xml2RootValue){
 
@@ -82,7 +110,17 @@ class XmlUtils{
 			$xml1AttributeName = ($ignoreCase) ? strtolower($xml1Attributes[$i]->getName()) : $xml1Attributes[$i]->getName();
 			$xml1AttributeValue = ($ignoreCase) ? strtolower((string)$xml1Attributes[$i]) : (string)$xml1Attributes[$i];
 
-			if($IgnoreAttributeOrder){
+			if($strictAttributeOrder){
+
+				$xml2AttributeName = ($ignoreCase) ? strtolower($xml2Attributes[$i]->getName()) : $xml2Attributes[$i]->getName();
+				$xml2AttributeValue = ($ignoreCase) ? strtolower((string)$xml2Attributes[$i]) : (string)$xml2Attributes[$i];
+
+				if($xml1AttributeName != $xml2AttributeName || $xml1AttributeValue != $xml2AttributeValue){
+
+					return false;
+				}
+
+			}else{
 
 				$attributeFound = false;
 
@@ -99,16 +137,6 @@ class XmlUtils{
 				}
 
 				if(!$attributeFound){
-
-					return false;
-				}
-
-			}else{
-
-				$xml2AttributeName = ($ignoreCase) ? strtolower($xml2Attributes[$i]->getName()) : $xml2Attributes[$i]->getName();
-				$xml2AttributeValue = ($ignoreCase) ? strtolower((string)$xml2Attributes[$i]) : (string)$xml2Attributes[$i];
-
-				if($xml1AttributeName != $xml2AttributeName || $xml1AttributeValue != $xml2AttributeValue){
 
 					return false;
 				}
@@ -130,13 +158,20 @@ class XmlUtils{
 
 		for ($i = 0; $i < $xml1ChildrenCount; $i++) {
 
-			if($IgnoreChildrenOrder){
+			if($strictChildOrder){
+
+				if(!self::isEqualTo($xml1Children[$i], $xml2Children[$i], $strictChildOrder, $strictAttributeOrder, $ignoreCase)){
+
+					return false;
+				}
+
+			}else{
 
 				$childFound = false;
 
 				for ($j = 0; $j < $xml2ChildrenCount; $j++) {
 
-					if(self::isEqualTo($xml1Children[$i], $xml2Children[$j], $IgnoreChildrenOrder, $IgnoreAttributeOrder, $ignoreCase)){
+					if(self::isEqualTo($xml1Children[$i], $xml2Children[$j], $strictChildOrder, $strictAttributeOrder, $ignoreCase)){
 
 						$childFound = true;
 						break;
@@ -144,13 +179,6 @@ class XmlUtils{
 				}
 
 				if(!$childFound){
-
-					return false;
-				}
-
-			}else{
-
-				if(!self::isEqualTo($xml1Children[$i], $xml2Children[$i], $IgnoreChildrenOrder, $IgnoreAttributeOrder, $ignoreCase)){
 
 					return false;
 				}
@@ -162,24 +190,20 @@ class XmlUtils{
 
 
 	/**
-	 * Append an xml element as child to another one.
-	 * The child xml will be placed directly under the root of the parent, after the last one of
-	 * the current children (if any).
-	 * Original xml elements will not be modified
+	 * Append an xml element as child to another one, directly under the root node after the last one of its children (if any).
+	 * NOTE: Parent element that is provided as parameter will be modified after this method is called.
 	 *
-	 * @param object $parent An xml element (as a string or a simplexmlelement instance) that will have the new child element.
-	 * @param object $child An xml element (as a string or a simplexmlelement instance) that will be added as child to the specified parent.
+	 * @param SimpleXMLElement $parent An xml element that will be modified to have the new child apended after the last of its children.
+	 * @param string|SimpleXMLElement $child An xml element that will be added as child to the specified parent. This parameter can be provided as a SimpleXMLElement or a valid xml string
 	 *
-	 * @return SimpleXMLElement The
+	 * @return SimpleXMLElement The modified parent object containing the provided child element
 	 */
-	public static function addChild($parent, $child){
-
-		// TODO - incomplete method
+	public static function addChild(SimpleXMLElement $parent, $child){
 
 		// Make sure both elements are SimpleXmlElement
-		if(is_string($parent)){
+		if(!self::isValidXML($parent) || !self::isValidXML($child)){
 
-			$parent = SerializationUtils::stringToXml($parent);
+			throw new Exception('XmlUtils->addChild parameters must be valid XML data');
 		}
 
 		if(is_string($child)){
