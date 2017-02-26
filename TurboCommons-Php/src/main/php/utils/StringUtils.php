@@ -458,8 +458,10 @@ class StringUtils {
 		$chars = 'abcdefghijkmnopqrstuvwxyz023456789';
 
 		// With the upper case option, also upper case letters will be used
-		if($useuppercase)
+		if($useuppercase){
+
 			$chars = 'ABCDEFGHIJKMNOPQRSTUVWXYZ'.$chars;
+		}
 
 		// Get the lenght for the chars string to use in random generation process
 		$charslen = strlen($chars) - 1;
