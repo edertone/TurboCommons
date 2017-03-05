@@ -20,6 +20,7 @@ QUnit.module("StringUtilsTest");
  */
 QUnit.test("isEmpty", function(assert){
 
+	assert.ok(utils.StringUtils.isEmpty(undefined));
 	assert.ok(utils.StringUtils.isEmpty(null));
 	assert.ok(utils.StringUtils.isEmpty(''));
 	assert.ok(utils.StringUtils.isEmpty([]));
@@ -92,81 +93,81 @@ QUnit.test("limitLen", function(assert){
 
 
 /**
- * extractDomainFromUrl
+ * getDomainFromUrl
  */
-QUnit.test("extractDomainFromUrl", function(assert){
+QUnit.test("getDomainFromUrl", function(assert){
 
-	assert.ok(utils.StringUtils.extractDomainFromUrl(null) === '');
-	assert.ok(utils.StringUtils.extractDomainFromUrl(undefined) === '');
-	assert.ok(utils.StringUtils.extractDomainFromUrl('') === '');
-	assert.ok(utils.StringUtils.extractDomainFromUrl("aa....aa..") === '');
-	assert.ok(utils.StringUtils.extractDomainFromUrl('google.com') === '');
-	assert.ok(utils.StringUtils.extractDomainFromUrl('http://google.com') === 'google.com');
-	assert.ok(utils.StringUtils.extractDomainFromUrl('http://www.google.com') === 'google.com');
-	assert.ok(utils.StringUtils.extractDomainFromUrl('https://www.youtube.com/watch?v=Zs3im94FSpU') === 'youtube.com');
-	assert.ok(utils.StringUtils.extractDomainFromUrl('https://developer.chrome.com/extensions/notifications#method-clear') === 'chrome.com');
-	assert.ok(utils.StringUtils.extractDomainFromUrl('http://www.abc.es/internacional/abci-represion-mediatica-venezuela-periodistas-detenidos-y-expulsados-menos-24-horas-201609011727_noticia.html') === 'abc.es');
-	assert.ok(utils.StringUtils.extractDomainFromUrl('file:///C:/Users/Jaume/Desktop/Extension%200.2.9/PopUp-Enable.html') === '');
-	assert.ok(utils.StringUtils.extractDomainFromUrl(' asdfa sfdaewr 345 drtwertwert5324') === '');
-	assert.ok(utils.StringUtils.extractDomainFromUrl("\n\t\n2i34.,.324 .,h we. h \n\n") === '');
-	assert.ok(utils.StringUtils.extractDomainFromUrl('ftp://ftp.funet.fi/pub/standards/RFC/rfc959.txt') === 'funet.fi');
-	assert.ok(utils.StringUtils.extractDomainFromUrl('ftp://jess12:bosox67@ftp.xyz.com') === 'xyz.com');
-	assert.ok(utils.StringUtils.extractDomainFromUrl('ftp://jess12@xyz.com:bosox67@ftp.xyz.com') === 'xyz.com');
+	assert.ok(utils.StringUtils.getDomainFromUrl(null) === '');
+	assert.ok(utils.StringUtils.getDomainFromUrl(undefined) === '');
+	assert.ok(utils.StringUtils.getDomainFromUrl('') === '');
+	assert.ok(utils.StringUtils.getDomainFromUrl("aa....aa..") === '');
+	assert.ok(utils.StringUtils.getDomainFromUrl('google.com') === '');
+	assert.ok(utils.StringUtils.getDomainFromUrl('http://google.com') === 'google.com');
+	assert.ok(utils.StringUtils.getDomainFromUrl('http://www.google.com') === 'google.com');
+	assert.ok(utils.StringUtils.getDomainFromUrl('https://www.youtube.com/watch?v=Zs3im94FSpU') === 'youtube.com');
+	assert.ok(utils.StringUtils.getDomainFromUrl('https://developer.chrome.com/extensions/notifications#method-clear') === 'chrome.com');
+	assert.ok(utils.StringUtils.getDomainFromUrl('http://www.abc.es/internacional/abci-represion-mediatica-venezuela-periodistas-detenidos-y-expulsados-menos-24-horas-201609011727_noticia.html') === 'abc.es');
+	assert.ok(utils.StringUtils.getDomainFromUrl('file:///C:/Users/Jaume/Desktop/Extension%200.2.9/PopUp-Enable.html') === '');
+	assert.ok(utils.StringUtils.getDomainFromUrl(' asdfa sfdaewr 345 drtwertwert5324') === '');
+	assert.ok(utils.StringUtils.getDomainFromUrl("\n\t\n2i34.,.324 .,h we. h \n\n") === '');
+	assert.ok(utils.StringUtils.getDomainFromUrl('ftp://ftp.funet.fi/pub/standards/RFC/rfc959.txt') === 'funet.fi');
+	assert.ok(utils.StringUtils.getDomainFromUrl('ftp://jess12:bosox67@ftp.xyz.com') === 'xyz.com');
+	assert.ok(utils.StringUtils.getDomainFromUrl('ftp://jess12@xyz.com:bosox67@ftp.xyz.com') === 'xyz.com');
 });
 
 
 /**
- * extractHostNameFromUrl
+ * getHostNameFromUrl
  */
-QUnit.test("extractHostNameFromUrl", function(assert){
+QUnit.test("getHostNameFromUrl", function(assert){
 
-	assert.ok(utils.StringUtils.extractHostNameFromUrl(null) === '');
-	assert.ok(utils.StringUtils.extractHostNameFromUrl(undefined) === '');
-	assert.ok(utils.StringUtils.extractHostNameFromUrl('') === '');
-	assert.ok(utils.StringUtils.extractHostNameFromUrl("aa....aa..") === '');
-	assert.ok(utils.StringUtils.extractHostNameFromUrl('google.com') === '');
-	assert.ok(utils.StringUtils.extractHostNameFromUrl('http://x.ye') === 'x.ye');
-	assert.ok(utils.StringUtils.extractHostNameFromUrl('http://google.com') === 'google.com');
-	assert.ok(utils.StringUtils.extractHostNameFromUrl('http://www.google.com') === 'www.google.com');
-	assert.ok(utils.StringUtils.extractHostNameFromUrl('|%$)"·/%') === '');
-	assert.ok(utils.StringUtils.extractHostNameFromUrl('http://|%$)"·/%') === '');
-	assert.ok(utils.StringUtils.extractHostNameFromUrl('https://www.youtube.com/watch?v=Zs3im94FSpU') === 'www.youtube.com');
-	assert.ok(utils.StringUtils.extractHostNameFromUrl('https://developer.chrome.com/extensions/notifications#method-clear') === 'developer.chrome.com');
-	assert.ok(utils.StringUtils.extractHostNameFromUrl('http://www.abc.es/internacional/abci-represion-mediatica-venezuela-periodistas-detenidos-y-expulsados-menos-24-horas-201609011727_noticia.html') === 'www.abc.es');
-	assert.ok(utils.StringUtils.extractHostNameFromUrl('file:///C:/Users/Jaume/Desktop/Extension%200.2.9/PopUp-Enable.html') === '');
-	assert.ok(utils.StringUtils.extractHostNameFromUrl(' asdfa sfdaewr 345 drtwertwert5324') === '');
-	assert.ok(utils.StringUtils.extractHostNameFromUrl("\n\t\n2i34.,.324 .,h we. h \n\n") === '');
-	assert.ok(utils.StringUtils.extractHostNameFromUrl('ftp://ftp.funet.fi/pub/standards/RFC/rfc959.txt') === 'ftp.funet.fi');
-	assert.ok(utils.StringUtils.extractHostNameFromUrl('ftp://jess12:bosox67@ftp.xyz.com') === 'ftp.xyz.com');
-	assert.ok(utils.StringUtils.extractHostNameFromUrl('ftp://jess12@xyz.com:bosox67@ftp.xyz.com') === 'ftp.xyz.com');
+	assert.ok(utils.StringUtils.getHostNameFromUrl(null) === '');
+	assert.ok(utils.StringUtils.getHostNameFromUrl(undefined) === '');
+	assert.ok(utils.StringUtils.getHostNameFromUrl('') === '');
+	assert.ok(utils.StringUtils.getHostNameFromUrl("aa....aa..") === '');
+	assert.ok(utils.StringUtils.getHostNameFromUrl('google.com') === '');
+	assert.ok(utils.StringUtils.getHostNameFromUrl('http://x.ye') === 'x.ye');
+	assert.ok(utils.StringUtils.getHostNameFromUrl('http://google.com') === 'google.com');
+	assert.ok(utils.StringUtils.getHostNameFromUrl('http://www.google.com') === 'www.google.com');
+	assert.ok(utils.StringUtils.getHostNameFromUrl('|%$)"·/%') === '');
+	assert.ok(utils.StringUtils.getHostNameFromUrl('http://|%$)"·/%') === '');
+	assert.ok(utils.StringUtils.getHostNameFromUrl('https://www.youtube.com/watch?v=Zs3im94FSpU') === 'www.youtube.com');
+	assert.ok(utils.StringUtils.getHostNameFromUrl('https://developer.chrome.com/extensions/notifications#method-clear') === 'developer.chrome.com');
+	assert.ok(utils.StringUtils.getHostNameFromUrl('http://www.abc.es/internacional/abci-represion-mediatica-venezuela-periodistas-detenidos-y-expulsados-menos-24-horas-201609011727_noticia.html') === 'www.abc.es');
+	assert.ok(utils.StringUtils.getHostNameFromUrl('file:///C:/Users/Jaume/Desktop/Extension%200.2.9/PopUp-Enable.html') === '');
+	assert.ok(utils.StringUtils.getHostNameFromUrl(' asdfa sfdaewr 345 drtwertwert5324') === '');
+	assert.ok(utils.StringUtils.getHostNameFromUrl("\n\t\n2i34.,.324 .,h we. h \n\n") === '');
+	assert.ok(utils.StringUtils.getHostNameFromUrl('ftp://ftp.funet.fi/pub/standards/RFC/rfc959.txt') === 'ftp.funet.fi');
+	assert.ok(utils.StringUtils.getHostNameFromUrl('ftp://jess12:bosox67@ftp.xyz.com') === 'ftp.xyz.com');
+	assert.ok(utils.StringUtils.getHostNameFromUrl('ftp://jess12@xyz.com:bosox67@ftp.xyz.com') === 'ftp.xyz.com');
 });
 
 
 /**
- * extractLines
+ * getLines
  */
-QUnit.test("extractLines", function(assert){
+QUnit.test("getLines", function(assert){
 
-	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines(null), []));
-	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines(''), []));
-	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines('          '), []));
-	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines('single line'), ['single line']));
-	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines("line1\nline2\nline3"), ['line1', 'line2', 'line3']));
-	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines("line1\n        \nline2"), ['line1', 'line2']));
-	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines("line1\n\n\n\t\r       \nline2"), ['line1', 'line2']));
-	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines("line1\r\n   \r\nline2"), ['line1', 'line2']));
-	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines("line1\n 1  \nline2"), ['line1', ' 1  ', 'line2']));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.getLines(null), []));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.getLines(''), []));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.getLines('          '), []));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.getLines('single line'), ['single line']));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.getLines("line1\nline2\nline3"), ['line1', 'line2', 'line3']));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.getLines("line1\n        \nline2"), ['line1', 'line2']));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.getLines("line1\n\n\n\t\r       \nline2"), ['line1', 'line2']));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.getLines("line1\r\n   \r\nline2"), ['line1', 'line2']));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.getLines("line1\n 1  \nline2"), ['line1', ' 1  ', 'line2']));
 
-	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines('          ', []), ['          ']));
-	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines("line1\n   \nline2", []), ['line1', '   ', 'line2']));
-	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.extractLines("line1\r\n   \r\nline2", []), ['line1', '   ', 'line2']));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.getLines('          ', []), ['          ']));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.getLines("line1\n   \nline2", []), ['line1', '   ', 'line2']));
+	assert.ok(utils.ArrayUtils.isEqualTo(utils.StringUtils.getLines("line1\r\n   \r\nline2", []), ['line1', '   ', 'line2']));
 });
 
 
 /**
- * extractKeyWords
+ * getKeyWords
  */
-QUnit.test("extractKeyWords", function(assert){
+QUnit.test("getKeyWords", function(assert){
 
 	// TODO: copy tests from PHP
 	assert.ok(true);
@@ -174,86 +175,86 @@ QUnit.test("extractKeyWords", function(assert){
 
 
 /**
- * extractFileNameWithExtension
+ * getFileNameWithExtension
  */
-QUnit.test("extractFileNameWithExtension", function(assert){
+QUnit.test("getFileNameWithExtension", function(assert){
 
-	assert.ok(utils.StringUtils.extractFileNameWithExtension(null) === '');
-	assert.ok(utils.StringUtils.extractFileNameWithExtension('') === '');
-	assert.ok(utils.StringUtils.extractFileNameWithExtension('       ') === '');
-	assert.ok(utils.StringUtils.extractFileNameWithExtension('C:\\Program Files\\CCleaner\\CCleaner64.exe') === 'CCleaner64.exe');
-	assert.ok(utils.StringUtils.extractFileNameWithExtension('\\Files/CCleaner/CCleaner64.exe') === 'CCleaner64.exe');
-	assert.ok(utils.StringUtils.extractFileNameWithExtension('//folder/folder2/folder3/file.txt') === 'file.txt');
-	assert.ok(utils.StringUtils.extractFileNameWithExtension('CCleaner64.exe') === 'CCleaner64.exe');
-	assert.ok(utils.StringUtils.extractFileNameWithExtension('\\\\\\CCleaner64.exe') === 'CCleaner64.exe');
-	assert.ok(utils.StringUtils.extractFileNameWithExtension('\\some long path containing lots of spaces\\///CCleaner64.exe') === 'CCleaner64.exe');
-	assert.ok(utils.StringUtils.extractFileNameWithExtension("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe") === 'CCleaner64.exe');
+	assert.ok(utils.StringUtils.getFileNameWithExtension(null) === '');
+	assert.ok(utils.StringUtils.getFileNameWithExtension('') === '');
+	assert.ok(utils.StringUtils.getFileNameWithExtension('       ') === '');
+	assert.ok(utils.StringUtils.getFileNameWithExtension('C:\\Program Files\\CCleaner\\CCleaner64.exe') === 'CCleaner64.exe');
+	assert.ok(utils.StringUtils.getFileNameWithExtension('\\Files/CCleaner/CCleaner64.exe') === 'CCleaner64.exe');
+	assert.ok(utils.StringUtils.getFileNameWithExtension('//folder/folder2/folder3/file.txt') === 'file.txt');
+	assert.ok(utils.StringUtils.getFileNameWithExtension('CCleaner64.exe') === 'CCleaner64.exe');
+	assert.ok(utils.StringUtils.getFileNameWithExtension('\\\\\\CCleaner64.exe') === 'CCleaner64.exe');
+	assert.ok(utils.StringUtils.getFileNameWithExtension('\\some long path containing lots of spaces\\///CCleaner64.exe') === 'CCleaner64.exe');
+	assert.ok(utils.StringUtils.getFileNameWithExtension("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe") === 'CCleaner64.exe');
 });
 
 
 /**
- * extractFileNameWithoutExtension
+ * getFileNameWithoutExtension
  */
-QUnit.test("extractFileNameWithoutExtension", function(assert){
+QUnit.test("getFileNameWithoutExtension", function(assert){
 
-	assert.ok(utils.StringUtils.extractFileNameWithoutExtension(null) === '');
-	assert.ok(utils.StringUtils.extractFileNameWithoutExtension('') === '');
-	assert.ok(utils.StringUtils.extractFileNameWithoutExtension('       ') === '');
-	assert.ok(utils.StringUtils.extractFileNameWithoutExtension('C:\\Program Files\\CCleaner\\CCleaner64.exe') === 'CCleaner64');
-	assert.ok(utils.StringUtils.extractFileNameWithoutExtension('\\Files/CCleaner/CCleaner64.exe') === 'CCleaner64');
-	assert.ok(utils.StringUtils.extractFileNameWithoutExtension('//folder/folder2/folder3/file.txt') === 'file');
-	assert.ok(utils.StringUtils.extractFileNameWithoutExtension('CCleaner64.exe') === 'CCleaner64');
-	assert.ok(utils.StringUtils.extractFileNameWithoutExtension('\\\\\\CCleaner64.exe') === 'CCleaner64');
-	assert.ok(utils.StringUtils.extractFileNameWithoutExtension('\\some long path containing lots of spaces\\///CCleaner64.exe') === 'CCleaner64');
-	assert.ok(utils.StringUtils.extractFileNameWithoutExtension("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe") === 'CCleaner64');
+	assert.ok(utils.StringUtils.getFileNameWithoutExtension(null) === '');
+	assert.ok(utils.StringUtils.getFileNameWithoutExtension('') === '');
+	assert.ok(utils.StringUtils.getFileNameWithoutExtension('       ') === '');
+	assert.ok(utils.StringUtils.getFileNameWithoutExtension('C:\\Program Files\\CCleaner\\CCleaner64.exe') === 'CCleaner64');
+	assert.ok(utils.StringUtils.getFileNameWithoutExtension('\\Files/CCleaner/CCleaner64.exe') === 'CCleaner64');
+	assert.ok(utils.StringUtils.getFileNameWithoutExtension('//folder/folder2/folder3/file.txt') === 'file');
+	assert.ok(utils.StringUtils.getFileNameWithoutExtension('CCleaner64.exe') === 'CCleaner64');
+	assert.ok(utils.StringUtils.getFileNameWithoutExtension('\\\\\\CCleaner64.exe') === 'CCleaner64');
+	assert.ok(utils.StringUtils.getFileNameWithoutExtension('\\some long path containing lots of spaces\\///CCleaner64.exe') === 'CCleaner64');
+	assert.ok(utils.StringUtils.getFileNameWithoutExtension("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe") === 'CCleaner64');
 });
 
 
 /**
- * extractFileExtension
+ * getFileExtension
  */
-QUnit.test("extractFileExtension", function(assert){
+QUnit.test("getFileExtension", function(assert){
 
-	assert.ok(utils.StringUtils.extractFileExtension(null) === '');
-	assert.ok(utils.StringUtils.extractFileExtension('') === '');
-	assert.ok(utils.StringUtils.extractFileExtension('       ') === '');
-	assert.ok(utils.StringUtils.extractFileExtension('C:\\Program Files\\CCleaner\\CCleaner64.exe') === 'exe');
-	assert.ok(utils.StringUtils.extractFileExtension('\\Files/CCleaner/CCleaner64.exe') === 'exe');
-	assert.ok(utils.StringUtils.extractFileExtension('//folder/folder2/folder3/file.txt') === 'txt');
-	assert.ok(utils.StringUtils.extractFileExtension('CCleaner64.exe') === 'exe');
-	assert.ok(utils.StringUtils.extractFileExtension('\\\\\\CCleaner64.exe') === 'exe');
-	assert.ok(utils.StringUtils.extractFileExtension('\\some long path containing lots of spaces\\///CCleaner64.exe') === 'exe');
-	assert.ok(utils.StringUtils.extractFileExtension('CCleaner64.EXE') === 'EXE');
-	assert.ok(utils.StringUtils.extractFileExtension('\\\\\\CCleaner64.eXEfile') === 'eXEfile');
-	assert.ok(utils.StringUtils.extractFileExtension("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe") === 'exe');
+	assert.ok(utils.StringUtils.getFileExtension(null) === '');
+	assert.ok(utils.StringUtils.getFileExtension('') === '');
+	assert.ok(utils.StringUtils.getFileExtension('       ') === '');
+	assert.ok(utils.StringUtils.getFileExtension('C:\\Program Files\\CCleaner\\CCleaner64.exe') === 'exe');
+	assert.ok(utils.StringUtils.getFileExtension('\\Files/CCleaner/CCleaner64.exe') === 'exe');
+	assert.ok(utils.StringUtils.getFileExtension('//folder/folder2/folder3/file.txt') === 'txt');
+	assert.ok(utils.StringUtils.getFileExtension('CCleaner64.exe') === 'exe');
+	assert.ok(utils.StringUtils.getFileExtension('\\\\\\CCleaner64.exe') === 'exe');
+	assert.ok(utils.StringUtils.getFileExtension('\\some long path containing lots of spaces\\///CCleaner64.exe') === 'exe');
+	assert.ok(utils.StringUtils.getFileExtension('CCleaner64.EXE') === 'EXE');
+	assert.ok(utils.StringUtils.getFileExtension('\\\\\\CCleaner64.eXEfile') === 'eXEfile');
+	assert.ok(utils.StringUtils.getFileExtension("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe") === 'exe');
 });
 
 
 /**
- * extractSchemeFromUrl
+ * getSchemeFromUrl
  */
-QUnit.test("extractSchemeFromUrl", function(assert){
+QUnit.test("getSchemeFromUrl", function(assert){
 
 	// Invalid urls
-	assert.ok(utils.StringUtils.extractSchemeFromUrl(null) === '');
-	assert.ok(utils.StringUtils.extractSchemeFromUrl(undefined) === '');
-	assert.ok(utils.StringUtils.extractSchemeFromUrl('') === '');
-	assert.ok(utils.StringUtils.extractSchemeFromUrl('adfadsf') === '');
-	assert.ok(utils.StringUtils.extractSchemeFromUrl('http://') === '');
-	assert.ok(utils.StringUtils.extractSchemeFromUrl('||@#~@#~·$%') === '');
-	assert.ok(utils.StringUtils.extractSchemeFromUrl('http://|@##~€#~€') === '');
-	assert.ok(utils.StringUtils.extractSchemeFromUrl('http:/youtube.org') === '');
-	assert.ok(utils.StringUtils.extractSchemeFromUrl('x.ye') === '');
-	assert.ok(utils.StringUtils.extractSchemeFromUrl('google.com') === '');
+	assert.ok(utils.StringUtils.getSchemeFromUrl(null) === '');
+	assert.ok(utils.StringUtils.getSchemeFromUrl(undefined) === '');
+	assert.ok(utils.StringUtils.getSchemeFromUrl('') === '');
+	assert.ok(utils.StringUtils.getSchemeFromUrl('adfadsf') === '');
+	assert.ok(utils.StringUtils.getSchemeFromUrl('http://') === '');
+	assert.ok(utils.StringUtils.getSchemeFromUrl('||@#~@#~·$%') === '');
+	assert.ok(utils.StringUtils.getSchemeFromUrl('http://|@##~€#~€') === '');
+	assert.ok(utils.StringUtils.getSchemeFromUrl('http:/youtube.org') === '');
+	assert.ok(utils.StringUtils.getSchemeFromUrl('x.ye') === '');
+	assert.ok(utils.StringUtils.getSchemeFromUrl('google.com') === '');
 
 	// Valid urls
-	assert.ok(utils.StringUtils.extractSchemeFromUrl('http://youtube.org') === 'http');
-	assert.ok(utils.StringUtils.extractSchemeFromUrl('https://yahoo.es') === 'https');
-	assert.ok(utils.StringUtils.extractSchemeFromUrl('ftp://user:password@host.com:8080/path') === 'ftp');
-	assert.ok(utils.StringUtils.extractSchemeFromUrl('http://www.example.com/a/b/c/d/e/f/g/h/i.html') === 'http');
-	assert.ok(utils.StringUtils.extractSchemeFromUrl('http://➡.ws/䨹') === 'http');
-	assert.ok(utils.StringUtils.extractSchemeFromUrl('http://-.~_!$&\'()*+,;=:%40:80%2f::::::@example.com') === 'http');
-	assert.ok(utils.StringUtils.extractSchemeFromUrl('https://223.255.255.254') === 'https');
+	assert.ok(utils.StringUtils.getSchemeFromUrl('http://youtube.org') === 'http');
+	assert.ok(utils.StringUtils.getSchemeFromUrl('https://yahoo.es') === 'https');
+	assert.ok(utils.StringUtils.getSchemeFromUrl('ftp://user:password@host.com:8080/path') === 'ftp');
+	assert.ok(utils.StringUtils.getSchemeFromUrl('http://www.example.com/a/b/c/d/e/f/g/h/i.html') === 'http');
+	assert.ok(utils.StringUtils.getSchemeFromUrl('http://➡.ws/䨹') === 'http');
+	assert.ok(utils.StringUtils.getSchemeFromUrl('http://-.~_!$&\'()*+,;=:%40:80%2f::::::@example.com') === 'http');
+	assert.ok(utils.StringUtils.getSchemeFromUrl('https://223.255.255.254') === 'https');
 
 });
 

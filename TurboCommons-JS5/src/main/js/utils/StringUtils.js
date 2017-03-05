@@ -51,7 +51,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 		var aux = '';
 
 		// Note that we are checking emptyness every time we do a replace to improve speed, avoiding unnecessary replacements.
-		if(string == null || string == "" || string === undefined){
+		if(string == null || string == ""){
 
 			return true;
 		}
@@ -99,6 +99,18 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	},
 
 
+	isCamelCase : function(){
+
+		// TODO - translate from php
+	},
+
+
+	isSnakeCase : function(){
+
+		// TODO - translate from php
+	},
+
+
 	/**
 	 * Count the number of words that exist on the given string
 	 *
@@ -115,7 +127,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 		wordSeparator = (wordSeparator === undefined) ? ' ' : wordSeparator;
 
 		var count = 0;
-		var lines = this.extractLines(string);
+		var lines = this.getLines(string);
 
 		for(var i = 0; i < lines.length; i++){
 
@@ -190,9 +202,9 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 * 
 	 * @returns {string} The domain from the given string (excluding the subdomain if exists)
 	 */
-	extractDomainFromUrl : function(url){
+	getDomainFromUrl : function(url){
 
-		var hostName = this.extractHostNameFromUrl(url);
+		var hostName = this.getHostNameFromUrl(url);
 
 		hostName = hostName.split('.');
 
@@ -215,7 +227,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 * 
 	 * @returns {string} The domain and subdomain from the given string (subdomain.domain.com)
 	 */
-	extractHostNameFromUrl : function(url){
+	getHostNameFromUrl : function(url){
 
 		var validationManager = new org_turbocommons_src_main_js_managers.ValidationManager();
 
@@ -252,7 +264,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 *
 	 * @returns {array} A list with all the string lines sepparated as different array elements.
 	 */
-	extractLines : function(string, filters){
+	getLines : function(string, filters){
 
 		// Set optional parameters default values
 		filters = (filters === undefined) ? [/\s+/g] : filters;
@@ -302,7 +314,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 *
 	 * @returns {array} The list of keywords that have been extracted from the given text
 	 */
-	extractKeyWords : function(string, max, longerThan, shorterThan, ignoreNumericWords){
+	getKeyWords : function(string, max, longerThan, shorterThan, ignoreNumericWords){
 
 		// Set optional parameters default values
 		max = (max === undefined) ? 25 : max;
@@ -324,7 +336,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 *
 	 * @returns {string} The extracted filename and extension, like: finemane.txt
 	 */
-	extractFileNameWithExtension : function(path){
+	getFileNameWithExtension : function(path){
 
 		var osSeparator = org_turbocommons_src_main_js_utils.FileSystemUtils.getDirectorySeparator();
 
@@ -354,14 +366,14 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 *
 	 * @returns {string} The extracted filename WITHOUT extension, like: finemane
 	 */
-	extractFileNameWithoutExtension : function(path){
+	getFileNameWithoutExtension : function(path){
 
 		if(this.isEmpty(path)){
 
 			return '';
 		}
 
-		path = this.extractFileNameWithExtension(path);
+		path = this.getFileNameWithExtension(path);
 
 		if(path.indexOf('.') >= 0){
 
@@ -382,7 +394,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 *
 	 * @returns {string} The file extension WITHOUT the dot character. For example: jpg, png, js, exe ...
 	 */
-	extractFileExtension : function(path){
+	getFileExtension : function(path){
 
 		if(this.isEmpty(path)){
 
@@ -406,7 +418,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 *
 	 * @returns {string} ('ftp', 'http', ...) if the url is valid or '' if the url is invalid
 	 */
-	extractSchemeFromUrl : function(url){
+	getSchemeFromUrl : function(url){
 
 		var validationManager = new org_turbocommons_src_main_js_managers.ValidationManager();
 
@@ -417,7 +429,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 
 		if(!validationManager.isString(url)){
 
-			throw new Error("StringUtils.extractSchemeFromUrl: Specified value must be a string");
+			throw new Error("StringUtils.getSchemeFromUrl: Specified value must be a string");
 		}
 
 		if(!validationManager.isUrl(url)){
@@ -428,6 +440,12 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 		var res = url.split('://');
 
 		return (res.length === 2) ? res[0] : '';
+	},
+
+
+	formatCase : function(){
+
+		// TODO - translate from php
 	},
 
 
@@ -522,7 +540,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 		url = url.replace(/\\/g, '/');
 
 		// get the url scheme
-		var scheme = this.extractSchemeFromUrl(url);
+		var scheme = this.getSchemeFromUrl(url);
 
 		if(scheme === ''){
 
