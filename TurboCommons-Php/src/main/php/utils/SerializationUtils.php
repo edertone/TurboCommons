@@ -71,7 +71,7 @@ class SerializationUtils{
 		$isWaitingOtherLine = false;
 
 		// Generate an array with the properties lines, ignoring blank lines and comments
-		$lines = StringUtils::extractLines($string, ['/\s+/', '/ *#.*| *!.*/']);
+		$lines = StringUtils::getLines($string, ['/\s+/', '/ *#.*| *!.*/']);
 
 		foreach($lines as $i=>$line) {
 

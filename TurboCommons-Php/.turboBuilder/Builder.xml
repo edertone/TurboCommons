@@ -859,11 +859,11 @@
 	<!-- Generate a release version of the single JS file -->
 	<target name="createMergedJsRelease">
 
-		<echo file="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/${projectBaseName}-${Build.versionNumber}.${build.number}.js" 
+		<echo file="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/${projectBaseName}-${Build.versionNumber}.${build.number}.min.js" 
 			  append="true" 
 			  message="/** ${projectBaseName} ${Build.versionNumber}.${build.number} */&#13;&#10;" />
 				
-		<concat destfile="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/${projectBaseName}-${Build.versionNumber}.${build.number}.js"
+		<concat destfile="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/${projectBaseName}-${Build.versionNumber}.${build.number}.min.js"
 				append="true">
 					
 			<fileset dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main" casesensitive="false">

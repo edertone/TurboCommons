@@ -11,11 +11,10 @@
 
 namespace org\turbocommons\src\test\php\model;
 
+use org\turbocommons\src\test\php\resources\model\baseDependantClass\DependantClass2;
 use org\turbocommons\src\test\php\resources\model\baseDependantClass\DependantClass;
 use PHPUnit_Framework_TestCase;
 use Exception;
-use org\turbocommons\src\test\php\resources\model\baseDependantClass\DependantClass2;
-use org\turbocommons\src\main\php\managers\ValidationManager;
 
 
 /**
@@ -27,72 +26,82 @@ class BaseDependantClassTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
-	 * testSetDependency
+	 * testSetDependencies
 	 *
 	 * @return void
 	 */
-	public function testSetDependency(){
+	public function testSetDependencies(){
 
 		// Create a dependant class
 		$dependantClass = new DependantClass();
 
-		// Test null values work ok if still not set
-		$dependantClass->setDependency('_property1', null);
-		$dependantClass->setDependency('_property2', null);
-
+		// test setting wrong values cause exceptions
 		$exceptionMessage = '';
 
-		// test setting wrong types cause exceptions
 		try {
-			$dependantClass->setDependency('_property1', '');
-			$exceptionMessage = '"" did not cause exception';
-		} catch (Exception $e) {
-			// We expect an exception to happen
-		}
-
-		try {
-			$dependantClass->setDependency('_property1', ['a', 'b', 'c']);
-			$exceptionMessage = 'array did not cause exception';
-		} catch (Exception $e) {
-			// We expect an exception to happen
-		}
-
-		try {
-			$dependantClass->setDependency('_property2', 'ertert');
-			$exceptionMessage = 'string ertert did not cause exception';
-		} catch (Exception $e) {
-			// We expect an exception to happen
-		}
-
-		//Test setting values to the dependencies
-		$dependantClass->setDependency('_property1', new DependantClass());
-		$dependantClass->setDependency('_property1', new DependantClass());
-		$dependantClass->setDependency('_property2', new DependantClass2());
-
-		// Test changing dependency type throws exception
-		try {
-			$dependantClass->setDependency('_property1', null);
+			$dependantClass->setDependencies(null);
 			$exceptionMessage = 'null did not cause exception';
 		} catch (Exception $e) {
 			// We expect an exception to happen
 		}
 
 		try {
-			$dependantClass->setDependency('_property1', 235);
+			$dependantClass->setDependencies([]);
+			$exceptionMessage = '[] did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			$dependantClass->setDependencies(['']);
+			$exceptionMessage = '"" did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			$dependantClass->setDependencies(['a', 'b', 'c']);
+			$exceptionMessage = 'array did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			$dependantClass->setDependencies(['ertert']);
+			$exceptionMessage = 'string ertert did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		//Test setting values to the dependencies
+		$dependantClass->setDependencies(['_property1' => new DependantClass()]);
+		$dependantClass->setDependencies(['_property1' => new DependantClass()]);
+		$dependantClass->setDependencies(['_property2' => new DependantClass2()]);
+
+		// Test changing dependency type throws exception
+		try {
+			$dependantClass->setDependencies(['_property1' => null]);
+			$exceptionMessage = 'null did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			$dependantClass->setDependencies(['_property1' => 235]);
 			$exceptionMessage = '235 did not cause exception';
 		} catch (Exception $e) {
 			// We expect an exception to happen
 		}
 
 		try {
-			$dependantClass->setDependency('_property1', 'string');
+			$dependantClass->setDependencies(['_property1' => 'string']);
 			$exceptionMessage = 'string did not cause exception';
 		} catch (Exception $e) {
 			// We expect an exception to happen
 		}
 
 		try {
-			$dependantClass->setDependency('_property1', new DependantClass2());
+			$dependantClass->setDependencies(['_property1' => new DependantClass2()]);
 			$exceptionMessage = 'DependantClass2 did not cause exception';
 		} catch (Exception $e) {
 			// We expect an exception to happen
@@ -100,21 +109,14 @@ class BaseDependantClassTest extends PHPUnit_Framework_TestCase {
 
 		// Test non existing property throw exception
 		try {
-			$dependantClass->setDependency('', null);
+			$dependantClass->setDependencies(['' => null]);
 			$exceptionMessage = '"" property did not cause exception';
 		} catch (Exception $e) {
 			// We expect an exception to happen
 		}
 
 		try {
-			$dependantClass->setDependency([], null);
-			$exceptionMessage = '[] property did not cause exception';
-		} catch (Exception $e) {
-			// We expect an exception to happen
-		}
-
-		try {
-			$dependantClass->setDependency('test1', null);
+			$dependantClass->setDependencies(['test1' => null]);
 			$exceptionMessage = 'test1 did not cause exception';
 		} catch (Exception $e) {
 			// We expect an exception to happen
@@ -122,7 +124,7 @@ class BaseDependantClassTest extends PHPUnit_Framework_TestCase {
 
 		// Test setting a public property as dependency throws exception
 		try {
-			$dependantClass->setDependency('publicProp', 123);
+			$dependantClass->setDependencies(['publicProp' => 123]);
 			$exceptionMessage = 'publicProp did not cause exception';
 		} catch (Exception $e) {
 			// We expect an exception to happen
@@ -132,68 +134,9 @@ class BaseDependantClassTest extends PHPUnit_Framework_TestCase {
 
 			$this->fail($exceptionMessage);
 		}
-	}
 
-
-	/**
-	 * testGetDependency
-	 *
-	 * @return void
-	 */
-	public function testGetDependency(){
-
-		// Create two dependant classes
-		$dependantClass = new DependantClass();
-		$dependantClass2 = new DependantClass2();
-
-		// Set each one as dependency for the other
-		$dependantClass->setDependency('_property1', $dependantClass2);
-		$dependantClass2->setDependency('_property1', $dependantClass);
-
-		// Check that dependencies are the same after retrieving them
-		$validationManager = new ValidationManager();
-
-		$this->assertTrue($validationManager->isEqualTo($dependantClass->getDependency('_property1'), $dependantClass2));
-		$this->assertTrue($validationManager->isEqualTo($dependantClass2->getDependency('_property1'), $dependantClass));
-		$this->assertTrue($validationManager->isEqualTo($dependantClass2->getDependency('_property2'), null));
-
-		// Test getting non existing dependencies throws exception
-		$exceptionMessage = '';
-
-		try {
-			$dependantClass->getDependency('nonexisting');
-			$exceptionMessage = 'nonexisting did not cause exception';
-		} catch (Exception $e) {
-			// We expect an exception to happen
-		}
-
-		// Test getting a public property as dependency throws exception
-		try {
-			$dependantClass->getDependency('publicProp');
-			$exceptionMessage = 'publicProp did not cause exception';
-		} catch (Exception $e) {
-			// We expect an exception to happen
-		}
-
-		// Test getting wrong property values throw exception
-		try {
-			$dependantClass->getDependency('');
-			$exceptionMessage = '"" did not cause exception';
-		} catch (Exception $e) {
-			// We expect an exception to happen
-		}
-
-		try {
-			$dependantClass->getDependency([1]);
-			$exceptionMessage = '[1] did not cause exception';
-		} catch (Exception $e) {
-			// We expect an exception to happen
-		}
-
-		if($exceptionMessage != ''){
-
-			$this->fail($exceptionMessage);
-		}
+		// Set multiple dependencies on a single call
+		$dependantClass->setDependencies(['_property1' => new DependantClass(), '_property2' => new DependantClass2()]);
 	}
 }
 

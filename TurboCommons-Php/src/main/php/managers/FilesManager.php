@@ -209,11 +209,11 @@ class FilesManager extends BaseSingletonClass{
 		$i = 1;
 		$path = StringUtils::formatPath($path);
 		$result = ($desiredName == '' ? $i : $desiredName);
-		$extension = StringUtils::extractFileExtension($desiredName);
+		$extension = StringUtils::getFileExtension($desiredName);
 
 		while(is_dir($path.DIRECTORY_SEPARATOR.$result) || is_file($path.DIRECTORY_SEPARATOR.$result)){
 
-			$result = self::_generateUniqueNameAux($i, StringUtils::extractFileNameWithoutExtension($desiredName), $text, $separator, $isPrefix);
+			$result = self::_generateUniqueNameAux($i, StringUtils::getFileNameWithoutExtension($desiredName), $text, $separator, $isPrefix);
 
 			if($extension != ''){
 

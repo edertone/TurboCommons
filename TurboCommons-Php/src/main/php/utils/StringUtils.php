@@ -11,8 +11,8 @@
 
 namespace org\turbocommons\src\main\php\utils;
 
-use Exception;
-use org\turbocommons\src\main\php\managers\ValidationManager;
+use InvalidArgumentException;
+use UnexpectedValueException;
 use org\turbocommons\src\main\php\managers\FilesManager;
 
 
@@ -20,6 +20,62 @@ use org\turbocommons\src\main\php\managers\FilesManager;
  * The most common string processing and modification utilities
  */
 class StringUtils {
+
+
+	/** Defines the sentence case format (Only the first character of the sentence is capitalised, except for proper nouns and other words which are required by a more specific rule to be capitalised). Generally equivalent to the baseline universal standard of formal English orthography */
+	const FORMAT_SENTENCE_CASE = 'FORMAT_SENTENCE_CASE';
+
+
+	/** Defines the start case format (The first character in all words capitalised and all the rest of the word lower case) */
+	const FORMAT_START_CASE = 'FORMAT_START_CASE';
+
+
+	/** Defines the all upper case format (All letters on a string written with Capital letters only) */
+	const FORMAT_ALL_UPPER_CASE = 'FORMAT_ALL_UPPER_CASE';
+
+
+	/** Defines the all lower case format (All letters on a string written with lower case letters only) */
+	const FORMAT_ALL_LOWER_CASE = 'FORMAT_ALL_LOWER_CASE';
+
+
+	/** Defines the CamelCase format (the practice of writing compound words or phrases such that each word or abbreviation begins with a capital letter) */
+	const FORMAT_CAMEL_CASE = 'FORMAT_CAMEL_CASE';
+
+
+	/**
+	 * Defines the UpperCamelCase format variation that writes first letter as upper case
+	 *
+	 * @see StringUtils::FORMAT_CAMEL_CASE
+	 */
+	const FORMAT_UPPER_CAMEL_CASE = 'FORMAT_UPPER_CAMEL_CASE';
+
+
+	/**
+	 * Defines the lowerCamelCase format variation that writes first letter as lower case
+	 *
+	 * @see StringUtils::FORMAT_CAMEL_CASE
+	 */
+	const FORMAT_LOWER_CAMEL_CASE = 'FORMAT_LOWER_CAMEL_CASE';
+
+
+	/** Defines the snake_case format (the practice of writing compound words or phrases in which the elements are separated with one underscore character (_) and no spaces) */
+	const FORMAT_SNAKE_CASE = 'FORMAT_SNAKE_CASE';
+
+
+	/**
+	 * Defines the FORMAT_UPPER_SNAKE_CASE format variation that writes all letters as upper case
+	 *
+	 * @see StringUtils::FORMAT_SNAKE_CASE
+	 */
+	const FORMAT_UPPER_SNAKE_CASE = 'FORMAT_UPPER_SNAKE_CASE';
+
+
+	/**
+	 * Defines the lower_snake_case format variation that writes all letters as lower case
+	 *
+	 * @see StringUtils::FORMAT_SNAKE_CASE
+	 */
+	const FORMAT_LOWER_SNAKE_CASE = 'FORMAT_LOWER_SNAKE_CASE';
 
 
 	/**
@@ -42,11 +98,9 @@ class StringUtils {
 		}
 
 		// Throw exception if non string value was received
-		$validationManager = new ValidationManager();
+		if(!is_string($string)){
 
-		if(!$validationManager->isString($string)){
-
-			throw new Exception('StringUtils->isEmpty: value is not a string');
+			throw new InvalidArgumentException('StringUtils->isEmpty: value is not a string');
 		}
 
 		// Replace all empty spaces.
@@ -87,6 +141,155 @@ class StringUtils {
 
 
 	/**
+	 * Test if a given string is written using the camel case format or not.
+	 * 3 variants can be checked: Default one that does not care about the first letter case, and Upper or Lower camel case formats which
+	 * force it to be upper case and lower case respectively.
+	 *
+	 * @param string $string The string to be tested
+	 * @param string $type The variant of camel case we are testing: StringUtils::FORMAT_UPPER_CAMEL_CASE, StringUtils::FORMAT_LOWER_CAMEL_CASE or StringUtils::FORMAT_CAMEL_CASE (default).
+	 *
+	 * @see StringUtils::FORMAT_CAMEL_CASE
+	 * @see StringUtils::FORMAT_UPPER_CAMEL_CASE
+	 * @see StringUtils::FORMAT_LOWER_CAMEL_CASE
+	 *
+	 * @return boolean True if the given string is accepted as camel case for the specified variant.
+	 */
+	public static function isCamelCase($string, $type = self::FORMAT_CAMEL_CASE){
+
+		if($string == null || $string == ''){
+
+			return false;
+		}
+
+		// Throw exception if non string value was received
+		if(!is_string($string)){
+
+			throw new InvalidArgumentException('StringUtils->isCamelCase: value is not a string');
+		}
+
+		// Single letter is accepted as default camel case
+		$isCamelCase = strlen($string) == 1;
+
+		// Single word that is shorter than 45 characters (the longest english word found in a major dictionary)
+		// is accepted as default camel case if all except the first letter are lowercase
+		$isCamelCase = $isCamelCase || (strlen($string) < 46 && ctype_alpha($string) && strtolower(substr($string, 1)) === substr($string, 1));
+
+		// Apply regex for default camel case validation
+		$isCamelCase = $isCamelCase || preg_match('/[A-Z|a-z]([A-Z0-9]*[a-z][a-z0-9]*[A-Z]|[a-z0-9]*[A-Z][A-Z0-9]*[a-z])[A-Za-z0-9]*/', $string) == 1;
+
+		switch ($type) {
+
+			case self::FORMAT_CAMEL_CASE:
+				break;
+
+			case self::FORMAT_UPPER_CAMEL_CASE:
+				$isCamelCase = ctype_upper($string[0]) && $isCamelCase;
+
+				// Upper camel case type is also valid if all lowercase except the first letter and
+				// the whole word does not exceed the 45 characters of the longest english word found in a major dictionary
+				$isCamelCase = (strlen($string) < 46 && ctype_alpha($string) && ucfirst(strtolower($string)) == $string) || $isCamelCase;
+				break;
+
+			case self::FORMAT_LOWER_CAMEL_CASE:
+				$isCamelCase = ctype_lower($string[0]) && $isCamelCase;
+				break;
+
+			default:
+				throw new InvalidArgumentException('StringUtils->isCamelCase: Unknown type specified');
+		}
+
+		// Perform a last alphanumeric validation before returning the result
+		return ctype_alnum($string) && !ctype_digit($string) && $isCamelCase;
+	}
+
+
+	/**
+	 * Test if a given string is written using the snake case format or not.
+	 * 3 variants can be checked: Default one that does not care about the text case, and Upper or Lower snake case formats which
+	 * force it to be upper case and lower case respectively.
+	 *
+	 * @param string $string The string to be tested
+	 * @param string $type The variant of snake case we are testing: StringUtils::FORMAT_UPPER_SNAKE_CASE, StringUtils::FORMAT_LOWER_SNAKE_CASE or StringUtils::FORMAT_SNAKE_CASE (default).
+	 *
+	 * @see StringUtils::FORMAT_SNAKE_CASE
+	 * @see StringUtils::FORMAT_UPPER_SNAKE_CASE
+	 * @see StringUtils::FORMAT_LOWER_SNAKE_CASE
+	 *
+	 * @return boolean True if the given string is accepted as snake case for the specified variant.
+	 */
+	public static function isSnakeCase($string, $type = self::FORMAT_SNAKE_CASE){
+
+		if($string == null || $string == ''){
+
+			return false;
+		}
+
+		// Throw exception if non string value was received
+		if(!is_string($string)){
+
+			throw new InvalidArgumentException('StringUtils->isSnakeCase: value is not a string');
+		}
+
+		// Check that there are only letters, numbers and underscores
+		$isSnakeCase = preg_match('/^[a-zA-Z0-9_]*$/', $string) == 1;
+
+		// Check that it does not start or end with underscore
+		$isSnakeCase = $isSnakeCase && $string[0] != '_' && $string[strlen($string)-1] != '_';
+
+		// Check that it has at least one letter and no repeated underscores
+		$isSnakeCase = $isSnakeCase && preg_match('/[a-z]/i', $string) && strpos($string, '__') === false;
+
+		switch ($type) {
+
+			case self::FORMAT_SNAKE_CASE:
+				break;
+
+			case self::FORMAT_UPPER_SNAKE_CASE:
+				$isSnakeCase = $isSnakeCase && strtoupper($string) == $string;
+				break;
+
+			case self::FORMAT_LOWER_SNAKE_CASE:
+				$isSnakeCase = $isSnakeCase && strtolower($string) == $string;
+				break;
+
+			default:
+				throw new InvalidArgumentException('StringUtils->isSnakeCase: Unknown type specified');
+		}
+
+		return $isSnakeCase;
+	}
+
+
+	/**
+	 * Count the number of times a string is found inside another string
+	 *
+	 * @param string $string The string where we want to search
+	 * @param string $findMe The string that we want to look for
+	 *
+	 * @return int The number of times that $findMe appears on $string
+	 */
+	public static function countStringOccurences($string, $findMe){
+
+		return substr_count($string, $findMe);
+	}
+
+
+	/**
+	 * Count the number of capital letters on the given string
+	 *
+	 * @param string $string The string which capital letters will be counted
+	 *
+	 * @return int The number of capital letters that are present on the string
+	 */
+	public static function countCapitalLetters($string){
+
+		$lowerCase = mb_strtolower($string);
+
+		return strlen($lowerCase) - similar_text($string, $lowerCase);
+	}
+
+
+	/**
 	 * Count the number of words that exist on the given string
 	 *
 	 * @param string $string The string which words will be counted
@@ -97,7 +300,7 @@ class StringUtils {
 	public static function countWords($string, $wordSeparator = ' '){
 
 		$count = 0;
-		$lines = self::extractLines($string);
+		$lines = self::getLines($string);
 		$linesCount = count($lines);
 
 		for ($i = 0; $i < $linesCount; $i++) {
@@ -132,7 +335,7 @@ class StringUtils {
 
 		if(!is_numeric($limit)){
 
-			throw new Exception('StringUtils->limitLen: limit must be a numeric value');
+			throw new InvalidArgumentException('StringUtils->limitLen: limit must be a numeric value');
 		}
 
 		if(!is_string($string)){
@@ -159,7 +362,7 @@ class StringUtils {
 	/**
 	 * TODO
 	 */
-	public static function extractDomainFromUrl($string){
+	public static function getDomainFromUrl($string){
 
 		// TODO translate from JS
 	}
@@ -168,7 +371,7 @@ class StringUtils {
 	/**
 	 * TODO
 	 */
-	public static function extractHostNameFromUrl($string){
+	public static function getHostNameFromUrl($string){
 
 		// TODO translate from JS
 	}
@@ -184,7 +387,7 @@ class StringUtils {
      *
      * @return array A list with all the string lines sepparated as different array elements.
      */
-    public static function extractLines($string, array $filters = ['/\s+/']){
+    public static function getLines($string, array $filters = ['/\s+/']){
 
     	$res = [];
 
@@ -221,7 +424,7 @@ class StringUtils {
      *
      * @return array The list of keywords that have been extracted from the given text
      */
-    public static function extractKeyWords($string, $max = 25, $longerThan = 3, $shorterThan = 15, $ignoreNumericWords = false){
+    public static function getKeyWords($string, $max = 25, $longerThan = 3, $shorterThan = 15, $ignoreNumericWords = false){
 
     	if($string == null){
 
@@ -254,10 +457,10 @@ class StringUtils {
     	for($i=$maxCount; $i> 0; $i--){
 
     		foreach($words as $key => $v){
-    			if($v == $i){
-					if(!is_numeric($key) || (is_numeric($key) && !$ignoreNumericWords)){
-						array_push($res, $key);
-					}
+
+    			if($v == $i && (!is_numeric($key) || (is_numeric($key) && !$ignoreNumericWords))){
+
+					array_push($res, $key);
     			}
     		}
     	}
@@ -282,7 +485,7 @@ class StringUtils {
 	 *
 	 * @return string The extracted filename and extension, like: finemane.txt
 	 */
-	public static function extractFileNameWithExtension($path){
+	public static function getFileNameWithExtension($path){
 
 		$osSeparator = FilesManager::getInstance()->getDirectorySeparator();
 
@@ -310,14 +513,14 @@ class StringUtils {
      *
      * @return string The extracted filename WITHOUT extension, like: finemane
      */
-    public static function extractFileNameWithoutExtension($path){
+    public static function getFileNameWithoutExtension($path){
 
     	if(self::isEmpty($path)){
 
     		return '';
     	}
 
-    	$path = self::extractFileNameWithExtension($path);
+    	$path = self::getFileNameWithExtension($path);
 
 		if(strpos($path, '.') !== false){
 
@@ -336,7 +539,7 @@ class StringUtils {
 	 *
 	 * @return string The file extension WITHOUT the dot character. For example: jpg, png, js, exe ...
 	 */
-	public static function extractFileExtension($path){
+	public static function getFileExtension($path){
 
 		if(self::isEmpty($path)){
 
@@ -351,9 +554,152 @@ class StringUtils {
     /**
      * TODO - translate from js
      */
-    public static function extractSchemeFromUrl(){
+    public static function getSchemeFromUrl(){
 
     	// TODO - translate from js
+    }
+
+
+    /**
+     * Changes the letter case for the given string to the specified format.
+     *
+     * @param string $string A string that will be processed to match the specified case format.
+     * @param string $format The format to which the given string will be converted. Possible values are defined as
+     * StringUtils constants that start with <b>FORMAT_</b>, like: StringUtils::FORMAT_ALL_UPPER_CASE
+     *
+     * @see StringUtils::FORMAT_SENTENCE_CASE
+     * @see StringUtils::FORMAT_START_CASE
+     * @see StringUtils::FORMAT_ALL_UPPER_CASE
+     * @see StringUtils::FORMAT_ALL_LOWER_CASE
+     * @see StringUtils::FORMAT_CAMEL_CASE
+     * @see StringUtils::FORMAT_UPPER_CAMEL_CASE
+     * @see StringUtils::FORMAT_LOWER_CAMEL_CASE
+     * @see StringUtils::FORMAT_SNAKE_CASE
+     * @see StringUtils::FORMAT_UPPER_SNAKE_CASE
+     * @see StringUtils::FORMAT_LOWER_SNAKE_CASE
+     *
+     * @return string The given string converted to the specified case format.
+     */
+    public static function formatCase($string, $format){
+
+    	// null values will return an empty string
+    	if($string == null){
+
+    		return '';
+    	}
+
+    	// Empty values will return the string itself
+    	if(self::isEmpty($string)){
+
+    		return $string;
+    	}
+
+    	// Non string values will throw an exception
+    	if(!is_string($string)){
+
+    		throw new InvalidArgumentException('StringUtils->formatCase: value is not a string');
+    	}
+
+    	// Generate the sentence case output
+    	if($format == self::FORMAT_SENTENCE_CASE){
+
+    		$result = '';
+    		$sentences = preg_split('/([.?!]+)/', $string, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
+
+    		foreach ($sentences as $s) {
+
+    			if(preg_match('~[a-z]~i', self::removeAccents($s), $match, PREG_OFFSET_CAPTURE) == 1){
+
+    				$result .= mb_substr($s, 0, $match[0][1]).mb_strtoupper(mb_substr($s, $match[0][1], 1)).mb_substr($s, $match[0][1] + 1);
+
+    			}else{
+
+    				$result .= $s;
+    			}
+    		}
+
+    		return $result;
+    	}
+
+    	// Generate the title case output
+    	if($format == self::FORMAT_START_CASE){
+
+    		return mb_convert_case($string, MB_CASE_TITLE);
+    	}
+
+    	// Generate the all upper case output
+    	if($format == self::FORMAT_ALL_UPPER_CASE){
+
+    		return mb_strtoupper($string);
+    	}
+
+    	// Generate the all lower case output
+    	if($format == self::FORMAT_ALL_LOWER_CASE){
+
+    		return mb_strtolower($string);
+    	}
+
+    	// Generate the snake case format
+    	if(strpos($format, 'SNAKE_CASE') !== false){
+
+    		$processedString = null;
+
+    		// Check if string is accepted as camel case or a raw string
+    		if(self::isCamelCase($string) && self::countCapitalLetters($string, ' ') > 0){
+
+    			preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $string, $processedString);
+
+    			$processedString = $processedString[0];
+
+    		}else{
+
+    			$processedString = explode(' ', $string);
+			}
+
+    		if($format == self::FORMAT_UPPER_SNAKE_CASE){
+
+    			return mb_strtoupper(implode('_', $processedString));
+    		}
+
+    		if($format == self::FORMAT_LOWER_SNAKE_CASE){
+
+    			return mb_strtolower(implode('_', $processedString));
+    		}
+
+    		return implode('_', $processedString);
+    	}
+
+    	// Generate the camel case format
+    	if(strpos($format, 'CAMEL_CASE') !== false){
+
+    		// non-alpha and non-numeric characters become spaces and the whole string is splitted to words
+    		$string = explode(' ', trim(preg_replace('/[^a-z0-9]+/i', ' ', self::removeAccents($string))));
+
+    		// uppercase the first character of each word except the first one
+    		if(($stringCount = count($string)) > 1){
+
+    			for ($i = 1; $i < $stringCount; $i++) {
+
+    				$string[$i] = ucfirst($string[$i]);
+    			}
+    		}
+
+    		$string = implode('', $string);
+
+    		if($format == self::FORMAT_UPPER_CAMEL_CASE){
+
+    			return ucfirst($string);
+    		}
+
+    		if($format == self::FORMAT_LOWER_CAMEL_CASE){
+
+    			return lcfirst($string);
+    		}
+
+    		return $string;
+    	}
+
+    	throw new InvalidArgumentException('StringUtils->formatCase: Unknown format specified');
     }
 
 
@@ -381,7 +727,7 @@ class StringUtils {
 
     	if(!is_string($path)){
 
-    		throw new Exception('StringUtils->formatPath: Specified path must be a string');
+    		throw new InvalidArgumentException('StringUtils->formatPath: Specified path must be a string');
     	}
 
     	// Replace all slashes on the path with the os default

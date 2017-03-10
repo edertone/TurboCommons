@@ -1,0 +1,6 @@
+eclipse.preferences.version=1
+phpunit_config_file=/TurboCommons-Php/src/test/php/PhpUnitSetup.xml
+preload_script=/TurboCommons-Php/src/test/php/AutoLoader.php
+test_file_pattern=
+test_folders=/TurboCommons-Php/src/test/php
+testing_framework=PHPUnit
