@@ -54,7 +54,7 @@ Latest version can be downloaded at:
 
 - Javascript: http://turbocommons.org/resources/shared/zip/TurboCommons-JS-0.3.805.zip
 
-- Php: http://turbocommons.org/resources/shared/zip/TurboCommons-Php-0.3.1036.zip
+- Php: http://turbocommons.org/resources/shared/zip/TurboCommons-Php.zip
 
 ### Dependencies
 The main goal for this library is to have zero dependencies, but sometimes this is not totally possible. So currently, the javascript version requires jquery 1.8.3 for some of the features. Php version is totally dependency free now.
