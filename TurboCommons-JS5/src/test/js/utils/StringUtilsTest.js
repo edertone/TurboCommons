@@ -45,6 +45,46 @@ QUnit.test("isEmpty", function(assert){
 
 
 /**
+ * isCamelCase
+ */
+QUnit.test("isCamelCase", function(assert){
+
+	// TODO: copy tests from PHP
+	assert.ok(true);
+});
+
+
+/**
+ * isSnakeCase
+ */
+QUnit.test("isSnakeCase", function(assert){
+
+	// TODO: copy tests from PHP
+	assert.ok(true);
+});
+
+
+/**
+ * countStringOccurences
+ */
+QUnit.test("countStringOccurences", function(assert){
+
+	// TODO: copy tests from PHP
+	assert.ok(true);
+});
+
+
+/**
+ * countCapitalLetters
+ */
+QUnit.test("countCapitalLetters", function(assert){
+
+	// TODO: copy tests from PHP
+	assert.ok(true);
+});
+
+
+/**
  * countWords
  */
 QUnit.test("countWords", function(assert){

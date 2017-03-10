@@ -111,6 +111,18 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	},
 
 
+	countStringOccurences : function(){
+
+		// TODO - translate from php
+	},
+
+
+	countCapitalLetters : function(){
+
+		// TODO - translate from php
+	},
+
+
 	/**
 	 * Count the number of words that exist on the given string
 	 *
