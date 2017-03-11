@@ -11,7 +11,7 @@
 
 namespace org\turbocommons\src\main\php\model;
 
-use Exception;
+use UnexpectedValueException;
 
 
 /**
@@ -29,7 +29,7 @@ abstract class BaseStrictClass {
 	 */
 	public function __get($name) {
 
-		throw new Exception(get_class($this).' property '.$name.' does not exist');
+		throw new UnexpectedValueException(get_class($this).' property '.$name.' does not exist');
 	}
 
 
@@ -43,7 +43,7 @@ abstract class BaseStrictClass {
 	 */
 	public function __set($name, $value) {
 
-		throw new Exception(get_class($this).' property '.$name.' does not exist');
+		throw new UnexpectedValueException(get_class($this).' property '.$name.' does not exist');
 	}
 
 

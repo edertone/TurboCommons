@@ -487,7 +487,9 @@ class StringUtils {
 	 */
 	public static function getFileNameWithExtension($path){
 
-		$osSeparator = FilesManager::getInstance()->getDirectorySeparator();
+		$filesManager = new FilesManager();
+
+		$osSeparator = $filesManager->getDirectorySeparator();
 
 		if(self::isEmpty($path)){
 
@@ -718,7 +720,9 @@ class StringUtils {
      */
     public static function formatPath($path){
 
-    	$osSeparator = FilesManager::getInstance()->getDirectorySeparator();
+    	$filesManager = new FilesManager();
+
+    	$osSeparator = $filesManager->getDirectorySeparator();
 
     	if($path == null){
 

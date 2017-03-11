@@ -11,7 +11,7 @@
 
 namespace org\turbocommons\src\main\php\utils;
 
-use Exception;
+use UnexpectedValueException;
 use SimpleXMLElement;
 
 
@@ -155,7 +155,7 @@ class SerializationUtils{
 
 			libxml_clear_errors();
 
-			throw new Exception('SerializationUtils->stringToXml could not convert string to SimpleXMLElement');
+			throw new UnexpectedValueException('SerializationUtils->stringToXml could not convert string to SimpleXMLElement');
 		}
 
 		libxml_use_internal_errors($previous);

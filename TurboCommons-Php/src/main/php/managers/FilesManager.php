@@ -11,36 +11,22 @@
 
 namespace org\turbocommons\src\main\php\managers;
 
-use org\turbocommons\src\main\php\model\BaseSingletonClass;
 use org\turbocommons\src\main\php\utils\HTTPUtils;
 use DirectoryIterator;
 use Exception;
+use UnexpectedValueException;
 use org\turbocommons\src\main\php\utils\StringUtils;
+use org\turbocommons\src\main\php\model\BaseStrictClass;
 
 
 /**
  * SINGLETON class containing common file system interaction functionalities
  */
-class FilesManager extends BaseSingletonClass{
+class FilesManager extends BaseStrictClass{
 
 
 	/** Defines if some of the class methods will accept internet urls in addition to regular OS filesystem paths as parameters */
 	public $acceptUrls = false;
-
-
-	/**
-	 * Returns the global singleton instance.
-	 *
-	 * @return FilesManager The singleton instance.
-	 */
-	public static function getInstance(){
-
-		// This method is overriden from the singleton one simply to get correct
-		// autocomplete annotations when returning the instance
-		 $instance = parent::getInstance();
-
-		 return $instance;
-	}
 
 
 	/**
@@ -60,19 +46,16 @@ class FilesManager extends BaseSingletonClass{
 			return true;
 		}
 
-		if($this->acceptUrls){
+		if($this->acceptUrls && HTTPUtils::urlExists($path)){
 
-			if(HTTPUtils::urlExists($path)){
+			if(!ini_get('allow_url_fopen')){
 
-				if(!ini_get('allow_url_fopen')){
+				throw new UnexpectedValueException('FilesManager->isFile: allow_url_fopen flag must be set to TRUE on php.ini');
+			}
 
-					throw new Exception('FilesManager->isFile: allow_url_fopen flag must be set to TRUE on php.ini');
-				}
+			if(strlen(file_get_contents($path, null, null, null, 10)) != 0){
 
-				if(strlen(file_get_contents($path, null, null, null, 10)) != 0){
-
-					return true;
-				}
+				return true;
 			}
 		}
 
@@ -122,7 +105,7 @@ class FilesManager extends BaseSingletonClass{
 
 		if (!is_readable($path)){
 
-			throw new Exception('FilesManager->isDirectoryEmpty: Path does not exist: '.$path);
+			throw new UnexpectedValueException('FilesManager->isDirectoryEmpty: Path does not exist: '.$path);
 		}
 
 		$handle = opendir($path);
@@ -296,7 +279,7 @@ class FilesManager extends BaseSingletonClass{
 		// If specified folder exists as a file, exception will happen
 		if(is_file($path)){
 
-			throw new Exception('FilesManager->createDirectory: specified path is an existing file '.$path);
+			throw new UnexpectedValueException('FilesManager->createDirectory: specified path is an existing file '.$path);
 		}
 
 		// Create the requested folder
@@ -342,7 +325,7 @@ class FilesManager extends BaseSingletonClass{
 
 		if(!self::createDirectory($tempDirectory)){
 
-			throw new Exception('FilesManager->createTempDirectory: Could not create TMP directory '.$tempDirectory);
+			throw new UnexpectedValueException('FilesManager->createTempDirectory: Could not create TMP directory '.$tempDirectory);
 		}
 
 		// Add a shutdown function to try to delete the file when the current script execution ends
@@ -380,7 +363,7 @@ class FilesManager extends BaseSingletonClass{
 		// If folder does not exist, we will throw an exception
 		if(!is_dir($path)){
 
-			throw new Exception('Specified path <'.$path.'> does not exist or is not a directory');
+			throw new UnexpectedValueException('Specified path <'.$path.'> does not exist or is not a directory');
 		}
 
 		// Get all the folder contents
@@ -621,28 +604,25 @@ class FilesManager extends BaseSingletonClass{
 
 			$fileFound = false;
 
-			if($this->acceptUrls){
+			if($this->acceptUrls && HTTPUtils::urlExists($path)){
 
-				if(HTTPUtils::urlExists($path)){
+				if(!ini_get('allow_url_fopen')){
 
-					if(!ini_get('allow_url_fopen')){
-
-						throw new Exception('FilesManager->readFile: allow_url_fopen flag must be set to TRUE on php.ini');
-					}
-
-					$fileFound = true;
+					throw new UnexpectedValueException('FilesManager->readFile: allow_url_fopen flag must be set to TRUE on php.ini');
 				}
+
+				$fileFound = true;
 			}
 		}
 
 		if(!$fileFound){
 
-			throw new Exception('FilesManager->readFile: File not found - '.$path);
+			throw new UnexpectedValueException('FilesManager->readFile: File not found - '.$path);
 		}
 
 		if(($contents = file_get_contents($path, true)) === false){
 
-			throw new Exception('FilesManager->readFile: Error reading file - '.$path);
+			throw new UnexpectedValueException('FilesManager->readFile: Error reading file - '.$path);
 		}
 
 		return $contents;

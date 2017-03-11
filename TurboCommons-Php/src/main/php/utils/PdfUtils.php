@@ -216,7 +216,9 @@ class PdfUtils {
 		}
 
 		// Make sure that the output folder is empty
-		if(count(FilesManager::getInstance()->getDirectoryList($outputPath)) > 0){
+		$filesManager = new FilesManager();
+
+		if(count($filesManager->getDirectoryList($outputPath)) > 0){
 
 			trigger_error('PdfUtils::generateDocumentJpgPictures Error: Specified output folder ('.$outputPath.') must be empty', E_USER_WARNING);
 
@@ -249,7 +251,7 @@ class PdfUtils {
 		}
 
 		// Verify that the output folder contains the generated pictures, and count their number
-		return count(FilesManager::getInstance()->getDirectoryList($outputPath));
+		return count($filesManager->getDirectoryList($outputPath));
 	}
 
 

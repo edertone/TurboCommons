@@ -12,7 +12,7 @@
 namespace org\turbocommons\src\main\php\utils;
 
 use org\turbocommons\src\main\php\managers\ValidationManager;
-use Exception;
+use UnexpectedValueException;
 
 
 /**
@@ -36,7 +36,7 @@ class ArrayUtils {
 		// Both provided values must be arrays or an exception will be launched
 		if(!$validationManager->isArray($array1) || !$validationManager->isArray($array2)){
 
-			throw new Exception('ArrayUtils->isEqualTo: Provided parameters must be arrays');
+			throw new UnexpectedValueException('ArrayUtils->isEqualTo: Provided parameters must be arrays');
 		}
 
 		// Compare lengths can save a lot of time

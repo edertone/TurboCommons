@@ -106,6 +106,7 @@ class XmlUtilsTest extends PHPUnit_Framework_TestCase {
 
 		// Test identical elements without strict order
 		$this->assertTrue(XmlUtils::isEqualTo('<root><a/></root>', '<root><a/></root>', false, false));
+		$this->assertTrue(XmlUtils::isEqualTo('<root><a/></root>', '<root><a></a></root>', false, false));
 		$this->assertTrue(XmlUtils::isEqualTo('<root><c/><a/></root>', '<root><a/><c/></root>', false, false));
 		$this->assertTrue(XmlUtils::isEqualTo('<root><c/><a/><b/></root>', '<root><a/><c/><b/></root>', false, false));
 		$this->assertTrue(XmlUtils::isEqualTo('<root a="1"></root>', '<root a="1"></root>', false, false));
@@ -140,7 +141,7 @@ class XmlUtilsTest extends PHPUnit_Framework_TestCase {
 		// Test big xml files
 		$basePath = __DIR__.'/../resources/utils/xmlUtils/isEqualTo/';
 
-		$filesManager = FilesManager::getInstance();
+		$filesManager = new FilesManager();
 
 		$xmlData1 = $filesManager->readFile($basePath.'Test1.xml');
 		$xmlData2 = $filesManager->readFile($basePath.'Test2.xml');

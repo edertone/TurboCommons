@@ -11,8 +11,10 @@
 
 namespace org\turbocommons\src\main\php\utils;
 
-
 use org\turbocommons\src\main\php\managers\ValidationManager;
+use UnexpectedValueException;
+
+
 /**
  * This class contains a collection of methods that are related to the most common http operations.
  */
@@ -141,7 +143,7 @@ class HTTPUtils{
 		// Check that curl is available
 		if(!function_exists('curl_init')){
 
-			throw new Exception('HTTPUtils::getUrlHeaders: Curl must be enabled');
+			throw new UnexpectedValueException('HTTPUtils::getUrlHeaders: Curl must be enabled');
 		}
 
 		$handle = curl_init($url);

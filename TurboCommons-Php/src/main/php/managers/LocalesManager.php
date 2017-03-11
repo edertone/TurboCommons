@@ -11,7 +11,7 @@
 
 namespace org\turbocommons\src\main\php\managers;
 
-use Exception;
+use UnexpectedValueException;
 use org\turbocommons\src\main\php\model\BaseSingletonClass;
 use org\turbocommons\src\main\php\utils\SerializationUtils;
 use org\turbocommons\src\main\php\utils\StringUtils;
@@ -152,23 +152,23 @@ class LocalesManager extends BaseSingletonClass{
 		// Locales must be an array
 		if(!is_array($localesArray)){
 
-			throw new Exception('LocalesManager->get: locales property must be an array');
+			throw new UnexpectedValueException('LocalesManager->get: locales property must be an array');
 		}
 
 		// Paths verifications
 		if(!is_array($this->paths)){
 
-			throw new Exception('LocalesManager->get: paths property must be an array');
+			throw new UnexpectedValueException('LocalesManager->get: paths property must be an array');
 		}
 
 		if(!is_array($this->pathStructure)){
 
-			throw new Exception('LocalesManager->get: pathStructure property must be an array');
+			throw new UnexpectedValueException('LocalesManager->get: pathStructure property must be an array');
 		}
 
 		if(count($this->pathStructure) > count($this->paths)){
 
-			throw new Exception('LocalesManager->get: pathStructure cannot have more elements than paths');
+			throw new UnexpectedValueException('LocalesManager->get: pathStructure cannot have more elements than paths');
 		}
 
 		// Check if we need to load the last used bundle
@@ -179,7 +179,7 @@ class LocalesManager extends BaseSingletonClass{
 
 		if($bundle == ''){
 
-			throw new Exception('LocalesManager->get: No resource bundle specified');
+			throw new UnexpectedValueException('LocalesManager->get: No resource bundle specified');
 		}
 
 		// Store the specified bundle name as the last that's been used till now
@@ -206,7 +206,7 @@ class LocalesManager extends BaseSingletonClass{
 			}
 		}
 
-		throw new Exception('LocalesManager->get: Specified key <'.$key.'> was not found on locales list: ['.implode(', ', $localesArray).']');
+		throw new UnexpectedValueException('LocalesManager->get: Specified key <'.$key.'> was not found on locales list: ['.implode(', ', $localesArray).']');
 	}
 
 
@@ -220,23 +220,24 @@ class LocalesManager extends BaseSingletonClass{
 	 */
 	private function _loadBundle($bundle, $locale){
 
+		$filesManager = new FilesManager();
 		$pathStructureArray = $this->pathStructure;
 
 		foreach ($this->paths as $path) {
 
-			$pathStructure = '';
+			$processedPathStructure = '';
 
 			// Process the path format string
 			if(count($pathStructureArray) > 0){
 
-				$pathStructure = str_replace(['$bundle', '$locale'], [$bundle, $locale], array_shift($pathStructureArray));
+				$processedPathStructure = str_replace(['$bundle', '$locale'], [$bundle, $locale], array_shift($pathStructureArray));
 			}
 
-			$bundlePath = StringUtils::formatPath($path.DIRECTORY_SEPARATOR.$pathStructure);
+			$bundlePath = StringUtils::formatPath($path.DIRECTORY_SEPARATOR.$processedPathStructure);
 
-			if(FilesManager::getInstance()->isFile($bundlePath)){
+			if($filesManager->isFile($bundlePath)){
 
-				$bundleData = FilesManager::getInstance()->readFile($bundlePath);
+				$bundleData = $filesManager->readFile($bundlePath);
 
 				$this->_loadedData[$bundle][$locale] = SerializationUtils::javaPropertiesToArray($bundleData);
 
@@ -244,7 +245,7 @@ class LocalesManager extends BaseSingletonClass{
 			}
 		}
 
-		throw new Exception('LocalesManager->_loadBundle: Could not load bundle <'.$bundle.'> and locale <'.$locale.'>');
+		throw new UnexpectedValueException('LocalesManager->_loadBundle: Could not load bundle <'.$bundle.'> and locale <'.$locale.'>');
 	}
 }
 

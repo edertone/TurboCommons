@@ -33,7 +33,7 @@ class FilesManagerTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testIsFile(){
 
-		$filesManager = FilesManager::getInstance();
+		$filesManager = new FilesManager();
 
 		// Create a temporary folder
 		$basePath = $filesManager->createTempDirectory('TurboCommons-Php');
@@ -74,7 +74,7 @@ class FilesManagerTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testIsDirectory(){
 
-		$filesManager = FilesManager::getInstance();
+		$filesManager = new FilesManager();
 
 		// Test with urls disabled
 		$filesManager->acceptUrls = false;
@@ -109,7 +109,7 @@ class FilesManagerTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testIsDirectoryEmpty(){
 
-		$filesManager = FilesManager::getInstance();
+		$filesManager = new FilesManager();
 
 		// Create a temporary folder
 		$basePath = $filesManager->createTempDirectory('TurboCommons-Php');
@@ -157,7 +157,7 @@ class FilesManagerTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testGetDirectorySeparator(){
 
-		$filesManager = FilesManager::getInstance();
+		$filesManager = new FilesManager();
 
 		$this->assertTrue($filesManager->getDirectorySeparator() === DIRECTORY_SEPARATOR);
 	}
@@ -170,7 +170,7 @@ class FilesManagerTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testFindUniqueDirectoryName(){
 
-		$filesManager = FilesManager::getInstance();
+		$filesManager = new FilesManager();
 
 		// Create a temporary folder
 		$basePath = $filesManager->createTempDirectory('TurboCommons-Php');
@@ -223,7 +223,7 @@ class FilesManagerTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testFindUniqueFileName(){
 
-		$filesManager = FilesManager::getInstance();
+		$filesManager = new FilesManager();
 
 		// Create a temporary folder
 		$basePath = $filesManager->createTempDirectory('TurboCommons-Php');
@@ -276,7 +276,7 @@ class FilesManagerTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testCreateDirectory(){
 
-		$filesManager = FilesManager::getInstance();
+		$filesManager = new FilesManager();
 
 		// Create a temporary folder
 		$basePath = $filesManager->createTempDirectory('TurboCommons-Php');
@@ -362,7 +362,7 @@ class FilesManagerTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testCreateTempDirectory(){
 
-		$filesManager = FilesManager::getInstance();
+		$filesManager = new FilesManager();
 
 		// Create a temporary folder
 		$basePath = $filesManager->createTempDirectory('TurboCommons-Php');
@@ -402,7 +402,7 @@ class FilesManagerTest extends PHPUnit_Framework_TestCase {
 	public function testGetDirectoryList(){
 
 		$validationManager = new ValidationManager();
-		$filesManager = FilesManager::getInstance();
+		$filesManager = new FilesManager();
 
 		// Create a temporary folder
 		$basePath = $filesManager->createTempDirectory('TurboCommons-Php');

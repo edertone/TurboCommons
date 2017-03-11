@@ -282,8 +282,10 @@ class MailManager extends BaseStrictClass {
 	 */
 	public static function processTemplate($templatePath, array $valuesToReplace, $replaceConstants = true, $replaceConstantsContaining = ''){
 
+		$filesManager = new FilesManager();
+
 		// Read the template text from the specified path
-		$templateText = FilesManager::getInstance()->readFile($templatePath);
+		$templateText = $filesManager->readFile($templatePath);
 
 		// We must sort all the values to replace by name lenght. Longest must be first, to prevent unwanted replacements. This is important!
 		$valuesToReplaceKeys = array_keys($valuesToReplace);

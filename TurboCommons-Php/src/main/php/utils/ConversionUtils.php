@@ -11,7 +11,7 @@
 
 namespace org\turbocommons\src\main\php\utils;
 
-use Exception;
+use InvalidArgumentException;
 use org\turbocommons\src\main\php\managers\ValidationManager;
 
 
@@ -40,7 +40,7 @@ class ConversionUtils {
 
 		if(!$validationManager->isString($string)){
 
-			throw new Exception('ConversionUtils->stringToBase64: value is not a string');
+			throw new InvalidArgumentException('ConversionUtils->stringToBase64: value is not a string');
 		}
 
 		return base64_encode($string);
@@ -65,7 +65,7 @@ class ConversionUtils {
 
 		if(!$validationManager->isString($string)){
 
-			throw new Exception('ConversionUtils->base64ToString: value is not a string');
+			throw new InvalidArgumentException('ConversionUtils->base64ToString: value is not a string');
 		}
 
 		return base64_decode($string);

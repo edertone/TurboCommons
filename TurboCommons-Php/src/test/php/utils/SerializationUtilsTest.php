@@ -71,8 +71,10 @@ class SerializationUtilsTest extends PHPUnit_Framework_TestCase {
 
 		$basePath = __DIR__.'/../resources/utils/serializationUtils/javaPropertiesToArray';
 
+		$filesManager = new FilesManager();
+
 		// Test the properties file 1
-		$test = FilesManager::getInstance()->readFile($basePath.'/Test1.properties');
+		$test = $filesManager->readFile($basePath.'/Test1.properties');
 		$test = SerializationUtils::javaPropertiesToArray($test);
 
 		$this->assertTrue(count($test) == 45);
@@ -91,7 +93,7 @@ class SerializationUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($test['reconcile'] == 'Y');
 
 		// Test the properties file 2
-		$test = FilesManager::getInstance()->readFile($basePath.'/Test2.properties');
+		$test = $filesManager->readFile($basePath.'/Test2.properties');
 		$test = SerializationUtils::javaPropertiesToArray($test);
 
 		$this->assertTrue(count($test) == 11);
@@ -105,7 +107,7 @@ class SerializationUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($test['SOME_JAPANESE_TEXT_WITH_MILTILINES'] == "氨䛧 ちゅレ゜頨褤つ 栨プ\n\n詞ゞ黨 禺驩へ, なか䤥楯ティ 䨺礨背㛤騟 嶥䰧ツェ餣\nしょ 查ぴゃ秺 む難 びゃ\nきゃ ");
 
 		// Test the properties file 3
-		$test = FilesManager::getInstance()->readFile($basePath.'/Test3.properties');
+		$test = $filesManager->readFile($basePath.'/Test3.properties');
 		$test = SerializationUtils::javaPropertiesToArray($test);
 
 		$this->assertTrue(count($test) == 5);
@@ -116,7 +118,7 @@ class SerializationUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($test['tab'] == "\t");
 
 		// Test the properties file 4
-		$test = FilesManager::getInstance()->readFile($basePath.'/Test4.properties');
+		$test = $filesManager->readFile($basePath.'/Test4.properties');
 		$test = SerializationUtils::javaPropertiesToArray($test);
 
 		$this->assertTrue(count($test) == 6);
@@ -194,7 +196,7 @@ class SerializationUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(get_class(SerializationUtils::stringToXml('<document><from>Joe</from></document>')) == 'SimpleXMLElement');
 		$this->assertTrue(get_class(SerializationUtils::stringToXml("<?xml version='1.0'?><document><from>Joe</from></document>")) == 'SimpleXMLElement');
 
-		$filesManager = FilesManager::getInstance();
+		$filesManager = new FilesManager();
 
 		$xmlData1 = $filesManager->readFile($basePath.$filesManager->getDirectorySeparator().'Test1.xml');
 		$xmlData2 = $filesManager->readFile($basePath.$filesManager->getDirectorySeparator().'Test2.xml');

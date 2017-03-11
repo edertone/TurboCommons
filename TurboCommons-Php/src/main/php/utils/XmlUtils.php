@@ -12,6 +12,7 @@
 namespace org\turbocommons\src\main\php\utils;
 
 use Exception;
+use InvalidArgumentException;
 use SimpleXMLElement;
 
 
@@ -67,7 +68,7 @@ class XmlUtils{
 		// Non xml elements must throw an exception
 		if(!self::isValidXML($xml1) || !self::isValidXML($xml2)){
 
-			throw new Exception('XmlUtils->isEqualTo parameters must contain valid xml data');
+			throw new InvalidArgumentException('XmlUtils->isEqualTo parameters must contain valid xml data');
 		}
 
 		// Convert both elements to simplexml elements if strings are received
@@ -203,7 +204,7 @@ class XmlUtils{
 		// Make sure both elements are SimpleXmlElement
 		if(!self::isValidXML($parent) || !self::isValidXML($child)){
 
-			throw new Exception('XmlUtils->addChild parameters must be valid XML data');
+			throw new InvalidArgumentException('XmlUtils->addChild parameters must be valid XML data');
 		}
 
 		if(is_string($child)){

@@ -13,7 +13,7 @@ namespace org\turbocommons\src\main\php\utils;
 
 
 use org\turbocommons\src\main\php\managers\ValidationManager;
-use Exception;
+use UnexpectedValueException;
 
 
 /**
@@ -36,7 +36,7 @@ class ObjectUtils {
 
 		if(!$validationManager->isObject($object)){
 
-			throw new Exception('ObjectUtils->getKeys: Provided parameter must be an object');
+			throw new UnexpectedValueException('ObjectUtils->getKeys: Provided parameter must be an object');
 		}
 
 		foreach($object as $key => $value){
@@ -63,7 +63,7 @@ class ObjectUtils {
 		// Both provided values must be objects or an exception will be launched
 		if(!$validationManager->isObject($object1) || !$validationManager->isObject($object2)){
 
-			throw new Exception('ObjectUtils->isEqualTo: Provided parameters must be objects');
+			throw new UnexpectedValueException('ObjectUtils->isEqualTo: Provided parameters must be objects');
 		}
 
 		$keys1 = self::getKeys($object1);

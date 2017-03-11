@@ -11,8 +11,10 @@
 
 namespace org\turbocommons\src\main\php\utils;
 
-
 use org\turbocommons\src\main\php\managers\FilesManager;
+use UnexpectedValueException;
+
+
 /**
  * Image manipulation utils
  */
@@ -43,7 +45,7 @@ class PictureUtils{
 		// GD extension must be enabled
 		if(!extension_loaded('gd')) {
 
-			throw new Exception('PictureUtils->thumbnailGenerate: GD library for php is not installed or enabled');
+			throw new UnexpectedValueException('PictureUtils->thumbnailGenerate: GD library for php is not installed or enabled');
 		}
 
 		// By default, stretch mode: resize and distort the image if necessary to fill the full destination size
@@ -168,19 +170,19 @@ class PictureUtils{
 
 		if($checkJpegTran != 0) {
 
-			throw new Exception('PictureUtils::compressJpgPicture: jpegtran is not enabled on the system');
+			throw new UnexpectedValueException('PictureUtils::compressJpgPicture: jpegtran is not enabled on the system');
 		}
 
 		// Check that source image exists
 		if(!is_file($imagePath)){
 
-			throw new Exception('PictureUtils::compressJpgPicture: Specified image file ('.$imagePath.') does not exist');
+			throw new UnexpectedValueException('PictureUtils::compressJpgPicture: Specified image file ('.$imagePath.') does not exist');
 		}
 
 		// Check that source and output paths are not the same!
 		if($imagePath == $outputPath) {
 
-			throw new Exception('PictureUtils::compressJpgPicture: source and output paths cannot be the same');
+			throw new UnexpectedValueException('PictureUtils::compressJpgPicture: source and output paths cannot be the same');
 		}
 
 		if($outputPath == ''){
@@ -195,7 +197,7 @@ class PictureUtils{
 		// Check any problem on jpegtran execution
 		if ($return != 0) {
 
-			throw new Exception('PictureUtils::compressJpgPicture: jpegtran failed. '.implode("\n", $output));
+			throw new UnexpectedValueException('PictureUtils::compressJpgPicture: jpegtran failed. '.implode("\n", $output));
 		}
 
 		return true;
@@ -216,10 +218,12 @@ class PictureUtils{
 		// Verify that path exists and is a real directory
 		if(!is_dir($imagesPath)){
 
-			throw new Exception('PictureUtils::compressJpgPictureFolder: Specified path ('.$imagesPath.') is not a folder');
+			throw new UnexpectedValueException('PictureUtils::compressJpgPictureFolder: Specified path ('.$imagesPath.') is not a folder');
 		}
 
-		$images = FilesManager::getInstance()->getDirectoryList($imagesPath);
+		$filesManager = new FilesManager();
+
+		$images = $filesManager->getDirectoryList($imagesPath);
 
 		// Remove folder trailing separator if exists
 		if(substr($imagesPath, -1) == DIRECTORY_SEPARATOR){
