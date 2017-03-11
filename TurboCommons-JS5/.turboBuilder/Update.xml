@@ -55,13 +55,22 @@
 
 	<target name="performUpdate" >
 
+		<!-- Delete all the files on the folder except the Update.xml and build.number -->
+		<delete>
+			<fileset dir=".">
+		      	<include name="*"/>
+				<exclude name="Update.xml" />
+				<exclude name="build.number" />
+			</fileset>
+		</delete>
+		
 		<!-- Update the builder files -->
 		<get src="https://raw.githubusercontent.com/edertone/TurboBuilder/master/TurboBuilder-Ant/turboBuilder/Builder.xml"
 			 dest="Builder.xml"
 			 httpusecaches="false" />
 
-		<get src="https://raw.githubusercontent.com/edertone/TurboBuilder/master/TurboBuilder-Ant/turboBuilder/BuilderSetupSchema.xsd"
-			 dest="BuilderSetupSchema.xsd"
+		<get src="https://raw.githubusercontent.com/edertone/TurboBuilder/master/TurboBuilder-Ant/turboBuilder/TurboBuilder.xsd"
+			 dest="TurboBuilder.xsd"
 			 httpusecaches="false" />
 
 	</target>
