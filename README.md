@@ -52,7 +52,7 @@ Learn once, code forever
 ### Download
 Latest version can be downloaded at:
 
-- Javascript: http://turbocommons.org/resources/shared/zip/TurboCommons-JS-0.3.805.zip
+- Javascript: http://turbocommons.org/resources/shared/zip/TurboCommons-JS5.zip
 
 - Php: http://turbocommons.org/resources/shared/zip/TurboCommons-Php.zip
 
