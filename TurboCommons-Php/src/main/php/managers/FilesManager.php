@@ -20,7 +20,7 @@ use org\turbocommons\src\main\php\model\BaseStrictClass;
 
 
 /**
- * SINGLETON class containing common file system interaction functionalities
+ * Class that contains the most common file system interaction functionalities
  */
 class FilesManager extends BaseStrictClass{
 
