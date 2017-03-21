@@ -36,6 +36,12 @@ class DateTimeUtils {
 
 
 	/**
+	 * String that defines the ISO 8601 formatto be used when calling the format method on DateTime Php class.
+	 */
+	const ISO8601_FORMAT_STRING = 'Y-m-d\\TH:i:s.uP';
+
+
+	/**
 	 * DateTimeUtils class operates only with ISO 8601 strings, which is the international standard for the representation of dates and times.
 	 * Therefore, this method considers a dateTime string value to be valid only if it follows the standard.
 	 *
@@ -102,14 +108,14 @@ class DateTimeUtils {
 
 		$now = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''), new DateTimeZone('UTC'));
 
-		return $now->format('Y-m-d\\TH:i:s.uP');
+		return $now->format(self::ISO8601_FORMAT_STRING);
 	}
 
 
 	// TODO - This method is pending
 	public static function getDateTimeFromLocalValues($year, $month = 0, $day = 0, $hour = 0, $minute = 0, $second = 0){
 
-		// TODO - this is a bit complicated
+		// TODO - This method is incomplete and pending
 
 		$dateTime = new DateTime(null, new DateTimeZone(date_default_timezone_get()));
 
@@ -117,63 +123,102 @@ class DateTimeUtils {
 		$dateTime->setTime($hour, $minute, $second);
 		$dateTime->setTimezone(new DateTimeZone('UTC'));
 
-		return $dateTime->format('Y-m-d\\TH:i:s.uP');
+		return $dateTime->format(self::ISO8601_FORMAT_STRING);
 	}
 
 
-	// TODO - This method is pending
-	public static function convertToLocalTimeZone($dateTime){
+	/**
+	 * Extract the day from a given dateTime as a numeric value from 1 to 31.
+	 *
+	 * @param string $dateTime A valid ISO 8601 dateTime value, containing at least year-month-day information (like: 2015-12-31...)
+	 *
+	 * @return int The day of month from the specified dateTime between 1 and 31.
+	 * If the specified dateTime does not contain valid day information, an exception will be thrown
+	 */
+	public static function getDay($dateTime){
 
 		if(!self::isValidDateTime($dateTime)){
 
-			throw new UnexpectedValueException('DateTimeUtils->convertToLocalTimeZone : Provided value is not a valid ISO 8601 date time format.');
+			throw new UnexpectedValueException('DateTimeUtils->getDay : Provided value is not a valid ISO 8601 date time format.');
 		}
 
+		$parsedDate = explode('-', $dateTime);
 
-	}
+		if(count($parsedDate) >= 3){
 
+			return (int) substr($parsedDate[2], 0, 2);
+		}
 
-	// TODO - This method is pending
-	public static function format($dateTime){
-
-	}
-
-
-	// TODO - This method is pending
-	public static function getDay($dateTime){
-// 		$time = strtotime($date);
-
-// 		return date('d', $time);
-// 		return date('j');
+		throw new UnexpectedValueException('DateTimeUtils->getDay : Provided dateTime does not contain a valid day value.');
 	}
 
 
 	// TODO - This method is pending
 	public static function getDayOfWeek(){
-// 		$time = strtotime($date);
+		// 		$time = strtotime($date);
 
-// 		return date('w', $time) + 1;
-// 		return date('w') + 1;
+		// 		return date('w', $time) + 1;
+		// 		return date('w') + 1;
 	}
 
 
 	// TODO - This method is pending
 	public static function getMonth(){
 
-// 		$time = strtotime($date);
+		// 		$time = strtotime($date);
 
-// 		return date('m', $time);
-// 		return date('n');
+		// 		return date('m', $time);
+		// 		return date('n');
 	}
 
 
 	// TODO - This method is pending
 	public static function getYear(){
 
-// 		$time = strtotime($date);
+		// 		$time = strtotime($date);
 
-// 		return date('Y', $time);
-// 		return date('Y');
+		// 		return date('Y', $time);
+		// 		return date('Y');
+	}
+
+
+	// TODO - This method is pending
+	public static function getCurrentDay(){
+		// TODO - This method is pending
+		//return date('w') + 1;
+	}
+
+
+	/**
+	 * Get the current day of week based on system time
+	 *
+	 * @return int the current day of week from 1 to 7 (where Sunday is 1, Monday is 2, ...)
+	 */
+	public static function getCurrentDayOfWeek(){
+		// TODO - This method is pending
+		//return date('w') + 1;
+	}
+
+
+	/**
+	 * Get the current month based on system time
+	 *
+	 * @return int the current month from 1 to 12
+	 */
+	public static function getCurrentMonth(){
+		// TODO - This method is pending
+		//return date('n');
+	}
+
+
+	/**
+	 * Get the current year based on system time
+	 *
+	 * @return int the current year
+	 */
+	public static function getCurrentYear(){
+		// TODO - This method is pending
+		//return date('Y');
 	}
 
 
@@ -188,7 +233,7 @@ class DateTimeUtils {
 
 		// TODO - This method is pending
 
-	/** List of day names, used by some class methods */
+		/** List of day names, used by some class methods */
 		//private static $_days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
 
 		//return  self::$_days[$day - 1];
@@ -223,7 +268,7 @@ class DateTimeUtils {
 	// TODO - This method is pending
 	public static function getFirstDayOfMonth($dateTime){
 
-// 		return date('Y-m-01', strtotime($dateTime));
+		// 		return date('Y-m-01', strtotime($dateTime));
 	}
 
 
@@ -237,7 +282,36 @@ class DateTimeUtils {
 	// TODO - This method is pending
 	public static function getLastDayOfMonth($dateTime){
 
-// 		return date('Y-m-t', strtotime($dateTime));
+		// 		return date('Y-m-t', strtotime($dateTime));
+	}
+
+
+	/**
+	 * Convert a valid dateTime value to the timezone that is defined on
+	 * the current system.
+	 *
+	 * @param string $dateTime A valid ISO 8601 dateTime value.
+	 *
+	 * @return string A valid ISO 8601 dateTime value that represents the same date and time info as the received value, but for the current local timezone.
+	 */
+	public static function convertToLocalTimeZone($dateTime){
+
+		if(!self::isValidDateTime($dateTime)){
+
+			throw new UnexpectedValueException('DateTimeUtils->convertToLocalTimeZone : Provided value is not a valid ISO 8601 date time format.');
+		}
+
+		$dateTimeInstance = new DateTime($dateTime);
+
+		$dateTimeInstance->setTimezone(new DateTimeZone(date_default_timezone_get()));
+
+		return $dateTimeInstance->format(self::ISO8601_FORMAT_STRING);
+	}
+
+
+	// TODO - This method is pending
+	public static function format($dateTime){
+
 	}
 
 

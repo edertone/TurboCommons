@@ -32,7 +32,7 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 	public static function setUpBeforeClass(){
 
 		// Used to standarize tests. This value is automatically restored after the script ends.
-		date_default_timezone_set('America/New_York');
+		date_default_timezone_set('Europe/Berlin');
 	}
 
 
@@ -121,6 +121,7 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(!DateTimeUtils::isValidDateTime('2007-11-a13'));
 		$this->assertTrue(!DateTimeUtils::isValidDateTime('2007-11-03t13'));
 		$this->assertTrue(!DateTimeUtils::isValidDateTime('2071-11-13-'));
+		$this->assertTrue(!DateTimeUtils::isValidDateTime(' 2071-11-13'));
 		$this->assertTrue(!DateTimeUtils::isValidDateTime('2009-05-19T14a39r'));
 		$this->assertTrue(!DateTimeUtils::isValidDateTime('2007-11-03T13:18:05.987-'));
 		$this->assertTrue(!DateTimeUtils::isValidDateTime('2007-11-03T13:18:05.987-03!'));
@@ -148,19 +149,19 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 		// Test valid values
 		$this->assertTrue(DateTimeUtils::isLocalTimeZone('2008'));
 		$this->assertTrue(DateTimeUtils::isLocalTimeZone('2008-11'));
-		$this->assertTrue(DateTimeUtils::isLocalTimeZone('2008-09-15'));
+		$this->assertTrue(DateTimeUtils::isLocalTimeZone('2015-12-15'));
 		$this->assertTrue(DateTimeUtils::isLocalTimeZone('2007-11-03T13:18:05'));
-		$this->assertTrue(DateTimeUtils::isLocalTimeZone('1994-11-05T13:15:30-04:00'));
-		$this->assertTrue(DateTimeUtils::isLocalTimeZone('2007-11-03T13:18:05.987-04:00'));
-		$this->assertTrue(DateTimeUtils::isLocalTimeZone('2010-02-18T16:23:48.54123-04:00'));
+		$this->assertTrue(DateTimeUtils::isLocalTimeZone('1994-11-05T13:15:30+01:00'));
+		$this->assertTrue(DateTimeUtils::isLocalTimeZone('2007-11-03T13:18:05.987+01:00'));
+		$this->assertTrue(DateTimeUtils::isLocalTimeZone('2010-02-18T16:23:48.54123+01:00'));
 
 		// Test invalid values
 		$this->assertTrue(!DateTimeUtils::isLocalTimeZone('2010-02-18T16:23:48.54123-01:00'));
-		$this->assertTrue(!DateTimeUtils::isLocalTimeZone('2010-02-18T16:23:48.54123+01:00'));
 		$this->assertTrue(!DateTimeUtils::isLocalTimeZone('2010-02-18T16:23:48.54123-02:00'));
-		$this->assertTrue(!DateTimeUtils::isLocalTimeZone('2010-02-18T16:23:48.54123+01:00'));
+		$this->assertTrue(!DateTimeUtils::isLocalTimeZone('2010-02-18T16:23:48.54123+02:00'));
 		$this->assertTrue(!DateTimeUtils::isLocalTimeZone('2010-02-18T16:23:48.54123-03:00'));
 		$this->assertTrue(!DateTimeUtils::isLocalTimeZone('2010-02-18T16:23:48.54123+03:00'));
+		$this->assertTrue(!DateTimeUtils::isLocalTimeZone('2010-02-18T16:23:48.54123-04:00'));
 		$this->assertTrue(!DateTimeUtils::isLocalTimeZone('2010-02-18T16:23:48.54123+04:00'));
 		$this->assertTrue(!DateTimeUtils::isLocalTimeZone('2010-12-20T16:23:48.54123-05:00'));
 		$this->assertTrue(!DateTimeUtils::isLocalTimeZone('2010-02-18T16:23:48.54123+05:00'));
@@ -269,6 +270,8 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testGetDateTimeFromLocalValues(){
 
+		// TODO - This tests are pending
+
 		// Test empty values
 
 		// Test valid values
@@ -279,9 +282,353 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 		// Test exceptions
 	}
 
+
+	/**
+	 * testGetDay
+	 *
+	 * @return void
+	 */
+	public function testGetDay(){
+
+		// Test valid values
+		$this->assertTrue(DateTimeUtils::getDay('2015-12-15') == 15);
+		$this->assertTrue(DateTimeUtils::getDay('2007-11-03T13:18:05') == 3);
+		$this->assertTrue(DateTimeUtils::getDay('1994-11-05T13:15:30+01:00') == 5);
+		$this->assertTrue(DateTimeUtils::getDay('2007-11-03T13:18:05.987+01:00') == 3);
+		$this->assertTrue(DateTimeUtils::getDay('2010-02-18T16:23:48.54123+01:00') == 18);
+
+		// test exceptions
+		$exceptionMessage = '';
+
+		try {
+			DateTimeUtils::getDay(null);
+			$exceptionMessage = 'null did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getDay('');
+			$exceptionMessage = '"" did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::isLocalTimeZone(123);
+			$exceptionMessage = '123 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::isLocalTimeZone([1,5,6,6]);
+			$exceptionMessage = '[1,5,6,6] did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getDay('2008');
+			$exceptionMessage = '2008 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getDay('2008-11');
+			$exceptionMessage = '2008 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		if($exceptionMessage != ''){
+
+			$this->fail($exceptionMessage);
+		}
+	}
+
+
+	/**
+	 * testGetDayOfWeek
+	 *
+	 * @return void
+	 */
+	public function testGetDayOfWeek(){
+
+		// TODO
+
+		// Test empty values
+
+		// Test valid values
+
+		// Test invalid values
+
+		// Test exceptions
+	}
+
+
+	/**
+	 * testGetMonth
+	 *
+	 * @return void
+	 */
+	public function testGetMonth(){
+
+		// TODO
+
+		// Test empty values
+
+		// Test valid values
+
+		// Test invalid values
+
+		// Test exceptions
+	}
+
+
+	/**
+	 * testGetYear
+	 *
+	 * @return void
+	 */
+	public function testGetYear(){
+
+		// TODO
+
+		// Test empty values
+
+		// Test valid values
+
+		// Test invalid values
+
+		// Test exceptions
+	}
+
+
+	/**
+	 * testGetCurrentDay
+	 *
+	 * @return void
+	 */
+	public function testGetCurrentDay(){
+
+		// TODO
+
+		// Test empty values
+
+		// Test valid values
+
+		// Test invalid values
+
+		// Test exceptions
+	}
+
+
+	/**
+	 * testGetCurrentDayOfWeek
+	 *
+	 * @return void
+	 */
+	public function testGetCurrentDayOfWeek(){
+
+		// TODO
+
+		// Test empty values
+
+		// Test valid values
+
+		// Test invalid values
+
+		// Test exceptions
+	}
+
+
+	/**
+	 * testGetCurrentMonth
+	 *
+	 * @return void
+	 */
+	public function testGetCurrentMonth(){
+
+		// TODO
+
+		// Test empty values
+
+		// Test valid values
+
+		// Test invalid values
+
+		// Test exceptions
+	}
+
+
+	/**
+	 * testGetCurrentYear
+	 *
+	 * @return void
+	 */
+	public function testGetCurrentYear(){
+
+		// TODO
+
+		// Test empty values
+
+		// Test valid values
+
+		// Test invalid values
+
+		// Test exceptions
+	}
+
+
+	/**
+	 * testGetDayName
+	 *
+	 * @return void
+	 */
+	public function testGetDayName(){
+
+		// TODO
+
+		// Test empty values
+
+		// Test valid values
+
+		// Test invalid values
+
+		// Test exceptions
+	}
+
+
+	/**
+	 * testGetMonthName
+	 *
+	 * @return void
+	 */
+	public function testGetMonthName(){
+
+		// TODO
+
+		// Test empty values
+
+		// Test valid values
+
+		// Test invalid values
+
+		// Test exceptions
+	}
+
+
+	/**
+	 * testGetFirstDayOfMonth
+	 *
+	 * @return void
+	 */
+	public function testGetFirstDayOfMonth(){
+
+		// TODO
+
+		// Test empty values
+
+		// Test valid values
+
+		// Test invalid values
+
+		// Test exceptions
+	}
+
+
+	/**
+	 * testGetLastDayOfMonth
+	 *
+	 * @return void
+	 */
+	public function testGetLastDayOfMonth(){
+
+		// TODO
+
+		// Test empty values
+
+		// Test valid values
+
+		// Test invalid values
+
+		// Test exceptions
+	}
+
+
+	/**
+	 * testConvertToLocalTimeZone
+	 *
+	 * @return void
+	 */
+	public function testConvertToLocalTimeZone(){
+
+		// Test valid values
+		$this->assertTrue(DateTimeUtils::convertToLocalTimeZone('2015') == '2015-01-01T00:00:00.000000+01:00');
+		$this->assertTrue(DateTimeUtils::convertToLocalTimeZone('2015-11') == '2015-11-01T00:00:00.000000+01:00');
+		$this->assertTrue(DateTimeUtils::convertToLocalTimeZone('2015-01-01') == '2015-01-01T00:00:00.000000+01:00');
+		$this->assertTrue(DateTimeUtils::convertToLocalTimeZone('2010-02-18T16:23:48.541+06:00') == '2010-02-18T11:23:48.541000+01:00');
+		$this->assertTrue(DateTimeUtils::convertToLocalTimeZone('2007-11-03T13:18:05') == '2007-11-03T13:18:05.000000+01:00');
+		$this->assertTrue(DateTimeUtils::convertToLocalTimeZone('2008-09-15T15:53:00+05:00') == '2008-09-15T12:53:00.000000+02:00');
+		$this->assertTrue(DateTimeUtils::convertToLocalTimeZone('1994-11-05T08:15:30-05:00') == '1994-11-05T14:15:30.000000+01:00');
+		$this->assertTrue(DateTimeUtils::convertToLocalTimeZone('1994-11-05T13:15:30Z') == '1994-11-05T14:15:30.000000+01:00');
+
+		// Test invalid values
+		$exceptionMessage = '';
+
+		try {
+			DateTimeUtils::convertToLocalTimeZone(null);
+			$exceptionMessage = 'null did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::convertToLocalTimeZone('');
+			$exceptionMessage = '"" did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::convertToLocalTimeZone(123);
+			$exceptionMessage = '123 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::convertToLocalTimeZone([1,5,6,6]);
+			$exceptionMessage = '[1,5,6,6] did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::convertToLocalTimeZone('asdfasdf');
+			$exceptionMessage = 'asdfasdf did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::convertToLocalTimeZone('2009-05-19T14a39r');
+			$exceptionMessage = '2009-05-19T14a39r did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		if($exceptionMessage != ''){
+
+			$this->fail($exceptionMessage);
+		}
+	}
+
+
+
 	// TODO add all missing tests
-
-
 }
 
 ?>
