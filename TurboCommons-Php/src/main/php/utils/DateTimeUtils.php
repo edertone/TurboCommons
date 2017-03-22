@@ -137,19 +137,17 @@ class DateTimeUtils {
 	 */
 	public static function getDay($dateTime){
 
-		if(!self::isValidDateTime($dateTime)){
+		if(self::isValidDateTime($dateTime)){
 
-			throw new UnexpectedValueException('DateTimeUtils->getDay : Provided value is not a valid ISO 8601 date time format.');
+			$parsedDate = explode('-', $dateTime);
+
+			if(count($parsedDate) >= 3){
+
+				return (int) substr($parsedDate[2], 0, 2);
+			}
 		}
 
-		$parsedDate = explode('-', $dateTime);
-
-		if(count($parsedDate) >= 3){
-
-			return (int) substr($parsedDate[2], 0, 2);
-		}
-
-		throw new UnexpectedValueException('DateTimeUtils->getDay : Provided dateTime does not contain a valid day value.');
+		throw new UnexpectedValueException('DateTimeUtils->getDay : Provided value is not a valid ISO 8601 date time format or contains invalid day value.');
 	}
 
 
@@ -164,23 +162,21 @@ class DateTimeUtils {
 	 */
 	public static function getDayOfWeek($dateTime){
 
-		if(!self::isValidDateTime($dateTime)){
+		if(self::isValidDateTime($dateTime)){
 
-			throw new UnexpectedValueException('DateTimeUtils->getDayOfWeek : Provided value is not a valid ISO 8601 date time format.');
+			$parsedDate = explode('-', $dateTime);
+
+			if(count($parsedDate) >= 3){
+
+				$dateTimeInstance = new DateTime();
+
+				$dateTimeInstance->setDate($parsedDate[0], $parsedDate[1], substr($parsedDate[2], 0, 2));
+
+				return $dateTimeInstance->format('w') + 1;
+			}
 		}
 
-		$parsedDate = explode('-', $dateTime);
-
-		if(count($parsedDate) < 3){
-
-			throw new UnexpectedValueException('DateTimeUtils->getDayOfWeek : Provided dateTime does not contain a valid date value.');
-		}
-
-		$dateTimeInstance = new DateTime();
-
-		$dateTimeInstance->setDate($parsedDate[0], $parsedDate[1], substr($parsedDate[2], 0, 2));
-
-		return $dateTimeInstance->format('w') + 1;
+		throw new UnexpectedValueException('DateTimeUtils->getDayOfWeek : Provided value is not a valid ISO 8601 date time format or contains invalid date value.');
 	}
 
 
@@ -193,19 +189,17 @@ class DateTimeUtils {
 	 */
 	public static function getMonth($dateTime){
 
-		if(!self::isValidDateTime($dateTime)){
+		if(self::isValidDateTime($dateTime)){
 
-			throw new UnexpectedValueException('DateTimeUtils->getMonth : Provided value is not a valid ISO 8601 date time format.');
+			$parsedDate = explode('-', $dateTime);
+
+			if(count($parsedDate) >= 2){
+
+				return (int) substr($parsedDate[1], 0, 2);
+			}
 		}
 
-		$parsedDate = explode('-', $dateTime);
-
-		if(count($parsedDate) >= 2){
-
-			return (int) substr($parsedDate[1], 0, 2);
-		}
-
-		throw new UnexpectedValueException('DateTimeUtils->getMonth : Provided dateTime does not contain a valid month value.');
+		throw new UnexpectedValueException('DateTimeUtils->getMonth : Provided value is not a valid ISO 8601 date time format or contains invalid month value.');
 	}
 
 
@@ -218,19 +212,17 @@ class DateTimeUtils {
 	 */
 	public static function getYear($dateTime){
 
-		if(!self::isValidDateTime($dateTime)){
+		if(self::isValidDateTime($dateTime)){
 
-			throw new UnexpectedValueException('DateTimeUtils->getYear : Provided value is not a valid ISO 8601 date time format.');
+			$parsedDate = explode('-', $dateTime);
+
+			if(count($parsedDate) >= 1){
+
+				return (int) $parsedDate[0];
+			}
 		}
 
-		$parsedDate = explode('-', $dateTime);
-
-		if(count($parsedDate) >= 1){
-
-			return (int) $parsedDate[0];
-		}
-
-		throw new UnexpectedValueException('DateTimeUtils->getYear : Provided dateTime does not contain a valid year value.');
+		throw new UnexpectedValueException('DateTimeUtils->getYear : Provided value is not a valid ISO 8601 date time format or contains invalid year value.');
 	}
 
 
