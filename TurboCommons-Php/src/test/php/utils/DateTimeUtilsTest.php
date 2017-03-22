@@ -315,14 +315,14 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 		}
 
 		try {
-			DateTimeUtils::isLocalTimeZone(123);
+			DateTimeUtils::getDay(123);
 			$exceptionMessage = '123 did not cause exception';
 		} catch (Exception $e) {
 			// We expect an exception to happen
 		}
 
 		try {
-			DateTimeUtils::isLocalTimeZone([1,5,6,6]);
+			DateTimeUtils::getDay([1,5,6,6]);
 			$exceptionMessage = '[1,5,6,6] did not cause exception';
 		} catch (Exception $e) {
 			// We expect an exception to happen
@@ -356,15 +356,62 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testGetDayOfWeek(){
 
-		// TODO
-
-		// Test empty values
-
 		// Test valid values
+		$this->assertTrue(DateTimeUtils::getDayOfWeek('2015-12-15') == 3);
+		$this->assertTrue(DateTimeUtils::getDayOfWeek('2007-11-03T13:18:05') == 7);
+		$this->assertTrue(DateTimeUtils::getDayOfWeek('1994-11-02T13:15:30+01:00') == 4);
+		$this->assertTrue(DateTimeUtils::getDayOfWeek('2027-02-03T13:18:05.987+01:00') == 4);
+		$this->assertTrue(DateTimeUtils::getDayOfWeek('2010-09-18T16:23:48.54123+01:00') == 7);
 
-		// Test invalid values
+		// test exceptions
+		$exceptionMessage = '';
 
-		// Test exceptions
+		try {
+			DateTimeUtils::getDayOfWeek(null);
+			$exceptionMessage = 'null did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getDayOfWeek('2001');
+			$exceptionMessage = '2001 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getDayOfWeek(123);
+			$exceptionMessage = '123 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getDayOfWeek([1,5,6,6]);
+			$exceptionMessage = '[1,5,6,6] did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getDayOfWeek('2008-12');
+			$exceptionMessage = '2008-12 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getDayOfWeek('2008-80-10');
+			$exceptionMessage = '2008-80-10 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		if($exceptionMessage != ''){
+
+			$this->fail($exceptionMessage);
+		}
 	}
 
 
@@ -375,15 +422,42 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testGetMonth(){
 
-		// TODO
-
-		// Test empty values
-
 		// Test valid values
+		$this->assertTrue(DateTimeUtils::getMonth('2015-05') == 5);
+		$this->assertTrue(DateTimeUtils::getMonth('2015-12-15') == 12);
+		$this->assertTrue(DateTimeUtils::getMonth('2007-11-03T13:18:05') == 11);
+		$this->assertTrue(DateTimeUtils::getMonth('1994-06-02T13:15:30+01:00') == 6);
+		$this->assertTrue(DateTimeUtils::getMonth('2027-02-03T13:18:05.987+01:00') == 2);
+		$this->assertTrue(DateTimeUtils::getMonth('2010-09-18T16:23:48.54123+01:00') == 9);
 
-		// Test invalid values
+		// test exceptions
+		$exceptionMessage = '';
 
-		// Test exceptions
+		try {
+			DateTimeUtils::getMonth('2001');
+			$exceptionMessage = '2001 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getMonth(123);
+			$exceptionMessage = '123 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getMonth('2015-00-12');
+			$exceptionMessage = 'rtyey did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		if($exceptionMessage != ''){
+
+			$this->fail($exceptionMessage);
+		}
 	}
 
 
@@ -394,15 +468,42 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testGetYear(){
 
-		// TODO
-
-		// Test empty values
-
 		// Test valid values
+		$this->assertTrue(DateTimeUtils::getYear('2015-05') == 2015);
+		$this->assertTrue(DateTimeUtils::getYear('1915-12-15') == 1915);
+		$this->assertTrue(DateTimeUtils::getYear('2007-11-03T13:18:05') == 2007);
+		$this->assertTrue(DateTimeUtils::getYear('1994-06-02T13:15:30+01:00') == 1994);
+		$this->assertTrue(DateTimeUtils::getYear('2027-02-03T13:18:05.987+01:00') == 2027);
+		$this->assertTrue(DateTimeUtils::getYear('3010-09-18T16:23:48.54123+01:00') == 3010);
 
-		// Test invalid values
+		// test exceptions
+		$exceptionMessage = '';
 
-		// Test exceptions
+		try {
+			DateTimeUtils::getYear('');
+			$exceptionMessage = '"" did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getYear(123);
+			$exceptionMessage = '123 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getYear(['2015-']);
+			$exceptionMessage = 'rtyey did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		if($exceptionMessage != ''){
+
+			$this->fail($exceptionMessage);
+		}
 	}
 
 

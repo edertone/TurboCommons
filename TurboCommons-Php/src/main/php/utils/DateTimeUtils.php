@@ -130,7 +130,7 @@ class DateTimeUtils {
 	/**
 	 * Extract the day from a given dateTime as a numeric value from 1 to 31.
 	 *
-	 * @param string $dateTime A valid ISO 8601 dateTime value, containing at least year-month-day information (like: 2015-12-31...)
+	 * @param string $dateTime A valid ISO 8601 dateTime value containing at least year-month-day information (like: 2015-12-31...)
 	 *
 	 * @return int The day of month from the specified dateTime between 1 and 31.
 	 * If the specified dateTime does not contain valid day information, an exception will be thrown
@@ -153,32 +153,84 @@ class DateTimeUtils {
 	}
 
 
-	// TODO - This method is pending
-	public static function getDayOfWeek(){
-		// 		$time = strtotime($date);
+	/**
+	 * Get the numeric day of week (between 1 and 7) from the specified dateTime value, where Sunday is considered
+	 * to be the first one:<br>
+	 * 1 = Sunday, 2 = Monday, 3 = Tuesday, etc ...
+	 *
+	 * @param string $dateTime A valid ISO 8601 dateTime value containing at least year-month-day information (like: 2015-12-31...)
+	 *
+	 * @return int A numeric value between 1 and 7, or an exception if an invalid dateTime value was provided.
+	 */
+	public static function getDayOfWeek($dateTime){
 
-		// 		return date('w', $time) + 1;
-		// 		return date('w') + 1;
+		if(!self::isValidDateTime($dateTime)){
+
+			throw new UnexpectedValueException('DateTimeUtils->getDayOfWeek : Provided value is not a valid ISO 8601 date time format.');
+		}
+
+		$parsedDate = explode('-', $dateTime);
+
+		if(count($parsedDate) < 3){
+
+			throw new UnexpectedValueException('DateTimeUtils->getDayOfWeek : Provided dateTime does not contain a valid date value.');
+		}
+
+		$dateTimeInstance = new DateTime();
+
+		$dateTimeInstance->setDate($parsedDate[0], $parsedDate[1], substr($parsedDate[2], 0, 2));
+
+		return $dateTimeInstance->format('w') + 1;
 	}
 
 
-	// TODO - This method is pending
-	public static function getMonth(){
+	/**
+	 * Extract the month from a given dateTime as a numeric value from 1 to 12.
+	 *
+	 * @param string $dateTime A valid ISO 8601 dateTime value containing at least year-month information (like: 2015-12..)
+	 *
+	 * @return int A value between 1 and 12 or an exception if invalid value is provided.
+	 */
+	public static function getMonth($dateTime){
 
-		// 		$time = strtotime($date);
+		if(!self::isValidDateTime($dateTime)){
 
-		// 		return date('m', $time);
-		// 		return date('n');
+			throw new UnexpectedValueException('DateTimeUtils->getMonth : Provided value is not a valid ISO 8601 date time format.');
+		}
+
+		$parsedDate = explode('-', $dateTime);
+
+		if(count($parsedDate) >= 2){
+
+			return (int) substr($parsedDate[1], 0, 2);
+		}
+
+		throw new UnexpectedValueException('DateTimeUtils->getMonth : Provided dateTime does not contain a valid month value.');
 	}
 
 
-	// TODO - This method is pending
-	public static function getYear(){
+	/**
+	 * Extract the year from a given dateTime as a numeric value.
+	 *
+	 * @param string $dateTime A valid ISO 8601 dateTime value containing at least year information (like: 2015...)
+	 *
+	 * @return int A numeric value or an exception if invalid value is provided.
+	 */
+	public static function getYear($dateTime){
 
-		// 		$time = strtotime($date);
+		if(!self::isValidDateTime($dateTime)){
 
-		// 		return date('Y', $time);
-		// 		return date('Y');
+			throw new UnexpectedValueException('DateTimeUtils->getYear : Provided value is not a valid ISO 8601 date time format.');
+		}
+
+		$parsedDate = explode('-', $dateTime);
+
+		if(count($parsedDate) >= 1){
+
+			return (int) $parsedDate[0];
+		}
+
+		throw new UnexpectedValueException('DateTimeUtils->getYear : Provided dateTime does not contain a valid year value.');
 	}
 
 
