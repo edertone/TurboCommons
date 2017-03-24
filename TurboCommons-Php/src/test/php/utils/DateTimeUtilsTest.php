@@ -132,6 +132,11 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(!DateTimeUtils::isValidDateTime('2010-02-18T16:63:48.541-06:00'));
 		$this->assertTrue(!DateTimeUtils::isValidDateTime('2010-02-18T16:23:68.541-06:00'));
 		$this->assertTrue(!DateTimeUtils::isValidDateTime('2010-02-18T16:23:48.541-96:00'));
+		$this->assertTrue(!DateTimeUtils::isValidDateTime('2010-02-31T16:23:48.541+06:00'));
+		$this->assertTrue(!DateTimeUtils::isValidDateTime('2010-06-31T16:23:48.541+06:00'));
+		$this->assertTrue(!DateTimeUtils::isValidDateTime('2010-02-31T16:23:48.541+06:00'));
+		$this->assertTrue(!DateTimeUtils::isValidDateTime('2010-11-31T16:23:48.541+06:00'));
+		$this->assertTrue(!DateTimeUtils::isValidDateTime('2010-02-30T16:23:48.541+06:00'));
 		$this->assertTrue(!DateTimeUtils::isValidDateTime(123));
 		$this->assertTrue(!DateTimeUtils::isValidDateTime(123.97));
 		$this->assertTrue(!DateTimeUtils::isValidDateTime([1,2,3]));
@@ -246,20 +251,6 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 
 			$this->fail($exceptionMessage);
 		}
-	}
-
-
-	/**
-	 * testGetDateTimeNow
-	 *
-	 * @return void
-	 */
-	public function testGetDateTimeNow(){
-
-		// Test valid values
-		$this->assertTrue(DateTimeUtils::isValidDateTime(DateTimeUtils::getDateTimeNow()));
-
-		$this->assertTrue(!DateTimeUtils::isLocalTimeZone(DateTimeUtils::getDateTimeNow()));
 	}
 
 
@@ -508,21 +499,29 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
+	 * testGetDateTimeNow
+	 *
+	 * @return void
+	 */
+	public function testGetDateTimeNow(){
+
+		// Test valid values
+		$this->assertTrue(DateTimeUtils::isValidDateTime(DateTimeUtils::getCurrentDateTime()));
+
+		$this->assertTrue(!DateTimeUtils::isLocalTimeZone(DateTimeUtils::getCurrentDateTime()));
+	}
+
+
+	/**
 	 * testGetCurrentDay
 	 *
 	 * @return void
 	 */
 	public function testGetCurrentDay(){
 
-		// TODO
-
-		// Test empty values
-
-		// Test valid values
-
-		// Test invalid values
-
-		// Test exceptions
+		$this->assertTrue(DateTimeUtils::getCurrentDay() == date('j'));
+		$this->assertTrue(DateTimeUtils::getCurrentDay() <= 31);
+		$this->assertTrue(DateTimeUtils::getCurrentDay() >= 1);
 	}
 
 
@@ -533,15 +532,9 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testGetCurrentDayOfWeek(){
 
-		// TODO
-
-		// Test empty values
-
-		// Test valid values
-
-		// Test invalid values
-
-		// Test exceptions
+		$this->assertTrue(DateTimeUtils::getCurrentDayOfWeek() == (date('w') + 1));
+		$this->assertTrue(DateTimeUtils::getCurrentDayOfWeek() <= 7);
+		$this->assertTrue(DateTimeUtils::getCurrentDayOfWeek() >= 1);
 	}
 
 
@@ -552,15 +545,9 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testGetCurrentMonth(){
 
-		// TODO
-
-		// Test empty values
-
-		// Test valid values
-
-		// Test invalid values
-
-		// Test exceptions
+		$this->assertTrue(DateTimeUtils::getCurrentMonth() == date('n'));
+		$this->assertTrue(DateTimeUtils::getCurrentMonth() <= 12);
+		$this->assertTrue(DateTimeUtils::getCurrentMonth() >= 1);
 	}
 
 
@@ -571,15 +558,8 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testGetCurrentYear(){
 
-		// TODO
-
-		// Test empty values
-
-		// Test valid values
-
-		// Test invalid values
-
-		// Test exceptions
+		$this->assertTrue(DateTimeUtils::getCurrentYear() == date('Y'));
+		$this->assertTrue(DateTimeUtils::getCurrentYear() > 2015);
 	}
 
 
@@ -590,15 +570,68 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testGetDayName(){
 
-		// TODO
-
-		// Test empty values
-
 		// Test valid values
+		$this->assertTrue(DateTimeUtils::getDayName(0001) == 'SUNDAY');
+		$this->assertTrue(DateTimeUtils::getDayName(1) == 'SUNDAY');
+		$this->assertTrue(DateTimeUtils::getDayName('1') == 'SUNDAY');
+		$this->assertTrue(DateTimeUtils::getDayName(' 1') == 'SUNDAY');
+		$this->assertTrue(DateTimeUtils::getDayName('0001') == 'SUNDAY');
+		$this->assertTrue(DateTimeUtils::getDayName(3) == 'TUESDAY');
+		$this->assertTrue(DateTimeUtils::getDayName('3') == 'TUESDAY');
+		$this->assertTrue(DateTimeUtils::getDayName(' 3') == 'TUESDAY');
+		$this->assertTrue(DateTimeUtils::getDayName(5) == 'THURSDAY');
+		$this->assertTrue(DateTimeUtils::getDayName('5') == 'THURSDAY');
+		$this->assertTrue(DateTimeUtils::getDayName(' 5') == 'THURSDAY');
 
-		// Test invalid values
+		// test exceptions
+		$exceptionMessage = '';
 
-		// Test exceptions
+		try {
+			DateTimeUtils::getDayName(null);
+			$exceptionMessage = 'null did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getDayName('');
+			$exceptionMessage = '"" did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getDayName(123);
+			$exceptionMessage = '123 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getDayName(8);
+			$exceptionMessage = '8 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getDayName(-1);
+			$exceptionMessage = '-1 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getDayName(['6']);
+			$exceptionMessage = '6 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		if($exceptionMessage != ''){
+
+			$this->fail($exceptionMessage);
+		}
 	}
 
 
@@ -609,15 +642,71 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testGetMonthName(){
 
-		// TODO
-
-		// Test empty values
-
 		// Test valid values
+		$this->assertTrue(DateTimeUtils::getMonthName(0001) == 'JANUARY');
+		$this->assertTrue(DateTimeUtils::getMonthName(1) == 'JANUARY');
+		$this->assertTrue(DateTimeUtils::getMonthName('1') == 'JANUARY');
+		$this->assertTrue(DateTimeUtils::getMonthName(' 1') == 'JANUARY');
+		$this->assertTrue(DateTimeUtils::getMonthName('0001') == 'JANUARY');
+		$this->assertTrue(DateTimeUtils::getMonthName(6) == 'JUNE');
+		$this->assertTrue(DateTimeUtils::getMonthName('6') == 'JUNE');
+		$this->assertTrue(DateTimeUtils::getMonthName(' 6') == 'JUNE');
+		$this->assertTrue(DateTimeUtils::getMonthName(9) == 'SEPTEMBER');
+		$this->assertTrue(DateTimeUtils::getMonthName('9') == 'SEPTEMBER');
+		$this->assertTrue(DateTimeUtils::getMonthName(' 9') == 'SEPTEMBER');
+		$this->assertTrue(DateTimeUtils::getMonthName(12) == 'DECEMBER');
+		$this->assertTrue(DateTimeUtils::getMonthName('12') == 'DECEMBER');
+		$this->assertTrue(DateTimeUtils::getMonthName(' 12') == 'DECEMBER');
 
-		// Test invalid values
+		// test exceptions
+		$exceptionMessage = '';
 
-		// Test exceptions
+		try {
+			DateTimeUtils::getMonthName(null);
+			$exceptionMessage = 'null did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getMonthName('');
+			$exceptionMessage = '"" did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getMonthName(123);
+			$exceptionMessage = '123 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getMonthName(13);
+			$exceptionMessage = '13 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getMonthName(-1);
+			$exceptionMessage = '-1 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getMonthName(['6']);
+			$exceptionMessage = '6 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		if($exceptionMessage != ''){
+
+			$this->fail($exceptionMessage);
+		}
 	}
 
 
@@ -628,15 +717,55 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testGetFirstDayOfMonth(){
 
-		// TODO
-
-		// Test empty values
-
 		// Test valid values
+		$this->assertTrue(DateTimeUtils::getFirstDayOfMonth('2010-09') == '2010-09-01T00:00:00.000000+02:00');
+		$this->assertTrue(DateTimeUtils::getFirstDayOfMonth('2012-01-18') == '2012-01-01T00:00:00.000000+01:00');
+		$this->assertTrue(DateTimeUtils::getFirstDayOfMonth('2000-12-18T16:23:48') == '2000-12-01T16:23:48.000000+01:00');
+		$this->assertTrue(DateTimeUtils::getFirstDayOfMonth('2010-09-18T16:23:48.54123+01:00') == '2010-09-01T16:23:48.541230+01:00');
+		$this->assertTrue(DateTimeUtils::getFirstDayOfMonth('2020-01-01T16:23:48.54123+01:00') == '2020-01-01T16:23:48.541230+01:00');
 
-		// Test invalid values
+		// test exceptions
+		$exceptionMessage = '';
 
-		// Test exceptions
+		try {
+			DateTimeUtils::getFirstDayOfMonth('');
+			$exceptionMessage = '2020-06-31T23:58:59.000000+01:00 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getFirstDayOfMonth('2020-06-31T23:58:59.000000+01:00');
+			$exceptionMessage = '2020-06-31T23:58:59.000000+01:00 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getFirstDayOfMonth('2010');
+			$exceptionMessage = '2010 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getFirstDayOfMonth('fert');
+			$exceptionMessage = 'fert did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getFirstDayOfMonth('2010-13');
+			$exceptionMessage = '2010-13 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		if($exceptionMessage != ''){
+
+			$this->fail($exceptionMessage);
+		}
 	}
 
 
@@ -647,15 +776,55 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testGetLastDayOfMonth(){
 
-		// TODO
-
-		// Test empty values
-
 		// Test valid values
+		$this->assertTrue(DateTimeUtils::getLastDayOfMonth('2010-09') == '2010-09-30T00:00:00.000000+02:00');
+		$this->assertTrue(DateTimeUtils::getLastDayOfMonth('2012-01-18') == '2012-01-31T00:00:00.000000+01:00');
+		$this->assertTrue(DateTimeUtils::getLastDayOfMonth('2000-12-18T16:23:48') == '2000-12-31T16:23:48.000000+01:00');
+		$this->assertTrue(DateTimeUtils::getLastDayOfMonth('2010-09-18T16:23:48.54123+01:00') == '2010-09-30T16:23:48.541230+01:00');
+		$this->assertTrue(DateTimeUtils::getLastDayOfMonth('2020-01-01T16:23:48.54123+01:00') == '2020-01-31T16:23:48.541230+01:00');
 
-		// Test invalid values
+		// test exceptions
+		$exceptionMessage = '';
 
-		// Test exceptions
+		try {
+			DateTimeUtils::getLastDayOfMonth('');
+			$exceptionMessage = '2020-06-31T23:58:59.000000+01:00 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getLastDayOfMonth('2020-06-31T23:58:59.000000+01:00');
+			$exceptionMessage = '2020-06-31T23:58:59.000000+01:00 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getLastDayOfMonth('2010');
+			$exceptionMessage = '2010 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getLastDayOfMonth('fert');
+			$exceptionMessage = 'fert did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		try {
+			DateTimeUtils::getLastDayOfMonth('2010-13');
+			$exceptionMessage = '2010-13 did not cause exception';
+		} catch (Exception $e) {
+			// We expect an exception to happen
+		}
+
+		if($exceptionMessage != ''){
+
+			$this->fail($exceptionMessage);
+		}
 	}
 
 
@@ -667,8 +836,8 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 	public function testConvertToLocalTimeZone(){
 
 		// Test valid values
-		$this->assertTrue(DateTimeUtils::convertToLocalTimeZone('2015') == '2015-01-01T00:00:00.000000+01:00');
-		$this->assertTrue(DateTimeUtils::convertToLocalTimeZone('2015-11') == '2015-11-01T00:00:00.000000+01:00');
+		$this->assertTrue(DateTimeUtils::convertToLocalTimeZone('2015') == '2015');
+		$this->assertTrue(DateTimeUtils::convertToLocalTimeZone('2015-11') == '2015-11');
 		$this->assertTrue(DateTimeUtils::convertToLocalTimeZone('2015-01-01') == '2015-01-01T00:00:00.000000+01:00');
 		$this->assertTrue(DateTimeUtils::convertToLocalTimeZone('2010-02-18T16:23:48.541+06:00') == '2010-02-18T11:23:48.541000+01:00');
 		$this->assertTrue(DateTimeUtils::convertToLocalTimeZone('2007-11-03T13:18:05') == '2007-11-03T13:18:05.000000+01:00');
@@ -726,8 +895,6 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 			$this->fail($exceptionMessage);
 		}
 	}
-
-
 
 	// TODO add all missing tests
 }

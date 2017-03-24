@@ -38,7 +38,7 @@ class DateTimeUtils {
 	/**
 	 * String that defines the ISO 8601 formatto be used when calling the format method on DateTime Php class.
 	 */
-	const ISO8601_FORMAT_STRING = 'Y-m-d\\TH:i:s.uP';
+	private static $_iso8601FormatString = 'Y-m-d\\TH:i:s.uP';
 
 
 	/**
@@ -53,20 +53,30 @@ class DateTimeUtils {
 	 */
 	public static function isValidDateTime($dateTime){
 
-		if($dateTime == null || !is_string($dateTime)){
-
-			return false;
-		}
-
-		// Validate that string ends only with alphanumeric values
-		if(!ctype_alnum(substr($dateTime, -1))){
+		// Validate that is a string and ends only with alphanumeric values
+		if(!is_string($dateTime) || !ctype_alnum(substr($dateTime, -1))){
 
 			return false;
 		}
 
 		$regex = '/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/';
 
-		return (preg_match($regex, $dateTime) > 0);
+		if (preg_match($regex, $dateTime) > 0){
+
+			// We must also validate that the day, month and year are a correct date value
+			$parsedDate = explode('-', $dateTime);
+
+			if(count($parsedDate) >= 3){
+
+				return checkdate($parsedDate[1], substr($parsedDate[2], 0, 2), $parsedDate[0]);
+
+			}else{
+
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 
@@ -82,33 +92,12 @@ class DateTimeUtils {
 	 */
 	public static function isLocalTimeZone($dateTime){
 
-		if(!self::isValidDateTime($dateTime)){
+		if(self::isValidDateTime($dateTime)){
 
-			throw new UnexpectedValueException('DateTimeUtils->isLocalTimeZone : Provided value is not a valid ISO 8601 date time format.');
+			return ((new DateTime($dateTime))->getOffset() === (new DateTime())->getOffset());
 		}
 
-		$dateTimeInstance = new DateTime($dateTime);
-		$localTimeInstance = new DateTime();
-
-		return ($dateTimeInstance->getOffset() === $localTimeInstance->getOffset());
-	}
-
-
-	/**
-	 * Generates an ISO 8601 string containing the current full date and time with microseconds precision.
-	 * The value is formatted using UTC, so it does not have a timezone offset. To get the local timezone
-	 * date and time, use DateTimeUtils::convertToLocalTimeZone().
-	 *
-	 * @see DateTimeUtils
-	 * @see DateTimeUtils::convertToLocalTimeZone
-	 *
-	 * @return string The current date and time as a valid full ISO 8601 UTC value (no timezone offset).
-	 */
-	public static function getDateTimeNow(){
-
-		$now = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''), new DateTimeZone('UTC'));
-
-		return $now->format(self::ISO8601_FORMAT_STRING);
+		throw new UnexpectedValueException('DateTimeUtils->isLocalTimeZone : Provided value is not a valid ISO 8601 date time format.');
 	}
 
 
@@ -123,7 +112,7 @@ class DateTimeUtils {
 		$dateTime->setTime($hour, $minute, $second);
 		$dateTime->setTimezone(new DateTimeZone('UTC'));
 
-		return $dateTime->format(self::ISO8601_FORMAT_STRING);
+		return $dateTime->format(self::$_iso8601FormatString);
 	}
 
 
@@ -208,7 +197,7 @@ class DateTimeUtils {
 	 *
 	 * @param string $dateTime A valid ISO 8601 dateTime value containing at least year information (like: 2015...)
 	 *
-	 * @return int A numeric value or an exception if invalid value is provided.
+	 * @return int A 4 digits numeric value or an exception if invalid value is provided.
 	 */
 	public static function getYear($dateTime){
 
@@ -226,107 +215,152 @@ class DateTimeUtils {
 	}
 
 
-	// TODO - This method is pending
-	public static function getCurrentDay(){
-		// TODO - This method is pending
-		//return date('w') + 1;
+	/**
+	 * Generates an ISO 8601 string containing the current full date and time with microseconds precision.
+	 * The value is formatted using UTC, so it does not have a timezone offset. To get the local timezone
+	 * date and time, use DateTimeUtils::convertToLocalTimeZone().
+	 *
+	 * @see DateTimeUtils
+	 * @see DateTimeUtils::convertToLocalTimeZone
+	 *
+	 * @return string The current date and time as a valid full ISO 8601 UTC value (no timezone offset).
+	 */
+	public static function getCurrentDateTime(){
+
+		$now = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''), new DateTimeZone('UTC'));
+
+		return $now->format(self::$_iso8601FormatString);
 	}
 
 
 	/**
-	 * Get the current day of week based on system time
+	 * Get the current day of month based on system time as a numeric value from 1 to 31.
 	 *
-	 * @return int the current day of week from 1 to 7 (where Sunday is 1, Monday is 2, ...)
+	 * @return int The day of month as a value between 1 and 31.
+	 */
+	public static function getCurrentDay(){
+
+		$now = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''), new DateTimeZone('UTC'));
+
+		return $now->format('j');
+	}
+
+
+	/**
+	 * Get the current numeric day of week (between 1 and 7) based on system time, where Sunday is considered
+	 * to be the first one:<br>
+	 * 1 = Sunday, 2 = Monday, 3 = Tuesday, etc ...
+	 *
+	 * @return int A numeric value between 1 and 7  (where Sunday is 1, Monday is 2, ...)
 	 */
 	public static function getCurrentDayOfWeek(){
-		// TODO - This method is pending
-		//return date('w') + 1;
+
+		$now = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''), new DateTimeZone('UTC'));
+
+		return $now->format('w') + 1;
 	}
 
 
 	/**
-	 * Get the current month based on system time
+	 * Get the current month based on system time as a numeric value from 1 to 12.
 	 *
-	 * @return int the current month from 1 to 12
+	 * @return int A value between 1 and 12
 	 */
 	public static function getCurrentMonth(){
-		// TODO - This method is pending
-		//return date('n');
+
+		$now = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''), new DateTimeZone('UTC'));
+
+		return $now->format('n');
 	}
 
 
 	/**
 	 * Get the current year based on system time
 	 *
-	 * @return int the current year
+	 * @return int A 4 digits numeric value representing the current year.
 	 */
 	public static function getCurrentYear(){
-		// TODO - This method is pending
-		//return date('Y');
+
+		$now = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''), new DateTimeZone('UTC'));
+
+		return $now->format('Y');
 	}
 
 
 	/**
-	 * Returns the day name from a numeric day value
+	 * Get the english name representing the given numeric value of a week day (between 1 and 7), where
+	 * Sunday is considered to be the first one: 1 = Sunday, 2 = Monday, 3 = Tuesday, etc ...
 	 *
-	 * @param int $day A day number from 1 to 7 (SUNDAY = 1)
+	 * @param int $day A day number between 1 and 7
 	 *
-	 * @return string
+	 * @return string The day name in english and with capital letters, like for example: MONDAY, SATURDAY...
 	 */
 	public static function getDayName($day){
 
-		// TODO - This method is pending
+		if(!is_numeric($day) || $day > 7 || $day < 1){
 
-		/** List of day names, used by some class methods */
-		//private static $_days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+			throw new UnexpectedValueException('DateTimeUtils->getDayName : Provided value is not a valid day number between 1 and 7');
+		}
 
-		//return  self::$_days[$day - 1];
+		$days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+
+		return $days[$day - 1];
 	}
 
 
 	/**
 	 * Returns the month name from a numeric month value
 	 *
-	 * @param int $month A month number from 1 to 12
+	 * @param int $month A month number between 1 and 12
 	 *
-	 * @return string the month name in english and with capital letters, so we can use it with localized constants, for example: constant('LOC_'.DateUtils::getMonthName(1))
+	 * @return string the month name in english and with capital letters, like: JANUARY, FEBRUARY, ...
 	 */
 	public static function getMonthName($month){
 
-		// TODO - This method is pending
+		if(!is_numeric($month) || $month > 12 || $month < 1){
 
-		/** List of month names, used by some class methods */
-		//private static $_months = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+			throw new UnexpectedValueException('DateTimeUtils->getMonthName : Provided value is not a valid month number between 1 and 12');
+		}
 
-		//return  self::$_months[$month - 1];
+		$months = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+
+		return  $months[$month - 1];
 	}
 
 
 	/**
-	 * Get the first day for the received date
+	 * Get the first day of month for the given dateTime value.
 	 *
-	 * @param string $date A date in the yyyy-mm-dd format. Use conversion utils if your date is not in this format
+	 * @param string $dateTime A valid ISO 8601 dateTime value containing at least year and month information (like: 2015-10...)
 	 *
-	 * @return string A date representing the last day of month for the specified date
+	 * @return string A valid ISO8601 dateTime value representing the first day of month for the given dateTime value.
 	 */
-	// TODO - This method is pending
 	public static function getFirstDayOfMonth($dateTime){
 
-		// 		return date('Y-m-01', strtotime($dateTime));
+		if(self::isValidDateTime($dateTime) && count(explode('-', $dateTime)) >= 2){
+
+			return (new DateTime($dateTime))->format('Y-m-01\\TH:i:s.uP');
+		}
+
+		throw new UnexpectedValueException('DateTimeUtils->getFirstDayOfMonth : Provided value is not a valid ISO 8601 date time format or contains invalid date value');
 	}
 
 
 	/**
-	 * Get the last day for the received date
+	 * Get the last day of month for the given dateTime value.
 	 *
-	 * @param string $date A date in the yyyy-mm-dd format. Use conversion utils if your date is not in this format
+	 * @param string $dateTime A valid ISO 8601 dateTime value containing at least year and month information (like: 2015-10...)
 	 *
-	 * @return string A date representing the last day of month for the specified date
+	 * @return string A valid ISO8601 dateTime value representing the last day of month for the given dateTime value.
 	 */
-	// TODO - This method is pending
 	public static function getLastDayOfMonth($dateTime){
 
-		// 		return date('Y-m-t', strtotime($dateTime));
+		if(self::isValidDateTime($dateTime) && count(explode('-', $dateTime)) >= 2){
+
+			return (new DateTime($dateTime))->format('Y-m-t\\TH:i:s.uP');
+		}
+
+		throw new UnexpectedValueException('DateTimeUtils->getLastDayOfMonth : Provided value is not a valid ISO 8601 date time format or contains invalid date value');
 	}
 
 
@@ -340,21 +374,34 @@ class DateTimeUtils {
 	 */
 	public static function convertToLocalTimeZone($dateTime){
 
-		if(!self::isValidDateTime($dateTime)){
+		if(self::isValidDateTime($dateTime)){
 
-			throw new UnexpectedValueException('DateTimeUtils->convertToLocalTimeZone : Provided value is not a valid ISO 8601 date time format.');
+			if(count(explode('-', $dateTime)) >= 3){
+
+				$dateTimeInstance = new DateTime($dateTime);
+
+				$dateTimeInstance->setTimezone(new DateTimeZone(date_default_timezone_get()));
+
+				return $dateTimeInstance->format(self::$_iso8601FormatString);
+
+			}else{
+
+				return $dateTime;
+			}
 		}
 
-		$dateTimeInstance = new DateTime($dateTime);
-
-		$dateTimeInstance->setTimezone(new DateTimeZone(date_default_timezone_get()));
-
-		return $dateTimeInstance->format(self::ISO8601_FORMAT_STRING);
+		throw new UnexpectedValueException('DateTimeUtils->convertToLocalTimeZone : Provided value is not a valid ISO 8601 date time format.');
 	}
 
 
 	// TODO - This method is pending
 	public static function format($dateTime){
+
+	}
+
+
+	// TODO - This method is pending
+	public static function compare(){
 
 	}
 
@@ -489,12 +536,6 @@ class DateTimeUtils {
 // 				return date('Y-m-d', strtotime(date('Y-m-d', strtotime($date)).' -'.$n.' year'));
 // 			}
 // 		}
-	}
-
-
-	// TODO - This method is pending
-	public static function compare(){
-
 	}
 }
 
