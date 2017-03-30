@@ -47,7 +47,7 @@ class MailManager extends BaseStrictClass {
 		$f['filename'] = $filename;
 		$f['binary'] = chunk_split(base64_encode(file_get_contents($path)));
 
-		array_push($this->_attachments, $f);
+		$this->_attachments[] = $f;
 		$this->_attachmentsLen ++;
 
 	}
@@ -66,7 +66,7 @@ class MailManager extends BaseStrictClass {
 		$f['filename'] = $filename;
 		$f['binary'] = chunk_split(base64_encode($binary_data));
 
-		array_push($this->_attachments, $f);
+		$this->_attachments[] = $f;
 		$this->_attachmentsLen ++;
 
 	}

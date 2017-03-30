@@ -391,16 +391,16 @@ class ValidationManager extends BaseStrictClass{
 		// If the validation fails, we must change the validation status
 		if($errorMessage != ''){
 
-			array_push($this->failedMessagesList, $errorMessage);
+			$this->failedMessagesList[] = $errorMessage;
 
 			if($isWarning){
 
-				array_push($this->failedStatusList, self::VALIDATION_WARNING);
+				$this->failedStatusList [] = self::VALIDATION_WARNING;
 				$this->lastMessage = $errorMessage;
 
 			}else{
 
-				array_push($this->failedStatusList, self::VALIDATION_ERROR);
+				$this->failedStatusList[] = self::VALIDATION_ERROR;
 				$this->lastMessage = $errorMessage;
 			}
 

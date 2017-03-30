@@ -85,11 +85,11 @@ class FTPManager extends BaseStrictClass {
 		$list = ftp_nlist($this->_connectionId, $path);
 
 		// remove all the folder information from the received files
-		$result = array();
+		$result = [];
 
 		foreach($list as $l){
 
-			array_push($result, StringUtils::getFilenameWithExtension($l));
+			$result[] = StringUtils::getFilenameWithExtension($l);
 		}
 
 		return $result;

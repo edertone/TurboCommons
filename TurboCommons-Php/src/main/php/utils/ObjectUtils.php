@@ -41,7 +41,7 @@ class ObjectUtils {
 
 		foreach($object as $key => $value){
 
-			array_push($res, (string)$key);
+			$res[] = (string)$key;
 		}
 
 		return $res;

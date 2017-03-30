@@ -404,7 +404,7 @@ class StringUtils {
     		// Apply specified filters
     		if(is_string($line) && preg_replace($filters, '', $line) != ''){
 
-    			array_push($res, $line);
+    			$res[] = $line;
     		}
     	}
 
@@ -460,7 +460,7 @@ class StringUtils {
 
     			if($v == $i && (!is_numeric($key) || (is_numeric($key) && !$ignoreNumericWords))){
 
-					array_push($res, $key);
+    				$res[] = $key;
     			}
     		}
     	}

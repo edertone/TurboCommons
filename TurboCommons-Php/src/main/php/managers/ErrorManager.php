@@ -17,15 +17,16 @@ use org\turbocommons\src\main\php\model\ErrorData;
 
 
 /**
- * A class that is used to encapsulate the application error management.
- * It will give total control regarding application exceptions, the way they are handled and notified.
+ * A singleton class that is used to encapsulate all the global error management.
+ * It will give total control over the code exceptions, the way they are handled and notified.
  */
 class ErrorManager extends BaseSingletonClass{
 
 
 	/**
-	 * Flag that tells the project to show or hide all the browser html error output.
-	 * This is normally set to false cause html errors will give lots of information to malicious users, so setting it to true will generate an email warning notification if email error notifications are enabled
+	 * Flag that tells the class to show or hide all the browser html error output.
+	 * This is normally set to false cause html errors will give lots of information to malicious users,
+	 * so setting it to true will generate an email warning notification if email error notifications are enabled
 	 */
 	public $errorsToBrowser = false;
 
@@ -84,7 +85,8 @@ class ErrorManager extends BaseSingletonClass{
 
 	/**
 	 * Use this method to initialize the error management class.
-	 * The ErrorManager will not be doing anything till this method is called. Once intialized, the custom error handlers will take care of the generated app errors.
+	 * The ErrorManager will not be doing anything till this method is called. Once intialized, the custom error handlers will take care of
+	 * all the exceptions and errors that happen.
 	 * This method should be called only once. Subsequent calls will do nothing.
 	 *
 	 * @return void
@@ -108,9 +110,9 @@ class ErrorManager extends BaseSingletonClass{
 
 
 	/**
-	 * Get the detailed backtrace to the current execution point, normally used to check what happened before an error.
+	 * Get the detailed backtrace to the current execution point.
 	 *
-	 * @return string The detailed execution trace to the current code point
+	 * @return string The detailed execution trace to the point this method is called.
 	 */
 	public function getBackTrace(){
 
@@ -130,7 +132,8 @@ class ErrorManager extends BaseSingletonClass{
 
 
 	/**
-	 * If the php errors are setup to be output to the browser html code, this method will generate an alert that will be displayed as any other error message that is handled by this class.
+	 * If the php errors are setup to be output to the browser html code, this method will generate an alert that
+	 * will be displayed as any other error message that is handled by this class.
 	 * This verification is very important, cause showing the errors on browser is very dangerous as gives a lot of information to malicious users.
 	 *
 	 * @return void
@@ -155,7 +158,6 @@ class ErrorManager extends BaseSingletonClass{
 				break;
 
 			default:
-				break;
 		}
 
 		if($displayErrors){
@@ -209,12 +211,9 @@ class ErrorManager extends BaseSingletonClass{
 
 		echo '<br><b>'.$errorData->message.'</b> -- '.$errorData->fileName;
 
-		if(isset($errorData->line)){
+		if(isset($errorData->line) && $errorData->line != ''){
 
-			if($errorData->line != ''){
-
-				echo ' line '.$errorData->line;
-			}
+			echo ' line '.$errorData->line;
 		}
 
 		echo '<br><br>';
@@ -319,12 +318,9 @@ class ErrorManager extends BaseSingletonClass{
 		}
 
 		// Add the error trace if available
-		if(isset($errorData->trace)){
+		if(isset($errorData->trace) && $errorData->trace != ''){
 
-			if($errorData->trace != ''){
-
-				$errorMessage .= 'Trace: '.substr($errorData->trace, 0, 20000).'...'."\n\n";
-			}
+			$errorMessage .= 'Trace: '.substr($errorData->trace, 0, 20000).'...'."\n\n";
 		}
 
 		if(isset($errorData->context)){
@@ -350,7 +346,7 @@ class ErrorManager extends BaseSingletonClass{
 		}
 
 		// Store the message to the list of currently sent messages
-		array_push($this->_messagesSent, $messageCompare);
+		$this->_messagesSent[] = $messageCompare;
 	}
 
 
@@ -459,6 +455,8 @@ class ErrorManager extends BaseSingletonClass{
 				case E_ALL:
 					$type .= 'E_ALL ';
 					break;
+
+				default:
 			}
 
 			$errorData = new ErrorData();

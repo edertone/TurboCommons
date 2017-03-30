@@ -229,29 +229,29 @@ class FilesManager extends BaseStrictClass{
 
 			if($text != ''){
 
-				array_push($result, $text);
+				$result[] = $text;
 			}
 
-			array_push($result, $i);
+			$result[] = $i;
 
 			if($desiredName != ''){
 
-				array_push($result, $desiredName);
+				$result[] = $desiredName;
 			}
 
 		}else{
 
 			if($desiredName != ''){
 
-				array_push($result, $desiredName);
+				$result[] = $desiredName;
 			}
 
 			if($text != ''){
 
-				array_push($result, $text);
+				$result[] = $text;
 			}
 
-			array_push($result, $i);
+			$result[] = $i;
 		}
 
 		return implode($separator, $result);
@@ -386,7 +386,7 @@ class FilesManager extends BaseStrictClass{
 							break;
 
 						default:
-							array_push($result, $fileInfo->getFilename());
+							$result[] = $fileInfo->getFilename();
 							break;
 					}
 				}
@@ -409,7 +409,7 @@ class FilesManager extends BaseStrictClass{
 
 				foreach ($sortRes as $value) {
 
-					array_push($result, $value);
+					$result[] = $value;
 				}
 				break;
 
@@ -418,7 +418,7 @@ class FilesManager extends BaseStrictClass{
 
 				foreach ($sortRes as $value) {
 
-					array_push($result, $value);
+					$result[] = $value;
 				}
 				break;
 		}
