@@ -10,10 +10,11 @@ TurboCommons tries to standarize all those common operations so they are perform
 
 ### What does it do?
 This library tries to cover the following application areas:
-- Data structures manipulation: Strings, Arrays, Objects, XML, CSV, Dates, ...
+- Data manipulation: Strings, Arrays, Objects, XML, CSV, ...
+- Full standard ISO 8601 date/time values and timezone manipulation
 - Conversion and serialization / de-serialization of complex data structures
 - Pictures manipulation and transformation
-- Cross language localization (text translation) management
+- Application localization management (text language translation) 
 - Global exception management
 - Complex cross language validation: Mails, Urls, postal codes, ...
 - Sending emails, operations with ftp and http, ...
