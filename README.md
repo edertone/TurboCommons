@@ -9,12 +9,12 @@ Reading a file, validating an email address, counting the words in a string... w
 TurboCommons tries to standarize all those common operations so they are performed the same way across all possible languages. There's a set of well known common problems, with a set of well known common solutions that are the same for all the programming languages in the world. Our goal is that any developer who knows this library can start doing the same things with JS, Java or C# without having to learn something new. In brief, make our coding lifes easier!
 
 ### What does it do?
-This library tries to cover the following application areas:
+This library tries to cover the following development areas:
 - Data manipulation: Strings, Arrays, Objects, XML, CSV, ...
 - Full standard ISO 8601 date/time values and timezone manipulation
 - Conversion and serialization / de-serialization of complex data structures
 - Pictures manipulation and transformation
-- Application localization management (text language translation) 
+- Localization management (text translations) 
 - Global exception management
 - Complex cross language validation: Mails, Urls, postal codes, ...
 - Sending emails, operations with ftp and http, ...
