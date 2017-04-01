@@ -54,50 +54,55 @@ class DateTimeUtils {
 	public static function isValidDateTime($dateTime){
 
 		// Validate that is a string and ends only with alphanumeric values
-		if(!is_string($dateTime) || !ctype_alnum(substr($dateTime, -1))){
+		if(is_string($dateTime) && ctype_alnum(substr($dateTime, -1))){
 
-			return false;
-		}
+    		$regex = '/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/';
 
-		$regex = '/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/';
+    		if (preg_match($regex, $dateTime) > 0){
 
-		if (preg_match($regex, $dateTime) > 0){
+    			// We must also validate that the day, month and year are a correct date value
+    			$parsedDate = explode('-', $dateTime);
 
-			// We must also validate that the day, month and year are a correct date value
-			$parsedDate = explode('-', $dateTime);
+    			if(count($parsedDate) >= 3){
 
-			if(count($parsedDate) >= 3){
+    				return checkdate($parsedDate[1], substr($parsedDate[2], 0, 2), $parsedDate[0]);
 
-				return checkdate($parsedDate[1], substr($parsedDate[2], 0, 2), $parsedDate[0]);
+    			}else{
 
-			}else{
-
-				return true;
-			}
+    				return true;
+    			}
+    		}
 		}
 
 		return false;
 	}
 
 
+	public static function isSameDateTime($dateTime1, $dateTime2){
+
+		// TODO
+
+	}
+
+
 	/**
-	 * Given a valid ISO 8601 dateTime value, this method will check if its timezone is the same as
-	 * the one currently defined on this computer.
+	 * Given two valid ISO 8601 dateTime values, this method will check if they have the same timezone offset.
 	 *
-	 * @param string $dateTime A valid ISO 8601 dateTime value.
+	 * @param string $dateTime1 A valid ISO 8601 dateTime value.
+	 * @param string $dateTime2 A valid ISO 8601 dateTime value.
 	 *
 	 * @see DateTimeUtils
 	 *
 	 * @return boolean True if the time zone on $dateTime is exactly the same as the one defined on this computer.
 	 */
-	public static function isLocalTimeZone($dateTime){
+	public static function isSameTimeZone($dateTime1, $dateTime2){
 
-		if(self::isValidDateTime($dateTime)){
+		if(self::isValidDateTime($dateTime1) && self::isValidDateTime($dateTime2)){
 
-			return ((new DateTime($dateTime))->getOffset() === (new DateTime())->getOffset());
+			return self::getTimeZoneOffset($dateTime1) === self::getTimeZoneOffset($dateTime2);
 		}
 
-		throw new UnexpectedValueException('DateTimeUtils->isLocalTimeZone : Provided value is not a valid ISO 8601 date time format.');
+		throw new UnexpectedValueException('DateTimeUtils->isSameTimeZone : Provided values are not in valid ISO 8601 date time format');
 	}
 
 
@@ -117,12 +122,148 @@ class DateTimeUtils {
 
 
 	/**
+	 * Extract the microseconds from a given dateTime as a numeric value up to 6 digit.
+	 *
+	 * @param string $dateTime A valid ISO 8601 dateTime value containing microseconds information (like: 2015-12-31T18:30:45.458763)
+	 *
+	 * @throws UnexpectedValueException If an invalid dateTime was provided
+	 *
+	 * @return int The microseconds from the specified dateTime or -1 if no microseconds information was available
+	 */
+	public static function getMicroSeconds($dateTime){
+
+		if(self::isValidDateTime($dateTime)){
+
+			$parsedDate = explode('.', $dateTime);
+
+			if(count($parsedDate) == 2){
+
+				$parsedDate = $parsedDate[1];
+				$parsedDate = str_replace('-', '+', $parsedDate);
+				$parsedDate = explode('+', $parsedDate);
+				$parsedDate = preg_replace('/[^0-9]/', '', $parsedDate[0]);
+
+				return (int) str_pad($parsedDate, 6, '0', STR_PAD_RIGHT);
+			}
+
+			return -1;
+		}
+
+		throw new UnexpectedValueException('DateTimeUtils->getMicroSeconds : Provided value is not a valid ISO 8601 date time format');
+	}
+
+
+	/**
+	 * Extract the miliseconds from a given dateTime as a numeric value up to 3 digit.
+	 *
+	 * @param string $dateTime A valid ISO 8601 dateTime value containing miliseconds information (like: 2015-12-31T18:30:45.458)
+	 *
+	 * @throws UnexpectedValueException If an invalid dateTime was provided
+	 *
+	 * @return int The miliseconds from the specified dateTime or -1 if no miliseconds information was available
+	 */
+	public static function getMiliSeconds($dateTime){
+
+	    $result = self::getMicroSeconds($dateTime);
+
+	    if($result >= 0){
+
+	        $result = (int) substr(str_pad($result, 6, '0', STR_PAD_LEFT), 0, 3);
+	    }
+
+	    return $result;
+	}
+
+
+	/**
+	 * Extract the seconds from a given dateTime as a numeric value from 0 to 59.
+	 *
+	 * @param string $dateTime A valid ISO 8601 dateTime value containing at least year-month-day-hours-minutes-seconds information (like: 2015-12-31T18:30:45...)
+	 *
+	 * @throws UnexpectedValueException If an invalid dateTime was provided
+	 *
+	 * @return int The seconds from the specified dateTime or -1 if no seconds information was available
+	 */
+	public static function getSeconds($dateTime){
+
+		if(self::isValidDateTime($dateTime)){
+
+			$parsedDate = explode(':', $dateTime);
+
+			if(count($parsedDate) > 2){
+
+				return (int) substr($parsedDate[2], 0, 2);
+			}
+
+			return -1;
+		}
+
+		throw new UnexpectedValueException('DateTimeUtils->getSeconds : Provided value is not a valid ISO 8601 date time format');
+	}
+
+
+	/**
+	 * Extract the minutes from a given dateTime as a numeric value from 0 to 59.
+	 *
+	 * @param string $dateTime A valid ISO 8601 dateTime value containing at least year-month-day-hours-minutes information (like: 2015-12-31T18:30...)
+	 *
+	 * @throws UnexpectedValueException If an invalid dateTime was provided
+	 *
+	 * @return int The minutes from the specified dateTime or -1 if no minutes information was available
+	 */
+	public static function getMinutes($dateTime){
+
+		if(self::isValidDateTime($dateTime)){
+
+			$parsedDate = explode(':', $dateTime);
+
+			if(count($parsedDate) > 1){
+
+				return (int) substr($parsedDate[1], 0, 2);
+			}
+
+			return -1;
+		}
+
+		throw new UnexpectedValueException('DateTimeUtils->getMinutes : Provided value is not a valid ISO 8601 date time format');
+	}
+
+
+	/**
+	 * Extract the hour from a given dateTime as a numeric value from 0 to 23.
+	 *
+	 * @param string $dateTime A valid ISO 8601 dateTime value containing at least year-month-day-hours information (like: 2015-12-31T18...)
+	 *
+	 * @throws UnexpectedValueException If an invalid dateTime was provided
+	 *
+	 * @return int The hour from the specified dateTime between 0 and 23 or -1 if no hour information was available
+	 */
+	public static function getHour($dateTime){
+
+		if(self::isValidDateTime($dateTime)){
+
+			$parsedDate = explode('-', $dateTime);
+
+			if(count($parsedDate) >= 3 && strlen($parsedDate[2]) > 2){
+
+				return (int) substr($parsedDate[2], 3, 2);
+			}
+
+			return -1;
+		}
+
+		throw new UnexpectedValueException('DateTimeUtils->getHour : Provided value is not a valid ISO 8601 date time format');
+	}
+
+
+	/**
 	 * Extract the day from a given dateTime as a numeric value from 1 to 31.
 	 *
 	 * @param string $dateTime A valid ISO 8601 dateTime value containing at least year-month-day information (like: 2015-12-31...)
 	 *
-	 * @return int The day of month from the specified dateTime between 1 and 31.
-	 * If the specified dateTime does not contain valid day information, an exception will be thrown
+	 * @throws UnexpectedValueException If an invalid dateTime was provided
+	 *
+	 * @return int The day of month from the specified dateTime between 1 and 31 or -1 if no day information was available
 	 */
 	public static function getDay($dateTime){
 
@@ -134,9 +275,11 @@ class DateTimeUtils {
 
 				return (int) substr($parsedDate[2], 0, 2);
 			}
+
+			return -1;
 		}
 
-		throw new UnexpectedValueException('DateTimeUtils->getDay : Provided value is not a valid ISO 8601 date time format or contains invalid day value.');
+		throw new UnexpectedValueException('DateTimeUtils->getDay : Provided value is not a valid ISO 8601 date time format');
 	}
 
 
@@ -147,7 +290,9 @@ class DateTimeUtils {
 	 *
 	 * @param string $dateTime A valid ISO 8601 dateTime value containing at least year-month-day information (like: 2015-12-31...)
 	 *
-	 * @return int A numeric value between 1 and 7, or an exception if an invalid dateTime value was provided.
+	 * @throws UnexpectedValueException If an invalid dateTime was provided
+	 *
+	 * @return int A numeric value between 1 and 7 or -1 if no date information was available
 	 */
 	public static function getDayOfWeek($dateTime){
 
@@ -163,9 +308,11 @@ class DateTimeUtils {
 
 				return $dateTimeInstance->format('w') + 1;
 			}
+
+			return -1;
 		}
 
-		throw new UnexpectedValueException('DateTimeUtils->getDayOfWeek : Provided value is not a valid ISO 8601 date time format or contains invalid date value.');
+		throw new UnexpectedValueException('DateTimeUtils->getDayOfWeek : Provided value is not a valid ISO 8601 date time format');
 	}
 
 
@@ -174,7 +321,9 @@ class DateTimeUtils {
 	 *
 	 * @param string $dateTime A valid ISO 8601 dateTime value containing at least year-month information (like: 2015-12..)
 	 *
-	 * @return int A value between 1 and 12 or an exception if invalid value is provided.
+	 * @throws UnexpectedValueException If an invalid dateTime was provided
+	 *
+	 * @return int A value between 1 and 12 or -1 if no month information was available
 	 */
 	public static function getMonth($dateTime){
 
@@ -186,9 +335,11 @@ class DateTimeUtils {
 
 				return (int) substr($parsedDate[1], 0, 2);
 			}
+
+			return -1;
 		}
 
-		throw new UnexpectedValueException('DateTimeUtils->getMonth : Provided value is not a valid ISO 8601 date time format or contains invalid month value.');
+		throw new UnexpectedValueException('DateTimeUtils->getMonth : Provided value is not a valid ISO 8601 date time format');
 	}
 
 
@@ -197,7 +348,9 @@ class DateTimeUtils {
 	 *
 	 * @param string $dateTime A valid ISO 8601 dateTime value containing at least year information (like: 2015...)
 	 *
-	 * @return int A 4 digits numeric value or an exception if invalid value is provided.
+	 * @throws UnexpectedValueException If an invalid dateTime was provided
+	 *
+	 * @return int A 4 digits numeric value or -1 if no year information was available
 	 */
 	public static function getYear($dateTime){
 
@@ -209,9 +362,34 @@ class DateTimeUtils {
 
 				return (int) $parsedDate[0];
 			}
+
+			return -1;
 		}
 
-		throw new UnexpectedValueException('DateTimeUtils->getYear : Provided value is not a valid ISO 8601 date time format or contains invalid year value.');
+		throw new UnexpectedValueException('DateTimeUtils->getYear : Provided value is not a valid ISO 8601 date time format');
+	}
+
+
+	/**
+	 * Obtain the timezone offset (in seconds) that is defined on the specified dateTime value.
+	 *
+	 * @param string $dateTime A valid ISO 8601 dateTime value
+	 *
+	 * @return int The UTC timezone offset in seconds
+	 */
+	public static function getTimeZoneOffset($dateTime){
+
+		if(self::isValidDateTime($dateTime)){
+
+			if(substr_count($dateTime, '-') != 3 && substr_count($dateTime, '+') != 1){
+
+				return 0;
+			}
+
+			return (new DateTime($dateTime))->getOffset();
+		}
+
+		throw new UnexpectedValueException('DateTimeUtils->getTimeZoneOffset : Provided value is not a valid ISO 8601 date time format');
 	}
 
 
@@ -394,9 +572,88 @@ class DateTimeUtils {
 	}
 
 
-	// TODO - This method is pending
-	public static function format($dateTime){
+	public static function convertToUTCTimeZone($dateTime){
 
+		// TODO
+	}
+
+	/**
+	 * Output the specified dateTime value as a custom string.
+	 *
+	 * @param string $dateTime A valid ISO 8601 dateTime value.
+	 * @param string $formatString A string containing the output format like 'd/m/Y' or 'm-d-y'
+	 * where the following characters will be automatically replaced:<br><br>
+	 * - Y with a four digit year value<br>
+	 * - y with a one or two digit year value<br>
+	 * - M with a two digit month value<br>
+	 * - m with a one or two digit month value<br>
+	 * - D with a two digit day value<br>
+	 * - d with a one or two digit day value<br>
+	 * - H with a two digit hour value<br>
+	 * - h with a one or two digit hour value<br>
+	 * - N with a two digit minutes value<br>
+	 * - n with a one or two digit minutes value<br>
+	 * - S with a two digit seconds value<br>
+	 * - s with a one or two digit seconds value<br>
+	 * - U with a 6 digit microseconds value<br>
+	 * - u with a 3 digit miliseconds value
+	 *
+	 * @return string The dateTime with the specified format.
+	 */
+	public static function format($dateTime, $formatString){
+
+		if(self::isValidDateTime($dateTime)){
+
+			if(($year = self::getYear($dateTime)) > 0){
+
+				$formatString = str_replace('Y', $year, $formatString);
+				$formatString = str_replace('y', substr($year, 2), $formatString);
+			}
+
+			if(($month = self::getMonth($dateTime)) > 0){
+
+				$formatString = str_replace('M', str_pad($month, 2, '0', STR_PAD_LEFT), $formatString);
+				$formatString = str_replace('m', (int)$month, $formatString);
+			}
+
+			if(($day = self::getDay($dateTime)) > 0){
+
+				$formatString = str_replace('D', str_pad($day, 2, '0', STR_PAD_LEFT), $formatString);
+				$formatString = str_replace('d', (int)$day, $formatString);
+			}
+
+			if(($hour = self::getHour($dateTime)) >= 0){
+
+				$formatString = str_replace('H', str_pad($hour, 2, '0', STR_PAD_LEFT), $formatString);
+				$formatString = str_replace('h', (int)$hour, $formatString);
+			}
+
+			if(($minutes = self::getMinutes($dateTime)) >= 0){
+
+				$formatString = str_replace('N', str_pad($minutes, 2, '0', STR_PAD_LEFT), $formatString);
+				$formatString = str_replace('n', (int)$minutes, $formatString);
+            }
+
+			if(($seconds = self::getSeconds($dateTime)) >= 0){
+
+				$formatString = str_replace('S', str_pad($seconds, 2, '0', STR_PAD_LEFT), $formatString);
+				$formatString = str_replace('s', (int)$seconds, $formatString);
+			}
+
+			if(($miliSeconds = self::getMiliSeconds($dateTime)) >= 0){
+
+			    $formatString = str_replace('u', str_pad($miliSeconds, 3, '0', STR_PAD_LEFT), $formatString);
+			}
+
+			if(($microSeconds = self::getMicroSeconds($dateTime)) >= 0){
+
+				$formatString = str_replace('U', str_pad($microSeconds, 6, '0', STR_PAD_LEFT), $formatString);
+			}
+
+			return $formatString;
+		}
+
+		throw new UnexpectedValueException('DateTimeUtils->format : Provided value is not a valid ISO 8601 date time format.');
 	}
 
 
