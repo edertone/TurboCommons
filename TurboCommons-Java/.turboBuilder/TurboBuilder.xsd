@@ -74,6 +74,27 @@
 								
 							</xs:element>
 							
+							<!-- Java element -->
+							<xs:element name="Java" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>Contains the build process configuration related to Java files</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+								
+									<xs:attribute name="createJar" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												Specifies if all the Java files must be packed on a jar file or not. This file will have the same name as the current project.
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+																	
+								</xs:complexType>
+								
+							</xs:element>
+							
 							<!-- Ts element -->
 							<xs:element name="Ts" minOccurs="0" maxOccurs="1">
 								
@@ -169,7 +190,7 @@
 							</xs:annotation>
 						</xs:attribute>
 						
-						<xs:attribute name="phpOptimize" default="false" type="xs:boolean">
+						<xs:attribute name="optimizePhp" default="false" type="xs:boolean">
 							<xs:annotation>
 								<xs:documentation>Set if php files must be optimized as part of the release version build process</xs:documentation>
 							</xs:annotation>

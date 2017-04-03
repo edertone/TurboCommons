@@ -78,7 +78,7 @@
 		<property name="Release.gitChangeLog" value="false" />
 		<property name="Release.gitChangeLogCount" value="5" />
 		<property name="Release.optimizePictures" value="true" />
-		<property name="Release.phpOptimize" value="false" />
+		<property name="Release.optimizePhp" value="false" />
 		<property name="Release.optimizeJs" value="true" />
 		<property name="Release.optimizeCss" value="true" />
 								
@@ -407,7 +407,7 @@
 				var buildVersionNumber = project.getProperty("Build.versionNumber");
 				var buildNumber = project.getProperty("build.number");
 				var releaseOptimizePictures = project.getProperty("Release.optimizePictures");
-				var releaseOptimizePhp = project.getProperty("Release.phpOptimize");
+				var releaseOptimizePhp = project.getProperty("Release.optimizePhp");
 				var releaseOptimizeHtml = project.getProperty("Release.optimizeHtml");
 				var releaseOptimizeJs = project.getProperty("Release.optimizeJs");
 				var releaseOptimizeCss = project.getProperty("Release.optimizeCss");
@@ -816,7 +816,7 @@
 	</target>
 	
 	
-	<!-- Generate the release version phars -->
+	<!-- Generate the release version phar -->
 	<target name="createPharRelease">
 
 		<!--Define the contents for the stub file that will be autoexecuted when the phar file is included -->
@@ -883,8 +883,26 @@
 	<!-- Generate the Jar file from the files on the target folder if jar generation is enabled on setup build xml -->
 	<target name="createJar">
 
-		 <jar basedir="${mainFolderPath}/java"
-			  destfile="${targetFolderPath}/${projectBaseName}/${projectBaseName}.jar" />
+		<jar basedir="${mainFolderPath}/java"
+			 destfile="${targetFolderPath}/${projectBaseName}/${projectBaseName}.jar" />
+		
+		<script language="javascript">
+			<![CDATA[
+				
+				if(project.getProperty("Release.generate") == "true"){
+					self.project.executeTarget("createJarRelease");
+				}			
+		    ]]>
+		</script>
+		
+	</target>
+	
+	
+	<!-- Generate the release version jar -->
+	<target name="createJarRelease">
+
+		<jar basedir="${mainFolderPath}/java"
+			 destfile="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/${projectBaseName}-${Build.versionNumber}.${build.number}.jar" />
 		
 	</target>
 	
