@@ -155,7 +155,46 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testIsSameDateTime(){
 
-		// TODO
+	    // Test valid values
+	    $this->assertTrue(DateTimeUtils::isSameDateTime('2015', '2015'));
+	    $this->assertTrue(DateTimeUtils::isSameDateTime('2015-06', '2015-06'));
+	    $this->assertTrue(DateTimeUtils::isSameDateTime('2015-06-21', '2015-06-21'));
+	    $this->assertTrue(DateTimeUtils::isSameDateTime('2015-06-21T19:31:05', '2015-06-21T19:31:05'));
+	    $this->assertTrue(DateTimeUtils::isSameDateTime('1994-11-05T13:15:30.123456Z', '1994-11-05T13:15:30.123456Z'));
+	    $this->assertTrue(DateTimeUtils::isSameDateTime('1994-11-05T13:15:30.123456+00:00', '1994-11-05T13:15:30.123456+00:00'));
+	    $this->assertTrue(DateTimeUtils::isSameDateTime('1994-11-05T13:15:30.123456+01:00', '1994-11-05T12:15:30.123456+00:00'));
+	    $this->assertTrue(DateTimeUtils::isSameDateTime('2015-11-05T13:15:30.123456+05:00', '2015-11-05T08:15:30.123456+00:00'));
+
+	    // Test invalid values
+	    $this->assertTrue(!DateTimeUtils::isSameDateTime('2015', '2016'));
+	    $this->assertTrue(!DateTimeUtils::isSameDateTime('2015-06', '2015-11'));
+	    $this->assertTrue(!DateTimeUtils::isSameDateTime('2015-06-11', '2015-06-21'));
+	    $this->assertTrue(!DateTimeUtils::isSameDateTime('2015-06-21T19:31:05', '2015-06-21T19:32:05'));
+	    $this->assertTrue(!DateTimeUtils::isSameDateTime('1994-11-05T13:15:30.124456Z', '1994-11-05T13:15:30.123456Z'));
+	    $this->assertTrue(!DateTimeUtils::isSameDateTime('1994-11-05T13:15:30.123456+00:00', '1994-11-05T14:15:30.123456+00:00'));
+	    $this->assertTrue(!DateTimeUtils::isSameDateTime('1994-11-05T13:15:30.123456+02:00', '1994-11-05T12:15:30.123456+00:00'));
+	    $this->assertTrue(!DateTimeUtils::isSameDateTime('2015-11-05T13:15:30.123456+05:00', '2015-11-05T08:15:30.123457+00:00'));
+
+	    // test exceptions
+	    $exceptionMessage = '';
+
+	    foreach ($this->invalidValues as $value1) {
+
+	        foreach ($this->invalidValues as $value2) {
+
+	            try {
+	                DateTimeUtils::isSameDateTime($value1, $value2);
+	                $exceptionMessage = $value.' did not cause exception';
+	            } catch (Exception $e) {
+	                // We expect an exception to happen
+	            }
+	        }
+	    }
+
+	    if($exceptionMessage != ''){
+
+	        $this->fail($exceptionMessage);
+	    }
 	}
 
 
@@ -931,6 +970,46 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 
+
+	/**
+	 * testConvertToUTCTimeZone
+	 *
+	 * @return void
+	 */
+	public function testConvertToUTCTimeZone(){
+
+	    // Test valid values
+	    $this->assertTrue(DateTimeUtils::convertToUTCTimeZone('2015') == '2015');
+	    $this->assertTrue(DateTimeUtils::convertToUTCTimeZone('2015-11') == '2015-11');
+	    $this->assertTrue(DateTimeUtils::convertToUTCTimeZone('2015-01-01') == '2014-12-31T23:00:00.000000+00:00');
+	    $this->assertTrue(DateTimeUtils::convertToUTCTimeZone('2015-11-11') == '2015-11-10T23:00:00.000000+00:00');
+	    $this->assertTrue(DateTimeUtils::convertToUTCTimeZone('2010-02-18T16:23:48.541+06:00') == '2010-02-18T10:23:48.541000+00:00');
+	    $this->assertTrue(DateTimeUtils::convertToUTCTimeZone('2007-11-03T13:18:05') == '2007-11-03T12:18:05.000000+00:00');
+	    $this->assertTrue(DateTimeUtils::convertToUTCTimeZone('2008-09-15T15:53:00+05:00') == '2008-09-15T10:53:00.000000+00:00');
+	    $this->assertTrue(DateTimeUtils::convertToUTCTimeZone('1994-11-05T08:15:30-05:00') == '1994-11-05T13:15:30.000000+00:00');
+	    $this->assertTrue(DateTimeUtils::convertToUTCTimeZone('1994-11-05T13:15:30Z') == '1994-11-05T13:15:30.000000+00:00');
+	    $this->assertTrue(DateTimeUtils::convertToUTCTimeZone('2001-12-31T23:59:59.12+04:00') == '2001-12-31T19:59:59.120000+00:00');
+
+	    // test exceptions
+	    $exceptionMessage = '';
+
+	    foreach ($this->invalidValues as $value) {
+
+	        try {
+	            DateTimeUtils::convertToUTCTimeZone($value);
+	            $exceptionMessage = $value.' did not cause exception';
+	        } catch (Exception $e) {
+	            // We expect an exception to happen
+	        }
+	    }
+
+	    if($exceptionMessage != ''){
+
+	        $this->fail($exceptionMessage);
+	    }
+	}
+
+
 	/**
 	 * testFormat
 	 *
@@ -989,7 +1068,176 @@ class DateTimeUtilsTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 
-	// TODO add all missing tests
+
+	/**
+	 * testCompare
+	 *
+	 * @return void
+	 */
+	public function testCompare(){
+
+	    // Test valid values
+	    $this->assertTrue(DateTimeUtils::compare('2015', '2015') === 0);
+	    $this->assertTrue(DateTimeUtils::compare('2015', '2010') === 1);
+	    $this->assertTrue(DateTimeUtils::compare('2014', '2015') === 2);
+	    $this->assertTrue(DateTimeUtils::compare('2015-06', '2015-06') === 0);
+	    $this->assertTrue(DateTimeUtils::compare('2015-06', '2015-04') === 1);
+	    $this->assertTrue(DateTimeUtils::compare('2015-10', '2015-12') === 2);
+	    $this->assertTrue(DateTimeUtils::compare('2016-06', '2015-06') === 1);
+	    $this->assertTrue(DateTimeUtils::compare('2000-10', '2019-12') === 2);
+	    $this->assertTrue(DateTimeUtils::compare('2015-06-21', '2015-06-21') === 0);
+	    $this->assertTrue(DateTimeUtils::compare('2015-06-18', '2015-06-10') === 1);
+	    $this->assertTrue(DateTimeUtils::compare('2015-10-01', '2015-10-30') === 2);
+	    $this->assertTrue(DateTimeUtils::compare('2015-10-21', '2015-06-21') === 1);
+	    $this->assertTrue(DateTimeUtils::compare('2015-06-18', '2015-12-10') === 2);
+	    $this->assertTrue(DateTimeUtils::compare('2016-01-21', '2015-06-21') === 1);
+	    $this->assertTrue(DateTimeUtils::compare('2010-06-18', '2015-01-10') === 2);
+	    $this->assertTrue(DateTimeUtils::compare('2015-06-21T19:31:05', '2015-06-21T19:31:05') === 0);
+	    $this->assertTrue(DateTimeUtils::compare('2015-06-21T19:31:15', '2015-06-21T19:31:05') === 1);
+	    $this->assertTrue(DateTimeUtils::compare('2015-06-21T19:31:01', '2015-06-21T19:31:35') === 2);
+	    $this->assertTrue(DateTimeUtils::compare('2015-06-21T19:41:15', '2015-06-21T19:31:05') === 1);
+	    $this->assertTrue(DateTimeUtils::compare('2015-06-21T19:01:01', '2015-06-21T19:31:35') === 2);
+        $this->assertTrue(DateTimeUtils::compare('2015-06-21T19:41:15', '2015-06-21T11:31:05') === 1);
+	    $this->assertTrue(DateTimeUtils::compare('2015-06-21T10:01:01', '2015-06-21T11:31:35') === 2);
+	    $this->assertTrue(DateTimeUtils::compare('1994-11-05T13:15:30.123456Z', '1994-11-05T13:15:30.123456Z') === 0);
+	    $this->assertTrue(DateTimeUtils::compare('1994-11-05T13:15:30.123456+00:00', '1994-11-05T13:15:30.123456+00:00') === 0);
+	    $this->assertTrue(DateTimeUtils::compare('1994-11-05T13:15:30.123456+01:00', '1994-11-05T12:15:30.123456+00:00') === 0);
+	    $this->assertTrue(DateTimeUtils::compare('2015-11-05T13:15:30.123456+05:00', '2015-11-05T08:15:30.123456+00:00') === 0);
+	    $this->assertTrue(DateTimeUtils::compare('2016-11-05T13:15:30.123456+05:00', '2015-11-05T08:15:30.123456+00:00') === 1);
+	    $this->assertTrue(DateTimeUtils::compare('2015-11-05T13:15:30.123456+02:00', '2015-11-05T08:15:30.123456+00:00') === 1);
+	    $this->assertTrue(DateTimeUtils::compare('2015-11-05T13:15:30.123457+02:00', '2015-11-05T13:15:30.123456+02:00') === 1);
+	    $this->assertTrue(DateTimeUtils::compare('2015-11-05T08:15:30.123456-08:00', '2015-11-05T18:15:30.123456+00:00') === 2);
+	    $this->assertTrue(DateTimeUtils::compare('2015-11-05T08:15:30.123456-01:00', '2015-11-05T11:15:30.123456+01:00') === 2);
+	    $this->assertTrue(DateTimeUtils::compare('2015-11-05T08:15:30.123456-01:00', '2015-11-05T11:15:30.123456+01:00') === 2);
+
+	    // test exceptions
+	    $exceptionMessage = '';
+
+	    foreach ($this->invalidValues as $value1) {
+
+	        foreach ($this->invalidValues as $value2) {
+
+	            try {
+	                DateTimeUtils::compare($value1, $value2);
+	                $exceptionMessage = $value.' did not cause exception';
+	            } catch (Exception $e) {
+	                // We expect an exception to happen
+	            }
+	        }
+	    }
+
+	    if($exceptionMessage != ''){
+
+	        $this->fail($exceptionMessage);
+	    }
+	}
+
+
+	/**
+	 * testAdd
+	 *
+	 * @return void
+	 */
+	public function testAdd(){
+
+	    // Test valid year values
+        $this->assertTrue(DateTimeUtils::add('2015', 1, 'years') === '2016');
+        $this->assertTrue(DateTimeUtils::add('2015', -1, 'years') === '2014');
+        $this->assertTrue(DateTimeUtils::add('2015', 10, 'years') === '2025');
+        $this->assertTrue(DateTimeUtils::add('2015', -10, 'years') === '2005');
+        $this->assertTrue(DateTimeUtils::add('2015-08', 1, 'years') === '2016-08');
+        $this->assertTrue(DateTimeUtils::add('2015-08', -1, 'years') === '2014-08');
+        $this->assertTrue(DateTimeUtils::add('2015-08', 7, 'years') === '2022-08');
+        $this->assertTrue(DateTimeUtils::add('2015-08', -9, 'years') === '2006-08');
+        $this->assertTrue(DateTimeUtils::add('2015-01-12', 1, 'years') === '2016-01-12');
+        $this->assertTrue(DateTimeUtils::add('2000-10-01', -1, 'years') === '1999-10-01');
+        $this->assertTrue(DateTimeUtils::add('1996-12-31', 7, 'years') === '2003-12-31');
+        $this->assertTrue(DateTimeUtils::add('2025-04-23', -9, 'years') === '2016-04-23');
+        $this->assertTrue(DateTimeUtils::add('1996-12-31T15', 7, 'years') === '2003-12-31T15');
+        $this->assertTrue(DateTimeUtils::add('2025-04-23T23', -9, 'years') === '2016-04-23T23');
+        $this->assertTrue(DateTimeUtils::add('1996-12-31T15:45', 7, 'years') === '2003-12-31T15:45');
+        $this->assertTrue(DateTimeUtils::add('2025-04-23T23:59', -9, 'years') === '2016-04-23T23:59');
+        $this->assertTrue(DateTimeUtils::add('1996-12-31T15:45:00', 127, 'years') === '2123-12-31T15:45:00');
+        $this->assertTrue(DateTimeUtils::add('2025-04-23T23:59:32', -900, 'years') === '1125-04-23T23:59:32');
+        $this->assertTrue(DateTimeUtils::add('2015-11-05T08:15:30.123456-01:00', 1, 'years') === '2016-11-05T08:15:30.123456-01:00');
+        $this->assertTrue(DateTimeUtils::add('2015-11-05T08:15:30.123456-01:00', 8, 'years') === '2023-11-05T08:15:30.123456-01:00');
+        $this->assertTrue(DateTimeUtils::add('2015-11-05T08:15:30.123456-01:00', -1, 'years') === '2014-11-05T08:15:30.123456-01:00');
+        $this->assertTrue(DateTimeUtils::add('2015-11-05T08:15:30.123456-01:00', -8, 'years') === '2007-11-05T08:15:30.123456-01:00');
+
+	    // Test valid month values
+        // TODO - Pending
+
+	    // Test valid day values
+        // TODO - Pending
+
+	    // Test valid hour values
+        // TODO - Pending
+
+	    // Test valid minutes values
+        // TODO - Pending
+
+	    // Test valid seconds values
+        // TODO - Pending
+
+	    // Test valid miliseconds values
+        // TODO - Pending
+
+	    // Test valid microseconds values
+        // TODO - Pending
+
+	    // test exceptions
+	    $exceptionMessage = '';
+
+	    foreach ($this->invalidValues as $value) {
+
+            try {
+                DateTimeUtils::add($value, 1, 'y');
+                $exceptionMessage = $value.' did not cause exception';
+            } catch (Exception $e) {
+                // We expect an exception to happen
+            }
+	    }
+
+	    $invalidValueValues = ['a', null, new Exception(), 1.1, 0.1, 56.9];
+
+	    foreach ($invalidValueValues as $value) {
+
+	        try {
+	            DateTimeUtils::add('2015', $value, 'y');
+	            $exceptionMessage = $value.' did not cause exception';
+	        } catch (Exception $e) {
+	            // We expect an exception to happen
+	        }
+	    }
+
+	    $invalidTypeValues = ['a', null, new Exception(), 1, 'ya', '12', 'y', 'Y', 'm', 'month', 'year'. 'second'];
+
+	    foreach ($invalidTypeValues as $value) {
+
+	        try {
+	            DateTimeUtils::add('2015', 1, $value);
+	            $exceptionMessage = $value.' did not cause exception';
+	        } catch (Exception $e) {
+	            // We expect an exception to happen
+	        }
+	    }
+
+	    if($exceptionMessage != ''){
+
+	        $this->fail($exceptionMessage);
+	    }
+	}
+
+
+	/**
+	 * testSubstract
+	 *
+	 * @return void
+	 */
+	public function testSubstract(){
+
+	    // TODO
+	}
 }
 
 ?>

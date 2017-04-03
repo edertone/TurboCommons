@@ -78,10 +78,20 @@ class DateTimeUtils {
 	}
 
 
+	/**
+	 * Given two valid ISO 8601 dateTime values, this method will check if they represent the same exact date and time value.
+	 *
+	 * @param string $dateTime1 A valid ISO 8601 dateTime value.
+	 * @param string $dateTime2 A valid ISO 8601 dateTime value.
+	 *
+	 * @see DateTimeUtils
+	 * @throws UnexpectedValueException If an invalid dateTime was provided
+	 *
+	 * @return boolean True if both dateTime values are equivalent to the exact same date and time
+	 */
 	public static function isSameDateTime($dateTime1, $dateTime2){
 
-		// TODO
-
+		return (self::compare($dateTime1, $dateTime2) === 0);
 	}
 
 
@@ -92,8 +102,9 @@ class DateTimeUtils {
 	 * @param string $dateTime2 A valid ISO 8601 dateTime value.
 	 *
 	 * @see DateTimeUtils
+	 * @throws UnexpectedValueException If an invalid dateTime was provided
 	 *
-	 * @return boolean True if the time zone on $dateTime is exactly the same as the one defined on this computer.
+	 * @return boolean True if the time zone on both dateTime values is the same
 	 */
 	public static function isSameTimeZone($dateTime1, $dateTime2){
 
@@ -543,8 +554,7 @@ class DateTimeUtils {
 
 
 	/**
-	 * Convert a valid dateTime value to the timezone that is defined on
-	 * the current system.
+	 * Convert a valid dateTime value to the timezone that is defined on the current system.
 	 *
 	 * @param string $dateTime A valid ISO 8601 dateTime value.
 	 *
@@ -572,9 +582,32 @@ class DateTimeUtils {
 	}
 
 
+	/**
+	 * Convert a valid dateTime value to the UTC timezone.
+	 *
+	 * @param string $dateTime A valid ISO 8601 dateTime value.
+	 *
+	 * @return string A valid ISO 8601 dateTime value that represents the same date and time info as the received value, but for the UTC timezone.
+	 */
 	public static function convertToUTCTimeZone($dateTime){
 
-		// TODO
+	    if(self::isValidDateTime($dateTime)){
+
+	        if(count(explode('-', $dateTime)) >= 3){
+
+	            $dateTimeInstance = new DateTime($dateTime);
+
+	            $dateTimeInstance->setTimezone(new DateTimeZone('UTC'));
+
+	            return $dateTimeInstance->format(self::$_iso8601FormatString);
+
+	        }else{
+
+	            return $dateTime;
+	        }
+	    }
+
+	    throw new UnexpectedValueException('DateTimeUtils->convertToUTCTimeZone : Provided value is not a valid ISO 8601 date time format.');
 	}
 
 	/**
@@ -653,146 +686,105 @@ class DateTimeUtils {
 			return $formatString;
 		}
 
-		throw new UnexpectedValueException('DateTimeUtils->format : Provided value is not a valid ISO 8601 date time format.');
-	}
-
-
-	// TODO - This method is pending
-	public static function compare(){
-
+		throw new UnexpectedValueException('DateTimeUtils->format : Provided value is not a valid ISO 8601 date time format');
 	}
 
 
 	/**
-	 * Adds the specified amount of days to the given date
+	 * This method compares two dateTime values and tells if they are exactly the same or
+	 * which one represents a later time value than the other.
+	 * Timezones from the specified dateTime values are taken into consideration for the comparison.
 	 *
-	 * @param string $date A date in the yyyy-mm-dd format. Use conversion utils if your date is not in this format
-	 * @param int $n An integer indicating the amount of days to add
+	 * @param string $dateTime1 A valid ISO 8601 dateTime value.
+	 * @param string $dateTime2 A valid ISO 8601 dateTime value.
 	 *
-	 * @return string A date representing the specified date plus the number of specified days
+	 * @throws UnexpectedValueException
+	 *
+	 * @return int 0 If the two dateTime values represent the exact same time, 1 if dateTime1 > dateTime2 or 2 if dateTime2 > dateTime1
 	 */
-	// TODO - This method is pending
-	public static function add($dateTime, $years = 0, $months = 0, $weeks, $days = 0, $seconds = 0, $microseconds = 0){
+	public static function compare($dateTime1, $dateTime2){
 
-// 		if($n < 0){
+	    if(self::isValidDateTime($dateTime1) && self::isValidDateTime($dateTime2)){
 
-// 			trigger_error('Dateutils::addDays Error: An unsigned integer is expected', E_USER_WARNING);
+	        $date1 = self::convertToUTCTimeZone($dateTime1);
 
-// 			return '';
+	        $date2 = self::convertToUTCTimeZone($dateTime2);
 
-// 		}else{
+	        if($date1 === $date2){
 
-// 			return date('Y-m-d', strtotime(date('Y-m-d', strtotime($date)).' +'.$n.' day'));
-// 		}
+	            return 0;
+	        }
 
-// 		public static function addWeeks($dateTime, $n){
+	        $sortedDates = [$date1, $date2];
 
-// 			if($n < 0){
+	        sort($sortedDates, SORT_STRING);
 
-// 				trigger_error('Dateutils::addWeeks Error: An unsigned integer is expected', E_USER_WARNING);
+	        return ($sortedDates[0] == $date1) ? 2 : 1;
+	    }
 
-// 				return '';
-
-// 			}else{
-
-// 				return date('Y-m-d', strtotime(date('Y-m-d', strtotime($date)).' +'.$n.' week'));
-// 			}
-// 		}
-
-// 		public static function addMonths($dateTime, $n){
-
-// 			if($n < 0){
-
-// 				trigger_error('Dateutils::addMonths Error: An unsigned integer is expected', E_USER_WARNING);
-
-// 				return '';
-
-// 			}else{
-
-// 				return date('Y-m-d', strtotime(date('Y-m-d', strtotime($date)).' +'.$n.' month'));
-// 			}
-// 		}
-
-// 		public static function addYears($dateTime, $n){
-
-// 			if($n < 0){
-
-// 				trigger_error('Dateutils::addYears Error: An unsigned integer is expected', E_USER_WARNING);
-
-// 				return '';
-
-// 			}else{
-
-// 				return date('Y-m-d', strtotime(date('Y-m-d', strtotime($date)).' +'.$n.' year'));
-// 			}
-// 		}
+	    throw new UnexpectedValueException('DateTimeUtils->compare : Provided value is not a valid ISO 8601 date time format');
 	}
 
 
 	/**
-	 * Substracts the specified amount of days to the given date
+	 * Adds the specified amount of time to the given dateTime value
+	 * TODO - This method currently only works with years, and PHPDoc is incomplete!
 	 *
-	 * @param string $date A date in the yyyy-mm-dd format. Use conversion utils if your date is not in this format
-	 * @param int $n An integer indicating the amount of days to substract
+	 * @param string $dateTime A valid ISO 8601 dateTime value.
+	 * @param string $type TODO - this paramenter description
 	 *
-	 * @return string A date representing the specified date minus the number of specified days
+	 * @return string An ISO 8601 dateTime value representing the specified date plus the specified number of time
 	 */
+	public static function add($dateTime, $value, $type = 'minutes'){
+
+	    if(self::isValidDateTime($dateTime) && is_integer($value)){
+
+	        switch (strtolower($type)) {
+
+    	        case 'years':
+    	            return (substr($dateTime, 0, 4) + $value).substr($dateTime, 4);
+
+    	        case 'months':
+    	            throw new Exception('DateTimeUtils->add : months type is not implemented yet');
+    	            break;
+
+    	        case 'days':
+    	            throw new Exception('DateTimeUtils->add : days type is not implemented yet');
+    	            break;
+
+    	        case 'hours':
+    	            throw new Exception('DateTimeUtils->add : hours type is not implemented yet');
+    	            break;
+
+    	        case 'minutes':
+    	            throw new Exception('DateTimeUtils->add : minutes type is not implemented yet');
+    	            break;
+
+    	        case 'seconds':
+    	            throw new Exception('DateTimeUtils->add : seconds type is not implemented yet');
+    	            break;
+
+    	        case 'miliseconds':
+    	            throw new Exception('DateTimeUtils->add : miliseconds type is not implemented yet');
+    	            break;
+
+    	        case 'microseconds':
+    	            throw new Exception('DateTimeUtils->add : microseconds type is not implemented yet');
+    	            break;
+
+    	        default:
+    	            throw new UnexpectedValueException('DateTimeUtils->add : Invalid type specified');
+    	    }
+	    }
+
+	    throw new UnexpectedValueException('DateTimeUtils->add : Provided value is not a valid ISO 8601 date time format');
+	}
+
+
 	// TODO - This method is pending
-	public static function substract($dateTime, $years = 0, $months = 0, $weeks, $days = 0, $seconds = 0, $microseconds = 0){
+	public static function substract($dateTime, $value, $type = 'minutes'){
 
-// 		if($n < 0){
-
-// 			trigger_error('Dateutils::substractDays Error: An unsigned integer is expected', E_USER_WARNING);
-
-// 			return '';
-
-// 		}else{
-
-// 			return date('Y-m-d', strtotime(date('Y-m-d', strtotime($date)).' -'.$n.' day'));
-// 		}
-
-// 		public static function substractWeeks($dateTime, $n){
-
-// 			if($n < 0){
-
-// 				trigger_error('Dateutils::substractWeeks Error: An unsigned integer is expected', E_USER_WARNING);
-
-// 				return '';
-
-// 			}else{
-
-// 				return date('Y-m-d', strtotime(date('Y-m-d', strtotime($date)).' -'.$n.' week'));
-// 			}
-// 		}
-
-// 		public static function substractMonths($dateTime, $n){
-
-// 			if($n < 0){
-
-// 				trigger_error('Dateutils::substractMonths Error: An unsigned integer is expected', E_USER_WARNING);
-
-// 				return '';
-
-// 			}else{
-
-// 				return date('Y-m-d', strtotime(date('Y-m-d', strtotime($date)).' -'.$n.' month'));
-// 			}
-// 		}
-
-
-// 		public static function substractYears($dateTime, $n){
-
-// 			if($n < 0){
-
-// 				trigger_error('Dateutils::substractYears Error: An unsigned integer is expected', E_USER_WARNING);
-
-// 				return '';
-
-// 			}else{
-
-// 				return date('Y-m-d', strtotime(date('Y-m-d', strtotime($date)).' -'.$n.' year'));
-// 			}
-// 		}
+	    return self::add($dateTime, -$value, $type);
 	}
 }
 
