@@ -67,8 +67,9 @@
 		
 		<!-- Set default values for some properties in case they are not specified on the TurboBuilder.xml -->
 		<property name="Build.versionNumber" value="0.0" />
-		<property name="Build.Php.createPhars" value="true" />
+		<property name="Build.Php.createPhar" value="false" />
 		<property name="Build.Js.createMergedJs" value="false" />
+		<property name="Build.Java.createJar" value="false" />
 		<property name="Build.keepUnPackedFiles" value="false" />
 				
 		<property name="Release.generate" value="false" />
@@ -179,14 +180,18 @@
 					self.project.executeTarget("runJsTestsLocalServer");
 				}
 			
-				if(project.getProperty("Build.Php.createPhars") == "true"){
-					self.project.executeTarget("createPhars");
+				if(project.getProperty("Build.Php.createPhar") == "true"){
+					self.project.executeTarget("createPhar");
 				}
 			
 				if(project.getProperty("Build.Js.createMergedJs") == "true"){
 					self.project.executeTarget("createMergedJs");
 				}
 			
+				if(project.getProperty("Build.Java.createJar") == "true"){
+					self.project.executeTarget("createJar");
+				}
+						
 				if(project.getProperty("Build.keepUnPackedFiles") != "true"){
 					self.project.executeTarget("removeUnpackedFiles");
 				}
@@ -777,7 +782,7 @@
 	
 	
 	<!-- Generate the phar file from the files on the target folder if phar generation is enabled on setup build xml -->
-	<target name="createPhars">
+	<target name="createPhar">
 
 		<!-- Autoloader.php must exist on src/main/php/ for the phar to be correctly generated -->
 		<fail message="src/main/php/AutoLoader.php not found. This is required to create a phar that loads classes automatically">
@@ -802,7 +807,7 @@
 			<![CDATA[
 				
 				if(project.getProperty("Release.generate") == "true"){
-					self.project.executeTarget("createPharsRelease");
+					self.project.executeTarget("createPharRelease");
 				}
 			
 		    ]]>
@@ -811,8 +816,8 @@
 	</target>
 	
 	
-	<!-- Generate the release version phars -->
-	<target name="createPharsRelease">
+	<!-- Generate the release version phar -->
+	<target name="createPharRelease">
 
 		<!--Define the contents for the stub file that will be autoexecuted when the phar file is included -->
 		<property name="phpStubFileRelease" value="&lt;?php Phar::mapPhar(); include \'phar://${projectBaseName}-${Build.versionNumber}.${build.number}.phar/php/AutoLoader.php\'; __HALT_COMPILER(); ?>"/>
@@ -872,6 +877,33 @@
 	    
 		</concat>
 				
+	</target>
+	
+	
+	<!-- Generate the Jar file from the files on the target folder if jar generation is enabled on setup build xml -->
+	<target name="createJar">
+
+		<jar basedir="${mainFolderPath}/java"
+			 destfile="${targetFolderPath}/${projectBaseName}/${projectBaseName}.jar" />
+		
+		<script language="javascript">
+			<![CDATA[
+				
+				if(project.getProperty("Release.generate") == "true"){
+					self.project.executeTarget("createJarRelease");
+				}			
+		    ]]>
+		</script>
+		
+	</target>
+	
+	
+	<!-- Generate the release version jar -->
+	<target name="createJarRelease">
+
+		<jar basedir="${mainFolderPath}/java"
+			 destfile="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/${projectBaseName}-${Build.versionNumber}.${build.number}.jar" />
+		
 	</target>
 	
 	

@@ -2,7 +2,11 @@
 <TurboBuilder xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 			xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/edertone/TurboBuilder/master/TurboBuilder-Ant/turboBuilder/TurboBuilder.xsd">
 
-	<Build />
+	<Build>
+	
+		<Php createPhar="true" />
+	
+	</Build>
 
 	<Release gitChangeLog="true"
 			 optimizePhp="false"
