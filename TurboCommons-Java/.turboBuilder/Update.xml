@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project>
+<project name="Update" basedir="." default="update">
+
+
+	<description>
+
+		TurboBuilder updater.
+
+		Updates the TurboBuilder files to the latest version
+
+	</description>
+
+
+	<!-- TODO -->
+	<target name="update" >
+
+
+		<!-- Perform all the build tasks -->
+		<script language="javascript">
+			<![CDATA[
+
+				if(project.getProperty("updateFileUpdated") == "true"){
+
+					self.project.executeTarget("performUpdate");
+
+				}else{
+
+					self.project.executeTarget("downloadUpdateLatest");
+				}
+
+		    ]]>
+		</script>
+
+	</target>
+
+
+	<target name="downloadUpdateLatest" >
+
+		<!-- First download and override the latest version of this update script -->
+		<get src="https://raw.githubusercontent.com/edertone/TurboBuilder/master/TurboBuilder-Ant/turboBuilder/Update.xml"
+			 dest="Update.xml"
+			 httpusecaches="false" />
+
+		<!-- Call the downloaded update file -->
+		<ant antfile="Update.xml">
+
+			<!-- Define a property to tell the new update script version to not download itself again -->
+			<property name="updateFileUpdated" value="true" />
+
+		</ant>
+
+	</target>
+
+
+	<target name="performUpdate" >
+
+		<!-- Delete all the files on the folder except the Update.xml and build.number -->
+		<delete>
+			<fileset dir=".">
+		      	<include name="*"/>
+				<exclude name="Update.xml" />
+				<exclude name="build.number" />
+			</fileset>
+		</delete>
+		
+		<!-- Update the builder files -->
+		<get src="https://raw.githubusercontent.com/edertone/TurboBuilder/master/TurboBuilder-Ant/turboBuilder/Builder.xml"
+			 dest="Builder.xml"
+			 httpusecaches="false" />
+
+		<get src="https://raw.githubusercontent.com/edertone/TurboBuilder/master/TurboBuilder-Ant/turboBuilder/TurboBuilder.xsd"
+			 dest="TurboBuilder.xsd"
+			 httpusecaches="false" />
+
+	</target>
+
+
+</project>

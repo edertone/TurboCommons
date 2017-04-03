@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TurboBuilder xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/edertone/TurboBuilder/master/TurboBuilder-Ant/turboBuilder/TurboBuilder.xsd">
+
+	<Build>
+	
+		<Java createJar="true" />
+		
+	</Build>
+
+	<Release gitChangeLog="true" />
+	
+	<Validate />
+	
+	<Test />
+			
+</TurboBuilder>

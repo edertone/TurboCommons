@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+	
+	<!-- DEFINITION FOR THE SIMPLE TYPES -->
+	<xs:simpleType name="phpTestsMode">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="commandLine" />
+			<xs:enumeration value="localWebServer" />
+		</xs:restriction>
+	</xs:simpleType>
+		
+
+	<!-- DEFINITION FOR THE ROOT SETUP ELEMENT -->
+	<xs:element name="TurboBuilder">
+		
+		<xs:annotation>
+			<xs:documentation>Contains all the parameters that are used with the build process of the current project</xs:documentation>
+		</xs:annotation>
+		
+		<xs:complexType>		
+		
+			<xs:sequence>		
+		
+				<!-- The Build setup part -->
+				<xs:element name="Build" minOccurs="0" maxOccurs="1">
+		
+					<xs:annotation>
+						<xs:documentation>General options related to the project build process</xs:documentation>
+					</xs:annotation>
+					
+					<xs:complexType>
+					
+						<xs:sequence>
+					
+							<!-- Php element -->
+							<xs:element name="Php" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>Contains the build process configuration related to Php files</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+								
+									<xs:attribute name="createPhar" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												Specifies if all the Php files that are deployed to the target folder by the build process 
+												must be packed on a phar file or not. This file will have the same name as the current project.
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+																	
+								</xs:complexType>
+								
+							</xs:element>
+							
+							<!-- Js element -->
+							<xs:element name="Js" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>Contains the build process configuration related to Javascript files</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+								
+									<xs:attribute name="createMergedJs" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>Generate a .js file on the target folder containing all the project javascript files merged. This file can then be easily distributed or used on other projects.</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+																	
+								</xs:complexType>
+								
+							</xs:element>
+							
+							<!-- Ts element -->
+							<xs:element name="Ts" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>Contains the build process configuration related to Typescript files</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+								
+									<xs:attribute name="alwaysStrict" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>TODO</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="sourceMap" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>TODO</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="target" use="required" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>TODO</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+																											
+								</xs:complexType>
+								
+							</xs:element>
+												
+						</xs:sequence>
+					
+						<xs:attribute name="versionNumber" default="0.0" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>
+									Version number is retrieved automatically from the latest GIT Tag. But if we want to define it manually we can define it here and this value will override the one from GIT.&lt;br&gt;&lt;br&gt;
+									NOTE: The build number will be always added automatically after the versionNumber. For example, if versionNumber is 1.4, the final value will be '1.4.buildnumber'
+								</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						
+						<xs:attribute name="keepUnPackedFiles" default="false" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>
+									If set to false, all the files that are copied to the target/ProjectName/ folder will be removed. Otherwise they will be kept on the folder.
+									This is useful when we are packing all the target contents inside a jar or merged js file, and we don't need the unpacked files.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>						
+						
+					</xs:complexType>
+					
+				</xs:element>
+				
+				
+				<!-- The Release setup part -->
+				<xs:element name="Release" minOccurs="1" maxOccurs="1">
+		
+					<xs:annotation>
+						<xs:documentation>Options related to the release production build version generation. To enable the release build version of the project and use these parameters, a file named TurboBuilder-OneTime.properties must exist on the root of the project folder, containing the following line: Release.generate=true.&lt;br&gt;&lt;br&gt;After a release build is complete, the Release.generate property will be set to false automatically, to prevent multiple release builds to be generated. If the TurboBuilder-OneTime.properties file does not exist, it will be auto generated by the build process wih the Release.generate property set to false.</xs:documentation>
+					</xs:annotation>
+					
+					<xs:complexType>
+					
+						<xs:attribute name="phpDoc" default="false" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Enable or disable the automatic documentation generation for the Php code to the 'target/projectName-version/doc/php' folder</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>		
+						
+						<xs:attribute name="jsDoc" default="false" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Enable or disable the automatic documentation generation for the JS code to the 'target/projectName-version/doc/js' folder</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						
+						<xs:attribute name="gitChangeLog" default="false" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Enable or disable the automatic GIT changelog generation to the 'target/projectName-version/changelog' folder</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>	
+						
+						<xs:attribute name="gitChangeLogCount" default="5" type="xs:integer">
+							<xs:annotation>
+								<xs:documentation>If gitChangeLog is enabled, this defines the number of git tags to be included on the changelog. For example, a value of 10 will generate a changelog with the detailed information for the last 10 tags on the git repository.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>		
+						
+						<xs:attribute name="optimizePictures" default="true" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Set if project pictures must be optimized as part of the release version build process</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						
+						<xs:attribute name="phpOptimize" default="false" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Set if php files must be optimized as part of the release version build process</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						
+						<xs:attribute name="optimizeHtml" default="true" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Set if php and html files must have its html tags and code optimized as part of the release version build process</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						
+						<xs:attribute name="optimizeJs" default="true" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Set if js files must be optimized as part of the release version build process</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						
+						<xs:attribute name="optimizeCss" default="true" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Set if css files must be optimized as part of the release version build process</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						
+					</xs:complexType>
+					
+				</xs:element>
+				
+				
+				<!-- The Validate setup part -->
+				<xs:element name="Validate" minOccurs="0" maxOccurs="1">
+		
+					<xs:annotation>
+						<xs:documentation>Parameters related to project structure and code validation</xs:documentation>
+					</xs:annotation>
+					
+					<xs:complexType>
+					
+						<xs:attribute name="checkProjectStructure" default="true" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Validate that current project folders and files meet the framework specifications</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>	
+						
+						<xs:attribute name="validateCss" default="true" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Verify that all the css files on the project are valid by passing them to the w3c official validator</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>		
+						
+					</xs:complexType>
+					
+				</xs:element>
+				
+				
+				<!-- The Tests setup part -->
+				<xs:element name="Test" minOccurs="0" maxOccurs="1">
+		
+					<xs:annotation>
+						<xs:documentation>Parameters related to project automated testing</xs:documentation>
+					</xs:annotation>
+					
+					<xs:complexType>
+					
+						<xs:sequence>
+					
+							<!-- Php element -->
+							<xs:element name="Php" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>Contains the configuration for the automatic PHP unit tests when building the project</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+								
+									<xs:attribute name="enabled" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>Enable or disable the php unit tests as part of the build process</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+									
+									<xs:attribute name="mode" use="required" type="phpTestsMode">
+										<xs:annotation>
+											<xs:documentation>
+												Defines how the tests will be executed when enabled. Possible values are:&lt;br&gt;&lt;br&gt;
+												commandLine: The tests will be executed using the php command line executable which is defined at Tools->phpPath on this same xml setup.&lt;br&gt;
+												localWebServer: The tests will be copied to a web server that exists on the current local machine, and executed as part of the build process (if tests are enabled). 
+												Note that even if tests are disabled, setting this mode will mean the tests are copied to the specified web server. 
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+									
+									<xs:attribute name="localServerPath" use="optional" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>
+												A local server is required to correctly run the tests when localWebServer mode is defined, so this value specifies a path to that local server http documents folder.
+												A subfolder called "ProjectName-unitTests" will be created when running the tests, and removed once tests are finished.&lt;br&gt;&lt;br&gt;
+												Example: C:/xampp/htdocs/unitTests
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+								
+								</xs:complexType>
+								
+							</xs:element>
+							
+							<!-- Js element -->
+							<xs:element name="Js" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>Contains the configuration for the automatic JS unit tests when building the project</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+																	
+									<xs:choice minOccurs="1" maxOccurs="unbounded">
+									
+										<xs:element name="Browser">
+											
+											<xs:annotation>
+												<xs:documentation>Defines a browser instance where the tests will be executed. Multiple browsers can be used at the same time to test the project</xs:documentation>
+											</xs:annotation>
+											
+											<xs:complexType>
+											
+												<xs:attribute name="enabled" use="required" type="xs:boolean">
+													<xs:annotation>
+														<xs:documentation>Enable or disable the JS unit tests on this browser instance</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>	
+												
+												<xs:attribute name="osPath" use="required" type="xs:string">
+													<xs:annotation>
+														<xs:documentation>
+															Full Operating System path to the browser executable so it can be automatically executed by the tests build.&lt;br&gt;&lt;br&gt;
+															Example: C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+														</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>
+																				
+											</xs:complexType>
+											
+										</xs:element>
+									
+									</xs:choice>
+
+									<xs:attribute name="enabled" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>Enable or disable the JS unit tests as part of the build process</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+									
+									<xs:attribute name="localServerPath" use="required" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>
+												A local server is required to correctly run the JS tests, so this value specifies a path to that local server http documents folder.
+												A subfolder called "ProjectName-unitTests" will be created when running the tests.&lt;br&gt;&lt;br&gt;
+												Example: C:/xampp/htdocs/unitTests
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="localServerUrl" use="required" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>
+												A local server is required to correctly run the JS tests, so this value specifies the same root folder as localServerPath but accessible via http, so the tests can be run on browser.&lt;br&gt;&lt;br&gt;
+												Example: http://localhost/unitTests
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+																	
+								</xs:complexType>
+								
+							</xs:element>
+					
+						</xs:sequence>
+						
+					</xs:complexType>
+					
+				</xs:element>
+				
+				
+				<!-- The Deploy setup part -->
+				<xs:element name="Deploy" minOccurs="0" maxOccurs="1">
+		
+					<xs:annotation>
+						<xs:documentation>Parameters related to deploying the built project files to other locations, like localhost or remote ftp folders</xs:documentation>
+					</xs:annotation>
+										
+					<xs:complexType>
+					
+						<xs:sequence>
+					
+							<!-- LocalHost element -->
+							<xs:element name="LocalHost" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>Contains the deploy setup for a location that is found on the current machine</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+								
+									<xs:attribute name="enabled" default="false" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>Enable or disable the copy of the built files to a location on this computer</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+									
+									<xs:attribute name="destPath" default="" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>The full path to the localhost webapps, htdocs or similar folder for the local webserver where the project built files will be copied</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+									
+									<xs:attribute name="ignore" default="" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>An expression that will be used to ignore folders or files when copying or deleting the built files to the specified local destination. The matching paths will be left untouched on the local path, even when doing a project clean. For example: storage/**</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+								
+								</xs:complexType>
+								
+							</xs:element>
+							
+							<!-- Ftp element -->
+							<xs:element name="Ftp" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>Contains the deploy setup for a location that is found on a remote ftp server</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+								
+									<xs:attribute name="enabled" default="false" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>Enable or disable remote ftp host deployment. An ftp server must be available and accessible to copy the built files</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+									
+									<xs:attribute name="destPath" default="/" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>A path inside the remote ftp location where the built files will be copied. For example: /, /folderName, /public_html/_preview, ...</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+									
+									<xs:attribute name="ignore" default="" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>An expression that will be used to ignore folders or files when transferring the built files. The matching paths will be left untouched on the remote Ftp location, even when doing a project clean. For example: storage/**</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="server" default="" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>The remote host or ip where the ftp server is located</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="user" default="" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>The user name that will be used to login to the remote ftp server</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="psw" default="" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>The user password that will be used to login to the remote ftp server</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+								
+								</xs:complexType>
+								
+							</xs:element>
+					
+						</xs:sequence>
+						
+					</xs:complexType>
+					
+				</xs:element>
+
+				
+				<!-- The Database setup part -->
+				<xs:element name="DataBase" minOccurs="0" maxOccurs="1">
+		
+					<xs:annotation>
+						<xs:documentation>Parameters related to database automation when doing a build</xs:documentation>
+					</xs:annotation>
+					
+					<xs:complexType>
+						
+						
+									
+					</xs:complexType>
+					
+				</xs:element>				
+				
+				
+				<!-- Tools setup part -->
+				<xs:element name="Tools" minOccurs="0" maxOccurs="1">
+		
+					<xs:annotation>
+						<xs:documentation>Paths to the executables and applications that are required to perform most of the build actions</xs:documentation>
+					</xs:annotation>
+					
+					<xs:complexType>
+					
+						<xs:attribute name="toolsPath" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>Path where all the turbo builder tools are located. These tools are required by turbo builder and include minifiers, compressors, encoders and other command line utilities. If this value is not specified, the OS_USER_HOME/TurboBuilder-Tools/ folder will be used by default.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+												
+						<xs:attribute name="mysqlPath" default="C:/xampp/mysql/bin/mysql.exe" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>Path where the mysql.exe tool is located on this computer. It is used to automate database operations like create and delete</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>	
+												
+						<xs:attribute name="jsDocPath" default="C:/Program Files/nodejs/node_modules/.bin/jsdoc.cmd" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>Path where the jsdoc executor is located. Note that jsdoc needs to be installed on our system via node.js</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						
+						<xs:attribute name="jsDocTemplatePath" default="C:/Program Files/nodejs/node_modules/ink-docstrap/template" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>Path where the jsdoc custom template is located. This template is used to change the generated HTML documentation page. Extra templates are normally installed via node.js</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>		
+						
+						<xs:attribute name="phpPath" default="C:/xampp/php/php.exe" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>Path where the php.exe tool is located on this computer. It is used to compress php files, generate phar files and other operations</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>			
+												
+					</xs:complexType>
+					
+				</xs:element>				
+				
+			</xs:sequence>
+		
+		</xs:complexType>
+		
+	</xs:element>
+
+</xs:schema>
