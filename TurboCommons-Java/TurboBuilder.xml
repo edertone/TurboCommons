@@ -10,7 +10,22 @@
 
 	<Release gitChangeLog="true" />
 	
-	<Validate />
+	<Validate enabled="true">
+	
+		<ProjectStructure enabled="true" />
+
+		<CopyrightHeaders enabled="true">
+		
+			<Header path="assets/copyrightHeaders/TurboCommons-Generic.txt" 
+					appliesTo="src/main/java" />
+			
+			<Header path="assets/copyrightHeaders/TurboCommons-Generic.txt" 
+					appliesTo="src/test/java"
+					includes="**/*.java" />
+		
+		</CopyrightHeaders>
+	
+	</Validate>
 	
 	<Test />
 			
