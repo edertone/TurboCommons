@@ -82,9 +82,16 @@
 		<property name="Release.optimizeJs" value="true" />
 		<property name="Release.optimizeCss" value="true" />
 								
-		<property name="Validate.checkProjectStructure" value="true" />
-		<property name="Validate.validateCss" value="true" />
-				
+		<property name="Validate.enabled" value="false" />
+		<property name="Validate.ProjectStructure.enabled" value="true" />
+		<property name="Validate.PhpNamespaces.enabled" value="true" />
+		<property name="Validate.PhpNamespaces.mandatory" value="true" />
+		<property name="Validate.PhpNamespaces.forcePath" value="true" />
+		<property name="Validate.PhpNamespaces.mustContain" value="" />
+		<property name="Validate.PhpNamespaces.excludes" value="" />
+		<property name="Validate.Css.enabled" value="false" />
+		<property name="Validate.CopyrightHeaders.enabled" value="false" />
+							
 		<property name="Test.Php.enabled" value="false" />
 		<property name="Test.Php.mode" value="commandLine" />
 		<property name="Test.Js.enabled" value="false" />	
@@ -163,7 +170,11 @@
 				if(project.getProperty("Release.generate") == "true"){
 					self.project.executeTarget("createReleaseVersion");
 				}
-						
+			
+				if(project.getProperty("Validate.enabled") == "true"){
+					self.project.executeTarget("validateProject");
+				}
+			
 				if(project.getProperty("Test.Php.enabled") == "true"){
 			
 					if(project.getProperty("Test.Php.mode") == "localWebServer"){
@@ -883,7 +894,12 @@
 	<!-- Generate the Jar file from the files on the target folder if jar generation is enabled on setup build xml -->
 	<target name="createJar">
 
-		<jar basedir="${mainFolderPath}/java"
+		<!-- Compile the java code -->
+		<javac srcdir="${mainFolderPath}/java"
+			   destdir="${targetFolderPath}/${projectBaseName}/main"
+		       source="1.8" />
+		
+		<jar basedir="${targetFolderPath}/${projectBaseName}/main/java"
 			 destfile="${targetFolderPath}/${projectBaseName}/${projectBaseName}.jar" />
 		
 		<script language="javascript">
@@ -911,6 +927,18 @@
 	<target name="removeUnpackedFiles">		
 		<delete dir="${targetFolderPath}/${projectBaseName}/main" failonerror="true" />
 		<delete dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main" failonerror="false" />
+	</target>
+	
+	
+	<!-- Validate the project -->
+	<target name="validateProject" >
+
+		<!-- Execute the project analysis -->
+		<script language="javascript" src="${basedir}/Validate.js" />
+
+		<!-- Check if the build must fail or not -->
+		<fail if="javascript.fail.message" message="${javascript.fail.message}" />
+
 	</target>
 	
 	

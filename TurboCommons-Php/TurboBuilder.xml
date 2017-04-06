@@ -12,8 +12,32 @@
 			 optimizePhp="false"
 			 phpDoc="true" />
 	
-	<Validate checkProjectStructure="true"
-			  validateCss="true" />
+	<Validate enabled="true">
+	
+		<ProjectStructure enabled="true" />
+
+		<PhpNamespaces enabled="true"
+					   mandatory="true"
+					   forcePath="true"
+					   mustContain="org\turbocommons\src"
+					   excludes="**/AutoLoader.php,**/index.php" />
+
+		<Css enabled="false" />
+
+		<CopyrightHeaders enabled="true">
+		
+			<Header path="assets/copyrightHeaders/TurboCommons-Generic.txt" 
+					appliesTo="src/main/php"
+					includes=""
+					excludes="" />
+			
+			<Header path="assets/copyrightHeaders/TurboCommons-Generic.txt" 
+					appliesTo="src/test/php"
+					includes="**/*.php" />
+		
+		</CopyrightHeaders>
+	
+	</Validate>
 	
 	<Test>	
 	

@@ -223,22 +223,186 @@
 				<xs:element name="Validate" minOccurs="0" maxOccurs="1">
 		
 					<xs:annotation>
-						<xs:documentation>Parameters related to project structure and code validation</xs:documentation>
+						<xs:documentation>Options related to project structure and code validation</xs:documentation>
 					</xs:annotation>
 					
 					<xs:complexType>
 					
-						<xs:attribute name="checkProjectStructure" default="true" type="xs:boolean">
+						<xs:sequence>
+					
+							<!-- ProjectStructure element -->
+							<xs:element name="ProjectStructure" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>A validation rule that verifies that project folders, files and general structure follow the TurboBuilder requirements.</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+								
+									<xs:attribute name="enabled" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												Activates or deactivates the project structure validation rule
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+																	
+								</xs:complexType>
+								
+							</xs:element>
+							
+							<!-- PhpNamespaces element -->
+							<xs:element name="PhpNamespaces" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>A validation rule that verifies that all Php files on the project declare a well formed namespace. To be valid, the namespace must at least contain the path where the Php file is placed.</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+								
+									<xs:attribute name="enabled" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												Activates or deactivates the php namespaces validation rule
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="mandatory" use="optional" default="true" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												Forces that all php files inside this project must have a defined namespace
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="forcePath" use="optional" default="true" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												If enabled, all namespaces declared on all php files inside the project must contain the file path after main folder. 
+												For example, a file located at: 'src\main\php\managers\' must have a namespace that contains 'php\managers\'
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+									
+									<xs:attribute name="mustContain" use="optional" default="" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>
+												Specifies a string that must be present on the namespace to be considered valid
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+									
+									<xs:attribute name="excludes" use="optional" default="" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>
+												comma- or space-separated list of patterns of files that must be excluded; no files (except default excludes) are excluded when omitted. For example: "**" , "**/*.js"
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>		
+																	
+								</xs:complexType>
+								
+							</xs:element>
+							
+							<!-- Css element -->
+							<xs:element name="Css" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>A validation rule that verifies that all the css files on the project are valid by passing them to the w3c official validator</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+								
+									<xs:attribute name="enabled" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												Activates or deactivates the css validation rule
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+																	
+								</xs:complexType>
+								
+							</xs:element>
+							
+							<!-- CopyrightHeaders element -->
+							<xs:element name="CopyrightHeaders" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>A validation rule to verify that files on specified folders start with a specific header pattern</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+									
+									<xs:sequence>
+						
+										<!-- Header element -->
+										<xs:element name="Header" minOccurs="1" maxOccurs="unbounded">
+											
+											<xs:annotation>
+												<xs:documentation>Defines how a specific copyright header must be validated by defining the template file and the folders where it must be applied</xs:documentation>
+											</xs:annotation>
+											
+											<xs:complexType>
+											
+												<xs:attribute name="path" use="required" type="xs:string">
+													<xs:annotation>
+														<xs:documentation>
+															Full path including the filename (based on the project root) where a file containing a copyright header is located. For example: "assets/copyrightHeaders/HeaderTempate.txt"
+														</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>	
+												
+												<xs:attribute name="appliesTo" use="required" type="xs:string">
+													<xs:annotation>
+														<xs:documentation>
+															Path (based on the project root) that will be validated. All files inside the specified path must start with the header defined on this rule. For example: "src/main/php"
+														</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>	
+												
+												<xs:attribute name="includes" use="optional" type="xs:string">
+													<xs:annotation>
+														<xs:documentation>
+															comma- or space-separated list of patterns of files that must be included; all files are included when omitted. For example: "**" , "**/*.js"
+														</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>	
+												
+												<xs:attribute name="excludes" use="optional" type="xs:string">
+													<xs:annotation>
+														<xs:documentation>
+															comma- or space-separated list of patterns of files that must be excluded; no files (except default excludes) are excluded when omitted. For example: "**" , "**/*.js"
+														</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>	
+																				
+											</xs:complexType>
+											
+										</xs:element>
+									
+									</xs:sequence>
+									
+									<xs:attribute name="enabled" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												Activates or deactivates the copyright headers validation rule
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+																	
+								</xs:complexType>
+								
+							</xs:element>
+												
+						</xs:sequence>
+					
+						<xs:attribute name="enabled" use="required" type="xs:boolean">
 							<xs:annotation>
-								<xs:documentation>Validate that current project folders and files meet the framework specifications</xs:documentation>
+								<xs:documentation>Globally activates or deactivates the project validation</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>	
-						
-						<xs:attribute name="validateCss" default="true" type="xs:boolean">
-							<xs:annotation>
-								<xs:documentation>Verify that all the css files on the project are valid by passing them to the w3c official validator</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>		
 						
 					</xs:complexType>
 					
