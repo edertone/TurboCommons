@@ -33,7 +33,8 @@
 			
 			<Header path="assets/copyrightHeaders/TurboCommons-Generic.txt" 
 					appliesTo="src/test/php"
-					includes="**/*.php" />
+					includes="**/*.php"
+					excludes="" />
 		
 		</CopyrightHeaders>
 	
