@@ -1,23 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TurboBuilder xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-			xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/edertone/TurboBuilder/master/TurboBuilder-Ant/turboBuilder/BuilderSetupSchema.xsd">
+			xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/edertone/TurboBuilder/master/TurboBuilder-Ant/turboBuilder/TurboBuilder.xsd">
 
 	<Build>
 	
-		<Php createPhars="false" />	   
-		
-		<Js createMergedJs="true" />
+		<Ts enabled="true"
+			createMergedJs="true"
+			compilerDeclarationFile="true"
+			compilerAlwaysStrict="true"
+			compilerSourceMap="false"
+			compilerTargets="ES3,ES5,ES6" />
 		   
 	</Build>
 
-	<Release gitChangeLog="true"
-			 jsDoc="true" />
+	<Release gitChangeLog="true" />
 	
-	<Validate />
+	<Validate enabled="true">
+	
+		<CopyrightHeaders enabled="true">
+		
+			<Header path="assets/copyrightHeaders/TsFiles-Header.txt" 
+					appliesTo="src"
+					includes="**/*.ts"
+					excludes="" />
+					
+			<Header path="assets/copyrightHeaders/JsFiles-Header.txt" 
+					appliesTo="src"
+					includes="**/*.js"
+					excludes="**/libs/**" />
+		
+		</CopyrightHeaders>
+	
+	</Validate>
 	
 	<Test>
 	
-		<Js enabled="true"
+		<Ts enabled="true"
+			targets="ES3,ES5,ES6"
 			localServerPath="C:\xampp\htdocs\unitTests"
 			localServerUrl="http://localhost/unitTests">
 			
@@ -30,7 +49,7 @@
 		 	<Browser enabled="true"
 					 osPath="C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"/>
 			
-		</Js>
+		</Ts>
 	
 	</Test>
 				

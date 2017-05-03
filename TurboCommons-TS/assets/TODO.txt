@@ -1,0 +1,2 @@
+- The build process must generate all the JS language versions (ES3, ES5, ES6 ...) and launch the same JS unit tests for all of them. 
+- Should we mantain all the different Turbocommons-JSX projects or simply have a global TS project and release the generated code for all JS versions? I think the right way is the second one
