@@ -42,7 +42,15 @@
 								
 								<xs:complexType>
 								
-									<xs:attribute name="createPhars" use="required" type="xs:boolean">
+									<xs:attribute name="enabled" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												Activate or deactivate the build process for php files
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+									
+									<xs:attribute name="createPhar" use="required" type="xs:boolean">
 										<xs:annotation>
 											<xs:documentation>
 												Specifies if all the Php files that are deployed to the target folder by the build process 
@@ -64,9 +72,46 @@
 								
 								<xs:complexType>
 								
+									<xs:attribute name="enabled" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												Activate or deactivate the build process for Js files
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
 									<xs:attribute name="createMergedJs" use="required" type="xs:boolean">
 										<xs:annotation>
 											<xs:documentation>Generate a .js file on the target folder containing all the project javascript files merged. This file can then be easily distributed or used on other projects.</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+																	
+								</xs:complexType>
+								
+							</xs:element>
+							
+							<!-- Java element -->
+							<xs:element name="Java" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>Contains the build process configuration related to Java files</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+								
+									<xs:attribute name="enabled" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												Activate or deactivate the build process for java files
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="createJar" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												Specifies if all the Java files must be packed on a jar file or not. This file will have the same name as the current project.
+											</xs:documentation>
 										</xs:annotation>
 									</xs:attribute>	
 																	
@@ -83,21 +128,47 @@
 								
 								<xs:complexType>
 								
-									<xs:attribute name="alwaysStrict" use="required" type="xs:boolean">
+									<xs:attribute name="enabled" use="required" type="xs:boolean">
 										<xs:annotation>
-											<xs:documentation>TODO</xs:documentation>
+											<xs:documentation>
+												Activate or deactivate the build process for ts files
+											</xs:documentation>
 										</xs:annotation>
 									</xs:attribute>
 									
-									<xs:attribute name="sourceMap" use="required" type="xs:boolean">
+									<xs:attribute name="createMergedJs" use="required" type="xs:boolean">
 										<xs:annotation>
-											<xs:documentation>TODO</xs:documentation>
+											<xs:documentation>
+												Generate a .js file on the target folder containing all the compiled ts files merged. 
+												A separate file will be generated for each one of the defined compiler targets.
+												These files can then be easily distributed or used on other projects.
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+								
+									<xs:attribute name="compilerDeclarationFile" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>Enable or disable the generation of d.ts files as part of the compilation process. These files allow us to use the compiled javascript source in other ts projects while retaining type information.</xs:documentation>
 										</xs:annotation>
 									</xs:attribute>
 									
-									<xs:attribute name="target" use="required" type="xs:string">
+									<xs:attribute name="compilerStrict" use="required" type="xs:boolean">
 										<xs:annotation>
-											<xs:documentation>TODO</xs:documentation>
+											<xs:documentation>Enable or disable --strict tag for the compiler. It is recommended to enable it cause it forces lot of strict checkings that are recommended for stronger code</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="compilerSourceMap" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>TODO - this description is missing</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="compilerTargets" use="required" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>
+												Defines the javascript language versions that will be generated when compiling the ts files (Each language version will be generated independently).
+											</xs:documentation>
 										</xs:annotation>
 									</xs:attribute>
 																											
@@ -202,22 +273,297 @@
 				<xs:element name="Validate" minOccurs="0" maxOccurs="1">
 		
 					<xs:annotation>
-						<xs:documentation>Parameters related to project structure and code validation</xs:documentation>
+						<xs:documentation>Options related to project structure and code validation</xs:documentation>
 					</xs:annotation>
 					
 					<xs:complexType>
 					
-						<xs:attribute name="checkProjectStructure" default="true" type="xs:boolean">
+						<xs:sequence>
+					
+							<!-- ProjectStructure element -->
+							<xs:element name="ProjectStructure" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>A validation rule that verifies that project folders, files and general structure follow the TurboBuilder requirements.</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+								
+									<xs:attribute name="enabled" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												Activates or deactivates the project structure validation rule
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+																	
+								</xs:complexType>
+								
+							</xs:element>
+							
+							<!-- PhpNamespaces element -->
+							<xs:element name="PhpNamespaces" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>
+										A validation rule that verifies that all Php files on the project declare a well formed namespace.
+									</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+								
+									<xs:attribute name="enabled" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												Activates or deactivates the php namespaces validation rule
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="mandatory" use="optional" default="true" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												Forces that all php files inside this project must have a defined namespace
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="mustContain" use="optional" default="" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>
+												Defines one or more string values (coma separated) that must be found on the declared namespaces.&lt;br&gt;
+												Wildcards can be used to include parts of the file path into the namespace validation. Possible wildcards are:&lt;br&gt;
+												- $path : The full path from src\ to the file. For example, a file located at 'src\main\php\managers\File.php' will have 'main\php\managers' as the $path value.&lt;br&gt;
+												- $i : an item from the file path, where i is a numeric index starting from the right most path item.&lt;br&gt;
+												For example, for a file located at 'src\main\php\managers\File.php':&lt;br&gt;
+												- mustContain='myspace\and\$path' : Will require that declared domain contains 'myspace\and\main\php\managers'.&lt;br&gt;
+												- mustContain='myspace\and\$0' : Will require that declared domain contains 'myspace\and\File.php'.&lt;br&gt;
+												- mustContain='myspace\and\$1\' : Will require that declared domain contains 'myspace\and\managers\'.&lt;br&gt;
+												- mustContain='myspace\and\$0\$1' : Will require that declared domain contains 'myspace\and\File.php\managers'.&lt;br&gt;
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+																		
+									<xs:attribute name="excludes" use="optional" default="" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>
+												comma- or space-separated list of patterns of files that must be excluded; no files (except default excludes) are excluded when omitted. For example: "**" , "**/*.js"
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>		
+																	
+								</xs:complexType>
+								
+							</xs:element>
+							
+							<!-- JsNamespaces element -->
+							<xs:element name="JsNamespaces" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>
+										A validation rule that verifies that all Js files on the project declare a well formed namespace.
+									</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+								
+									<xs:attribute name="enabled" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												Activates or deactivates the Js namespaces validation rule
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="mandatory" use="optional" default="true" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												Forces that all Js files inside this project must have a defined namespace
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="mustContain" use="optional" default="" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>
+												Defines one or more string values (coma separated) that must be found on the declared namespaces.&lt;br&gt;
+												Wildcards can be used to include parts of the file path into the namespace validation. Possible wildcards are:&lt;br&gt;
+												- $path : The full path from src\ to the file. For example, a file located at 'src\main\js\managers\File.js' will have 'main\js\managers' as the $path value.&lt;br&gt;
+												- $i : an item from the file path, where i is a numeric index starting from the right most path item.&lt;br&gt;
+												For example, for a file located at 'src\main\js\managers\File.js':&lt;br&gt;
+												- mustContain='myspace\and\$path' : Will require that declared domain contains 'myspace\and\main\js\managers'.&lt;br&gt;
+												- mustContain='myspace\and\$0' : Will require that declared domain contains 'myspace\and\File.js'.&lt;br&gt;
+												- mustContain='myspace\and\$1\' : Will require that declared domain contains 'myspace\and\managers\'.&lt;br&gt;
+												- mustContain='myspace\and\$0\$1' : Will require that declared domain contains 'myspace\and\File.js\managers'.&lt;br&gt;
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="excludes" use="optional" default="" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>
+												comma- or space-separated list of patterns of files that must be excluded; no files (except default excludes) are excluded when omitted. For example: "**" , "**/*.js"
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>		
+																	
+								</xs:complexType>
+								
+							</xs:element>
+							
+							<!-- TsNamespaces element -->
+							<xs:element name="TsNamespaces" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>
+										A validation rule that verifies that all Ts files on the project declare a well formed namespace.
+									</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+								
+									<xs:attribute name="enabled" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												Activates or deactivates the Ts namespaces validation rule
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="mandatory" use="optional" default="true" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												Forces that all Ts files inside this project must have a defined namespace
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="mustContain" use="optional" default="" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>
+												Defines one or more string values (coma separated) that must be found on the declared namespaces.&lt;br&gt;
+												Wildcards can be used to include parts of the file path into the namespace validation. Possible wildcards are:&lt;br&gt;
+												- $path : The full path from src\ to the file. For example, a file located at 'src\main\ts\managers\File.ts' will have 'main\ts\managers' as the $path value.&lt;br&gt;
+												- $i : an item from the file path, where i is a numeric index starting from the right most path item.&lt;br&gt;
+												For example, for a file located at 'src\main\ts\managers\File.ts':&lt;br&gt;
+												- mustContain='myspace\and\$path' : Will require that declared domain contains 'myspace\and\main\ts\managers'.&lt;br&gt;
+												- mustContain='myspace\and\$0' : Will require that declared domain contains 'myspace\and\File.ts'.&lt;br&gt;
+												- mustContain='myspace\and\$1\' : Will require that declared domain contains 'myspace\and\managers\'.&lt;br&gt;
+												- mustContain='myspace\and\$0\$1' : Will require that declared domain contains 'myspace\and\File.ts\managers'.&lt;br&gt;
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="excludes" use="optional" default="" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>
+												comma- or space-separated list of patterns of files that must be excluded; no files (except default excludes) are excluded when omitted. For example: "**" , "**/*.ts"
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>		
+																	
+								</xs:complexType>
+								
+							</xs:element>
+							
+							<!-- Css element -->
+							<xs:element name="Css" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>A validation rule that verifies that all the css files on the project are valid by passing them to the w3c official validator</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+								
+									<xs:attribute name="enabled" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												Activates or deactivates the css validation rule
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+																	
+								</xs:complexType>
+								
+							</xs:element>
+							
+							<!-- CopyrightHeaders element -->
+							<xs:element name="CopyrightHeaders" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>A validation rule to verify that files on specified folders start with a specific header pattern</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+									
+									<xs:sequence>
+						
+										<!-- Header element -->
+										<xs:element name="Header" minOccurs="1" maxOccurs="unbounded">
+											
+											<xs:annotation>
+												<xs:documentation>Defines how a specific copyright header must be validated by defining the template file and the folders where it must be applied</xs:documentation>
+											</xs:annotation>
+											
+											<xs:complexType>
+											
+												<xs:attribute name="path" use="required" type="xs:string">
+													<xs:annotation>
+														<xs:documentation>
+															Full path including the filename (based on the project root) where a file containing a copyright header is located. For example: "assets/copyrightHeaders/HeaderTempate.txt"
+														</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>	
+												
+												<xs:attribute name="appliesTo" use="required" type="xs:string">
+													<xs:annotation>
+														<xs:documentation>
+															Path (based on the project root) that will be validated. All files inside the specified path must start with the header defined on this rule. For example: "src/main/php"
+														</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>	
+												
+												<xs:attribute name="includes" use="required" type="xs:string">
+													<xs:annotation>
+														<xs:documentation>
+															comma- or space-separated list of patterns of files that must be included; all files are included when omitted. For example: "**" , "**/*.js"
+														</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>	
+												
+												<xs:attribute name="excludes" use="required" type="xs:string">
+													<xs:annotation>
+														<xs:documentation>
+															comma- or space-separated list of patterns of files that must be excluded; no files (except default excludes) are excluded when omitted. For example: "**" , "**/*.js"
+														</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>	
+																				
+											</xs:complexType>
+											
+										</xs:element>
+									
+									</xs:sequence>
+									
+									<xs:attribute name="enabled" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												Activates or deactivates the copyright headers validation rule
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+																	
+								</xs:complexType>
+								
+							</xs:element>
+												
+						</xs:sequence>
+					
+						<xs:attribute name="enabled" use="required" type="xs:boolean">
 							<xs:annotation>
-								<xs:documentation>Validate that current project folders and files meet the framework specifications</xs:documentation>
+								<xs:documentation>Globally activates or deactivates the project validation</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>	
-						
-						<xs:attribute name="validateCss" default="true" type="xs:boolean">
-							<xs:annotation>
-								<xs:documentation>Verify that all the css files on the project are valid by passing them to the w3c official validator</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>		
 						
 					</xs:complexType>
 					
@@ -279,7 +625,7 @@
 							<xs:element name="Js" minOccurs="0" maxOccurs="1">
 								
 								<xs:annotation>
-									<xs:documentation>Contains the configuration for the automatic JS unit tests when building the project</xs:documentation>
+									<xs:documentation>Contains the configuration for the automatic Javascript unit tests when building the project</xs:documentation>
 								</xs:annotation>
 								
 								<xs:complexType>
@@ -344,6 +690,82 @@
 								
 							</xs:element>
 					
+							<!-- Ts element -->
+							<xs:element name="Ts" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>Contains the configuration for the automatic Typescript unit tests when building the project</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+																	
+									<xs:choice minOccurs="1" maxOccurs="unbounded">
+									
+										<xs:element name="Browser">
+											
+											<xs:annotation>
+												<xs:documentation>Defines a browser instance where the tests will be executed. Multiple browsers can be used at the same time to test the project</xs:documentation>
+											</xs:annotation>
+											
+											<xs:complexType>
+											
+												<xs:attribute name="enabled" use="required" type="xs:boolean">
+													<xs:annotation>
+														<xs:documentation>Enable or disable the TS unit tests on this browser instance</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>	
+												
+												<xs:attribute name="osPath" use="required" type="xs:string">
+													<xs:annotation>
+														<xs:documentation>
+															Full Operating System path to the browser executable so it can be automatically executed by the tests build.&lt;br&gt;&lt;br&gt;
+															Example: C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+														</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>
+																				
+											</xs:complexType>
+											
+										</xs:element>
+									
+									</xs:choice>
+
+									<xs:attribute name="enabled" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>Enable or disable the TS unit tests as part of the build process</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>	
+									
+									<xs:attribute name="targets" use="required" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>Defines the javascript language versions that will be generated and tested.
+											For example, if we set this attribute to "ES5,ES6" the typescript code will be compiled to javascript 5 and javascript 6 and all tests will be launched for all defined browsers for all target language</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="localServerPath" use="required" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>
+												A local server is required to correctly run the TS tests, so this value specifies a path to that local server http documents folder.
+												A subfolder called "ProjectName-unitTests" will be created when running the tests.&lt;br&gt;&lt;br&gt;
+												Example: C:/xampp/htdocs/unitTests
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="localServerUrl" use="required" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>
+												A local server is required to correctly run the TS tests, so this value specifies the same root folder as localServerPath but accessible via http, so the tests can be run on browser.&lt;br&gt;&lt;br&gt;
+												Example: http://localhost/unitTests
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+																	
+								</xs:complexType>
+								
+							</xs:element>
+							
 						</xs:sequence>
 						
 					</xs:complexType>
@@ -504,6 +926,8 @@
 							</xs:annotation>
 						</xs:attribute>			
 												
+						<!-- TODO - add missing attributes -->
+						
 					</xs:complexType>
 					
 				</xs:element>				

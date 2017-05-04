@@ -4,16 +4,31 @@
 
 	<Build>
 	
-		<Php createPhars="false"/>
-		
-		<Js createMergedJs="true"/>	   
+		<Js enabled="true"
+			createMergedJs="true"/>	   
 		   
 	</Build>
 
 	<Release gitChangeLog="true"
 			 jsDoc="true" />
 	
-	<Validate />
+	<Validate enabled="true">
+	
+		<JsNamespaces enabled="true"
+				   	  mandatory="true"		
+				   	  mustContain="org_turbocommons_,$1"
+				   	  excludes="**/test/**,**/index.js" />
+			
+		<CopyrightHeaders enabled="true">
+		
+			<Header path="assets/copyrightHeaders/JsFiles-Header.txt" 
+					appliesTo="src"
+					includes="**/*.js"
+					excludes="**/libs/**" />
+		
+		</CopyrightHeaders>
+	
+	</Validate>
 	
 	<Test>
 	

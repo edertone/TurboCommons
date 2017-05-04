@@ -43,14 +43,14 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 *
 	 * @returns {boolean} false if the string is not empty, true if the string contains only spaces, newlines or any other characters defined as "empty" values
 	 */
-	isEmpty : function(string, emptyChars){
+	isEmpty : function(string, emptyChars) {
 
 		// Set optional parameters default values
 		emptyChars = (emptyChars === undefined || emptyChars === null) ? [] : emptyChars;
 
 		var aux = '';
 
-		// Note that we are checking emptyness every time we do a replace to improve speed, avoiding unnecessary replacements.
+		// Empty or null value is considered empty
 		if(string == null || string == ""){
 
 			return true;
@@ -99,25 +99,25 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	},
 
 
-	isCamelCase : function(){
+	isCamelCase : function() {
 
 		// TODO - translate from php
 	},
 
 
-	isSnakeCase : function(){
+	isSnakeCase : function() {
 
 		// TODO - translate from php
 	},
 
 
-	countStringOccurences : function(){
+	countStringOccurences : function() {
 
 		// TODO - translate from php
 	},
 
 
-	countCapitalLetters : function(){
+	countCapitalLetters : function() {
 
 		// TODO - translate from php
 	},
@@ -133,7 +133,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 *
 	 * @returns int The number of words (elements divided by the wordSeparator value) that are present on the string
 	 */
-	countWords : function(string, wordSeparator){
+	countWords : function(string, wordSeparator) {
 
 		// Set optional parameters default values
 		wordSeparator = (wordSeparator === undefined) ? ' ' : wordSeparator;
@@ -170,7 +170,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 *
 	 * @returns string The specified string but limited in length if necessary. Final result will never exceed the specified limit, also with the limiterString appended.
 	 */
-	limitLen : function(string, limit, limiterString){
+	limitLen : function(string, limit, limiterString) {
 
 		// Set optional parameters default values
 		limit = (limit === undefined) ? 100 : limit;
@@ -214,7 +214,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 * 
 	 * @returns {string} The domain from the given string (excluding the subdomain if exists)
 	 */
-	getDomainFromUrl : function(url){
+	getDomainFromUrl : function(url) {
 
 		var hostName = this.getHostNameFromUrl(url);
 
@@ -239,7 +239,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 * 
 	 * @returns {string} The domain and subdomain from the given string (subdomain.domain.com)
 	 */
-	getHostNameFromUrl : function(url){
+	getHostNameFromUrl : function(url) {
 
 		var validationManager = new org_turbocommons_src_main_js_managers.ValidationManager();
 
@@ -276,7 +276,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 *
 	 * @returns {array} A list with all the string lines sepparated as different array elements.
 	 */
-	getLines : function(string, filters){
+	getLines : function(string, filters) {
 
 		// Set optional parameters default values
 		filters = (filters === undefined) ? [/\s+/g] : filters;
@@ -326,7 +326,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 *
 	 * @returns {array} The list of keywords that have been extracted from the given text
 	 */
-	getKeyWords : function(string, max, longerThan, shorterThan, ignoreNumericWords){
+	getKeyWords : function(string, max, longerThan, shorterThan, ignoreNumericWords) {
 
 		// Set optional parameters default values
 		max = (max === undefined) ? 25 : max;
@@ -334,7 +334,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 		shorterThan = (shorterThan === undefined) ? 15 : shorterThan;
 		ignoreNumericWords = (ignoreNumericWords) ? false : ignoreNumericWords;
 
-		// TODO: translate from php
+	// TODO: translate from php
 	},
 
 
@@ -348,7 +348,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 *
 	 * @returns {string} The extracted filename and extension, like: finemane.txt
 	 */
-	getFileNameWithExtension : function(path){
+	getFileNameWithExtension : function(path) {
 
 		var osSeparator = org_turbocommons_src_main_js_utils.FileSystemUtils.getDirectorySeparator();
 
@@ -378,7 +378,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 *
 	 * @returns {string} The extracted filename WITHOUT extension, like: finemane
 	 */
-	getFileNameWithoutExtension : function(path){
+	getFileNameWithoutExtension : function(path) {
 
 		if(this.isEmpty(path)){
 
@@ -406,7 +406,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 *
 	 * @returns {string} The file extension WITHOUT the dot character. For example: jpg, png, js, exe ...
 	 */
-	getFileExtension : function(path){
+	getFileExtension : function(path) {
 
 		if(this.isEmpty(path)){
 
@@ -430,7 +430,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 *
 	 * @returns {string} ('ftp', 'http', ...) if the url is valid or '' if the url is invalid
 	 */
-	getSchemeFromUrl : function(url){
+	getSchemeFromUrl : function(url) {
 
 		var validationManager = new org_turbocommons_src_main_js_managers.ValidationManager();
 
@@ -455,7 +455,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	},
 
 
-	formatCase : function(){
+	formatCase : function() {
 
 		// TODO - translate from php
 	},
@@ -476,7 +476,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 *
 	 * @returns string The correctly formatted path without any trailing directory separator
 	 */
-	formatPath : function(path){
+	formatPath : function(path) {
 
 		var validationManager = new org_turbocommons_src_main_js_managers.ValidationManager();
 
@@ -497,7 +497,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 		path = path.replace(/\\/g, osSeparator);
 
 		// Remove duplicate path separator characters
-		while(path.indexOf(osSeparator + osSeparator) >= 0){
+		while(path.indexOf(osSeparator + osSeparator) >= 0) {
 
 			path = path.replace(osSeparator + osSeparator, osSeparator);
 		}
@@ -527,7 +527,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 *
 	 * @returns {string} The formated url string or the original string if it was not a valid url
 	 */
-	formatUrl : function(url){
+	formatUrl : function(url) {
 
 		var validationManager = new org_turbocommons_src_main_js_managers.ValidationManager();
 
@@ -572,7 +572,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 * @static
 	 * 
 	 */
-	formatForFullTextSearch : function(string, wordSeparator){
+	formatForFullTextSearch : function(string, wordSeparator) {
 
 		// TODO: Translate from PHP method
 	},
@@ -584,7 +584,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 * @static
 	 * 
 	 */
-	generateRandomPassword : function(lenght, useuppercase){
+	generateRandomPassword : function(lenght, useuppercase) {
 
 		// TODO: Translate from PHP method
 	},
@@ -602,7 +602,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 	 *
 	 * @returns {string} The given string with all accent and diacritics replaced by the respective ASCII characters.
 	 */
-	removeAccents : function(string){
+	removeAccents : function(string) {
 
 		if(string == null){
 
@@ -881,7 +881,7 @@ org_turbocommons_src_main_js_utils.StringUtils = {
 			}
 		}
 
-		return string.replace(/[^\u0000-\u007E]/g, function(a){
+		return string.replace(/[^\u0000-\u007E]/g, function(a) {
 
 			return diacriticsMap[a] || a;
 		});
