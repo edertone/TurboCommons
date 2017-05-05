@@ -13,6 +13,7 @@ namespace org\turbocommons\src\test\php\utils;
 
 use PHPUnit_Framework_TestCase;
 use org\turbocommons\src\main\php\utils\StringUtils;
+use stdClass;
 use Exception;
 
 
@@ -65,6 +66,31 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 	public static function tearDownAfterClass(){
 
 		// Nothing necessary here
+	}
+
+
+	/**
+	 * testIsString
+	 *
+	 * @return void
+	 */
+	public function testIsString(){
+
+	    $this->assertTrue(StringUtils::isString(''));
+	    $this->assertTrue(StringUtils::isString('      '));
+	    $this->assertTrue(StringUtils::isString('1'));
+	    $this->assertTrue(StringUtils::isString('a'));
+	    $this->assertTrue(StringUtils::isString('hello'));
+	    $this->assertTrue(StringUtils::isString("hello\n\nguys"));
+
+	    $this->assertTrue(!StringUtils::isString(null));
+	    $this->assertTrue(!StringUtils::isString(0));
+	    $this->assertTrue(!StringUtils::isString(15));
+	    $this->assertTrue(!StringUtils::isString([]));
+	    $this->assertTrue(!StringUtils::isString([1]));
+	    $this->assertTrue(!StringUtils::isString(['a', 'cd']));
+	    $this->assertTrue(!StringUtils::isString(new stdClass()));
+	    $this->assertTrue(!StringUtils::isString(new Exception()));
 	}
 
 
@@ -504,9 +530,7 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testLimitLen(){
 
-		$this->assertTrue(StringUtils::limitLen(null, 0) === '');
 		$this->assertTrue(StringUtils::limitLen(null, 10) === '');
-		$this->assertTrue(StringUtils::limitLen('', 0) === '');
 		$this->assertTrue(StringUtils::limitLen('', 10) === '');
 		$this->assertTrue(StringUtils::limitLen('hello dear how are you', 1) === ' ');
 		$this->assertTrue(StringUtils::limitLen('hello dear how are you', 2) === ' .');
@@ -520,14 +544,28 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(StringUtils::limitLen('hello dear how are you', 22) === 'hello dear how are you');
 		$this->assertTrue(StringUtils::limitLen('hello dear how are you', 50) === 'hello dear how are you');
 
-		// Test non numeric limit value gives exception
+		// Test invalid values give exception
 		$exceptionMessage = '';
 
 		try {
-			$this->assertTrue(StringUtils::limitLen('hello', null) === '');
-			$exceptionMessage = 'hello did not cause exception';
+		    StringUtils::limitLen('', 0);
+		    $exceptionMessage = '0 did not cause exception';
+		} catch (Exception $e) {
+		    // We expect an exception to happen
+		}
+
+		try {
+			StringUtils::limitLen('hello', [1, 2]);
+			$exceptionMessage = '[1, 2] did not cause exception';
 		} catch (Exception $e) {
 			// We expect an exception to happen
+		}
+
+		try {
+		    StringUtils::limitLen('hello', null);
+		    $exceptionMessage = 'hello did not cause exception';
+		} catch (Exception $e) {
+		    // We expect an exception to happen
 		}
 
 		if($exceptionMessage != ''){
@@ -1048,6 +1086,50 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		// $this->assertTrue(StringUtils::removeWordsLongerThan("Line1\nline2\r\nline3 and  \nline4", 4) === "\n\r\n and  \n");
 		// $this->assertTrue(StringUtils::removeWordsLongerThan("Line1 line12\nline2\r\nline3 and  \nline4", 6) === " line12\n\r\n   \n");
 		// TODO: add more multi line tests
+	}
+
+
+	/**
+	 * testRemoveUrls
+	 *
+	 * @return void
+	 */
+	public function testRemoveUrls(){
+
+	    // TODO!!
+	}
+
+
+	/**
+	 * testRemoveEmails
+	 *
+	 * @return void
+	 */
+	public function testRemoveEmails(){
+
+	    // TODO!!
+	}
+
+
+	/**
+	 * testRemoveHtmlCode
+	 *
+	 * @return void
+	 */
+	public function testRemoveHtmlCode(){
+
+	    // TODO!!
+	}
+
+
+	/**
+	 * testRemoveMultipleSpaces
+	 *
+	 * @return void
+	 */
+	public function testRemoveMultipleSpaces(){
+
+	    // TODO!!
 	}
 }
 

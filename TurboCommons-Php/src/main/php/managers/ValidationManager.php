@@ -25,21 +25,15 @@ use org\turbocommons\src\main\php\utils\ObjectUtils;
 class ValidationManager extends BaseStrictClass{
 
 
-	/**
-	 * Constant that defines the correct validation status
-	 */
+	/** Constant that defines the correct validation status */
 	const VALIDATION_OK = 0;
 
 
-	/**
-	 * Constant that defines the warning validation status
-	 */
+	/** Constant that defines the warning validation status */
 	const VALIDATION_WARNING = 1;
 
 
-	/**
-	 * Constant that defines the error validation status
-	 */
+	/** Constant that defines the error validation status */
 	const VALIDATION_ERROR = 2;
 
 
@@ -133,7 +127,7 @@ class ValidationManager extends BaseStrictClass{
 		// Set optional parameters default values
 		$errorMessage = (StringUtils::isEmpty($errorMessage)) ? 'value is not a string' : $errorMessage;
 
-		$res = (!is_string($value)) ? $errorMessage : '';
+		$res = (!StringUtils::isString($value)) ? $errorMessage : '';
 
 		return $this->_updateValidationStatus($res, $isWarning);
 	}
@@ -150,12 +144,12 @@ class ValidationManager extends BaseStrictClass{
 	 */
 	public function isUrl($value, $errorMessage = '', $isWarning = false){
 
-		// Set optional parameters default values
-		$errorMessage = (StringUtils::isEmpty($errorMessage)) ? 'value is not an URL' : $errorMessage;
+	    $validationManager = new ValidationManager();
+
+	    // Set optional parameters default values
+	    $errorMessage = (!$validationManager->isFilledIn($errorMessage)) ? 'value is not an URL' : $errorMessage;
 
 		$res = $errorMessage;
-
-		$validationManager = new ValidationManager();
 
 		if($validationManager->isFilledIn($value) && $validationManager->isString($value)){
 
@@ -193,7 +187,7 @@ class ValidationManager extends BaseStrictClass{
 		// Set optional parameters default values
 		$errorMessage = (StringUtils::isEmpty($errorMessage)) ? 'value is not an array' : $errorMessage;
 
-		$res = (!is_array($value)) ? $errorMessage : '';
+		$res = (!ArrayUtils::isArray($value)) ? $errorMessage : '';
 
 		return $this->_updateValidationStatus($res, $isWarning);
 	}
@@ -211,7 +205,7 @@ class ValidationManager extends BaseStrictClass{
 	public function isObject($value, $errorMessage = '', $isWarning = false){
 
 		// Set optional parameters default values
-		$errorMessage = (StringUtils::isEmpty($errorMessage)) ? 'value is not an object' : $errorMessage;
+		$errorMessage = StringUtils::isEmpty($errorMessage) ? 'value is not an object' : $errorMessage;
 
 		$res = ($value == null || !is_object($value)) ? $errorMessage : '';
 
@@ -273,10 +267,10 @@ class ValidationManager extends BaseStrictClass{
 	 */
 	public function isEqualTo($value, $value2, $errorMessage = '', $isWarning = false){
 
-		// Set optional parameters default values
-		$errorMessage = (StringUtils::isEmpty($errorMessage)) ? 'values are not equal' : $errorMessage;
+	    $validationManager = new ValidationManager();
 
-		$validationManager = new ValidationManager();
+	    // Set optional parameters default values
+		$errorMessage = (StringUtils::isEmpty($errorMessage)) ? 'values are not equal' : $errorMessage;
 
 		$res = $errorMessage;
 

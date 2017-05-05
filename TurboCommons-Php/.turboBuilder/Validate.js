@@ -20,17 +20,143 @@ var projectBaseDir = project.getProperty("basedir") + "/../";
 var projectSrcDir = projectBaseDir + '/src';
 
 
-//--------------------------------------------------------------------------------------------------------------------------------------
-// Apply the ProjectStructure rule if enabled
-if(project.getProperty("Validate.ProjectStructure.enabled") === "true"){
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//Aux methods
+
+
+function validateFilesThatMustExist(errorPrefix, path, filesThatMustExist){
 	
-	// TODO
+	for(var i = 0; i < filesThatMustExist.length; i++){
+		
+		if(!fileExists(path + filesThatMustExist[i])){
+			
+			antErrors.push(errorPrefix + path + filesThatMustExist[i] + " does not exist");
+		}
+	}
 }
 
 
-//--------------------------------------------------------------------------------------------------------------------------------------
+function validateAllowedFolders(errorPrefix, parentFolders, allowedSubFolders){
+	
+	for(i = 0; i < parentFolders.length; i++){
+		
+		var foldersList = getFoldersList(parentFolders[i]);
+		
+		for(var j = 0; j < foldersList.length; j++){
+			
+			if(!inArray(foldersList[j], allowedSubFolders)){
+					
+				antErrors.push(errorPrefix + foldersList[j] + " is not allowed inside " + parentFolders[i]);
+			}						
+		}
+	}
+}
+
+
+function validateNamespaceString(namespace, filePath, mustContain){
+	
+	if(project.getProperty("Validate.PhpNamespaces.mustContain") != ""){
+		
+		var explodedPath = filePath.split('\\').reverse();
+		
+		// Replace the wildcards on the mustContain
+		var path = filePath.split('\\');
+		path.pop();
+		
+		mustContain = mustContain.replace('$path', path.join('\\'));
+		
+		for(var i = 0; i < explodedPath.length; i++){
+			
+			mustContain = mustContain.replace('$' + String(i), explodedPath[i]);
+		}
+		
+		if(namespace.indexOf(mustContain) < 0){
+			
+			return mustContain;
+		}
+	}
+		
+	return '';
+}
+
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// Apply the ProjectStructure rule if enabled
+if(project.getProperty("Validate.ProjectStructure.enabled") !== "false"){
+	
+	validateFilesThatMustExist("Validate.ProjectStructure -> ", projectBaseDir, [".turboBuilder", "src/main", "src/test", "TurboBuilder.xml", "TurboBuilder-OneTime.properties"]);
+	
+	validateAllowedFolders("Validate.ProjectStructure -> ", [projectBaseDir + "src/main", projectBaseDir + "src/test"], ["css", "js", "ts", "php", "java", "resources"]);
+	
+	if(project.getProperty("Validate.ProjectStructure.forceAssetsFolder") !== "false" && !fileExists(projectBaseDir + "assets")){
+			
+		antErrors.push("Validate.ProjectStructure.forceAssetsFolder -> " + projectBaseDir + "assets folder does not exist");
+	}
+	
+	if(project.getProperty("Validate.ProjectStructure.forceTODOFile") !== "false" && !fileExists(projectBaseDir + "assets/TODO.txt")){
+			
+		antErrors.push("Validate.ProjectStructure.forceTODOFile -> " + projectBaseDir + "assets/TODO.txt file does not exist");
+	}
+
+	if(project.getProperty("Validate.ProjectStructure.resourcesStructure") !== "false"){
+		
+		// TODO Validate resources folders structure
+	}
+	
+	// Validate that gitIgnore file is correct
+	if(project.getProperty("Validate.ProjectStructure.phpStructure") !== "false"){
+	
+		// TODO Validate php folders structure
+	}
+	
+	if(project.getProperty("Validate.ProjectStructure.jsStructure") !== "false"){
+		
+		// TODO Validate js folders structure
+	}
+	
+	if(project.getProperty("Validate.ProjectStructure.tsStructure") !== "false"){
+		
+		// TODO Validate ts folders structure
+	}
+	
+	if(project.getProperty("Validate.ProjectStructure.javaStructure") !== "false"){
+		
+		// TODO Validate java folders structure
+	}
+	
+	if(project.getProperty("Validate.ProjectStructure.cssStructure") !== "false"){
+		
+		// TODO Validate css folders structure
+	}
+		
+	// Validate that gitIgnore file is correct
+	if(project.getProperty("Validate.ProjectStructure.checkGitIgnore") !== "false"){
+		
+		try{
+			
+			var gitIgnore = loadFileAsString(projectBaseDir + "../.gitignore");
+		
+			var gitIgnoreLines = ["target/", "bin/", "cache.properties", "TurboBuilder-OneTime.properties", 
+				".DS_Store", ".DS_Store?", ".Spotlight-V100", ".Trashes", "ehthumbs.db", "Thumbs.db", "thumbs.db"];
+			
+			for(i = 0; i < gitIgnoreLines.length; i++){
+				
+				if(gitIgnore.indexOf(gitIgnoreLines[i]) < 0){
+					
+					antErrors.push("Validate.ProjectStructure.checkGitIgnore -> " + projectBaseDir + "../.gitignore file does not contain " + gitIgnoreLines[i]);
+				}
+			}
+			
+		}catch(e){
+			
+			antErrors.push("Validate.ProjectStructure.checkGitIgnore -> " + projectBaseDir + "../.gitignore file does not exist");
+		}		
+	}	
+}
+
+
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //Apply the PhpNamespaces rule if enabled
-if(project.getProperty("Validate.PhpNamespaces.enabled") === "true"){
+if(project.getProperty("Validate.PhpNamespaces.enabled") !== "false"){
 		
 	var phpFiles = getFilesList(projectSrcDir, "**/*.php", project.getProperty("Validate.PhpNamespaces.excludes"));
 	
@@ -40,71 +166,94 @@ if(project.getProperty("Validate.PhpNamespaces.enabled") === "true"){
 		
 		if(file.indexOf("namespace") >= 0){
 
-			var fileNamespace = file.split("namespace")[1].split(";")[0];
+			var namespace = file.split("namespace")[1].split(";")[0];
 			
-			var namespace = phpFiles[i].split('\\');
-			namespace.pop();
-			namespace = namespace.join('\\');
+			var validateNamespace = validateNamespaceString(namespace, phpFiles[i], project.getProperty("Validate.PhpNamespaces.mustContain"));
 			
-			if(fileNamespace.indexOf(namespace) < 0){
-				
-				antErrors.push(phpFiles[i] + " namespace <" + fileNamespace + "> is invalid. Must contain <" + namespace + ">");
-			}
+			if(validateNamespace !== ''){
 			
-			var mustContain = project.getProperty("Validate.PhpNamespaces.mustContain");
-			
-			if(mustContain != "" && fileNamespace.indexOf(mustContain) < 0){
-				
-				antErrors.push(phpFiles[i] + " namespace <" + fileNamespace + "> is invalid. Must contain <" + mustContain + ">");
-			}
+				antErrors.push("Validate.PhpNamespaces -> " + phpFiles[i] + " namespace <" + namespace + "> is invalid. Must contain <" + validateNamespace + ">");
+			}	
 			
 		}else{
 			
 			if(project.getProperty("Validate.PhpNamespaces.mandatory") === "true"){
 			
-				antErrors.push(phpFiles[i] + " does not contain a namespace declaration");
+				antErrors.push("Validate.PhpNamespaces.mandatory -> " + phpFiles[i] + " does not contain a namespace declaration");
 			}			
 		}
 	}		
 }
 
 
-//--------------------------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Apply the Css rule if enabled
-if(project.getProperty("Validate.Css.enabled") === "true"){
+if(project.getProperty("Validate.Css.enabled") !== "false"){
 	
-	// TODO
+	// TODO - Apply w3c css validator
 }
 
 
-// --------------------------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Apply the CopyrightHeaders rule if enabled
-if(project.getProperty("Validate.CopyrightHeaders.enabled") === "true"){
+if(project.getProperty("Validate.CopyrightHeaders.enabled") !== "false"){
 	
-	var paths = project.getProperty("Validate.CopyrightHeaders.Header").split(",");
-	var appliesTo = project.getProperty("Validate.CopyrightHeaders.Header.appliesTo").split(",");
-	var includes = project.getProperty("Validate.CopyrightHeaders.Header.includes").split(",");
-	var excludes = project.getProperty("Validate.CopyrightHeaders.Header.excludes").split(",");
+	try{
 		
-	for(i = 0; i < paths.length; i++){
-		
-		var header = loadFileAsString(projectBaseDir + paths[i]);
-		
-		var files = getFilesList(projectBaseDir + appliesTo[i], includes[i], excludes[i]);
-		
-		for(var j = 0; j < files.length; j++){
+		var paths = project.getProperty("Validate.CopyrightHeaders.Header").split(",");
+		var appliesTo = project.getProperty("Validate.CopyrightHeaders.Header.appliesTo").split(",");
+		var includes = project.getProperty("Validate.CopyrightHeaders.Header.includes").split(",");
+		var excludes = project.getProperty("Validate.CopyrightHeaders.Header.excludes").split(",");
 			
-			file = loadFileAsString(projectBaseDir + appliesTo[i] + "/" + files[j]);
+		for(i = 0; i < paths.length; i++){
 			
-			if(file.indexOf(header) != 0){
+			var header = loadFileAsString(projectBaseDir + paths[i]);
+			
+			var files = getFilesList(projectBaseDir + appliesTo[i], includes[i], excludes[i]);
+			
+			for(var j = 0; j < files.length; j++){
 				
-				antErrors.push(appliesTo[i] + "/" + files[j]  + " bad copyright header. Must be as defined in " + paths[i]);
-			}
-		}	
-	}
+				file = loadFileAsString(projectBaseDir + appliesTo[i] + "/" + files[j]);
+				
+				if(file.indexOf(header) != 0){
+					
+					antErrors.push("Validate.CopyrightHeaders -> " + appliesTo[i] + "/" + files[j]  + " bad copyright header. Must be as defined in " + paths[i]);
+				}
+			}	
+		}
+		
+	}catch(e){
+		
+		antErrors.push("Validate.CopyrightHeaders -> There was a problem validating copyright headers. Check that setup is correctly defined.");
+	}	
 }
 
 
-//--------------------------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Show warnings and errors if any was generated
-echoWarningsAndErrors(antWarnings, antErrors);
+
+//Define the echo task to use for warnings and errors
+var echo = project.createTask("echo");
+var error = new org.apache.tools.ant.taskdefs.Echo.EchoLevel();
+error.setValue("error");
+echo.setLevel(error);
+
+//Display all the detected warnings
+for(i = 0; i < antWarnings.length; i++){
+
+	echo.setMessage("WARNING: " + antWarnings[i]);
+	echo.perform();
+}
+
+//Display all the detected errors
+for(i = 0; i < antErrors.length; i++){
+
+	echo.setMessage("ERROR: " + antErrors[i]);
+	echo.perform();
+}
+
+//Set a failure to the ant build if errors are present
+if(antErrors.length > 0){
+
+	project.setProperty("javascript.fail.message", "Source analisis detected errors.");
+}

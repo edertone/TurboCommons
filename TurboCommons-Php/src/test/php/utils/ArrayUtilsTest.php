@@ -24,6 +24,37 @@ use PHPUnit_Framework_TestCase;
 class ArrayUtilsTest extends PHPUnit_Framework_TestCase {
 
 
+    /**
+     * testIsArray
+     *
+     * @return void
+     */
+    public function testIsArray(){
+
+        // Test empty values
+        $this->assertTrue(!ArrayUtils::isArray(null));
+        $this->assertTrue(ArrayUtils::isArray([]));
+        $this->assertTrue(!ArrayUtils::isArray(0));
+
+        // Test correct values
+        $this->assertTrue(ArrayUtils::isArray([1]));
+        $this->assertTrue(ArrayUtils::isArray(['2']));
+        $this->assertTrue(ArrayUtils::isArray(['q']));
+        $this->assertTrue(ArrayUtils::isArray([true, false]));
+        $this->assertTrue(ArrayUtils::isArray([1, 4, 'a']));
+        $this->assertTrue(ArrayUtils::isArray([new Exception(), 67]));
+
+        // Test wrong values
+        $this->assertTrue(!ArrayUtils::isArray(1));
+        $this->assertTrue(!ArrayUtils::isArray('a'));
+        $this->assertTrue(!ArrayUtils::isArray(false));
+        $this->assertTrue(!ArrayUtils::isArray(new Exception()));
+        $this->assertTrue(!ArrayUtils::isArray((object) [
+            'a' => 1
+        ]));
+    }
+
+
 	/**
 	 * testIsEqualTo
 	 *

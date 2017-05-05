@@ -21,6 +21,19 @@ use UnexpectedValueException;
 class ArrayUtils {
 
 
+    /**
+	 * Tells if the given value is an array or not
+	 *
+	 * @param mixed $value A value to check
+	 *
+	 * @return boolean true if the given value is an array, false otherwise
+	 */
+    public static function isArray($value){
+
+        return is_array($value);
+    }
+
+
 	/**
 	 * Check if two provided arrays are identical
 	 *

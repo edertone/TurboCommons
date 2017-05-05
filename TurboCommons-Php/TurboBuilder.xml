@@ -4,7 +4,8 @@
 
 	<Build>
 	
-		<Php createPhar="true" />
+		<Php enabled="true"
+			 createPhar="true" />
 	
 	</Build>
 
@@ -18,8 +19,7 @@
 
 		<PhpNamespaces enabled="true"
 					   mandatory="true"
-					   forcePath="true"
-					   mustContain="org\turbocommons\src"
+					   mustContain="org\turbocommons\src\$path"
 					   excludes="**/AutoLoader.php,**/index.php" />
 
 		<Css enabled="false" />
@@ -27,12 +27,7 @@
 		<CopyrightHeaders enabled="true">
 		
 			<Header path="assets/copyrightHeaders/TurboCommons-Generic.txt" 
-					appliesTo="src/main/php"
-					includes=""
-					excludes="" />
-			
-			<Header path="assets/copyrightHeaders/TurboCommons-Generic.txt" 
-					appliesTo="src/test/php"
+					appliesTo="src"
 					includes="**/*.php"
 					excludes="" />
 		

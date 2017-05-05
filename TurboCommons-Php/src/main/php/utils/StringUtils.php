@@ -12,7 +12,6 @@
 namespace org\turbocommons\src\main\php\utils;
 
 use InvalidArgumentException;
-use UnexpectedValueException;
 use org\turbocommons\src\main\php\managers\FilesManager;
 
 
@@ -79,6 +78,19 @@ class StringUtils {
 
 
 	/**
+	 * Tells if the given value is a string or not
+	 *
+	 * @param mixed $value A value to check
+	 *
+	 * @return boolean true if the given value is a string, false otherwise
+	 */
+	public static function isString($value){
+
+	    return is_string($value);
+	}
+
+
+	/**
 	 * Tells if a specified string is empty. The string may contain empty spaces, and new line characters but have some lenght, and therefore be EMPTY.
 	 * This method checks all these different conditions that can tell us that a string is empty.
 	 *
@@ -91,7 +103,7 @@ class StringUtils {
 
 		$aux = '';
 
-		// Note that we are checking emptyness every time we do a replace to improve speed, avoiding unnecessary replacements.
+		// Empty or null value is considered empty
 		if($string == null || $string == ''){
 
 			return true;
@@ -333,9 +345,9 @@ class StringUtils {
 	 */
 	public static function limitLen($string, $limit = 100, $limiterString = ' ...'){
 
-		if(!is_numeric($limit)){
+	    if($limit <= 0 || !is_numeric($limit)){
 
-			throw new InvalidArgumentException('StringUtils->limitLen: limit must be a numeric value');
+			throw new InvalidArgumentException('StringUtils->limitLen: limit must be a positive numeric value');
 		}
 
 		if(!is_string($string)){

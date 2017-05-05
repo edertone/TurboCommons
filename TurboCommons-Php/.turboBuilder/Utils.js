@@ -1,8 +1,47 @@
 "use strict";
 
 /**
+ * --------------------------------------------------------------------------------------------------------------------------------------
  * Utility methods used by TurboBuilder
+ * --------------------------------------------------------------------------------------------------------------------------------------
  */
+
+
+/**
+ * Check that the specified value is found inside an array
+ */
+function inArray(value, array){
+	
+	for(var i = 0; i < array.length; i++){
+		
+		if(array[i] === value){
+			
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+
+/**
+ * Check if the specified file or folder exists or not
+ */
+function fileExists(path){
+
+	try{
+	
+		var f = new java.io.File(path);
+	    
+		return f.exists();
+		
+	}catch(e){
+
+		// Nothing to do
+	}
+	
+	return false;
+}
 
 
 /**
@@ -30,6 +69,35 @@ function loadFileAsString(path, replaceWhiteSpaces){
 	}
 
 	return lines;
+}
+
+
+/**
+ * Get a list with all the first level folders inside the specified path.
+ * 
+ * @param path A full file system path from which we want to get the list of first level folders
+ * 
+ * @returns An array containing all the first level folders inside the given path. Each array element will be 
+ * relative to the provided path. For example, if we provide "src/main" as path, 
+ * resulting folders may be like "php", "css", ... and so.
+ */
+function getFoldersList(path){
+	
+	var ds = project.createDataType("dirset");
+	
+	ds.setDir(new java.io.File(path));
+	ds.setIncludes("*");
+	
+	var srcFolders = ds.getDirectoryScanner(project).getIncludedDirectories();
+    
+    var result = [];
+    
+    for (var i = 0; i<srcFolders.length; i++){
+        
+    	result.push(srcFolders[i]);
+    }
+    
+    return result;
 }
 
 
@@ -78,33 +146,98 @@ function getFilesList(path, includes, excludes){
 
 
 /**
- * Output to ant console the warnings and errors if exist
+ * Copy all the contents from the given folder to another specified folder.
+ * 
+ * @param source A file system path where the files and folders to copy are found.
+ * @param dest A file system path where the source files and folders will be copied.
+ * 
+ * @returns void
  */
-function echoWarningsAndErrors(antWarnings, antErrors){
+function copyFolderTo(source, dest){
 	
-	//Define the echo task to use for warnings and errors
+	var fs = project.createDataType("fileset");
+
+	fs.setDir(new java.io.File(source));
+    	
+	var copy = project.createTask("copy");
+	
+	copy.setTodir(new java.io.File(dest));
+	copy.setOverwrite(true);
+	copy.addFileset(fs);
+	copy.perform();
+}
+
+
+/**
+ * Copy the specified file to the specified folder.
+ * 
+ * @param source A file system path including the filename that will be copied
+ * @param dest A file system path where the file will be copied.
+ * 
+ * @returns void
+ */
+function copyFileTo(source, dest){
+	
+	var copy = project.createTask("copy");
+	
+	copy.setFile(new java.io.File(source));
+	copy.setTodir(new java.io.File(dest));
+	copy.setOverwrite(true);
+	copy.perform();
+}
+
+
+/**
+ * Create a file with the specified content
+ * 
+ * @param path Full path including the file name to be created
+ * @param contents String containing the text to be written to the file
+ * 
+ * @returns void
+ */
+function createFile(path, contents){
+	
 	var echo = project.createTask("echo");
-	var error = new org.apache.tools.ant.taskdefs.Echo.EchoLevel();
-	error.setValue("error");
-	echo.setLevel(error);
+	
+	echo.setFile(new java.io.File(path));
+	echo.setMessage(contents);
+	echo.perform();
+}
 
-	//Display all the detected warnings
-	for(var i = 0; i < antWarnings.length; i++){
 
-		echo.setMessage("WARNING: " + antWarnings[i]);
-		echo.perform();
-	}
+/**
+ * change the name of a file
+ * 
+ * @param from Full path including the file name to be renamed
+ * @param to Full path including the file name that will be assigned
+ * 
+ * @returns void
+ */
+function renameFile(from, to){
+	
+	var move = project.createTask("move");
+	
+	move.setFile(new java.io.File(from));
+	move.setTofile(new java.io.File(to));
+	move.perform();
+}
 
-	//Display all the detected errors
-	for(i = 0; i < antErrors.length; i++){
 
-		echo.setMessage("ERROR: " + antErrors[i]);
-		echo.perform();
-	}
+/**
+ * Open an url with the specified browser
+ * 
+ * @param url Url to open 
+ * @param browserExecutable Full path to the browser executable
+ * 
+ * @returns void
+ */
+function launchOnBrowser(url, browserExecutable){
+	
+	var exec = project.createTask("exec");
+	exec.setExecutable(browserExecutable);
+	exec.setSpawn(true);
 
-	//Set a failure to the ant build if errors are present
-	if(antErrors.length > 0){
-
-		project.setProperty("javascript.fail.message", "Source analisis detected errors.");
-	}
+	exec.createArg().setLine(encodeURI(url));
+	
+	exec.perform();
 }
