@@ -152,9 +152,9 @@
 										</xs:annotation>
 									</xs:attribute>
 									
-									<xs:attribute name="compilerAlwaysStrict" use="required" type="xs:boolean">
+									<xs:attribute name="compilerStrict" use="required" type="xs:boolean">
 										<xs:annotation>
-											<xs:documentation>Enable or disable the generation of "use strict" on the generated javascript files. It is recommended to enable it.</xs:documentation>
+											<xs:documentation>Enable or disable --strict tag for the compiler. It is recommended to enable it cause it forces lot of strict checkings that are recommended for stronger code</xs:documentation>
 										</xs:annotation>
 									</xs:attribute>
 									
@@ -328,23 +328,22 @@
 										</xs:annotation>
 									</xs:attribute>
 									
-									<xs:attribute name="forcePath" use="optional" default="true" type="xs:boolean">
-										<xs:annotation>
-											<xs:documentation>
-												If enabled, all namespaces declared on all php files inside the project must contain the file path after main folder. 
-												For example, a file located at: 'src\main\php\managers\' must have a namespace that contains 'php\managers\'
-											</xs:documentation>
-										</xs:annotation>
-									</xs:attribute>	
-									
 									<xs:attribute name="mustContain" use="optional" default="" type="xs:string">
 										<xs:annotation>
 											<xs:documentation>
-												Specifies a string that must be present on the namespace to be considered valid
+												Defines one or more string values (coma separated) that must be found on the declared namespaces.&lt;br&gt;
+												Wildcards can be used to include parts of the file path into the namespace validation. Possible wildcards are:&lt;br&gt;
+												- $path : The full path from src\ to the file. For example, a file located at 'src\main\php\managers\File.php' will have 'main\php\managers' as the $path value.&lt;br&gt;
+												- $i : an item from the file path, where i is a numeric index starting from the right most path item.&lt;br&gt;
+												For example, for a file located at 'src\main\php\managers\File.php':&lt;br&gt;
+												- mustContain='myspace\and\$path' : Will require that declared domain contains 'myspace\and\main\php\managers'.&lt;br&gt;
+												- mustContain='myspace\and\$0' : Will require that declared domain contains 'myspace\and\File.php'.&lt;br&gt;
+												- mustContain='myspace\and\$1\' : Will require that declared domain contains 'myspace\and\managers\'.&lt;br&gt;
+												- mustContain='myspace\and\$0\$1' : Will require that declared domain contains 'myspace\and\File.php\managers'.&lt;br&gt;
 											</xs:documentation>
 										</xs:annotation>
 									</xs:attribute>	
-									
+																		
 									<xs:attribute name="excludes" use="optional" default="" type="xs:string">
 										<xs:annotation>
 											<xs:documentation>
@@ -384,27 +383,81 @@
 										</xs:annotation>
 									</xs:attribute>
 									
-									<xs:attribute name="forcePath" use="optional" default="true" type="xs:boolean">
-										<xs:annotation>
-											<xs:documentation>
-												If enabled, all namespaces declared on all Js files inside the project must contain the file path after main folder. 
-												For example, a file located at: 'src\main\js\managers\' must have a namespace that contains 'js_managers'
-											</xs:documentation>
-										</xs:annotation>
-									</xs:attribute>	
-									
 									<xs:attribute name="mustContain" use="optional" default="" type="xs:string">
 										<xs:annotation>
 											<xs:documentation>
-												Specifies a string that must be present on the namespace to be considered valid
+												Defines one or more string values (coma separated) that must be found on the declared namespaces.&lt;br&gt;
+												Wildcards can be used to include parts of the file path into the namespace validation. Possible wildcards are:&lt;br&gt;
+												- $path : The full path from src\ to the file. For example, a file located at 'src\main\js\managers\File.js' will have 'main\js\managers' as the $path value.&lt;br&gt;
+												- $i : an item from the file path, where i is a numeric index starting from the right most path item.&lt;br&gt;
+												For example, for a file located at 'src\main\js\managers\File.js':&lt;br&gt;
+												- mustContain='myspace\and\$path' : Will require that declared domain contains 'myspace\and\main\js\managers'.&lt;br&gt;
+												- mustContain='myspace\and\$0' : Will require that declared domain contains 'myspace\and\File.js'.&lt;br&gt;
+												- mustContain='myspace\and\$1\' : Will require that declared domain contains 'myspace\and\managers\'.&lt;br&gt;
+												- mustContain='myspace\and\$0\$1' : Will require that declared domain contains 'myspace\and\File.js\managers'.&lt;br&gt;
 											</xs:documentation>
 										</xs:annotation>
-									</xs:attribute>	
+									</xs:attribute>
 									
 									<xs:attribute name="excludes" use="optional" default="" type="xs:string">
 										<xs:annotation>
 											<xs:documentation>
 												comma- or space-separated list of patterns of files that must be excluded; no files (except default excludes) are excluded when omitted. For example: "**" , "**/*.js"
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>		
+																	
+								</xs:complexType>
+								
+							</xs:element>
+							
+							<!-- TsNamespaces element -->
+							<xs:element name="TsNamespaces" minOccurs="0" maxOccurs="1">
+								
+								<xs:annotation>
+									<xs:documentation>
+										A validation rule that verifies that all Ts files on the project declare a well formed namespace.
+									</xs:documentation>
+								</xs:annotation>
+								
+								<xs:complexType>
+								
+									<xs:attribute name="enabled" use="required" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												Activates or deactivates the Ts namespaces validation rule
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="mandatory" use="optional" default="true" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>
+												Forces that all Ts files inside this project must have a defined namespace
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="mustContain" use="optional" default="" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>
+												Defines one or more string values (coma separated) that must be found on the declared namespaces.&lt;br&gt;
+												Wildcards can be used to include parts of the file path into the namespace validation. Possible wildcards are:&lt;br&gt;
+												- $path : The full path from src\ to the file. For example, a file located at 'src\main\ts\managers\File.ts' will have 'main\ts\managers' as the $path value.&lt;br&gt;
+												- $i : an item from the file path, where i is a numeric index starting from the right most path item.&lt;br&gt;
+												For example, for a file located at 'src\main\ts\managers\File.ts':&lt;br&gt;
+												- mustContain='myspace\and\$path' : Will require that declared domain contains 'myspace\and\main\ts\managers'.&lt;br&gt;
+												- mustContain='myspace\and\$0' : Will require that declared domain contains 'myspace\and\File.ts'.&lt;br&gt;
+												- mustContain='myspace\and\$1\' : Will require that declared domain contains 'myspace\and\managers\'.&lt;br&gt;
+												- mustContain='myspace\and\$0\$1' : Will require that declared domain contains 'myspace\and\File.ts\managers'.&lt;br&gt;
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									
+									<xs:attribute name="excludes" use="optional" default="" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>
+												comma- or space-separated list of patterns of files that must be excluded; no files (except default excludes) are excluded when omitted. For example: "**" , "**/*.ts"
 											</xs:documentation>
 										</xs:annotation>
 									</xs:attribute>		

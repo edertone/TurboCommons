@@ -7,7 +7,7 @@
 		<Ts enabled="true"
 			createMergedJs="true"
 			compilerDeclarationFile="true"
-			compilerAlwaysStrict="true"
+			compilerStrict="true"
 			compilerSourceMap="false"
 			compilerTargets="ES3,ES5,ES6" />
 		   
@@ -17,6 +17,11 @@
 	
 	<Validate enabled="true">
 	
+		<TsNamespaces enabled="true"
+				   	  mandatory="true"		
+				   	  mustContain="org_turbocommons_,$1"
+				   	  excludes="**/test/**" />
+				   	  
 		<CopyrightHeaders enabled="true">
 		
 			<Header path="assets/copyrightHeaders/TsFiles-Header.txt" 

@@ -80,7 +80,7 @@
 		<property name="Build.Java.createJar" value="false" />
 		<property name="Build.Ts.enabled" value="false" />
 		<property name="Build.Ts.createMergedJs" value="false" />
-		<property name="Build.Ts.compilerAlwaysStrict" value="true" />
+		<property name="Build.Ts.compilerStrict" value="true" />
 		<property name="Build.Ts.compilerSourceMap" value="false" />
 		<property name="Build.Ts.compilerTargets" value="ES3,ES5,ES6" />
 
@@ -326,8 +326,8 @@
 						
 						exec.createArg().setLine('--alwaysStrict');	
 						
-						if(project.getProperty("Build.Ts.compilerAlwaysStrict") != "false"){
-							exec.createArg().setLine('--alwaysStrict');
+						if(project.getProperty("Build.Ts.compilerStrict") != "false"){
+							exec.createArg().setLine('--strict');
 						}
 			
 						if(project.getProperty("Build.Ts.compilerDeclarationFile") != "false"){
@@ -352,8 +352,8 @@
 						exec.setFailonerror(true);
 						exec.setExecutable(project.getProperty("Tools.tsCompilerPath"));
 						
-						if(project.getProperty("Build.Ts.compilerAlwaysStrict") != "false"){
-							exec.createArg().setLine('--alwaysStrict');
+						if(project.getProperty("Build.Ts.compilerStrict") != "false"){
+							exec.createArg().setLine('--strict');
 						}
 			
 						if(project.getProperty("Build.Ts.compilerDeclarationFile") != "false"){
@@ -438,8 +438,8 @@
 		<delete dir="${Test.Js.localServerPath}/${projectBaseName}-unitTests" failonerror="true" />
 
 		<!-- Copy all the test files to local server -->
-		<copy todir="${Test.Js.localServerPath}/${projectBaseName}-unitTests/ts" overwrite="true">
-			<fileset dir="${srcFolderPath}/test/ts" casesensitive="false" />
+		<copy todir="${Test.Js.localServerPath}/${projectBaseName}-unitTests/js" overwrite="true">
+			<fileset dir="${srcFolderPath}/test/js" casesensitive="false" />
 		</copy>
 
 		<!-- Append all the Js code that needs to be tested to the index.js file -->
@@ -547,14 +547,15 @@
 					var fs = project.createDataType("fileset");
 					
 					fs.setCaseSensitive(false);
-					fs.setDir(new java.io.File(targetFolderPath + '/' + projectBaseName));
-				
+					
 					if(project.getProperty("Release.generate") == "true"){
 			
-						fs.setIncludes(projectBaseName + '-' + 'targets[i]' + '-' + buildVersionNumber + '.' + buildNumber + '.min.js');
+						fs.setDir(new java.io.File(targetFolderPath + '/' + projectBaseName + '-' + buildVersionNumber + '.' + buildNumber));
+						fs.setIncludes(projectBaseName + '-' + targets[i] + '-' + buildVersionNumber + '.' + buildNumber + '.min.js');
 	
 					}else{
 						
+						fs.setDir(new java.io.File(targetFolderPath + '/' + projectBaseName));
 						fs.setIncludes(projectBaseName + '-' + targets[i] + '.js');
 					}
 				

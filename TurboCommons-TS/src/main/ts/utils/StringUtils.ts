@@ -29,8 +29,14 @@ namespace org_turbocommons_utils {
     export class StringUtils {
         
         
-        /** TODO - implementar en php tb i fer testos */
-        public static isString(value:any) {
+        /**
+         * Tells if the given value is a string or not
+         *
+         * @param {any} value A value to check
+         *
+         * @returns {boolean} true if the given value is a string, false otherwise
+         */
+        public static isString(value:any):boolean {
             
             return (typeof value === 'string' || value instanceof String);
         }
@@ -132,10 +138,10 @@ namespace org_turbocommons_utils {
          *
          * @returns int The number of words (elements divided by the wordSeparator value) that are present on the string
          */
-        public static countWords(string:string, wordSeparator:string = '') {
+        public static countWords(string:string, wordSeparator:string = ' ') {
             
             var count:number = 0;
-            var lines:string[] = [];//StringUtils.getLines(string);
+            var lines:string[] = StringUtils.getLines(string);
     
             for(var i = 0; i < lines.length; i++){
     
@@ -266,7 +272,7 @@ namespace org_turbocommons_utils {
          *
          * @returns {array} A list with all the string lines sepparated as different array elements.
          */
-        public static getLines(string:string, filters:string[] = ['/\s+/']) {
+        public static getLines(string:string, filters:RegExp[] = [/\s+/g]) {
         
             var res:string[] = [];
     
@@ -315,7 +321,7 @@ namespace org_turbocommons_utils {
          */
         public static getFileNameWithExtension(path:string){
         
-            var osSeparator = org_turbocommons_utils.FileSystemUtils.getDirectorySeparator();
+            var osSeparator:string = (new org_turbocommons_managers.FilesManager()).getDirectorySeparator();
     
             if(StringUtils.isEmpty(path)){
     
@@ -441,9 +447,9 @@ namespace org_turbocommons_utils {
          *
          * @returns string The correctly formatted path without any trailing directory separator
          */
-        public static formatPath(path:string) {
+        public static formatPath(path:string):string {
         
-            var osSeparator = org_turbocommons_utils.FileSystemUtils.getDirectorySeparator();
+           var osSeparator:string = (new org_turbocommons_managers.FilesManager()).getDirectorySeparator();
     
             if(path == null || path == undefined){
     
@@ -820,7 +826,7 @@ namespace org_turbocommons_utils {
                 'letters' : '\u007A\u24E9\uFF5A\u017A\u1E91\u017C\u017E\u1E93\u1E95\u01B6\u0225\u0240\u2C6C\uA763'
             }];
     
-            var diacriticsMap:object = {};
+            var diacriticsMap:any = {};
     
             for(var i:number = 0; i < defaultDiacriticsRemovalMap.length; i++){
     
