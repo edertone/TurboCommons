@@ -207,7 +207,7 @@ class ValidationManager extends BaseStrictClass{
 		// Set optional parameters default values
 		$errorMessage = StringUtils::isEmpty($errorMessage) ? 'value is not an object' : $errorMessage;
 
-		$res = ($value == null || !is_object($value)) ? $errorMessage : '';
+		$res = (!ObjectUtils::isObject($value)) ? $errorMessage : '';
 
 		return $this->_updateValidationStatus($res, $isWarning);
 	}

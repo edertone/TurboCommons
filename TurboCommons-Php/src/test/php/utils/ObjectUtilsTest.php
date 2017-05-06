@@ -26,6 +26,42 @@ use Exception;
 class ObjectUtilsTest extends PHPUnit_Framework_TestCase {
 
 
+    /**
+     * testIsObject
+     *
+     * @return void
+     */
+    public function testIsObject(){
+
+        // test empty values
+        $this->assertTrue(!ObjectUtils::isObject(null));
+        $this->assertTrue(!ObjectUtils::isObject(''));
+        $this->assertTrue(!ObjectUtils::isObject([]));
+        $this->assertTrue(!ObjectUtils::isObject(0));
+        $this->assertTrue(ObjectUtils::isObject(new stdClass()));
+
+        // Test valid values
+        $this->assertTrue(ObjectUtils::isObject(new Exception()));
+        $this->assertTrue(ObjectUtils::isObject(((object) [
+            '1' => 1
+        ])));
+        $this->assertTrue(ObjectUtils::isObject(((object) [
+            'a' => 'hello'
+        ])));
+        $this->assertTrue(ObjectUtils::isObject(((object) [
+            'a' => 1,
+            'b' => 2,
+            'c' => 3
+        ])));
+
+        // Test invalid values
+        $this->assertTrue(!ObjectUtils::isObject(874));
+        $this->assertTrue(!ObjectUtils::isObject('hello'));
+        $this->assertTrue(!ObjectUtils::isObject([123]));
+        $this->assertTrue(!ObjectUtils::isObject([1, 'aaa']));
+    }
+
+
 	/**
 	 * testGetKeys
 	 *

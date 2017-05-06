@@ -22,6 +22,19 @@ use UnexpectedValueException;
 class ObjectUtils {
 
 
+    /**
+     * Tells if the given value is an object or not
+     *
+     * @param mixed $value A value to check
+     *
+     * @return boolean true if the given value is an object, false otherwise
+     */
+    public static function isObject($value){
+
+        return is_object($value);
+    }
+
+
 	/**
 	 * Get the list of literals for a given object. Note that only 1rst depth keys are providen
 	 *
@@ -32,9 +45,8 @@ class ObjectUtils {
 	public static function getKeys($object){
 
 		$res = [];
-		$validationManager = new ValidationManager();
 
-		if(!$validationManager->isObject($object)){
+		if(!ObjectUtils::isObject($object)){
 
 			throw new UnexpectedValueException('ObjectUtils->getKeys: Provided parameter must be an object');
 		}
