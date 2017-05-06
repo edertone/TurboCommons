@@ -1,1 +1,1 @@
-- Try to reduce the usage of namespace full string by replacing by this or an object if necessary. This will reduce final file size.
+- Turbocommons JS is deprecated. Now all the code will be moved to Typescript, and all javascript versions will be auto generated.
