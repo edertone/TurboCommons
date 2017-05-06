@@ -25,6 +25,41 @@ QUnit.module("ObjectUtilsTest", {
 
 
 /**
+ * isObject
+ */
+QUnit.test("isObject", function(assert) {
+
+    // test empty values
+    assert.ok(!ObjectUtils.isObject(null));
+    assert.ok(!ObjectUtils.isObject(undefined));
+    assert.ok(!ObjectUtils.isObject(''));
+    assert.ok(!ObjectUtils.isObject([]));
+    assert.ok(!ObjectUtils.isObject(0));
+    assert.ok(ObjectUtils.isObject({}));
+
+    // Test valid values
+    assert.ok(ObjectUtils.isObject(new Error()));
+    assert.ok(ObjectUtils.isObject({
+        1 : 1
+    }));
+    assert.ok(ObjectUtils.isObject({
+        a : 'hello'
+    }));
+    assert.ok(ObjectUtils.isObject({
+        a : 1,
+        b : 2,
+        c : 3
+    }));
+
+    // Test invalid values
+    assert.ok(!ObjectUtils.isObject(874));
+    assert.ok(!ObjectUtils.isObject('hello'));
+    assert.ok(!ObjectUtils.isObject([123]));
+    assert.ok(!ObjectUtils.isObject([1, 'aaa']));
+});
+
+
+/**
  * getKeys
  */
 QUnit.test("getKeys", function(assert) {
