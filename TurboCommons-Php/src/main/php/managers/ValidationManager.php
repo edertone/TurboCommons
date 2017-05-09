@@ -56,7 +56,7 @@ class ValidationManager extends BaseStrictClass{
 	/**
 	 * Validation will fail if specified value is not a true boolean value
 	 *
-	 * @param boolean $value A boolean expression to validate
+	 * @param mixed $value A boolean expression to validate
 	 * @param string $errorMessage The error message that will be generated if validation fails
 	 * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
 	 *
@@ -65,9 +65,9 @@ class ValidationManager extends BaseStrictClass{
 	public function isTrue($value, $errorMessage = '', $isWarning = false){
 
 		// Set optional parameters default values
-		$errorMessage = (StringUtils::isEmpty($errorMessage)) ? 'value is not true' : $errorMessage;
+		$errorMessage = StringUtils::isEmpty($errorMessage) ? 'value is not true' : $errorMessage;
 
-		$res = (!$value) ? $errorMessage : '';
+		$res = $value !== true ? $errorMessage : '';
 
 		return $this->_updateValidationStatus($res, $isWarning);
 	}
@@ -76,7 +76,7 @@ class ValidationManager extends BaseStrictClass{
 	/**
 	 * Validation will fail if specified value is not a boolean
 	 *
-	 * @param boolean $value The boolean to validate
+	 * @param mixed $value The boolean to validate
 	 * @param string $errorMessage The error message that will be generated if validation fails
 	 * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
 	 *
@@ -85,7 +85,7 @@ class ValidationManager extends BaseStrictClass{
 	public function isBoolean($value, $errorMessage = '', $isWarning = false){
 
 		// Set optional parameters default values
-		$errorMessage = (StringUtils::isEmpty($errorMessage)) ? 'value is not a boolean' : $errorMessage;
+		$errorMessage = StringUtils::isEmpty($errorMessage) ? 'value is not a boolean' : $errorMessage;
 
 		$res = !is_bool($value) ? $errorMessage : '';
 
@@ -96,7 +96,7 @@ class ValidationManager extends BaseStrictClass{
 	/**
 	 * Validation will fail if specified value is not numeric
 	 *
-	 * @param Number $value The number to validate
+	 * @param mixed $value The number to validate
 	 * @param string $errorMessage The error message that will be generated if validation fails
 	 * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
 	 *
@@ -105,7 +105,7 @@ class ValidationManager extends BaseStrictClass{
 	public function isNumeric($value, $errorMessage = '', $isWarning = false){
 
 		// Set optional parameters default values
-		$errorMessage = (StringUtils::isEmpty($errorMessage)) ? 'value is not a number' : $errorMessage;
+		$errorMessage = StringUtils::isEmpty($errorMessage) ? 'value is not a number' : $errorMessage;
 
 		$res = (!is_numeric($value)) ? $errorMessage : '';
 
@@ -116,7 +116,7 @@ class ValidationManager extends BaseStrictClass{
 	/**
 	 * Validation will fail if specified value is not a string
 	 *
-	 * @param string $value The element to validate
+	 * @param mixed $value The element to validate
 	 * @param string $errorMessage The error message that will be generated if validation fails
 	 * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
 	 *
@@ -125,7 +125,7 @@ class ValidationManager extends BaseStrictClass{
 	public function isString($value, $errorMessage = '', $isWarning = false){
 
 		// Set optional parameters default values
-		$errorMessage = (StringUtils::isEmpty($errorMessage)) ? 'value is not a string' : $errorMessage;
+		$errorMessage = StringUtils::isEmpty($errorMessage) ? 'value is not a string' : $errorMessage;
 
 		$res = (!StringUtils::isString($value)) ? $errorMessage : '';
 
@@ -136,7 +136,7 @@ class ValidationManager extends BaseStrictClass{
 	/**
 	 * Validation will fail if specified value is not an url
 	 *
-	 * @param string $value The element to validate
+	 * @param mixed $value The element to validate
 	 * @param string $errorMessage The error message that will be generated if validation fails
 	 * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
 	 *
@@ -176,7 +176,7 @@ class ValidationManager extends BaseStrictClass{
 	/**
 	 * Validation will fail if specified value is not an array
 	 *
-	 * @param array $value The array to validate
+	 * @param mixed $value The array to validate
 	 * @param string $errorMessage The error message that will be generated if validation fails
 	 * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
 	 *
@@ -185,7 +185,7 @@ class ValidationManager extends BaseStrictClass{
 	public function isArray($value, $errorMessage = '', $isWarning = false){
 
 		// Set optional parameters default values
-		$errorMessage = (StringUtils::isEmpty($errorMessage)) ? 'value is not an array' : $errorMessage;
+		$errorMessage = StringUtils::isEmpty($errorMessage) ? 'value is not an array' : $errorMessage;
 
 		$res = (!ArrayUtils::isArray($value)) ? $errorMessage : '';
 
@@ -196,7 +196,7 @@ class ValidationManager extends BaseStrictClass{
 	/**
 	 * Validation will fail if specified value is not an object
 	 *
-	 * @param object $value The object to validate
+	 * @param mixed $value The object to validate
 	 * @param string $errorMessage The error message that will be generated if validation fails
 	 * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
 	 *
@@ -226,10 +226,10 @@ class ValidationManager extends BaseStrictClass{
 	 *
 	 * @return boolean False in case the validation fails or true if validation succeeds.
 	 */
-	public function isFilledIn($value, $emptyChars = [], $errorMessage = '', $isWarning = false){
+	public function isFilledIn($value, array $emptyChars = [], $errorMessage = '', $isWarning = false){
 
 		// Set optional parameters default values
-		$errorMessage = (StringUtils::isEmpty($errorMessage)) ? 'value is required' : $errorMessage;
+		$errorMessage = StringUtils::isEmpty($errorMessage) ? 'value is required' : $errorMessage;
 
 		$res = StringUtils::isEmpty($value, $emptyChars) ? $errorMessage : '';
 
@@ -258,8 +258,8 @@ class ValidationManager extends BaseStrictClass{
 	/**
 	 * Validation will fail if specified elements are not identical.
 	 *
-	 * @param object $value First of the two objects to compare. Almost any type can be provided: ints, strings, arrays...
-	 * @param object $value2 Second of the two objects to compare. Almost any type can be provided: ints, strings, arrays...
+	 * @param mixed $value First of the two objects to compare. Almost any type can be provided: ints, strings, arrays...
+	 * @param mixed $value2 Second of the two objects to compare. Almost any type can be provided: ints, strings, arrays...
 	 * @param string $errorMessage The error message that will be generated if validation fails
 	 * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
 	 *
@@ -270,7 +270,7 @@ class ValidationManager extends BaseStrictClass{
 	    $validationManager = new ValidationManager();
 
 	    // Set optional parameters default values
-		$errorMessage = (StringUtils::isEmpty($errorMessage)) ? 'values are not equal' : $errorMessage;
+		$errorMessage = StringUtils::isEmpty($errorMessage) ? 'values are not equal' : $errorMessage;
 
 		$res = $errorMessage;
 
@@ -376,26 +376,19 @@ class ValidationManager extends BaseStrictClass{
 	 */
 	private function _updateValidationStatus($errorMessage, $isWarning){
 
-		// If we are currently in an error state, nothing to do
-		if($this->validationStatus == self::VALIDATION_ERROR){
-
-			return $errorMessage == '';
-		}
-
 		// If the validation fails, we must change the validation status
 		if($errorMessage != ''){
 
-			$this->failedMessagesList[] = $errorMessage;
+		    $this->failedMessagesList[] = $errorMessage;
+		    $this->lastMessage = $errorMessage;
 
-			if($isWarning){
+		    if($isWarning){
 
-				$this->failedStatusList [] = self::VALIDATION_WARNING;
-				$this->lastMessage = $errorMessage;
+				$this->failedStatusList[] = self::VALIDATION_WARNING;
 
 			}else{
 
 				$this->failedStatusList[] = self::VALIDATION_ERROR;
-				$this->lastMessage = $errorMessage;
 			}
 
 			if($isWarning && $this->validationStatus != self::VALIDATION_ERROR){
