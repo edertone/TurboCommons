@@ -17,7 +17,7 @@ namespace org_turbocommons_utils {
      * This is a static class, so no instance needs to be created.
      * Usage example:
      * 
-     * var ns = org_turbocommons_src_main_js_utils;
+     * var ns = org_turbocommons_utils;
      * 
      * var result1 = ns.StringUtils.isEmpty('   ');
      * var result2 = ns.StringUtils.countWords('hello');
