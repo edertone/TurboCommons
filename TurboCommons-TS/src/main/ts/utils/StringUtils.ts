@@ -174,9 +174,11 @@ namespace org_turbocommons_utils {
          */
         public static limitLen(string:string, limit:number = 100, limiterString:string = ' ...') {
             
-            if(limit <= 0 || !(!isNaN(Number(limit)) && isFinite(limit))){
+            var NumericUtils = org_turbocommons_utils.NumericUtils;
+            
+            if(limit <= 0 || !NumericUtils.isNumeric(limit)){
     
-                throw new Error("StringUtils.limitLen: limit must be a positive numeric value");
+                throw new Error('StringUtils.limitLen: limit must be a positive numeric value');
             }
     
             if(!StringUtils.isString(string)){

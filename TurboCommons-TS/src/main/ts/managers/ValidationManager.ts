@@ -106,12 +106,13 @@ namespace org_turbocommons_managers {
          */
         public isNumeric(value:any, errorMessage:string = '', isWarning:boolean = false):boolean {
         
+            var NumericUtils = org_turbocommons_utils.NumericUtils;
             var StringUtils = org_turbocommons_utils.StringUtils;
            
             // Set optional parameters default values
             errorMessage = StringUtils.isEmpty(errorMessage) ? 'value is not a number' : errorMessage;
             
-            var res:string = (!(!isNaN(parseFloat(value)) && isFinite(value))) ? errorMessage : '';
+            var res:string = !NumericUtils.isNumeric(value) ? errorMessage : '';
         
             return this._updateValidationStatus(res, isWarning);
         }
