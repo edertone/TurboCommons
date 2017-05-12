@@ -12,6 +12,7 @@
 namespace org\turbocommons\src\main\php\managers;
 
 use org\turbocommons\src\main\php\model\BaseStrictClass;
+use org\turbocommons\src\main\php\utils\NumericUtils;
 use org\turbocommons\src\main\php\utils\StringUtils;
 use org\turbocommons\src\main\php\utils\ArrayUtils;
 use org\turbocommons\src\main\php\utils\ObjectUtils;
@@ -107,7 +108,7 @@ class ValidationManager extends BaseStrictClass{
 		// Set optional parameters default values
 		$errorMessage = StringUtils::isEmpty($errorMessage) ? 'value is not a number' : $errorMessage;
 
-		$res = (!is_numeric($value)) ? $errorMessage : '';
+		$res = !NumericUtils::isNumeric($value) ? $errorMessage : '';
 
 		return $this->_updateValidationStatus($res, $isWarning);
 	}

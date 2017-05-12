@@ -345,12 +345,12 @@ class StringUtils {
 	 */
 	public static function limitLen($string, $limit = 100, $limiterString = ' ...'){
 
-	    if($limit <= 0 || !is_numeric($limit)){
+	    if($limit <= 0 || !NumericUtils::isNumeric($limit)){
 
 			throw new InvalidArgumentException('StringUtils->limitLen: limit must be a positive numeric value');
 		}
 
-		if(!is_string($string)){
+		if(!StringUtils::isString($string)){
 
 			return '';
 		}
@@ -470,7 +470,7 @@ class StringUtils {
 
     		foreach($words as $key => $v){
 
-    			if($v == $i && (!is_numeric($key) || (is_numeric($key) && !$ignoreNumericWords))){
+    		    if($v == $i && (!NumericUtils::isNumeric($key) || (NumericUtils::isNumeric($key) && !$ignoreNumericWords))){
 
     				$res[] = $key;
     			}

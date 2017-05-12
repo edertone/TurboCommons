@@ -118,7 +118,7 @@ class PdfUtils {
 		}
 
 		// Check that page value is ok
-		if(!is_numeric($page) || $page < 0){
+		if(!NumericUtils::isNumeric($page) || $page < 0){
 
 			trigger_error('PdfUtils::generatePageJpgPicture Error: Specified page must be a positive integer > 0', E_USER_WARNING);
 

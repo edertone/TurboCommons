@@ -54,7 +54,7 @@ class HTTPUtils{
 
 		foreach([404, 405] as $code){
 
-			if (is_numeric($code) && strpos($headers[0], strval($code)) !== false){
+		    if (NumericUtils::isNumeric($code) && strpos($headers[0], strval($code)) !== false){
 
 				return false;
 			}
