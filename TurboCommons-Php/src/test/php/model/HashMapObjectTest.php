@@ -20,11 +20,11 @@ use org\turbocommons\src\main\php\utils\ObjectUtils;
 
 
 /**
- * HashMapObjectClassTest
+ * HashMapObjectTest
  *
  * @return void
  */
-class HashMapObjectClassTest extends PHPUnit_Framework_TestCase {
+class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 
 
     /**
