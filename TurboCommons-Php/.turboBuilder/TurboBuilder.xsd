@@ -331,9 +331,12 @@
 									<xs:attribute name="mustContain" use="optional" default="" type="xs:string">
 										<xs:annotation>
 											<xs:documentation>
-												Defines a string value that must be found on the declared namespaces. Each namespace on each validated file must contain this string.&lt;br&gt;
-												Wildcards can be used to include parts of the file path into the namespace validation. Each wildcard value must be in the form $i, where i is a numeric index representing the reverse path depth.&lt;br&gt;
+												Defines one or more string values (coma separated) that must be found on the declared namespaces.&lt;br&gt;
+												Wildcards can be used to include parts of the file path into the namespace validation. Possible wildcards are:&lt;br&gt;
+												- $path : The full path from src\ to the file. For example, a file located at 'src\main\php\managers\File.php' will have 'main\php\managers' as the $path value.&lt;br&gt;
+												- $i : an item from the file path, where i is a numeric index starting from the right most path item.&lt;br&gt;
 												For example, for a file located at 'src\main\php\managers\File.php':&lt;br&gt;
+												- mustContain='myspace\and\$path' : Will require that declared domain contains 'myspace\and\main\php\managers'.&lt;br&gt;
 												- mustContain='myspace\and\$0' : Will require that declared domain contains 'myspace\and\File.php'.&lt;br&gt;
 												- mustContain='myspace\and\$1\' : Will require that declared domain contains 'myspace\and\managers\'.&lt;br&gt;
 												- mustContain='myspace\and\$0\$1' : Will require that declared domain contains 'myspace\and\File.php\managers'.&lt;br&gt;
@@ -383,12 +386,15 @@
 									<xs:attribute name="mustContain" use="optional" default="" type="xs:string">
 										<xs:annotation>
 											<xs:documentation>
-												Defines a string value that must be found on the declared namespaces. Each namespace on each validated file must contain this string.&lt;br&gt;
-												Wildcards can be used to include parts of the file path into the namespace validation. Each wildcard value must be in the form $i, where i is a numeric index representing the reverse path depth.&lt;br&gt;
+												Defines one or more string values (coma separated) that must be found on the declared namespaces.&lt;br&gt;
+												Wildcards can be used to include parts of the file path into the namespace validation. Possible wildcards are:&lt;br&gt;
+												- $path : The full path from src\ to the file. For example, a file located at 'src\main\js\managers\File.js' will have 'main\js\managers' as the $path value.&lt;br&gt;
+												- $i : an item from the file path, where i is a numeric index starting from the right most path item.&lt;br&gt;
 												For example, for a file located at 'src\main\js\managers\File.js':&lt;br&gt;
-												- mustContain='myspace_and_$0' : Will require that declared domain contains 'myspace_and_File.js'.&lt;br&gt;
-												- mustContain='myspace_and_$1_' : Will require that declared domain contains 'myspace_and_managers_'.&lt;br&gt;
-												- mustContain='myspace_and_$0_$1' : Will require that declared domain contains 'myspace_and_File.php_managers'.&lt;br&gt;
+												- mustContain='myspace\and\$path' : Will require that declared domain contains 'myspace\and\main\js\managers'.&lt;br&gt;
+												- mustContain='myspace\and\$0' : Will require that declared domain contains 'myspace\and\File.js'.&lt;br&gt;
+												- mustContain='myspace\and\$1\' : Will require that declared domain contains 'myspace\and\managers\'.&lt;br&gt;
+												- mustContain='myspace\and\$0\$1' : Will require that declared domain contains 'myspace\and\File.js\managers'.&lt;br&gt;
 											</xs:documentation>
 										</xs:annotation>
 									</xs:attribute>
@@ -435,12 +441,15 @@
 									<xs:attribute name="mustContain" use="optional" default="" type="xs:string">
 										<xs:annotation>
 											<xs:documentation>
-												Defines a string value that must be found on the declared namespaces. Each namespace on each validated file must contain this string.&lt;br&gt;
-												Wildcards can be used to include parts of the file path into the namespace validation. Each wildcard value must be in the form $i, where i is a numeric index representing the reverse path depth.&lt;br&gt;
+												Defines one or more string values (coma separated) that must be found on the declared namespaces.&lt;br&gt;
+												Wildcards can be used to include parts of the file path into the namespace validation. Possible wildcards are:&lt;br&gt;
+												- $path : The full path from src\ to the file. For example, a file located at 'src\main\ts\managers\File.ts' will have 'main\ts\managers' as the $path value.&lt;br&gt;
+												- $i : an item from the file path, where i is a numeric index starting from the right most path item.&lt;br&gt;
 												For example, for a file located at 'src\main\ts\managers\File.ts':&lt;br&gt;
-												- mustContain='myspace_and_$0' : Will require that declared domain contains 'myspace_and_File.ts'.&lt;br&gt;
-												- mustContain='myspace_and_$1_' : Will require that declared domain contains 'myspace_and_managers_'.&lt;br&gt;
-												- mustContain='myspace_and_$0_$1' : Will require that declared domain contains 'myspace_and_File.php_managers'.&lt;br&gt;
+												- mustContain='myspace\and\$path' : Will require that declared domain contains 'myspace\and\main\ts\managers'.&lt;br&gt;
+												- mustContain='myspace\and\$0' : Will require that declared domain contains 'myspace\and\File.ts'.&lt;br&gt;
+												- mustContain='myspace\and\$1\' : Will require that declared domain contains 'myspace\and\managers\'.&lt;br&gt;
+												- mustContain='myspace\and\$0\$1' : Will require that declared domain contains 'myspace\and\File.ts\managers'.&lt;br&gt;
 											</xs:documentation>
 										</xs:annotation>
 									</xs:attribute>
