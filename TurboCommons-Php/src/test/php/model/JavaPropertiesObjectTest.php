@@ -45,9 +45,14 @@ class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
      */
     protected function setUp(){
 
+        $this->wrongValues = [null, '', 'key', '=', '=key', '=key=', '=key=value', [1, 2], 1234, new stdclass()];
+        $this->wrongValuesCount = count($this->wrongValues);
+
         $this->filesManager = new FilesManager();
 
         $this->basePath = __DIR__.'/../resources/model/javaPropertiesObject';
+
+        $this->propertiesFiles = $this->filesManager->getDirectoryList($this->basePath);
     }
 
 
@@ -199,32 +204,13 @@ class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
         // Test exceptions
         $exceptionMessage = '';
 
-        try {
-            new JavaPropertiesObject(null);
-            $exceptionMessage = 'null did not cause exception';
-        } catch (Exception $e) {
-            // We expect an exception to happen
-        }
+        for ($i = 0; $i < $this->wrongValuesCount; $i++) {
 
-        try {
-            new JavaPropertiesObject([]);
-            $exceptionMessage = '[] did not cause exception';
-        } catch (Exception $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            new JavaPropertiesObject('onlykey');
-            $exceptionMessage = 'onlykey did not cause exception';
-        } catch (Exception $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            new JavaPropertiesObject(new stdClass());
-            $exceptionMessage = 'new stdClass() did not cause exception';
-        } catch (Exception $e) {
-            // We expect an exception to happen
+            try {
+                new JavaPropertiesObject($this->wrongValues[$i]);
+            } catch (Exception $e) {
+                // We expect an exception to happen
+            }
         }
 
         if($exceptionMessage != ''){
@@ -252,51 +238,18 @@ class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
         $this->assertTrue($test->toString() === '');
 
         // Test ok values
-        $fileData = $this->filesManager->readFile($this->basePath.'/1KeyWithValue.properties');
-        $test = new JavaPropertiesObject($fileData);
-        $this->assertTrue(JavaPropertiesUtils::isEqualTo($test->toString(), $fileData, true));
+        foreach ($this->propertiesFiles as $file) {
 
-        $fileData = $this->filesManager->readFile($this->basePath.'/2KeysWithValue.properties');
-        $test = new JavaPropertiesObject($fileData);
-        $this->assertTrue(JavaPropertiesUtils::isEqualTo($test->toString(), $fileData, true));
-
-        $fileData = $this->filesManager->readFile($this->basePath.'/MultipleKeysWithDifferentSpaces.properties');
-        $test = new JavaPropertiesObject($fileData);
-        $this->assertTrue(JavaPropertiesUtils::isEqualTo($test->toString(), $fileData, true));
-
-        $fileData = $this->filesManager->readFile($this->basePath.'/CommentsSlashesAndSpecialChars.properties');
-        $test = new JavaPropertiesObject($fileData);
-        $this->assertTrue(JavaPropertiesUtils::isEqualTo($test->toString(), $fileData, true));
-
-        $fileData = $this->filesManager->readFile($this->basePath.'/LotsOfLatinKeysAndValues.properties');
-        $test = new JavaPropertiesObject($fileData);
-        $this->assertTrue(JavaPropertiesUtils::isEqualTo($test->toString(), $fileData, true));
-
-        $fileData = $this->filesManager->readFile($this->basePath.'/LotsOfScapedCharacters.properties');
-        $test = new JavaPropertiesObject($fileData);
-        $this->assertTrue(JavaPropertiesUtils::isEqualTo($test->toString(), $fileData, true));
-
-        $fileData = $this->filesManager->readFile($this->basePath.'/VietnameseAndJapaneseCharacters.properties');
-        $test = new JavaPropertiesObject($fileData);
-        $this->assertTrue(JavaPropertiesUtils::isEqualTo($test->toString(), $fileData, true));
+            $fileData = $this->filesManager->readFile($this->basePath.'/'.$file);
+            $test = new JavaPropertiesObject($fileData);
+            $this->assertTrue(JavaPropertiesUtils::isEqualTo($test->toString(), $fileData, true));
+        }
 
         // Test wrong values
         // Already tested at constructor test
 
         // Test exceptions
-        $exceptionMessage = '';
-
-        try {
-            new JavaPropertiesObject('onlyKey');
-            $exceptionMessage = 'onlyKey did not cause exception';
-        } catch (Exception $e) {
-            // We expect an exception to happen
-        }
-
-        if($exceptionMessage != ''){
-
-            $this->fail($exceptionMessage);
-        }
+        // Already tested at constructor test
     }
 }
 
