@@ -200,9 +200,9 @@ class LocalesManager extends BaseSingletonClass{
 				$this->_loadBundle($bundle, $locale);
 			}
 
-			if(isset($this->_loadedData[$bundle][$locale][$key])){
+			if($this->_loadedData[$bundle][$locale]->isKey($key)){
 
-				return $this->_loadedData[$bundle][$locale][$key];
+			    return $this->_loadedData[$bundle][$locale]->get($key);
 			}
 		}
 
@@ -220,7 +220,6 @@ class LocalesManager extends BaseSingletonClass{
 	 */
 	private function _loadBundle($bundle, $locale){
 
-		$filesManager = new FilesManager();
 		$pathStructureArray = $this->pathStructure;
 
 		foreach ($this->paths as $path) {
@@ -235,11 +234,11 @@ class LocalesManager extends BaseSingletonClass{
 
 			$bundlePath = StringUtils::formatPath($path.DIRECTORY_SEPARATOR.$processedPathStructure);
 
-			if($filesManager->isFile($bundlePath)){
+			if(is_file($bundlePath)){
 
-				$bundleData = $filesManager->readFile($bundlePath);
+			    $bundleData = file_get_contents($bundlePath, true);
 
-				$this->_loadedData[$bundle][$locale] = SerializationUtils::javaPropertiesToArray($bundleData);
+				$this->_loadedData[$bundle][$locale] = SerializationUtils::stringToJavaPropertiesObject($bundleData);
 
 				return;
 			}
