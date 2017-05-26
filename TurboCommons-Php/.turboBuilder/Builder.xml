@@ -100,6 +100,7 @@
 
 		<property name="Test.Php.enabled" value="false" />
 		<property name="Test.Php.mode" value="commandLine" />
+		<property name="Test.Php.coverageReport" value="true" />
 		<property name="Test.Js.enabled" value="false" />
 
 		<property name="Tools.path" value="${user.home}/TurboBuilder-Tools" />
@@ -110,6 +111,7 @@
 		<property name="Tools.jpgOptimizerPath" value="${Tools.path}/jpegtran/jpegtran.exe" />
 		<property name="Tools.cssValidatorPath" value="${Tools.path}/W3c-css-validator/css-validator.jar" />
 		<property name="Tools.phpDocPath" value="${Tools.path}/PhpDocumentor/phpDocumentor.phar" />
+		<property name="Tools.phpUnitPath" value="${Tools.path}/PhpUnit/phpunit-5.7.14.phar" />
 
 		<property name="Tools.mysqlPath" value="C:/xampp/mysql/bin/mysql.exe" />
 		<property name="Tools.jsDocPath" value="C:/Program Files/nodejs/node_modules/.bin/jsdoc.cmd" />
@@ -385,19 +387,39 @@
 	<!-- Launch the PHP unit tests via Command line -->
 	<target name="runPhpTestsCmd">
 
-		<copy todir="${targetFolderPath}/${projectBaseName}/test" overwrite="true">
+		<sync todir="${targetFolderPath}/${projectBaseName}/test" overwrite="true">
 			<fileset dir="${srcFolderPath}/test" casesensitive="false" />
-		</copy>
-
-		<exec executable="${Tools.phpPath}" failonerror="true" >
-			<arg value="${targetFolderPath}/${projectBaseName}/test/php/index.php" />
-		</exec>
-
+		</sync>
+		
+		<script language="javascript">
+			<![CDATA[
+			    
+				var exec = project.createTask("exec");
+				exec.setExecutable(project.getProperty("Tools.phpPath"));
+				exec.setFailonerror(true);
+				
+				exec.createArg().setLine('"' + project.getProperty("Tools.phpUnitPath") + '"');
+							
+				if(project.getProperty("Test.Php.coverageReport") !== "false"){
+				
+					exec.createArg().setLine('--coverage-html "' + project.getProperty("targetFolderPath") + '/' + project.getProperty("projectBaseName") + '/coverage/php"');							
+				}
+			
+				exec.createArg().setLine('--configuration "' + project.getProperty("targetFolderPath") + '/' + project.getProperty("projectBaseName") + '/test/php/PhpUnitSetup.xml"');
+				
+				// Path to the tests to be executed				
+				exec.createArg().setLine('"' + project.getProperty("targetFolderPath") + "/" + project.getProperty("projectBaseName") + '/"');
+							
+				exec.perform();
+				
+			]]>
+		</script>
+		
 		<delete dir="${targetFolderPath}/${projectBaseName}/test" failonerror="true" />
 
 	</target>
-
-
+	
+	
 	<!-- Launch the PHP unit tests via local web server -->
 	<target name="runPhpTestsLocalServer">
 

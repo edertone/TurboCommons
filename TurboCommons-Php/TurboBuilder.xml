@@ -38,7 +38,8 @@
 	<Test>	
 	
 		<Php enabled="true" 
-			 mode="commandLine" />	
+			 mode="commandLine"
+             coverageReport="true" />	
 			 	  
 	</Test>
 			

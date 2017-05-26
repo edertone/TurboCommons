@@ -145,6 +145,14 @@
 											</xs:documentation>
 										</xs:annotation>
 									</xs:attribute>
+                                    
+                                    <xs:attribute name="createMergedTs" use="optional" default="false" type="xs:boolean">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Generate a .ts file on the target folder containing all the ts files merged so the project can be easily distributed in pure Typescript format
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:attribute>
 								
 									<xs:attribute name="compilerDeclarationFile" use="required" type="xs:boolean">
 										<xs:annotation>
@@ -617,6 +625,13 @@
 										</xs:annotation>
 									</xs:attribute>	
 								
+                                    <xs:attribute name="coverageReport" use="required" type="xs:boolean">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Enables or disables the coverage report generation as part of the unit tests execution
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:attribute>
 								</xs:complexType>
 								
 							</xs:element>

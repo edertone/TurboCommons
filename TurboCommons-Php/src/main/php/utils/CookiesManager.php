@@ -13,12 +13,12 @@ namespace org\turbocommons\src\main\php\utils;
 
 
 /**
- * Utilities related with saving, reading and operating with cookies
+ * Utilities related to save, read and operate with cookies
  */
-class CookiesUtils{
+class CookiesManager{
 
 
-	// TODO : Javascript version is more actual, so we must translate it to php
+	// TODO : translate from Javascript version
 
 }
 

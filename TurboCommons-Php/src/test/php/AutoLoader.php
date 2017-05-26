@@ -11,7 +11,11 @@
 
 
 require_once __DIR__.'/../../main/php/AutoLoader.php';
-require_once __DIR__.'/libs/phpunit-5.7.14.phar';
+
+if(!class_exists('PHPUnit_TextUI_TestRunner')){
+
+    require_once __DIR__.'/libs/phpunit-5.7.14.phar';
+}
 
 
 // Register the autoload method that will locate and automatically load the library classes

@@ -1,8 +1,20 @@
-<phpunit bootstrap="AutoLoader.php"
-    colors="false"
-    convertErrorsToExceptions="true"
-    convertNoticesToExceptions="true"
-    convertWarningsToExceptions="true"
-    stopOnFailure="false">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/5.7/phpunit.xsd"
+         bootstrap="AutoLoader.php"
+         colors="false"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         stopOnFailure="false">
+
+    <!-- Code coverage filter setup -->
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="false"> 
+            <directory suffix=".php">../../main/php/</directory>
+            <exclude>
+                <directory suffix="AutoLoader.php">../../main/php/</directory>
+            </exclude> 
+        </whitelist>
+    </filter>
 
 </phpunit>
