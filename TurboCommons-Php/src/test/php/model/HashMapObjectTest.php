@@ -382,12 +382,22 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 	        for ($j = 0; $j < $this->emptyValuesCount; $j++) {
 
 	            try {
-
 	                $this->populatedHashMap->rename($this->emptyValues[$i], $this->emptyValues[$j]);
-	                $this->populatedHashMap->rename($this->emptyValues[$i], 'a');
-	                $this->populatedHashMap->rename('a', $this->emptyValues[$j]);
-
 	                $exceptionMessage = 'empty value did not cause exception';
+    	        } catch (Exception $e) {
+    	            // We expect an exception to happen
+    	        }
+
+    	        try {
+    	            $this->populatedHashMap->rename($this->emptyValues[$i], 'a');
+    	            $exceptionMessage = 'empty value did not cause exception';
+    	        } catch (Exception $e) {
+    	            // We expect an exception to happen
+    	        }
+
+    	        try {
+    	            $this->populatedHashMap->rename('a', $this->emptyValues[$j]);
+    	            $exceptionMessage = 'empty value did not cause exception';
     	        } catch (Exception $e) {
     	            // We expect an exception to happen
     	        }
@@ -454,11 +464,21 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 	        for ($j = 0; $j < $this->emptyValuesCount; $j++) {
 
 	            try {
-
 	                $this->populatedHashMap->swap($this->emptyValues[$i], $this->emptyValues[$j]);
-	                $this->populatedHashMap->swap($this->emptyValues[$i], 'a');
-	                $this->populatedHashMap->swap('a', $this->emptyValues[$j]);
+	                $exceptionMessage = 'empty value did not cause exception';
+	            } catch (Exception $e) {
+	                // We expect an exception to happen
+	            }
 
+	            try {
+	                $this->populatedHashMap->swap($this->emptyValues[$i], 'a');
+	                $exceptionMessage = 'empty value did not cause exception';
+	            } catch (Exception $e) {
+	                // We expect an exception to happen
+	            }
+
+	            try {
+	                $this->populatedHashMap->swap('a', $this->emptyValues[$j]);
 	                $exceptionMessage = 'empty value did not cause exception';
 	            } catch (Exception $e) {
 	                // We expect an exception to happen
@@ -493,6 +513,14 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 
 	        $this->assertFalse($this->populatedHashMap->swap('no', 'string'));
+	        $exceptionMessage = 'no value did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+
+	        $this->assertFalse($this->populatedHashMap->swap('string', 'no'));
 	        $exceptionMessage = 'no value did not cause exception';
 	    } catch (Exception $e) {
 	        // We expect an exception to happen
