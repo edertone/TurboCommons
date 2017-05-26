@@ -12,7 +12,6 @@
 
 require_once __DIR__.'/../../main/php/AutoLoader.php';
 require_once __DIR__.'/libs/phpunit-5.7.14.phar';
-require_once __DIR__.'/libs/TurboDepot-Php-0.0.138.phar';
 
 
 // Register the autoload method that will locate and automatically load the library classes

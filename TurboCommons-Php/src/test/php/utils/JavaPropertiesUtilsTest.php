@@ -16,7 +16,7 @@ use PHPUnit_Framework_TestCase;
 use stdClass;
 use org\turbocommons\src\main\php\utils\JavaPropertiesUtils;
 use org\turbocommons\src\main\php\model\JavaPropertiesObject;
-use org\turbodepot\src\main\php\managers\FilesManager;
+use org\turbocommons\src\main\php\managers\FilesManager;
 
 
 /**

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <buildpath>
 	<buildpathentry kind="lib" path="src/test/php/libs/phpunit-5.7.14.phar"/>
-	<buildpathentry kind="lib" path="src/test/php/libs/TurboDepot-Php-0.0.138.phar"/>
 	<buildpathentry kind="src" path="src"/>
 	<buildpathentry kind="con" path="org.eclipse.php.core.LANGUAGE"/>
 </buildpath>
