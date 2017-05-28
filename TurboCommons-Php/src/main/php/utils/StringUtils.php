@@ -839,6 +839,29 @@ class StringUtils {
 
 
     /**
+     * Deletes all new line characters from the given string
+     *
+     * @param string $string The string to process
+     *
+     * @return string The string without any new line character
+     */
+    public static function removeNewLineCharacters($string){
+
+        if($string === null){
+
+            return '';
+        }
+
+        if(!self::isString($string)){
+
+            throw new InvalidArgumentException('StringUtils->removeNewLineCharacters: Specified value must be a string');
+        }
+
+        return str_replace(array("\n","\r"), '', $string);
+    }
+
+
+    /**
      * Converts all accent characters to ASCII characters on a given string.<br>
      * This method is based on the WordPress implementation called remove_Accents
      *

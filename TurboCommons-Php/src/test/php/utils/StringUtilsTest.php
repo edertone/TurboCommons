@@ -1018,6 +1018,72 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
+	 * testRemoveNewLineCharacters
+	 *
+	 * @return void
+	 */
+	public function testRemoveNewLineCharacters(){
+
+	    // Test empty values
+	    $this->assertTrue(StringUtils::removeNewLineCharacters(null) === '');
+	    $this->assertTrue(StringUtils::removeNewLineCharacters('') === '');
+	    $this->assertTrue(StringUtils::removeNewLineCharacters('     ') === '     ');
+
+	    // Test ok values
+	    $this->assertTrue(StringUtils::removeNewLineCharacters("\n") === '');
+	    $this->assertTrue(StringUtils::removeNewLineCharacters("\n\n") === '');
+	    $this->assertTrue(StringUtils::removeNewLineCharacters("\r\n") === '');
+	    $this->assertTrue(StringUtils::removeNewLineCharacters("\n\r\r") === '');
+	    $this->assertTrue(StringUtils::removeNewLineCharacters("a\nb") === 'ab');
+	    $this->assertTrue(StringUtils::removeNewLineCharacters("a\nb\rc") === 'abc');
+	    $this->assertTrue(StringUtils::removeNewLineCharacters("a\nb\rc\n\nd") === 'abcd');
+
+	    // Test wrong values
+	    $this->assertTrue(StringUtils::removeNewLineCharacters('heollo') === 'heollo');
+	    $this->assertTrue(StringUtils::removeNewLineCharacters('string    and spaces') === 'string    and spaces');
+	    $this->assertTrue(StringUtils::removeNewLineCharacters('\t\t\t') === '\t\t\t');
+	    $this->assertTrue(StringUtils::removeNewLineCharacters('a\t\t') === 'a\t\t');
+
+	    // Test exceptions
+	    $exceptionMessage = '';
+
+	    try {
+	        StringUtils::removeNewLineCharacters(1);
+	        $exceptionMessage = '1 did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::removeNewLineCharacters([]);
+	        $exceptionMessage = '[] did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::removeNewLineCharacters(new stdClass());
+	        $exceptionMessage = 'new stdClass() did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::removeNewLineCharacters([1,2,3,4]);
+	        $exceptionMessage = '[1,2,3,4] did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    if($exceptionMessage != ''){
+
+	        $this->fail($exceptionMessage);
+	    }
+
+	}
+
+
+	/**
 	 * testRemoveAccents
 	 *
 	 * @return void
