@@ -199,6 +199,20 @@ class ArrayUtilsTest extends PHPUnit_Framework_TestCase {
 	    $this->assertTrue(ArrayUtils::hasDuplicateElements(['hello', 'go', 'hello']));
 	    $this->assertTrue(ArrayUtils::hasDuplicateElements([new Exception(), 'go', 'hello', new Exception()]));
 
+	    $array = [];
+
+	    for ($i = 0; $i < 100; $i++) {
+
+	        for ($j = 0; $j < 100; $j++) {
+
+	            $array[] = $j;
+	        }
+
+	        $array[] = $i;
+
+	        $this->assertTrue(ArrayUtils::hasDuplicateElements($array));
+	    }
+
 	    // Test wrong values
 	    $this->assertFalse(ArrayUtils::hasDuplicateElements([1]));
 	    $this->assertFalse(ArrayUtils::hasDuplicateElements([1, 2]));

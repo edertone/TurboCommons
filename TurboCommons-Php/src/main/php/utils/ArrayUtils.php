@@ -115,9 +115,9 @@ class ArrayUtils {
 
 	    for ($i = 0; $i < $numElements; $i++) {
 
-	        for ($j = 0; $j < $numElements; $j++) {
+	        for ($j = $i + 1; $j < $numElements; $j++) {
 
-	            if($i != $j && $validationManager->isEqualTo($array[$i], $array[$j])){
+	            if($validationManager->isEqualTo($array[$i], $array[$j])){
 
 	                return true;
 	            }
