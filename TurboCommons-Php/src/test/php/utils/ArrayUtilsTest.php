@@ -12,6 +12,7 @@
 namespace org\turbocommons\src\test\php\utils;
 
 use Exception;
+use stdClass;
 use org\turbocommons\src\main\php\utils\ArrayUtils;
 use PHPUnit_Framework_TestCase;
 
@@ -147,6 +148,67 @@ class ArrayUtilsTest extends PHPUnit_Framework_TestCase {
 	public function testRemoveElement(){
 
 		// TODO - Translate from JS
+	}
+
+
+	/**
+	 * testHasDuplicateElements
+	 *
+	 * @return void
+	 */
+	public function testHasDuplicateElements(){
+
+	    // Test empty values
+	    $exceptionMessage = '';
+
+	    try {
+	        ArrayUtils::hasDuplicateElements(null);
+	        $exceptionMessage = 'null did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        ArrayUtils::hasDuplicateElements('');
+	        $exceptionMessage = '"" did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        ArrayUtils::hasDuplicateElements(new stdClass());
+	        $exceptionMessage = 'new stdClass() did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    if($exceptionMessage != ''){
+
+	        $this->fail($exceptionMessage);
+	    }
+
+	    $this->assertFalse(ArrayUtils::hasDuplicateElements([]));
+	    $this->assertFalse(ArrayUtils::hasDuplicateElements([null]));
+
+	    // Test ok values
+	    $this->assertTrue(ArrayUtils::hasDuplicateElements([1, 1]));
+	    $this->assertTrue(ArrayUtils::hasDuplicateElements(['1', '1']));
+	    $this->assertTrue(ArrayUtils::hasDuplicateElements([1, 0, 1]));
+	    $this->assertTrue(ArrayUtils::hasDuplicateElements(['1', '0', '1']));
+	    $this->assertTrue(ArrayUtils::hasDuplicateElements([1, 2, 3, 4, 2]));
+	    $this->assertTrue(ArrayUtils::hasDuplicateElements(['hello', 'go', 'hello']));
+	    $this->assertTrue(ArrayUtils::hasDuplicateElements([new Exception(), 'go', 'hello', new Exception()]));
+
+	    // Test wrong values
+	    $this->assertFalse(ArrayUtils::hasDuplicateElements([1]));
+	    $this->assertFalse(ArrayUtils::hasDuplicateElements([1, 2]));
+	    $this->assertFalse(ArrayUtils::hasDuplicateElements(['1', '2']));
+	    $this->assertFalse(ArrayUtils::hasDuplicateElements([1, 2, 3, 4, 5, 6]));
+	    $this->assertFalse(ArrayUtils::hasDuplicateElements(['1', 1]));
+	    $this->assertFalse(ArrayUtils::hasDuplicateElements([new Exception(), 'go', 'hello']));
+
+	    // Test exceptions
+	    // Already tested with empty values
 	}
 }
 

@@ -42,7 +42,7 @@ class ArrayUtils {
 	 *
 	 * @return boolean true if arrays are exactly the same, false if not
 	 */
-	public static function isEqualTo($array1, $array2){
+	public static function isEqualTo(array $array1, array $array2){
 
 		$validationManager = new ValidationManager();
 
@@ -90,13 +90,41 @@ class ArrayUtils {
 	}
 
 
-
 	/**
 	 * TODO - translate from js
 	 */
 	public static function removeElement(){
 
 		// TODO - translate from js
+	}
+
+
+	/**
+	 * Check if the given array contains duplicate values or not.
+	 * Duplicate values with different data types won't be considered as equal ('1', 1 will return false)
+	 *
+	 * @param array $array An array containing some elements to test
+	 *
+	 * @return boolean True if there are duplicate values, false otherwise
+	 */
+	public static function hasDuplicateElements(array $array){
+
+	    $numElements = count($array);
+
+	    $validationManager = new ValidationManager();
+
+	    for ($i = 0; $i < $numElements; $i++) {
+
+	        for ($j = 0; $j < $numElements; $j++) {
+
+	            if($i != $j && $validationManager->isEqualTo($array[$i], $array[$j])){
+
+	                return true;
+	            }
+	        }
+	    }
+
+	    return false;
 	}
 }
 
