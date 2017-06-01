@@ -128,6 +128,25 @@ class HashMapObject{
 
 
     /**
+     * Get a list with all the values from the HashMapObject with the same order as they are stored.
+     *
+     * @return array List of elements containing all the HashMapObject sorted values
+     */
+    public function getValues(){
+
+        $result = [];
+        $keys = $this->getKeys();
+
+        // Keys must be strictly converted to strings
+        foreach ($keys as $k) {
+            $result[] = $this->get($k);
+        }
+
+        return $result;
+    }
+
+
+    /**
      * Tells if the provided value matches a key that's stored inside the HashMapObject
      *
      * @param string $key A value to find on the currently stored keys.

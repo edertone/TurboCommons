@@ -257,6 +257,37 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
+	 * testGetValues
+	 *
+	 * @return void
+	 */
+	public function testGetValues(){
+
+	    // Test empty values
+	    // Not necessary
+
+	    // Test ok values
+	    $this->assertTrue($this->populatedHashMap->getValues() === [1, 2, 3, 4, 5, 6, 7, 'myValue', [1, 2, 3, 4]]);
+
+	    $h = new HashMapObject();
+	    $h->set('0', 0);
+	    $h->set('01', 1);
+	    $h->set('002', 2);
+	    $h->set('a', 'a');
+	    $this->assertEquals([0, 1, 2, 'a'], $h->getValues());
+
+	    // Test wrong values
+	    $this->assertFalse($this->populatedHashMap->getValues() === [1, 2, 3, 4, 5, 6, 7, 'myValu1e', [1, 2, 3, 4]]);
+	    $this->assertFalse($this->populatedHashMap->getValues() === [1, 2, 3, 4, 5, 6, 1, 'myValue', [1, 2, 3, 4]]);
+	    $this->assertFalse($this->populatedHashMap->getValues() === [1, 2, 3, 4, 5, 6, 7, 'myValue', [1, 3, 3, 4]]);
+	    $this->assertFalse($this->populatedHashMap->getValues() === [1, 1, 2, 3, 4, 5, 6, 7, 'myValue', [1, 2, 3, 4]]);
+
+	    // Test exceptions
+	    // Not necessary
+	}
+
+
+	/**
 	 * testIsKey
 	 *
 	 * @return void
