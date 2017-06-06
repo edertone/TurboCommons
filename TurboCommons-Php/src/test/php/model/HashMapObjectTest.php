@@ -446,9 +446,7 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 	    $this->assertTrue(ArrayUtils::isEqualTo($this->populatedHashMap->getKeys(), ['a1', 'b', 'somekey', 'd', 'e', 'f', 'g', 'string', 'array']));
 
 	    try {
-
 	        $this->populatedHashMap->get('a');
-
 	        $exceptionMessage = 'empty value did not cause exception';
 	    } catch (Exception $e) {
 	        // We expect an exception to happen
@@ -456,17 +454,15 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 
 	    // Test wrong values
 	    try {
-
-	        $this->assertFalse($this->populatedHashMap->rename('b', 'c'));
-	        $exceptionMessage = 'b value did not cause exception';
+	        $this->populatedHashMap->rename('unknown', 'b');
+	        $exceptionMessage = 'unknown value did not cause exception';
 	    } catch (Exception $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
-
-	        $this->assertFalse($this->populatedHashMap->rename('unknown', 'b'));
-	        $exceptionMessage = 'unknown value did not cause exception';
+	        $this->populatedHashMap->rename('a1', 'b');
+	        $exceptionMessage = 'a1 for existing b key did not cause exception';
 	    } catch (Exception $e) {
 	        // We expect an exception to happen
 	    }

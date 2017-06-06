@@ -211,6 +211,11 @@ class HashMapObject{
             throw new InvalidArgumentException('HashMapObject->rename: newKey must be a string');
         }
 
+        if($this->isKey($newKey)){
+
+            throw new InvalidArgumentException('HashMapObject->rename: newKey '.$newKey.' already exists');
+        }
+
         if($this->isKey($key)){
 
             $result = [];
