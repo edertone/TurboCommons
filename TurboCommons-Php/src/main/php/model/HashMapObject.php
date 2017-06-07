@@ -25,13 +25,25 @@ class HashMapObject{
     /**
      * Sort mode that compares values as strings (alphabetically)
      */
-    const SORT_STRING = 'SORT_STRING';
+    const SORT_METHOD_STRING = 'SORT_METHOD_STRING';
 
 
     /**
      * Sort mode that compares values as numbers (Avoid using it with non numeric values)
      */
-    const SORT_NUMERIC = 'SORT_NUMERIC';
+    const SORT_METHOD_NUMERIC = 'SORT_METHOD_NUMERIC';
+
+
+    /**
+     * Defines that elements will be sorted upward
+     */
+    const SORT_ORDER_ASCENDING = 'SORT_ORDER_ASCENDING';
+
+
+    /**
+     * Defines that elements will be sorted downward
+     */
+    const SORT_ORDER_DESCENDING = 'SORT_ORDER_DESCENDING';
 
 
     /**
@@ -308,51 +320,84 @@ class HashMapObject{
      * Sort the key/value pairs inside the HashMapObject by their key values.
      *
      * @param string $method Defines sort mode: HashMapObject::SORT_STRING or HashMapObject::SORT_NUMERIC
+     * @param string $order Defines the order for the sorted elements: self::SORT_ORDER_ASCENDING (default) or self::SORT_ORDER_DESCENDING
      *
      * @throws InvalidArgumentException
-     * @return boolean True if sort was successful
+     * @return boolean True if sort was successful false on failure
      */
-    public function sortByKey($method = self::SORT_STRING){
+    public function sortByKey($method = self::SORT_METHOD_STRING, $order = self::SORT_ORDER_ASCENDING){
 
-        if($method === self::SORT_STRING){
+        $methodFlag = null;
 
-            ksort($this->_array, SORT_STRING);
-            return true;
+        if($method === self::SORT_METHOD_STRING){
+
+            $methodFlag = SORT_STRING;
         }
 
-        if($method === self::SORT_NUMERIC){
+        if($method === self::SORT_METHOD_NUMERIC){
 
-            ksort($this->_array, SORT_NUMERIC);
-            return true;
+            $methodFlag = SORT_NUMERIC;
         }
 
-        throw new InvalidArgumentException('HashMapObject->sortByKey: Unknown sort method');
+        if($methodFlag === null){
+
+            throw new InvalidArgumentException('HashMapObject->sortByKey: Unknown sort method');
+        }
+
+        if($order === self::SORT_ORDER_ASCENDING){
+
+            return ksort($this->_array, $methodFlag);
+        }
+
+        if($order === self::SORT_ORDER_DESCENDING){
+
+            return krsort($this->_array, $methodFlag);
+        }
+
+        throw new InvalidArgumentException('HashMapObject->sortByKey: Unknown sort order');
     }
 
 
     /**
      * Sort the key/value pairs inside the HashMapObject by their values.
+     * Note that applying a sort method on values with different types than the expected by the sort method will give unexpected results.
      *
      * @param string $method Defines sort mode: HashMapObject::SORT_STRING or HashMapObject::SORT_NUMERIC
+     * @param string $order Defines the order for the sorted elements: self::SORT_ORDER_ASCENDING (default) or self::SORT_ORDER_DESCENDING
      *
      * @throws InvalidArgumentException
      * @return boolean True if sort was successful
      */
-    public function sortByValue($method = self::SORT_NUMERIC){
+    public function sortByValue($method = self::SORT_METHOD_NUMERIC, $order = self::SORT_ORDER_ASCENDING){
 
-        if($method === self::SORT_STRING){
+        $methodFlag = null;
 
-            asort($this->_array, SORT_STRING);
-            return true;
+        if($method === self::SORT_METHOD_STRING){
+
+            $methodFlag = SORT_STRING;
         }
 
-        if($method === self::SORT_NUMERIC){
+        if($method === self::SORT_METHOD_NUMERIC){
 
-            asort($this->_array, SORT_NUMERIC);
-            return true;
+            $methodFlag = SORT_NUMERIC;
         }
 
-        throw new InvalidArgumentException('HashMapObject->sortByValue: Unknown sort method');
+        if($methodFlag === null){
+
+            throw new InvalidArgumentException('HashMapObject->sortByValue: Unknown sort method');
+        }
+
+        if($order === self::SORT_ORDER_ASCENDING){
+
+            return asort($this->_array, $methodFlag);
+        }
+
+        if($order === self::SORT_ORDER_DESCENDING){
+
+            return arsort($this->_array, $methodFlag);
+        }
+
+        throw new InvalidArgumentException('HashMapObject->sortByValue: Unknown sort order');
     }
 
 

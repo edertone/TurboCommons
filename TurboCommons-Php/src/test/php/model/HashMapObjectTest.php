@@ -575,9 +575,15 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 	    for ($i = 0; $i < $this->emptyValuesCount; $i++) {
 
 	        try {
-
                 $this->populatedHashMap->sortByKey($this->emptyValues[$i]);
                 $exceptionMessage = 'empty value did not cause exception';
+            } catch (Exception $e) {
+                // We expect an exception to happen
+            }
+
+            try {
+                $this->populatedHashMap->sortByKey(HashMapObject::SORT_METHOD_NUMERIC, $this->emptyValues[$i]);
+                $exceptionMessage = 'empty param 2 did not cause exception';
             } catch (Exception $e) {
                 // We expect an exception to happen
             }
@@ -596,10 +602,13 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 	    $h->set('c', 4);
 	    $h->set('0', 5);
 	    $this->assertTrue($h->length() === 5);
-	    $this->assertTrue($h->sortByKey(HashMapObject::SORT_STRING));
+	    $this->assertTrue($h->sortByKey(HashMapObject::SORT_METHOD_STRING));
 	    $this->assertTrue($h->length() === 5);
 	    $this->assertTrue(ArrayUtils::isEqualTo($h->getKeys(), ['0', 'a', 'b', 'c', 'd']));
 	    $this->assertTrue($h->get('b') === 1);
+
+	    $this->assertTrue($h->sortByKey(HashMapObject::SORT_METHOD_STRING, HashMapObject::SORT_ORDER_DESCENDING));
+	    $this->assertEquals(['d', 'c', 'b', 'a', '0'], $h->getKeys());
 
 	    $h = new HashMapObject();
 	    $h->set('6', 6);
@@ -608,12 +617,20 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 	    $h->set('2', 2);
 	    $h->set('40', 4);
 	    $this->assertTrue($h->length() === 5);
-	    $this->assertTrue($h->sortByKey(HashMapObject::SORT_STRING));
+	    $this->assertTrue($h->sortByKey(HashMapObject::SORT_METHOD_STRING));
 	    $this->assertTrue($h->length() === 5);
 	    $this->assertTrue(ArrayUtils::isEqualTo($h->getKeys(), ['2', '3', '40', '5', '6']));
-	    $this->assertTrue($h->sortByKey(HashMapObject::SORT_NUMERIC));
+
+	    $this->assertTrue($h->sortByKey(HashMapObject::SORT_METHOD_STRING, HashMapObject::SORT_ORDER_DESCENDING));
+	    $this->assertTrue(ArrayUtils::isEqualTo($h->getKeys(), ['6', '5', '40', '3', '2']));
+
+	    $this->assertTrue($h->sortByKey(HashMapObject::SORT_METHOD_NUMERIC));
 	    $this->assertTrue($h->length() === 5);
 	    $this->assertTrue(ArrayUtils::isEqualTo($h->getKeys(), ['2', '3', '5', '6', '40']));
+
+	    $this->assertTrue($h->sortByKey(HashMapObject::SORT_METHOD_NUMERIC, HashMapObject::SORT_ORDER_DESCENDING));
+	    $this->assertTrue(ArrayUtils::isEqualTo($h->getKeys(), ['40', '6', '5', '3', '2']));
+	    $this->assertTrue($h->length() === 5);
 
 	    // Test wrong values
 	    // Not necessary
@@ -646,6 +663,14 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 	        } catch (Exception $e) {
 	            // We expect an exception to happen
 	        }
+
+	        try {
+
+	            $this->populatedHashMap->sortByValue(HashMapObject::SORT_METHOD_NUMERIC, $this->emptyValues[$i]);
+	            $exceptionMessage = 'empty parameter 2 did not cause exception';
+	        } catch (Exception $e) {
+	            // We expect an exception to happen
+	        }
 	    }
 
 	    $h = new HashMapObject();
@@ -661,10 +686,13 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 	    $h->set('c', 'd');
 	    $h->set('0', 'b');
 	    $this->assertTrue($h->length() === 5);
-	    $this->assertTrue($h->sortByValue(HashMapObject::SORT_STRING));
+	    $this->assertTrue($h->sortByValue(HashMapObject::SORT_METHOD_STRING));
 	    $this->assertTrue($h->length() === 5);
 	    $this->assertTrue(ArrayUtils::isEqualTo($h->getKeys(), ['b', '0', 'a', 'c', 'd']));
 	    $this->assertTrue($h->get('0') === 'b');
+
+	    $this->assertTrue($h->sortByValue(HashMapObject::SORT_METHOD_STRING, HashMapObject::SORT_ORDER_DESCENDING));
+	    $this->assertTrue(ArrayUtils::isEqualTo($h->getKeys(), ['d', 'c', 'a', '0', 'b']));
 
 	    $h = new HashMapObject();
 	    $h->set('b', 6);
@@ -673,12 +701,19 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 	    $h->set('c', '200');
 	    $h->set('0', 4);
 	    $this->assertTrue($h->length() === 5);
-	    $this->assertTrue($h->sortByValue(HashMapObject::SORT_STRING));
+	    $this->assertTrue($h->sortByValue(HashMapObject::SORT_METHOD_STRING));
 	    $this->assertTrue($h->length() === 5);
 	    $this->assertTrue(ArrayUtils::isEqualTo($h->getKeys(), ['c', 'd', '0', 'a', 'b']));
-	    $this->assertTrue($h->sortByValue(HashMapObject::SORT_NUMERIC));
+	    $this->assertTrue($h->sortByValue(HashMapObject::SORT_METHOD_NUMERIC));
 	    $this->assertTrue($h->length() === 5);
 	    $this->assertTrue(ArrayUtils::isEqualTo($h->getKeys(), ['d', '0', 'a', 'b', 'c']));
+
+	    $this->assertTrue($h->sortByValue(HashMapObject::SORT_METHOD_STRING, HashMapObject::SORT_ORDER_DESCENDING));
+	    $this->assertTrue(ArrayUtils::isEqualTo($h->getKeys(), ['b', 'a', '0', 'd', 'c']));
+
+	    $this->assertTrue($h->sortByValue(HashMapObject::SORT_METHOD_NUMERIC, HashMapObject::SORT_ORDER_DESCENDING));
+	    $this->assertTrue(ArrayUtils::isEqualTo($h->getKeys(), ['c', 'b', 'a', '0', 'd']));
+	    $this->assertTrue($h->length() === 5);
 
 	    // Test wrong values
 	    // Not necessary
