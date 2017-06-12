@@ -16,7 +16,6 @@ use PHPUnit_Framework_TestCase;
 use stdClass;
 use org\turbocommons\src\main\php\model\TableObject;
 use org\turbocommons\src\main\php\utils\NumericUtils;
-use org\turbocommons\src\main\php\utils\ArrayUtils;
 
 
 /**
