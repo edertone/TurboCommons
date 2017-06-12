@@ -117,6 +117,11 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	        }
 	    }
 
+	    $test = new TableObject(2, ['c1', 'c2', 'c3']);
+	    $this->assertTrue($test->countCells() === 6);
+	    $this->assertTrue($test->countRows() === 2);
+	    $this->assertTrue($test->countColumns() === 3);
+
 	    // Test wrong values
 	    try {
 	        new TableObject(0, NumericUtils::generateRandomInteger(10000000));
@@ -263,6 +268,13 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	        }
 	    }
 
+	    try {
+	        $test->setColumnName(40, 'name');
+	        $exceptionMessage = '40 did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
 	    // Test exceptions
 	    // Already tested
 
@@ -333,6 +345,13 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->setColumnNames(['column', 'column']);
 	        $exceptionMessage = '["column", "column"] array with duplicate values did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $test->setColumnNames(['column', 1]);
+	        $exceptionMessage = '["column", 1] array with non string value did not cause exception';
 	    } catch (Exception $e) {
 	        // We expect an exception to happen
 	    }
@@ -793,6 +812,13 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->addColumns(1, [], 4);
 	        $exceptionMessage = 'wrong column index did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $test->addColumns(1, ['a', 'b']);
+	        $exceptionMessage = 'different names number did not cause exception';
 	    } catch (Exception $e) {
 	        // We expect an exception to happen
 	    }

@@ -119,24 +119,14 @@ class TableObject{
 
         $columnIndex = $this->_validateColumnIndex($column);
 
-        if($columnIndex < $this->_columnsCount){
+        if(!StringUtils::isString($name)){
 
-            if(!StringUtils::isString($name)){
-
-                throw new UnexpectedValueException('TableObject->setColumnName name must be a string');
-            }
-
-            if($this->_columnNames == null){
-
-                $this->_columnNames = new HashMapObject();
-            }
-
-            $this->_columnNames->set((string)$columnIndex, $name);
-
-            return true;
+            throw new UnexpectedValueException('TableObject->setColumnName name must be a string');
         }
 
-        throw new UnexpectedValueException('TableObject->setColumnName specified column does not exist');
+        $this->_columnNames->set((string)$columnIndex, $name);
+
+        return true;
     }
 
 
