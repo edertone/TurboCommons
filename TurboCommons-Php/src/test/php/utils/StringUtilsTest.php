@@ -613,10 +613,12 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(StringUtils::getLines("line1\n\n\n\t\r       \nline2") == ['line1', 'line2']);
 		$this->assertTrue(StringUtils::getLines("line1\r\n   \r\nline2") == ['line1', 'line2']);
 		$this->assertTrue(StringUtils::getLines("line1\n 1  \nline2") == ['line1', ' 1  ', 'line2']);
+		$this->assertTrue(StringUtils::getLines("line1\r\n 1  \n\r\r\nline2") == ['line1', ' 1  ', 'line2']);
 
 		$this->assertTrue(StringUtils::getLines('          ', []) === ['          ']);
 		$this->assertTrue(StringUtils::getLines("line1\n   \nline2", []) == ['line1', '   ', 'line2']);
 		$this->assertTrue(StringUtils::getLines("line1\r\n   \r\nline2", []) == ['line1', '   ', 'line2']);
+		$this->assertTrue(StringUtils::getLines("line1\n\n\n\t\r       \nline2", []) == ['line1', "\t\r       ", 'line2']);
 	}
 
 
