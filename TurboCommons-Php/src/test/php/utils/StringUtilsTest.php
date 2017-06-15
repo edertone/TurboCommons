@@ -608,17 +608,20 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(StringUtils::getLines('') === []);
 		$this->assertTrue(StringUtils::getLines('          ') === []);
 		$this->assertTrue(StringUtils::getLines('single line') === ['single line']);
-		$this->assertTrue(StringUtils::getLines("line1\nline2\nline3") == ['line1', 'line2', 'line3']);
-		$this->assertTrue(StringUtils::getLines("line1\n        \nline2") == ['line1', 'line2']);
-		$this->assertTrue(StringUtils::getLines("line1\n\n\n\t\r       \nline2") == ['line1', 'line2']);
-		$this->assertTrue(StringUtils::getLines("line1\r\n   \r\nline2") == ['line1', 'line2']);
-		$this->assertTrue(StringUtils::getLines("line1\n 1  \nline2") == ['line1', ' 1  ', 'line2']);
-		$this->assertTrue(StringUtils::getLines("line1\r\n 1  \n\r\r\nline2") == ['line1', ' 1  ', 'line2']);
+		$this->assertTrue(StringUtils::getLines("line1\nline2\nline3") === ['line1', 'line2', 'line3']);
+		$this->assertTrue(StringUtils::getLines("line1\rline2\rline3") === ['line1', 'line2', 'line3']);
+		$this->assertTrue(StringUtils::getLines("line1\r\nline2\r\nline3") === ['line1', 'line2', 'line3']);
+		$this->assertTrue(StringUtils::getLines("line1\n        \nline2") === ['line1', 'line2']);
+		$this->assertTrue(StringUtils::getLines("line1\n\n\n\t\r       \nline2") === ['line1', 'line2']);
+		$this->assertTrue(StringUtils::getLines("line1\r\n   \r\nline2") === ['line1', 'line2']);
+		$this->assertTrue(StringUtils::getLines("line1\n 1  \nline2") === ['line1', ' 1  ', 'line2']);
+		$this->assertTrue(StringUtils::getLines("line1\r\n 1  \n\r\r\nline2") === ['line1', ' 1  ', 'line2']);
 
 		$this->assertTrue(StringUtils::getLines('          ', []) === ['          ']);
-		$this->assertTrue(StringUtils::getLines("line1\n   \nline2", []) == ['line1', '   ', 'line2']);
-		$this->assertTrue(StringUtils::getLines("line1\r\n   \r\nline2", []) == ['line1', '   ', 'line2']);
-		$this->assertTrue(StringUtils::getLines("line1\n\n\n\t\r       \nline2", []) == ['line1', "\t\r       ", 'line2']);
+		$this->assertTrue(StringUtils::getLines("line1\r   \rline2", []) === ['line1', '   ', 'line2']);
+		$this->assertTrue(StringUtils::getLines("line1\n   \nline2", []) === ['line1', '   ', 'line2']);
+		$this->assertTrue(StringUtils::getLines("line1\r\n   \r\nline2", []) === ['line1', '   ', 'line2']);
+		$this->assertTrue(StringUtils::getLines("line1\n\n\n\t\r       \nline2", []) === ['line1', "\t", '       ', 'line2']);
 	}
 
 

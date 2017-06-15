@@ -390,7 +390,7 @@ class StringUtils {
 
     /**
      * Extracts all the lines from the given string and outputs an array with each line as an element.
-     * It does not matter which line separator's been used (\n, \r, Windows, linux...). All source lines will be correctly extracted.
+     * It does not matter which line separator's been used (windows: \r\n, Linux/Unix: \n, Mac: \r). All source lines will be correctly extracted.
      *
      * @param string $string Text containing one or more lines that will be converted to an array with each line on a different element.
      * @param array $filters One or more regular expressions that will be used to filter unwanted lines. Lines that match any of the
@@ -408,7 +408,7 @@ class StringUtils {
             return $res;
         }
 
-        $tmp = preg_split("/\r?\n/", $string);
+        $tmp = preg_split("/\r\n|\n|\r/", $string);
 
         foreach($tmp as $line){
 
