@@ -60,8 +60,8 @@ class TableObject{
      *
      * Columns can be labeled with a textual name which can be used to access them anytime (data can be also accessed via numeric row and column indexes).
      *
-     * @param int $rows The number of rows for the created table (It can be modified anytime later).
-     * @param int $columns The number of columns for the created table (It can be modified anytime later).
+     * @param int $rows The number of rows for the created table (Rows can be added or modified anytime later).
+     * @param mixed $columns The number of columns to create or an array of strings containing the column labels for all of the columns that will be created (Columns can be added or modified anytime later).
      *
      * @return TableObject The constructed TableObject
      */
@@ -137,7 +137,7 @@ class TableObject{
      * It must have the same number of items and in the same order as the table columns.
      *
      * @throws UnexpectedValueException
-     * @return void
+     * @return array The list of column names after beign assigned
      */
     public function setColumnNames(array $names){
 
@@ -163,7 +163,7 @@ class TableObject{
                 $this->_columnNames->set((string)$i, $names[$i]);
             }
 
-            return true;
+            return $names;
         }
 
         throw new UnexpectedValueException('TableObject->setColumnNames List of names must match number of columns');

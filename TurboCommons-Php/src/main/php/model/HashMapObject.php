@@ -113,7 +113,7 @@ class HashMapObject{
 
         if(!$this->isKey($key)){
 
-            throw new InvalidArgumentException('HashMapObject->get: key does not exist');
+            throw new InvalidArgumentException('HashMapObject->get: key <'.$key.'> does not exist');
         }
 
         return $this->_array[$key];
