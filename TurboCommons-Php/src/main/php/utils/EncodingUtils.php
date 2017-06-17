@@ -20,15 +20,28 @@ class EncodingUtils{
 
 
 	/**
-	 * Convert a string with unicode escaped characters (\u00ed, \u0110) to an utf8 string.
+	 * Convert a string with unicode escaped sequence of characters (\u00ed, \u0110, ....) to an utf8 string.
 	 *
-	 * @param string $str A string containing unicode escaped characters.
+	 * @param string $string A string containing unicode escaped characters.
 	 *
 	 * @return string An utf8 string conversion of the unicode encoded input.
 	 */
-	public static function unicodeCharsToUtf8($str){
+    public static function unicodeEscapedCharsToUtf8($string){
 
-		return json_decode('"'.str_replace('"', '\\"', $str).'"');
+        return json_decode('"'.str_replace('"', '\\"', $string).'"');
+	}
+
+
+	/**
+	 * Convert a utf8 string to a string with unicode escaped sequence of characters (\u00ed, \u0110, ...).
+	 *
+	 * @param string $string A string containing an utf8 valid string.
+	 *
+	 * @return string A string containing escaped sequences for all the original utf8 characters
+	 */
+	public static function utf8ToUnicodeEscapedChars($string){
+
+	    return trim(json_encode($string, JSON_UNESCAPED_SLASHES + JSON_HEX_QUOT), '"');
 	}
 }
 
