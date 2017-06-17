@@ -268,21 +268,19 @@ class ValidationManager extends BaseStrictClass{
 	 */
 	public function isEqualTo($value, $value2, $errorMessage = '', $isWarning = false){
 
-	    $validationManager = new ValidationManager();
-
 	    // Set optional parameters default values
 		$errorMessage = StringUtils::isEmpty($errorMessage) ? 'values are not equal' : $errorMessage;
 
 		$res = $errorMessage;
 
 		// Compare elements depending on its type
-		if($validationManager->isArray($value) && $validationManager->isArray($value2)){
+		if(ArrayUtils::isArray($value) && ArrayUtils::isArray($value2)){
 
 			$res = ArrayUtils::isEqualTo($value, $value2) ? '' : $res;
 
 		}else{
 
-			if($validationManager->isObject($value) && $validationManager->isObject($value2)){
+		    if(ObjectUtils::isObject($value) && ObjectUtils::isObject($value2)){
 
 				$res = ObjectUtils::isEqualTo($value, $value2) ? '' : $res;
 
