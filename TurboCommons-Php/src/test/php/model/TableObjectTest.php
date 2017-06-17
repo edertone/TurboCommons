@@ -308,7 +308,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 
 	    // Test ok values
 	    $test = new TableObject(5, 3);
-	    $this->assertTrue($test->setColumnNames(['', '  ', "\n\n\n"]));
+	    $this->assertEquals(['', '  ', "\n\n\n"], $test->setColumnNames(['', '  ', "\n\n\n"]));
 	    $this->assertTrue($test->getColumnNames() === ['', '  ', "\n\n\n"]);
 
 	    for ($i = 1; $i < 50; $i+=10) {
@@ -324,7 +324,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	                $columns[] = 'column'.$k;
 	            }
 
-	            $this->assertTrue($test->setColumnNames($columns));
+	            $this->assertEquals($columns, $test->setColumnNames($columns));
 	            $this->assertTrue($test->getColumnNames() === $columns);
 	        }
 	    }
