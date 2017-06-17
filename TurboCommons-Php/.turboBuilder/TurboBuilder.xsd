@@ -218,19 +218,13 @@
 					
 					<xs:complexType>
 					
-						<xs:attribute name="phpDoc" default="false" type="xs:boolean">
+						<xs:attribute name="generateCodeDocumentation" default="true" type="xs:boolean">
 							<xs:annotation>
-								<xs:documentation>Enable or disable the automatic documentation generation for the Php code to the 'target/projectName-version/doc/php' folder</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>		
-						
-						<xs:attribute name="jsDoc" default="false" type="xs:boolean">
-							<xs:annotation>
-								<xs:documentation>Enable or disable the automatic documentation generation for the JS code to the 'target/projectName-version/doc/js' folder</xs:documentation>
+								<xs:documentation>Enable or disable the automatic code documentation generation for all the supported languages to the 'target/projectName-version/doc' folder</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
 						
-						<xs:attribute name="gitChangeLog" default="false" type="xs:boolean">
+						<xs:attribute name="gitChangeLog" default="true" type="xs:boolean">
 							<xs:annotation>
 								<xs:documentation>Enable or disable the automatic GIT changelog generation to the 'target/projectName-version/changelog' folder</xs:documentation>
 							</xs:annotation>
@@ -628,7 +622,15 @@
                                     <xs:attribute name="coverageReport" use="required" type="xs:boolean">
                                         <xs:annotation>
                                             <xs:documentation>
-                                                Enables or disables the coverage report generation as part of the unit tests execution
+                                                Enables or disables the coverage report generation as part of the unit tests execution. Note that phpunit requires Xdebug to be enabled on the php installation to work.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:attribute>
+                                    
+                                    <xs:attribute name="coverageReportOpenAfterTests" use="required" type="xs:boolean">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                If this flag is enabled, the coverage report will be automatically opened by the OS browser after the unit tests execute (even if there are test failures)
                                             </xs:documentation>
                                         </xs:annotation>
                                     </xs:attribute>

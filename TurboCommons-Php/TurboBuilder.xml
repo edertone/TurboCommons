@@ -9,9 +9,7 @@
 	
 	</Build>
 
-	<Release gitChangeLog="true"
-			 optimizePhp="false"
-			 phpDoc="true" />
+	<Release />
 	
 	<Validate enabled="true">
 	
@@ -39,7 +37,8 @@
 	
 		<Php enabled="true" 
 			 mode="commandLine"
-             coverageReport="true" />	
+             coverageReport="true"
+             coverageReportOpenAfterTests="true" />	
 			 	  
 	</Test>
 			

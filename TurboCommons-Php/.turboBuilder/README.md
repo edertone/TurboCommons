@@ -1,4 +1,4 @@
-# TurboBuilder 0.8.2
+# TurboBuilder 0.8.6
 
 This folder contains all the files that are required to run the project build with turbo builder.
 
