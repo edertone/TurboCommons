@@ -1345,6 +1345,13 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    $this->assertTrue($test->getRow(0) === [null]);
 
 	    $test = new TableObject(5, 5);
+	    $test->setCell(1, 0, 1);
+	    $test->setCell(1, 1, 2);
+	    $test->setCell(1, 2, 3);
+	    $this->assertTrue($test->getRow(0) === [null, null, null, null, null]);
+	    $this->assertTrue($test->getRow(1) === [1, 2, 3, null, null]);
+
+	    $test = new TableObject(5, 5);
 	    $this->assertTrue($test->getRow(0) === [null, null, null, null, null]);
 	    $test->setRow(2, [1, 2, 3, 4, 5]);
 	    $this->assertTrue($test->getRow(0) === [null, null, null, null, null]);
