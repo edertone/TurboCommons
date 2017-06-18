@@ -56,7 +56,7 @@ class CSVObject extends TableObject{
 
         for ($i = 0; $i < $stringLen; $i++) {
 
-            $character = substr($string, $i, 1);
+            $character = $string[$i];
 
             if($character === $enclosure){
 
@@ -206,7 +206,7 @@ class CSVObject extends TableObject{
 
         for ($i = $currentIndex + 1; $i < $stringLen; $i++) {
 
-            $char = substr($string, $i, 1);
+            $char = $string[$i];
 
             if($char === $delimiter || $char === "\r" || $char === "\n"){
 
