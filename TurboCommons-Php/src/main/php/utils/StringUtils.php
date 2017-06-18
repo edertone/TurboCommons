@@ -100,8 +100,6 @@ class StringUtils {
      */
     public static function isEmpty($string, array $emptyChars = []){
 
-        $aux = '';
-
         // Empty or null value is considered empty
         if($string == null || $string == ''){
 
@@ -114,24 +112,10 @@ class StringUtils {
             throw new InvalidArgumentException('StringUtils->isEmpty: value is not a string');
         }
 
-        // Replace all empty spaces.
-        if(($aux = str_replace(' ', '', $string)) == ''){
+        $aux = '';
 
-            return true;
-        }
-
-        // Replace all new line characters
-        if(($aux = str_replace("\n", '', $aux)) == ''){
-
-            return true;
-        }
-
-        if(($aux = str_replace("\r", '', $aux)) == ''){
-
-            return true;
-        }
-
-        if(($aux = str_replace("\t", '', $aux)) == ''){
+        // Replace all empty spaces and new line characters
+        if(($aux = str_replace([' ', "\n", "\r", "\t"], '', $string)) == ''){
 
             return true;
         }
