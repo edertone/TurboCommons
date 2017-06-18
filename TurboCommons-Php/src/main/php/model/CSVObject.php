@@ -75,7 +75,7 @@ class CSVObject extends TableObject{
 
                     }else{
 
-                        $i = $this->_findNextDelimiterIndex($string, $i, $delimiter) - 1;
+                        $i = $this->_findNextDelimiterIndex($string, $i, $delimiter, $stringLen) - 1;
                     }
                 }
 
@@ -196,15 +196,13 @@ class CSVObject extends TableObject{
     /**
      *Auxiliary method that looks for the next delimiter or newline characters on the csv string starting at the specified position.
      *
-     * @param string &$string The full csv string to search in. This is passed by reference to avoid memory duplication for big csv files
+     * @param string $string The full csv string to search in.
      * @param integer $currentIndex The csv string starting point for the search
      * @param string $delimiter The character that is used as the csv delimiter
      *
      * @return integer The index where the next delimiter or newline character is found
      */
-    private function _findNextDelimiterIndex(&$string, $currentIndex, $delimiter){
-
-        $stringLen = strlen($string);
+    private function _findNextDelimiterIndex($string, $currentIndex, $delimiter, $stringLen){
 
         for ($i = $currentIndex + 1; $i < $stringLen; $i++) {
 
