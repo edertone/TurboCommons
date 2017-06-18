@@ -244,11 +244,7 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 
 	        $fileData = $this->filesManager->readFile($this->basePath.'/'.$file);
 
-	        $startTime = microtime(true);
-
 	        $test = new CSVObject($fileData, StringUtils::countStringOccurences($file, 'WithHeader') === 1);
-
-	        $this->assertLessThan(5, microtime(true) - $startTime, 'CSV '.$file.' parsing took more than 5 second' );
 
 	        $resultFile = StringUtils::getFileNameWithoutExtension($file).'.properties';
 	        $resultData = new JavaPropertiesObject($this->filesManager->readFile($this->basePath.'/'.$resultFile));
@@ -271,7 +267,7 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	            }
 	        }
 	    }
-	    
+
 	    // Test wrong values
 	    // TODO
 
