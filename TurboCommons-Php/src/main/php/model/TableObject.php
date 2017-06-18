@@ -29,7 +29,7 @@ class TableObject{
      *
      * @var HashMapObject
      */
-    private $_columnNames = null;
+    protected $_columnNames = null;
 
 
     /**
@@ -38,21 +38,21 @@ class TableObject{
      *
      * @var HashMapObject
      */
-    private $_cells = null;
+    protected $_cells = null;
 
 
     /**
      * Stores the number of columns on the current table instance
      * @var integer
      */
-    private $_columnsCount = 0;
+    protected $_columnsCount = 0;
 
 
     /**
      * Stores the number of rows on the current table instance
      * @var integer
      */
-    private $_rowsCount = 0;
+    protected $_rowsCount = 0;
 
 
     /**
