@@ -58,6 +58,16 @@ class CSVObject extends TableObject{
 
             $character = $string[$i];
 
+            if ($character === $delimiter && !$enclosureFound) {
+
+                $this->_insertField($currentRow, $currentColumn, $fieldValue);
+
+                $fieldValue = '';
+                $currentColumn ++;
+
+                continue;
+            }
+
             if($character === $enclosure){
 
                 if($enclosureFound && substr($string, $i + 1, 1) === $enclosure){
@@ -78,16 +88,6 @@ class CSVObject extends TableObject{
                         $i = $this->_findNextDelimiterIndex($string, $i, $delimiter, $stringLen) - 1;
                     }
                 }
-
-                continue;
-            }
-
-            if ($character === $delimiter && !$enclosureFound) {
-
-                $this->_insertField($currentRow, $currentColumn, $fieldValue);
-
-                $fieldValue = '';
-                $currentColumn ++;
 
                 continue;
             }
@@ -126,7 +126,7 @@ class CSVObject extends TableObject{
             $fieldValue .= $character;
         }
 
-        if($fieldValue != '' || $currentColumn >= $this->countColumns()){
+        if($fieldValue != '' || $currentColumn >= $this->_columnsCount){
 
             $this->_insertField($currentRow, $currentColumn, $fieldValue);
         }
@@ -179,17 +179,17 @@ class CSVObject extends TableObject{
      */
     private function _insertField($currentRow, $currentColumn, $fieldValue){
 
-        if ($currentRow >= $this->countRows()){
+        if ($currentRow >= $this->_rowsCount){
 
-            $this->addRows(1);
+            $this->_rowsCount ++;
         }
 
-        if ($currentColumn >= $this->countColumns()){
+        if ($currentColumn >= $this->_columnsCount){
 
-            $this->addColumns(1);
+            $this->_columnsCount ++;
         }
 
-        $this->setCell($currentRow, $currentColumn, $fieldValue);
+        $this->_cells->set($currentRow.'-'.$currentColumn, $fieldValue);
     }
 
 
