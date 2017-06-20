@@ -263,7 +263,7 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	                $expected = $resultData->get($key);
 	                $value = $test->getCell((int)$rowCol[0], $columnFormatted);
 
-	                $this->assertEquals($expected, $value, 'File: '.$file);
+	                $this->assertEquals($expected, $value, 'File: '.$file.' row and col: '.$key);
 	            }
 	        }
 	    }
