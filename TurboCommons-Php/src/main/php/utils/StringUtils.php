@@ -432,11 +432,11 @@ class StringUtils {
         // Process the received string to contain only alphanumeric lowercase values
         $string = self::formatForFullTextSearch($string);
 
-          // Remove all the words that are shorter than the specified lenght
-          $string = self::removeWordsShorterThan($string, $longerThan);
+        // Remove all the words that are shorter than the specified lenght
+        $string = self::removeWordsShorterThan($string, $longerThan);
 
-          // Remove all the words longher than specified value
-          $string = self::removeWordsLongerThan($string, $shorterThan);
+        // Remove all the words longher than specified value
+        $string = self::removeWordsLongerThan($string, $shorterThan);
 
           // Count the occurences of each word
         $words = array_count_values(explode(' ', $string));
