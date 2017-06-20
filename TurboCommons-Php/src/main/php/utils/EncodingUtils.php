@@ -11,6 +11,8 @@
 
 namespace org\turbocommons\src\main\php\utils;
 
+use InvalidArgumentException;
+
 
 /**
  * Utilities related to string and text character encoding,
@@ -28,20 +30,39 @@ class EncodingUtils{
 	 */
     public static function unicodeEscapedCharsToUtf8($string){
 
-        return json_decode('"'.str_replace('"', '\\"', $string).'"');
+        if(!StringUtils::isString($string)){
+
+            throw new InvalidArgumentException('EncodingUtils->unicodeEscapedCharsToUtf8: Specified value must be a string');
+        }
+
+        return preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($match) {
+            return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
+        }, $string);
 	}
 
 
 	/**
 	 * Convert a utf8 string to a string with unicode escaped sequence of characters (\u00ed, \u0110, ...).
 	 *
-	 * @param string $string A string containing an utf8 valid string.
+	 * @param string $string A string containing an utf8 valid sequence.
 	 *
 	 * @return string A string containing escaped sequences for all the original utf8 characters
 	 */
 	public static function utf8ToUnicodeEscapedChars($string){
 
-	    return trim(json_encode($string, JSON_UNESCAPED_SLASHES + JSON_HEX_QUOT), '"');
+	    if(!StringUtils::isString($string)){
+
+	        throw new InvalidArgumentException('EncodingUtils->utf8ToUnicodeEscapedChars: Specified value must be a string');
+	    }
+
+	    if(StringUtils::isEmpty($string)){
+
+	        return $string;
+	    }
+
+	    $result = trim(json_encode($string, JSON_UNESCAPED_SLASHES + JSON_HEX_QUOT), '"');
+
+	    return str_replace('\\\\', '\\', $result);
 	}
 }
 
