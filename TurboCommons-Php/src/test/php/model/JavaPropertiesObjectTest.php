@@ -220,6 +220,24 @@ class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
                     $this->assertTrue($test->get('SOME_JAPANESE_TEXT_WITH_MULTILINES') === "氨䛧 ちゅレ゜頨褤つ 栨プ\n\n詞ゞ黨 禺驩へ, なか䤥楯ティ 䨺礨背㛤騟 嶥䰧ツェ餣\nしょ 查ぴゃ秺 む難 びゃ\nきゃ ");
                     break;
 
+                case 'BigFile-5000Lines.properties':
+                    $this->assertTrue($test->length() === 5000);
+                    $this->assertTrue($test->get('0') === 'value-0');
+                    $this->assertTrue($test->get('789') === 'value-789');
+                    $this->assertTrue($test->get('1240') === 'value-1240');
+                    $this->assertTrue($test->get('3450') === 'value-3450');
+                    $this->assertTrue($test->get('4999') === 'value-4999');
+                    break;
+
+                case 'BigFile-15000Lines.properties':
+                    $this->assertTrue($test->length() === 15000);
+                    $this->assertTrue($test->get('0') === 'value-0');
+                    $this->assertTrue($test->get('1789') === 'value-1789');
+                    $this->assertTrue($test->get('5240') === 'value-5240');
+                    $this->assertTrue($test->get('10450') === 'value-10450');
+                    $this->assertTrue($test->get('14999') === 'value-14999');
+                    break;
+
                 default:
                     $this->assertTrue(false, $file.' Was not tested');
                     break;
