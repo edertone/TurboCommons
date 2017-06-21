@@ -76,12 +76,12 @@ class JavaPropertiesUtils {
      */
     public static function isEqualTo($properties1, $properties2, $strictOrder = false){
 
-        if(!JavaPropertiesUtils::isJavaProperties($properties1)){
+        if(!self::isJavaProperties($properties1)){
 
             throw new UnexpectedValueException('JavaPropertiesUtils->isEqualTo properties1 does not contain valid java properties data');
         }
 
-        if(!JavaPropertiesUtils::isJavaProperties($properties2)){
+        if(!self::isJavaProperties($properties2)){
 
             throw new UnexpectedValueException('JavaPropertiesUtils->isEqualTo properties2 does not contain valid java properties data');
         }

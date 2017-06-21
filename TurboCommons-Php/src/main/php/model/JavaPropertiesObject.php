@@ -53,6 +53,7 @@ class JavaPropertiesObject extends HashMapObject {
         }
 
         $key = '';
+        $value = '';
         $isWaitingOtherLine = false;
 
         // Generate an array with the properties lines, ignoring blank lines and comments
@@ -75,14 +76,21 @@ class JavaPropertiesObject extends HashMapObject {
 
                 // Extract the key from the line
                 $key = trim(substr($line, 0, $keyDividerIndex));
-                $key = str_replace(['\\ ', '\#', '\!', '\=', '\:'], [' ', '#', '!', '=', ':'], $key);
+
+                // Add a space to the end if the last character is a \
+                if(substr($key, strlen($key) - 1, 1) === '\\'){
+
+                    $key .= ' ';
+                }
+
+                $key = str_replace(['\\\\', '\\ ', '\#', '\!', '\=', '\:'], ['\\', ' ', '#', '!', '=', ':'], $key);
 
                 // Extract the value from the line
                 $value = ltrim(substr($line, $keyDividerIndex + 1, strlen($line)));
             }
 
-            // Unescape escaped slashes on the value
-            $value = str_replace(['\\\\'], ['\u005C'], $value);
+            // Unescape escaped slashes and spaces on the value
+            $value = str_replace(['\\\\', '\\ ', '\\r\\n', '\\n', '\\t'], ['\u005C', ' ', "\r\n", "\n", "\t"], $value);
 
             // Check if ends with single '\'
             if(substr($value, -1) == '\\'){
@@ -126,18 +134,14 @@ class JavaPropertiesObject extends HashMapObject {
 
         for ($i = 0; $i < $keysCount; $i++) {
 
-            $key = str_replace([' ', '#', '!', '=', ':'], ['\\ ', '\#', '\!', '\=', '\:'], $keys[$i]);
+            $key = str_replace(['\\', ' ', '#', '!', '=', ':'], ['\\\\', '\\ ', '\#', '\!', '\=', '\:'], $keys[$i]);
 
-            $value = EncodingUtils::utf8ToUnicodeEscapedChars($this->get($keys[$i]));
+            $value = str_replace(['\\', ' ', "\r\n", "\n", "\t"], ['\\\\', '\\ ', '\\r\\n', '\\n', '\\t'], $this->get($keys[$i]));
 
-            $value = str_replace("\n", '\\n', $value);
-            $value = str_replace("\r", '\\r', $value);
-            $value = str_replace("\t", '\\t', $value);
-
-            $result[] = $key.'='.$value;
+            $result[] = $key.'='.EncodingUtils::utf8ToUnicodeEscapedChars($value);
         }
 
-        return implode("\n", $result);
+        return implode("\r\n", $result);
     }
 }
 
