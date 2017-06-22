@@ -35,7 +35,7 @@ class JavaPropertiesUtils {
 
         if(StringUtils::isString($value)){
 
-            if(StringUtils::isEmpty($value)){
+            if(StringUtils::isEmpty($value) || strlen($value) < 2 || substr($value, 0, 1) == '='){
 
                 return false;
             }
