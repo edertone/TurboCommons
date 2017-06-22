@@ -13,6 +13,7 @@ namespace org\turbocommons\src\main\php\model;
 
 use UnexpectedValueException;
 use org\turbocommons\src\main\php\utils\StringUtils;
+use org\turbocommons\src\main\php\utils\ArrayUtils;
 
 
 /**
@@ -133,8 +134,7 @@ class CSVObject extends TableObject{
 
         if($headers){
 
-            $this->setColumnNames($this->getRow(0));
-            $this->removeRow(0);
+            $this->_defineHeaders();
         }
     }
 
@@ -162,7 +162,7 @@ class CSVObject extends TableObject{
     /**
      * TODO
      */
-    public function toString(){
+    public function toString($delimiter = ',', $enclosure = '"'){
 
         // TODO
     }
@@ -215,6 +215,56 @@ class CSVObject extends TableObject{
         }
 
         return $stringLen;
+    }
+
+
+    /**
+     * Auxiliary method to load the first csv row as the column names and avoid duplicate column names
+     *
+     * @return void
+     */
+    private function _defineHeaders() {
+
+        $columnNames = $this->getRow(0);
+
+        if(ArrayUtils::hasDuplicateElements($columnNames)){
+
+            $i = 0;
+            $result = [];
+            $duplicateColumnNames = ArrayUtils::getDuplicateElements($columnNames);
+
+            foreach ($columnNames as $columnName) {
+
+                if($columnName === null || $columnName === ''){
+
+                    $i ++;
+                    $columnName = (string)$i;
+
+                }else{
+
+                    foreach ($duplicateColumnNames as $duplicateColumnName) {
+
+                        if($columnName === $duplicateColumnName){
+
+                            $i ++;
+                            $columnName = $columnName.(string)$i;
+
+                            break;
+                        }
+                    }
+                }
+
+                $result[] = $columnName;
+            }
+
+            $this->setColumnNames($result);
+
+        }else{
+
+            $this->setColumnNames($columnNames);
+        }
+
+        $this->removeRow(0);
     }
 }
 
