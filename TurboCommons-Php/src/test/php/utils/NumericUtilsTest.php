@@ -121,6 +121,7 @@ class NumericUtilsTest extends PHPUnit_Framework_TestCase {
 
 	    // Test wrong values
 	    $this->assertFalse(NumericUtils::isNumeric('abc'));
+	    $this->assertFalse(NumericUtils::isNumeric('col20'));
 	    $this->assertFalse(NumericUtils::isNumeric('1-'));
 	    $this->assertFalse(NumericUtils::isNumeric('1,1'));
 	    $this->assertFalse(NumericUtils::isNumeric(' '));

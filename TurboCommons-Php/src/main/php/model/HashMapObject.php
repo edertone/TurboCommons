@@ -50,14 +50,14 @@ class HashMapObject{
      * Structure that contains the HashMapObject data
      * @var array
      */
-    private $_array = [];
+    protected $_array = [];
 
 
     /**
      * Stores the number of elements inside the HashMapObject
      * @var integer
      */
-    private $_length = 0;
+    protected $_length = 0;
 
 
     /**
