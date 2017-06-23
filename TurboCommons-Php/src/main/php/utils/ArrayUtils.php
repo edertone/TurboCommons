@@ -100,6 +100,46 @@ class ArrayUtils {
 
 
 	/**
+	 * remove all the duplicate values on the provided array
+	 * Duplicate values with different data types won't be considered as equal ('1', 1 will not be removed)
+	 *
+	 * @param array $array An array with possible duplicate values
+	 *
+	 * @return array The same provided array but without duplicate elements
+	 */
+	public static function removeDuplicateElements(array $array){
+
+	    $result = [];
+	    $numElements = count($array);
+
+	    $validationManager = new ValidationManager();
+
+	    for ($i = 0; $i < $numElements; $i++) {
+
+	        $found = false;
+
+	        $resultCount = count($result);
+
+	        for ($j = 0; $j < $resultCount; $j++) {
+
+	            if($validationManager->isEqualTo($array[$i], $result[$j])){
+
+	                $found = true;
+	                break;
+	            }
+	        }
+
+	        if(!$found){
+
+	            $result[] = $array[$i];
+	        }
+	    }
+
+	    return $result;
+	}
+
+
+	/**
 	 * Check if the given array contains duplicate values or not.
 	 * Duplicate values with different data types won't be considered as equal ('1', 1 will return false)
 	 *
@@ -125,6 +165,36 @@ class ArrayUtils {
 	    }
 
 	    return false;
+	}
+
+
+	/**
+	 * Get all the duplicate values on the provided array
+	 * Duplicate values with different data types won't be considered as equal ('1', 1 will return false)
+	 *
+	 * @param array $array An array containing some elements to test
+	 *
+	 * @return array list with all the elements that are duplicated on the provided array
+	 */
+	public static function getDuplicateElements(array $array){
+
+	    $result = [];
+	    $numElements = count($array);
+
+	    $validationManager = new ValidationManager();
+
+	    for ($i = 0; $i < $numElements; $i++) {
+
+	        for ($j = $i + 1; $j < $numElements; $j++) {
+
+	            if($validationManager->isEqualTo($array[$i], $array[$j])){
+
+	                $result[] = $array[$i];
+	            }
+	        }
+	    }
+
+	    return self::removeDuplicateElements($result);
 	}
 }
 

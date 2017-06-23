@@ -152,6 +152,68 @@ class ArrayUtilsTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
+	 * testRemoveDuplicateElements
+	 *
+	 * @return void
+	 */
+	public function testRemoveDuplicateElements(){
+
+	    // Test empty values
+	    $exceptionMessage = '';
+
+	    try {
+	        ArrayUtils::removeDuplicateElements(null);
+	        $exceptionMessage = 'null did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        ArrayUtils::removeDuplicateElements('');
+	        $exceptionMessage = '"" did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        ArrayUtils::removeDuplicateElements(new stdClass());
+	        $exceptionMessage = 'new stdClass() did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    if($exceptionMessage != ''){
+
+	        $this->fail($exceptionMessage);
+	    }
+
+	    $this->assertEquals([], ArrayUtils::removeDuplicateElements([]));
+	    $this->assertEquals([null], ArrayUtils::removeDuplicateElements([null]));
+	    $this->assertEquals([null], ArrayUtils::removeDuplicateElements([null, null]));
+
+	    // Test ok values
+	    $this->assertEquals([1], ArrayUtils::removeDuplicateElements([1, 1]));
+	    $this->assertEquals(['1'], ArrayUtils::removeDuplicateElements(['1', '1']));
+	    $this->assertEquals([1, 0], ArrayUtils::removeDuplicateElements([1, 0, 1]));
+	    $this->assertEquals(['1', '0'], ArrayUtils::removeDuplicateElements(['1', '0', '1']));
+	    $this->assertEquals([1, 2, 3, 4], ArrayUtils::removeDuplicateElements([1, 2, 3, 4, 2]));
+	    $this->assertEquals(['hello', 'go'], ArrayUtils::removeDuplicateElements(['hello', 'go', 'hello']));
+	    $this->assertEquals([new Exception(), 'go', 'hello'], ArrayUtils::removeDuplicateElements([new Exception(), 'go', 'hello', new Exception()]));
+
+	    // Test wrong values
+	    $this->assertEquals([1], ArrayUtils::removeDuplicateElements([1]));
+	    $this->assertEquals([1, 2], ArrayUtils::removeDuplicateElements([1, 2]));
+	    $this->assertEquals(['1', '2'], ArrayUtils::removeDuplicateElements(['1', '2']));
+	    $this->assertEquals([1, 2, 3, 4, 5, 6], ArrayUtils::removeDuplicateElements([1, 2, 3, 4, 5, 6]));
+	    $this->assertEquals(['1', 1], ArrayUtils::removeDuplicateElements(['1', 1]));
+	    $this->assertEquals([new Exception(), 'go', 'hello'], ArrayUtils::removeDuplicateElements([new Exception(), 'go', 'hello']));
+
+	    // Test exceptions
+	    // Already tested with empty values
+	}
+
+
+	/**
 	 * testHasDuplicateElements
 	 *
 	 * @return void
@@ -220,6 +282,68 @@ class ArrayUtilsTest extends PHPUnit_Framework_TestCase {
 	    $this->assertFalse(ArrayUtils::hasDuplicateElements([1, 2, 3, 4, 5, 6]));
 	    $this->assertFalse(ArrayUtils::hasDuplicateElements(['1', 1]));
 	    $this->assertFalse(ArrayUtils::hasDuplicateElements([new Exception(), 'go', 'hello']));
+
+	    // Test exceptions
+	    // Already tested with empty values
+	}
+
+
+	/**
+	 * testGetDuplicateElements
+	 *
+	 * @return void
+	 */
+	public function testGetDuplicateElements(){
+
+	    // Test empty values
+	    $exceptionMessage = '';
+
+	    try {
+	        ArrayUtils::getDuplicateElements(null);
+	        $exceptionMessage = 'null did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        ArrayUtils::getDuplicateElements('');
+	        $exceptionMessage = '"" did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        ArrayUtils::getDuplicateElements(new stdClass());
+	        $exceptionMessage = 'new stdClass() did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    if($exceptionMessage != ''){
+
+	        $this->fail($exceptionMessage);
+	    }
+
+	    $this->assertEquals([], ArrayUtils::getDuplicateElements([]));
+	    $this->assertEquals([], ArrayUtils::getDuplicateElements([null]));
+
+	    // Test ok values
+	    $this->assertEquals([1], ArrayUtils::getDuplicateElements([1, 1]));
+	    $this->assertEquals(['1'], ArrayUtils::getDuplicateElements(['1', '1']));
+	    $this->assertEquals([1], ArrayUtils::getDuplicateElements([1, 0, 1]));
+	    $this->assertEquals(['1'], ArrayUtils::getDuplicateElements(['1', '0', '1']));
+	    $this->assertEquals([2], ArrayUtils::getDuplicateElements([1, 2, 3, 4, 2]));
+	    $this->assertEquals([2, 3], ArrayUtils::getDuplicateElements([1, 2, 3, 4, 2, 3, 3, 3]));
+	    $this->assertEquals(['hello'], ArrayUtils::getDuplicateElements(['hello', 'go', 'hello']));
+	    $this->assertEquals([new Exception()], ArrayUtils::getDuplicateElements([new Exception(), 'go', 'hello', new Exception()]));
+
+	    // Test wrong values
+	    $this->assertEquals([], ArrayUtils::getDuplicateElements([1]));
+	    $this->assertEquals([], ArrayUtils::getDuplicateElements([1, 2]));
+	    $this->assertEquals([], ArrayUtils::getDuplicateElements(['1', '2']));
+	    $this->assertEquals([], ArrayUtils::getDuplicateElements([1, 2, 3, 4, 5, 6]));
+	    $this->assertEquals([], ArrayUtils::getDuplicateElements(['1', 1]));
+	    $this->assertEquals([], ArrayUtils::getDuplicateElements([new Exception(), 'go', 'hello']));
 
 	    // Test exceptions
 	    // Already tested with empty values
