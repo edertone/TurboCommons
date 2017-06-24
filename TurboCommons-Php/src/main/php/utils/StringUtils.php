@@ -397,7 +397,7 @@ class StringUtils {
         foreach($tmp as $line){
 
             // Apply specified filters
-            if(is_string($line) && preg_replace($filters, '', $line) != ''){
+            if(preg_replace($filters, '', $line) != ''){
 
                 $res[] = $line;
             }
