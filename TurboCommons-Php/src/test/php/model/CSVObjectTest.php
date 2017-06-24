@@ -16,7 +16,6 @@ use PHPUnit_Framework_TestCase;
 use stdClass;
 use org\turbocommons\src\main\php\managers\FilesManager;
 use org\turbocommons\src\main\php\model\CSVObject;
-use org\turbocommons\src\main\php\utils\CSVUtils;
 use org\turbocommons\src\main\php\utils\StringUtils;
 use org\turbocommons\src\main\php\model\JavaPropertiesObject;
 use org\turbocommons\src\main\php\utils\NumericUtils;
@@ -133,7 +132,7 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	    $this->assertEquals('', $test->getCell(0, 0));
 	    $this->assertEquals('', $test->getCell(0, 1));
 	    $this->assertEquals('', $test->getCell(0, 2));
-	    CSVUtils::isEqualTo(',,', $test->toString());
+	    $this->assertTrue($test->isEqualTo(',,'));
 
 	    // Simple one row empty csv with headers
 	    $test = new CSVObject("c1,c2,c3\r\n,,", true);
@@ -143,14 +142,14 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	    $this->assertEquals('', $test->getCell(0, 0));
 	    $this->assertEquals('', $test->getCell(0, 1));
 	    $this->assertEquals('', $test->getCell(0, 2));
-	    CSVUtils::isEqualTo("c1,c2,c3\n,,", $test->toString());
+	    $this->assertTrue($test->isEqualTo("c1,c2,c3\n,,"));
 
 	    // Simple one row csv without headers
 	    $test = new CSVObject('a,b,c');
 	    $this->assertEquals('a', $test->getCell(0, 0));
 	    $this->assertEquals('b', $test->getCell(0, 1));
 	    $this->assertEquals('c', $test->getCell(0, 2));
-	    CSVUtils::isEqualTo('a,b,c', $test->toString());
+	    $this->assertTrue($test->isEqualTo('a,b,c'));
 
 	    // Simple one row csv with headers
 	    $test = new CSVObject("c1,c2,c3\n1,2,3", true);
@@ -160,14 +159,14 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	    $this->assertEquals('1', $test->getCell(0, 0));
 	    $this->assertEquals('2', $test->getCell(0, 1));
 	    $this->assertEquals('3', $test->getCell(0, 2));
-	    CSVUtils::isEqualTo("c1,c2,c3\r\n1,2,3", $test->toString());
+	    $this->assertTrue($test->isEqualTo("c1,c2,c3\r\n1,2,3"));
 
 	    // Simple one row csv without headers and scaped fields
 	    $test = new CSVObject('"a","b","c"');
 	    $this->assertEquals('a', $test->getCell(0, 0));
 	    $this->assertEquals('b', $test->getCell(0, 1));
 	    $this->assertEquals('c', $test->getCell(0, 2));
-	    CSVUtils::isEqualTo('a,b,c', $test->toString());
+	    $this->assertTrue($test->isEqualTo('a,b,c'));
 
 	    // Simple one row csv with headers and scaped fields
 	    $test = new CSVObject("c1,c2,c3\r\"a\",\"b\",\"c\"", true);
@@ -177,14 +176,14 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	    $this->assertEquals('a', $test->getCell(0, 0));
 	    $this->assertEquals('b', $test->getCell(0, 1));
 	    $this->assertEquals('c', $test->getCell(0, 2));
-	    CSVUtils::isEqualTo('c1,c2,c3\na,b,c', $test->toString());
+	    $this->assertTrue($test->isEqualTo('c1,c2,c3\na,b,c'));
 
 	    // Simple csv without headers and edge cases
 	    $test = new CSVObject(' a ,b  ,c  ');
 	    $this->assertEquals(' a ', $test->getCell(0, 0));
 	    $this->assertEquals('b  ', $test->getCell(0, 1));
 	    $this->assertEquals('c  ', $test->getCell(0, 2));
-	    CSVUtils::isEqualTo(' a ,b  ,c  ', $test->toString());
+	    $this->assertTrue($test->isEqualTo(' a ,b  ,c  '));
 
 	    // Multiple lines csv with different newline characters (windows: \r\n, Linux/Unix: \n, Mac: \r)
 	    $test = new CSVObject("1,2,3\na,b,c\r\n4,5,6\r");
@@ -197,7 +196,7 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	    $this->assertEquals('4', $test->getCell(2, 0));
 	    $this->assertEquals('5', $test->getCell(2, 1));
 	    $this->assertEquals('6', $test->getCell(2, 2));
-	    CSVUtils::isEqualTo("1,2,3\na,b,c\r\r4,5,6\r\n", $test->toString());
+	    $this->assertTrue($test->isEqualTo("1,2,3\na,b,c\r\r4,5,6\r\n"));
 	    $this->assertTrue($test->countColumns() === 3);
 	    $this->assertTrue($test->countRows() === 3);
 
@@ -208,7 +207,7 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	    $this->assertEquals('3', $test->getCell(0, 2));
 	    $this->assertEquals('4,', $test->getCell(0, 3));
 	    $this->assertEquals('5 ', $test->getCell(0, 4));
-	    CSVUtils::isEqualTo('""""" 1",",,,2","3","4,","5 "', $test->toString());
+	    $this->assertTrue($test->isEqualTo('""""" 1",",,,2","3","4,","5 "'));
 
 	    // Simple two row csv without headers and scaped fields and characters
 	    $test = new CSVObject("\"1\",\"2\",\"3\"\r\n\"a\"\"a\",\"b\",\"c\"");
@@ -218,7 +217,7 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	    $this->assertEquals('a"a', $test->getCell(1, 0));
 	    $this->assertEquals('b', $test->getCell(1, 1));
 	    $this->assertEquals('c', $test->getCell(1, 2));
-	    CSVUtils::isEqualTo("\"1\",\"2\",\"3\"\r\n\"a\"\"a\",\"b\",\"c\"", $test->toString());
+	    $this->assertTrue($test->isEqualTo("\"1\",\"2\",\"3\"\r\n\"a\"\"a\",\"b\",\"c\""));
 
 	    // Simple two row csv with headers and mixed scaped and non scaped fields and characters
 	    $test = new CSVObject("c1,\"c,\"\"2\",c3\r1,\"2\", 3 \r\n\"a \"\",a\",b,\"c\"", true);
@@ -235,37 +234,37 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	    $this->assertEquals('a ",a', $test->getCell(1, 0));
 	    $this->assertEquals('b', $test->getCell(1, 1));
 	    $this->assertEquals('c', $test->getCell(1, 2));
-	    CSVUtils::isEqualTo("c1,\"c,\"\"2\",c3\r1,\"2\", 3 \r\n\"a \"\",a\",b,\"c\"", $test->toString());
+	    $this->assertTrue($test->isEqualTo("c1,\"c,\"\"2\",c3\r1,\"2\", 3 \r\n\"a \"\",a\",b,\"c\""));
 
 	    // test csv files from resources
-	    // Expected values are stored on a properties file for each one of the csv files.
+	    // Expected values are expected to be stored on a properties file for each one of the csv files.
 	    // It must have exactly the same name but with .properties extension
 	    foreach ($this->csvFiles as $file) {
 
-	        $fileData = $this->filesManager->readFile($this->basePath.'/'.$file);
+            $fileData = $this->filesManager->readFile($this->basePath.'/'.$file);
 
-	        $test = new CSVObject($fileData, StringUtils::countStringOccurences($file, 'WithHeader') === 1);
+            $test = new CSVObject($fileData, StringUtils::countStringOccurences($file, 'WithHeader') === 1);
 
-	        $resultFile = StringUtils::getFileNameWithoutExtension($file).'.properties';
-	        $resultData = new JavaPropertiesObject($this->filesManager->readFile($this->basePath.'/'.$resultFile));
+            $resultFile = StringUtils::getFileNameWithoutExtension($file).'.properties';
+            $resultData = new JavaPropertiesObject($this->filesManager->readFile($this->basePath.'/'.$resultFile));
 
-	        $this->assertEquals($resultData->get('rows'), $test->countRows(), 'File: '.$file);
-	        $this->assertEquals($resultData->get('cols'), $test->countColumns(), 'File: '.$file);
+            $this->assertEquals($resultData->get('rows'), $test->countRows(), 'File: '.$file);
+            $this->assertEquals($resultData->get('cols'), $test->countColumns(), 'File: '.$file);
 
-	        foreach ($resultData->getKeys() as $key) {
+            foreach ($resultData->getKeys() as $key) {
 
-	            if($key !== 'rows' && $key !== 'cols'){
+                if($key !== 'rows' && $key !== 'cols'){
 
-	                $rowCol = explode('-', $key, 2);
+                    $rowCol = explode('-', $key, 2);
 
-	                $columnFormatted = NumericUtils::isNumeric($rowCol[1]) ? (int)$rowCol[1] : $rowCol[1];
+                    $columnFormatted = NumericUtils::isNumeric($rowCol[1]) ? (int)$rowCol[1] : $rowCol[1];
 
-	                $expected = $resultData->get($key);
-	                $value = $test->getCell((int)$rowCol[0], $columnFormatted);
+                    $expected = $resultData->get($key);
+                    $value = $test->getCell((int)$rowCol[0], $columnFormatted);
 
-	                $this->assertEquals($expected, $value, 'File: '.$file.' row and col: '.$key);
-	            }
-	        }
+                    $this->assertEquals($expected, $value, 'File: '.$file.' row and col: '.$key);
+                }
+            }
 	    }
 
 	    // Test wrong values
@@ -282,11 +281,74 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
-	 * testTodo
+	 * testSetCell
 	 *
 	 * @return void
 	 */
-	public function testTodo2(){
+	public function testSetCell(){
+
+	    // Test empty values
+	    // TODO
+
+	    // Test ok values
+	    // TODO
+
+	    // Test wrong values
+	    // TODO
+
+	    // Test exceptions
+	    // TODO
+	}
+
+
+	/**
+	 * testIsCSV
+	 *
+	 * @return void
+	 */
+	public function testIsCSV(){
+
+	    // Test empty values
+	    // TODO
+
+	    // Test ok values
+	    // TODO
+
+	    // Test wrong values
+	    // TODO
+
+	    // Test exceptions
+	    // TODO
+	}
+
+
+	/**
+	 * testIsEqualTo
+	 *
+	 * @return void
+	 */
+	public function testIsEqualTo(){
+
+	    // Test empty values
+	    // TODO
+
+	    // Test ok values
+	    // TODO
+
+	    // Test wrong values
+	    // TODO
+
+	    // Test exceptions
+	    // TODO
+	}
+
+
+	/**
+	 * testToString
+	 *
+	 * @return void
+	 */
+	public function testToString(){
 
 	    // Test empty values
 	    // TODO

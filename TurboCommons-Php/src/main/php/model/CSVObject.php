@@ -160,6 +160,36 @@ class CSVObject extends TableObject{
 
 
     /**
+     * Check if the provided object contains valid CSV information.
+     *
+     * @param mixed $value Object to test for valid CSV data. Accepted values are: Strings containing CSV data or CSVObject elements
+     *
+     * @return boolean True if the received object represent valid CSV data. False otherwise.
+     */
+    public static function isCSV($value){
+
+        // TODO - implement this method
+        return true;
+    }
+
+
+    /**
+     * Check if two provided CSV structures represent the same data
+     *
+     * @param object $csv2 A valid string or CSVObject to compare with the other one
+     * @param boolean $strictColumnOrder TODO
+     * @param boolean $strictRowOrder TODO
+     *
+     * @return boolean true if the two CSV elements are considered equal, false if not
+     */
+    public function isEqualTo($csv2, $strictColumnOrder = true, $strictRowOrder = true){
+
+        // TODO
+        return true;
+    }
+
+
+    /**
      * TODO
      */
     public function toString($delimiter = ',', $enclosure = '"'){
@@ -238,7 +268,7 @@ class CSVObject extends TableObject{
                 if($columnName === null || $columnName === ''){
 
                     $i ++;
-                    $columnName = (string)$i;
+                    $columnName = '('.$i.')';
 
                 }else{
 
@@ -247,8 +277,7 @@ class CSVObject extends TableObject{
                         if($columnName === $duplicateColumnName){
 
                             $i ++;
-                            $columnName = $columnName.(string)$i;
-
+                            $columnName = $columnName.'('.$i.')';
                             break;
                         }
                     }
