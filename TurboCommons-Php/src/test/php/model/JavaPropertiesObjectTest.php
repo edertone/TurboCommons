@@ -366,6 +366,8 @@ class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
             $fileData = $this->filesManager->readFile($this->basePath.'/'.$file);
             $test = new JavaPropertiesObject($fileData);
 
+            // TODO - This is added for performance reasons. If performance is improved on
+            // isEqualTo method, this constraint can be removed
             if($test->length() < 1000){
 
                 $this->assertTrue($test->isEqualTo($fileData));
@@ -417,6 +419,8 @@ class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
 
             $test = new JavaPropertiesObject($fileData);
 
+            // TODO - This is added for performance reasons. If performance is improved on
+            // isEqualTo method, this constraint can be removed
             if($test->length() < 1000){
 
                 $this->assertTrue($test->isEqualTo($test->toString(), true), $file.' has a problem');
