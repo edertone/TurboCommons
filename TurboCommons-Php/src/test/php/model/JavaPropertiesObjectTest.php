@@ -16,7 +16,6 @@ use PHPUnit_Framework_TestCase;
 use stdClass;
 use org\turbocommons\src\main\php\model\JavaPropertiesObject;
 use org\turbocommons\src\main\php\managers\FilesManager;
-use org\turbocommons\src\main\php\utils\JavaPropertiesUtils;
 
 
 /**
@@ -45,7 +44,7 @@ class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
      */
     protected function setUp(){
 
-        $this->wrongValues = [null, '', 'key', '=', '=key', '=key=', '=key=value', [1, 2], 1234, new stdclass()];
+        $this->wrongValues = [null, [], 'key', '=', '=key', '=key=', '=key=value', [1, 2], 1234, new stdclass()];
         $this->wrongValuesCount = count($this->wrongValues);
 
         $this->filesManager = new FilesManager();
@@ -86,14 +85,27 @@ class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
     public function testConstruct(){
 
         // Test empty values
+        $exceptionMessage = '';
+
         $test = new JavaPropertiesObject();
         $this->assertTrue($test->length() === 0);
 
         $test = new JavaPropertiesObject('');
         $this->assertTrue($test->length() === 0);
 
-        $test = new JavaPropertiesObject('       ');
-        $this->assertTrue($test->length() === 0);
+        try {
+            new JavaPropertiesObject('       ');
+            $exceptionMessage = '"        " value did not cause exception';
+        } catch (Exception $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            new JavaPropertiesObject("\n\n\n");
+            $exceptionMessage = '"\n\n\n" value did not cause exception';
+        } catch (Exception $e) {
+            // We expect an exception to happen
+        }
 
         // Test ok values
         $test = new JavaPropertiesObject('name=Stephen');
@@ -245,12 +257,11 @@ class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
         }
 
         // Test exceptions
-        $exceptionMessage = '';
-
         for ($i = 0; $i < $this->wrongValuesCount; $i++) {
 
             try {
                 new JavaPropertiesObject($this->wrongValues[$i]);
+                $exceptionMessage = 'wrong value did not cause exception';
             } catch (Exception $e) {
                 // We expect an exception to happen
             }
@@ -260,6 +271,126 @@ class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
 
             $this->fail($exceptionMessage);
         }
+    }
+
+
+    /**
+     * testIsJavaProperties
+     *
+     * @return void
+     */
+    public function testIsJavaProperties(){
+
+        $this->assertFalse(JavaPropertiesObject::isJavaProperties(null));
+        $this->assertTrue(JavaPropertiesObject::isJavaProperties(''));
+        $this->assertFalse(JavaPropertiesObject::isJavaProperties([]));
+        $this->assertFalse(JavaPropertiesObject::isJavaProperties(new stdClass()));
+        $this->assertFalse(JavaPropertiesObject::isJavaProperties('     '));
+        $this->assertFalse(JavaPropertiesObject::isJavaProperties("\n\n\n"));
+        $this->assertFalse(JavaPropertiesObject::isJavaProperties(0));
+
+        $this->assertTrue(JavaPropertiesObject::isJavaProperties(new JavaPropertiesObject()));
+        $this->assertTrue(JavaPropertiesObject::isJavaProperties(new JavaPropertiesObject('')));
+
+        // Test ok values
+        $this->assertTrue(JavaPropertiesObject::isJavaProperties('key='));
+        $this->assertTrue(JavaPropertiesObject::isJavaProperties('key:'));
+        $this->assertTrue(JavaPropertiesObject::isJavaProperties('key=value'));
+        $this->assertTrue(JavaPropertiesObject::isJavaProperties('key:value'));
+
+        foreach ($this->propertiesFiles as $file) {
+
+            $fileData = $this->filesManager->readFile($this->basePath.'/'.$file);
+            $test = new JavaPropertiesObject($fileData);
+            $this->assertTrue(JavaPropertiesObject::isJavaProperties($fileData));
+            $this->assertTrue(JavaPropertiesObject::isJavaProperties($test));
+        }
+
+        // Test wrong values
+        for ($i = 0; $i < $this->wrongValuesCount; $i++) {
+
+            $this->assertFalse(JavaPropertiesObject::isJavaProperties($this->wrongValues[$i]));
+        }
+
+        // Test exceptions
+        // Already tested at wrong values
+    }
+
+
+    /**
+     * testIsEqualTo
+     *
+     * @return void
+     */
+    public function testIsEqualTo(){
+
+        // Test empty values
+        $exceptionMessage = '';
+
+        $properties = new JavaPropertiesObject();
+
+        $this->assertTrue($properties->isEqualTo(''));
+
+        try {
+            $properties->isEqualTo(null);
+            $exceptionMessage = 'null value did not cause exception';
+        } catch (Exception $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            $properties->isEqualTo([]);
+            $exceptionMessage = '[] value did not cause exception';
+        } catch (Exception $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            $properties->isEqualTo(new stdClass());
+            $exceptionMessage = 'new stdClass() value did not cause exception';
+        } catch (Exception $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            $properties->isEqualTo(0);
+            $exceptionMessage = '0 value did not cause exception';
+        } catch (Exception $e) {
+            // We expect an exception to happen
+        }
+
+        // Test ok values
+        foreach ($this->propertiesFiles as $file) {
+
+            $fileData = $this->filesManager->readFile($this->basePath.'/'.$file);
+            $test = new JavaPropertiesObject($fileData);
+
+            if($test->length() < 1000){
+
+                $this->assertTrue($test->isEqualTo($fileData));
+            }
+        }
+
+        // Test wrong values
+        $properties = new JavaPropertiesObject();
+
+        for ($i = 0; $i < $this->wrongValuesCount; $i++) {
+
+            try {
+                $properties->isEqualTo($this->wrongValues[$i]);
+                $exceptionMessage = $this->wrongValues[$i].' wrong value did not cause exception';
+            } catch (Exception $e) {
+                // We expect an exception to happen
+            }
+        }
+
+        if($exceptionMessage != ''){
+
+            $this->fail($exceptionMessage);
+        }
+
+        // Test exceptions
+        // Already tested at wrong values
     }
 
 
@@ -277,9 +408,6 @@ class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
         $test = new JavaPropertiesObject('');
         $this->assertTrue($test->toString() === '');
 
-        $test = new JavaPropertiesObject('    ');
-        $this->assertTrue($test->toString() === '');
-
         // Test ok values
         foreach ($this->propertiesFiles as $file) {
 
@@ -287,7 +415,10 @@ class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
 
             $test = new JavaPropertiesObject($fileData);
 
-            $this->assertTrue(JavaPropertiesUtils::isEqualTo($test->toString(), $fileData, true), $file.' has a problem');
+            if($test->length() < 1000){
+
+                $this->assertTrue($test->isEqualTo($test->toString(), true), $file.' has a problem');
+            }
         }
 
         // Test wrong values

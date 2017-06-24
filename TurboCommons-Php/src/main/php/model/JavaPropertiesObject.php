@@ -11,7 +11,10 @@
 
 namespace org\turbocommons\src\main\php\model;
 
+use Exception;
 use UnexpectedValueException;
+use org\turbocommons\src\main\php\managers\ValidationManager;
+use org\turbocommons\src\main\php\utils\ArrayUtils;
 use org\turbocommons\src\main\php\utils\EncodingUtils;
 use org\turbocommons\src\main\php\utils\StringUtils;
 
@@ -41,13 +44,13 @@ class JavaPropertiesObject extends HashMapObject {
             throw new UnexpectedValueException('JavaPropertiesObject->__construct value must be a string');
         }
 
-        if(StringUtils::isEmpty($string)){
+        if($string === ''){
 
             return;
         }
 
-        // String must contain at least = or :
-        if(strpos($string, '=') === false && strpos($string, ':') === false){
+        // Validate received string
+        if(strlen($string) < 2 || substr($string, 0, 1) == '=' || (strpos($string, '=') === false && strpos($string, ':') === false)){
 
             throw new UnexpectedValueException('JavaPropertiesObject->__construct invalid properties format');
         }
@@ -114,11 +117,84 @@ class JavaPropertiesObject extends HashMapObject {
 
             unset($lines[$i]);
         }
+    }
 
-        if($this->length() <= 0){
 
-            throw new UnexpectedValueException('JavaPropertiesObject->__construct string does not contain valid java properties data');
+    /**
+     * Tells if the given value contains valid Java Properties data information or not
+     *
+     * @param mixed $value A value to check (a string or a JavaPropertiesObject instance)
+     *
+     * @return boolean true if the given value contains valid Java Properties data, false otherwise
+     */
+    public static function isJavaProperties($value){
+
+        // test that received string contains valid properties info
+        try {
+
+            $p = new JavaPropertiesObject($value);
+
+            return $p->length() >= 0;
+
+        } catch (Exception $e) {
+
+            try {
+
+                return ($value != null) && (get_class($value) === 'org\\turbocommons\\src\\main\\php\\model\\JavaPropertiesObject');
+
+            } catch (Exception $e) {
+
+                return false;
+            }
         }
+    }
+
+
+    /**
+     * Check if two provided java properties are identical.
+     * Only data is compared: Any comment that is found on both provided properties will be ignored.
+     *
+     * @param mixed $properties Second java properties value to compare (a string or a JavaPropertiesObject instance)
+     * @param boolean $strictOrder If set to true, both properties elements must have the same keys with the same order. Otherwise differences in key sorting will be accepted
+     *
+     * @return boolean true if both java properties data is exactly the same, false if not
+     */
+    public function isEqualTo($properties, $strictOrder = false){
+
+        $object1Keys = $this->getKeys();
+
+        try {
+
+            $object2 = new JavaPropertiesObject($properties);
+
+            $object2Keys = $object2->getKeys();
+
+        } catch (Exception $e) {
+
+            throw new UnexpectedValueException('JavaPropertiesUtils->isEqualTo properties does not contain valid java properties data');
+        }
+
+        if(count($object1Keys) != count($object2Keys) || ($strictOrder && !ArrayUtils::isEqualTo($object1Keys, $object2Keys))){
+
+            return false;
+        }
+
+        $validationManager = new ValidationManager();
+
+        foreach ($object1Keys as $key1) {
+
+            if(!$strictOrder && !$object2->isKey($key1)){
+
+                return false;
+            }
+
+            if(!$validationManager->isEqualTo($this->get($key1), $object2->get($key1))){
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
 
