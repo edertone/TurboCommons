@@ -62,7 +62,7 @@ class JavaPropertiesObject extends HashMapObject {
         // Generate an array with the properties lines, ignoring blank lines and comments
         $lines = StringUtils::getLines($string, ['/\s+/', '/ *#.*| *!.*/']);
 
-        foreach($lines as $i=>$line) {
+        foreach($lines as $line) {
 
             // Remove all blank spaces at the beginning of the line
             $line = ltrim($line);
@@ -112,11 +112,9 @@ class JavaPropertiesObject extends HashMapObject {
             }
 
             $this->_array[$key] = $value;
-
-            $this->_length = count($this->_array);
-
-            unset($lines[$i]);
         }
+
+        $this->_length = count($this->_array);
     }
 
 
