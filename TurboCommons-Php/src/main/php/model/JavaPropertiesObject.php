@@ -154,7 +154,7 @@ class JavaPropertiesObject extends HashMapObject {
      * Check if two provided java properties are identical.
      * Only data is compared: Any comment that is found on both provided properties will be ignored.
      *
-     * @param mixed $properties Second java properties value to compare (a string or a JavaPropertiesObject instance)
+     * @param mixed $properties java properties value to compare (a string or a JavaPropertiesObject instance)
      * @param boolean $strictOrder If set to true, both properties elements must have the same keys with the same order. Otherwise differences in key sorting will be accepted
      *
      * @return boolean true if both java properties data is exactly the same, false if not
@@ -162,17 +162,33 @@ class JavaPropertiesObject extends HashMapObject {
     public function isEqualTo($properties, $strictOrder = false){
 
         $object1Keys = $this->getKeys();
+        $objectToCompare = null;
 
         try {
 
-            $object2 = new JavaPropertiesObject($properties);
-
-            $object2Keys = $object2->getKeys();
+            $objectToCompare = new JavaPropertiesObject($properties);
 
         } catch (Exception $e) {
 
+            try {
+
+                if(get_class($properties) === 'org\\turbocommons\\src\\main\\php\\model\\JavaPropertiesObject'){
+
+                    $objectToCompare = $properties;
+                }
+
+            } catch (Exception $e) {
+
+                // Nothing to do
+            }
+        }
+
+        if($objectToCompare == null){
+
             throw new UnexpectedValueException('JavaPropertiesUtils->isEqualTo properties does not contain valid java properties data');
         }
+
+        $object2Keys = $objectToCompare->getKeys();
 
         if(count($object1Keys) != count($object2Keys) || ($strictOrder && !ArrayUtils::isEqualTo($object1Keys, $object2Keys))){
 
@@ -183,12 +199,12 @@ class JavaPropertiesObject extends HashMapObject {
 
         foreach ($object1Keys as $key1) {
 
-            if(!$strictOrder && !$object2->isKey($key1)){
+            if(!$strictOrder && !$objectToCompare->isKey($key1)){
 
                 return false;
             }
 
-            if(!$validationManager->isEqualTo($this->get($key1), $object2->get($key1))){
+            if(!$validationManager->isEqualTo($this->get($key1), $objectToCompare->get($key1))){
 
                 return false;
             }

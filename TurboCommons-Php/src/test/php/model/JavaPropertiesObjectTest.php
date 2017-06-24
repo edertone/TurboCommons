@@ -330,6 +330,7 @@ class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
         $properties = new JavaPropertiesObject();
 
         $this->assertTrue($properties->isEqualTo(''));
+        $this->assertTrue($properties->isEqualTo(new JavaPropertiesObject()));
 
         try {
             $properties->isEqualTo(null);
@@ -368,6 +369,7 @@ class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
             if($test->length() < 1000){
 
                 $this->assertTrue($test->isEqualTo($fileData));
+                $this->assertTrue($test->isEqualTo($test));
             }
         }
 
