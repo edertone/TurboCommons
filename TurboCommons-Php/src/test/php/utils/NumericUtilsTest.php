@@ -335,6 +335,20 @@ class NumericUtilsTest extends PHPUnit_Framework_TestCase {
 
 	    $exceptionMessage = '';
 
+	    try {
+	        NumericUtils::generateRandomInteger(5, 5);
+	        $exceptionMessage = '5,5 values did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        NumericUtils::generateRandomInteger(5, 6);
+	        $exceptionMessage = '5,6 values did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
 	    for ($i = 0; $i < $exceptionValuesCount; $i++) {
 
 	        for ($j = 0; $j < $exceptionValuesCount; $j++) {
