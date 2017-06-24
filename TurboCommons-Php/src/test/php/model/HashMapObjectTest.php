@@ -467,6 +467,13 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 	        // We expect an exception to happen
 	    }
 
+	    try {
+	        $this->populatedHashMap->rename('nonexistant', 'newkey');
+	        $exceptionMessage = 'nonexistant did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
 	    // Test exceptions
 	    // Tested at empty values
 	    if($exceptionMessage != ''){
