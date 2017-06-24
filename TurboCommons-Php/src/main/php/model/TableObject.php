@@ -653,10 +653,11 @@ class TableObject{
         $columnIndex = NumericUtils::isInteger($column) ? $column : -1;
         $columnNames = $this->_columnNames->getValues();
         $columnNamesKeys = $this->_columnNames->getKeys();
+        $columnNamesCount = count($columnNames);
 
         if(StringUtils::isString($column)){
 
-            for ($i = 0; $i < $columnNames; $i++) {
+            for ($i = 0; $i < $columnNamesCount; $i++) {
 
                 if($column === $columnNames[$i]){
 
@@ -669,7 +670,7 @@ class TableObject{
 
         if($columnIndex < 0 || $columnIndex >= $this->_columnsCount){
 
-            throw new UnexpectedValueException('TableObject->_calculateColumnIndex Invalid column value');
+            throw new UnexpectedValueException('TableObject->_calculateColumnIndex Invalid column value <'.$column.'>');
         }
 
         return $columnIndex;
