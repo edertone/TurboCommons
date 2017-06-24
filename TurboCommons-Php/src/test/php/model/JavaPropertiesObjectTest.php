@@ -364,14 +364,14 @@ class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
         foreach ($this->propertiesFiles as $file) {
 
             $fileData = $this->filesManager->readFile($this->basePath.'/'.$file);
-            $test = new JavaPropertiesObject($fileData);
+            $properties = new JavaPropertiesObject($fileData);
 
             // TODO - This is added for performance reasons. If performance is improved on
             // isEqualTo method, this constraint can be removed
-            if($test->length() < 1000){
+            if($properties->length() < 1000){
 
-                $this->assertTrue($test->isEqualTo($fileData));
-                $this->assertTrue($test->isEqualTo($test));
+                $this->assertTrue($properties->isEqualTo($fileData));
+                $this->assertTrue($properties->isEqualTo($properties));
             }
         }
 
@@ -387,6 +387,15 @@ class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
                 // We expect an exception to happen
             }
         }
+
+        $properties = new JavaPropertiesObject('key1=v1');
+        $this->assertFalse($properties->isEqualTo('key2=v1'));
+
+        $properties = new JavaPropertiesObject('key1=v1');
+        $this->assertFalse($properties->isEqualTo('key1=v2'));
+
+        $properties = new JavaPropertiesObject('key1=v1');
+        $this->assertFalse($properties->isEqualTo("key1=v1\nkey2=v2"));
 
         if($exceptionMessage != ''){
 
