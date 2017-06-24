@@ -46,12 +46,6 @@ class ArrayUtils {
 
 		$validationManager = new ValidationManager();
 
-		// Both provided values must be arrays or an exception will be launched
-		if(!$validationManager->isArray($array1) || !$validationManager->isArray($array2)){
-
-			throw new UnexpectedValueException('ArrayUtils->isEqualTo: Provided parameters must be arrays');
-		}
-
 		// Compare lengths can save a lot of time
 		if(count($array1) != count($array2)){
 
