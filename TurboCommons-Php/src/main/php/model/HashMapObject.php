@@ -11,6 +11,7 @@
 
 namespace org\turbocommons\src\main\php\model;
 
+use Exception;
 use InvalidArgumentException;
 use org\turbocommons\src\main\php\utils\StringUtils;
 use Doctrine\Instantiator\Exception\UnexpectedValueException;
@@ -111,12 +112,14 @@ class HashMapObject{
             throw new InvalidArgumentException('HashMapObject->get: key must be a string');
         }
 
-        if(!$this->isKey($key)){
+        try {
+
+            return $this->_array[$key];
+
+        } catch (Exception $e) {
 
             throw new InvalidArgumentException('HashMapObject->get: key <'.$key.'> does not exist');
         }
-
-        return $this->_array[$key];
     }
 
 
@@ -166,7 +169,16 @@ class HashMapObject{
      */
     public function isKey($key){
 
-        return in_array($key, array_keys($this->_array));
+        try {
+
+            $this->_array[$key];
+
+            return true;
+
+        } catch (Exception $e) {
+
+            return false;
+        }
     }
 
 
