@@ -73,7 +73,9 @@ class HashMapObject{
      */
     public function set($key, $value){
 
-        if(!StringUtils::isString($key) || StringUtils::isEmpty($key)){
+        // Check if key is a non empty string.
+        // We use the same logic as StringUtils::isEmpty but with some simplification for better performance
+        if(!is_string($key) || str_replace([' ', "\n", "\r", "\t"], '', $key) == ''){
 
             throw new InvalidArgumentException('HashMapObject->set: key must be a non empty string');
         }
@@ -82,7 +84,7 @@ class HashMapObject{
 
         $this->_length = count($this->_array);
 
-        return $this->_array[$key];
+        return $value;
     }
 
 

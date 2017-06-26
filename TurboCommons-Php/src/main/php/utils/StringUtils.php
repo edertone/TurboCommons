@@ -100,8 +100,8 @@ class StringUtils {
      */
     public static function isEmpty($string, array $emptyChars = []){
 
-        // Empty or null value is considered empty
-        if($string == null || $string == ''){
+        // Null value is considered empty
+        if($string == null){
 
             return true;
         }
