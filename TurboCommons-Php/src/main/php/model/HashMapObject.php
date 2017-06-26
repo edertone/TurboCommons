@@ -13,8 +13,7 @@ namespace org\turbocommons\src\main\php\model;
 
 use Exception;
 use InvalidArgumentException;
-use org\turbocommons\src\main\php\utils\StringUtils;
-use Doctrine\Instantiator\Exception\UnexpectedValueException;
+use UnexpectedValueException;
 
 
 /**
@@ -73,12 +72,7 @@ class HashMapObject{
      */
     public function set($key, $value){
 
-        // Check if key is a non empty string.
-        // We use the same logic as StringUtils::isEmpty but with some simplification for better performance
-        if(!is_string($key) || str_replace([' ', "\n", "\r", "\t"], '', $key) == ''){
-
-            throw new InvalidArgumentException('HashMapObject->set: key must be a non empty string');
-        }
+        $this->_validateKeyFormat($key);
 
         $this->_array[$key] = $value;
 
@@ -115,10 +109,7 @@ class HashMapObject{
 
         } catch (Exception $e) {
 
-            if(!StringUtils::isString($key) || StringUtils::isEmpty($key)){
-
-                throw new InvalidArgumentException('HashMapObject->get: key must be a non empty string');
-            }
+            $this->_validateKeyFormat($key);
 
             throw new InvalidArgumentException('HashMapObject->get: key <'.$key.'> does not exist');
         }
@@ -206,10 +197,7 @@ class HashMapObject{
 
         } catch (Exception $e) {
 
-            if(!StringUtils::isString($key) || StringUtils::isEmpty($key)){
-
-                throw new InvalidArgumentException('HashMapObject->delete: key must be a non empty string');
-            }
+            $this->_validateKeyFormat($key);
 
             throw new InvalidArgumentException('HashMapObject->rename: key does not exist '.$key);
         }
@@ -227,15 +215,8 @@ class HashMapObject{
      */
     public function rename($key, $newKey){
 
-        if(!StringUtils::isString($key) || StringUtils::isEmpty($key)){
-
-            throw new InvalidArgumentException('HashMapObject->rename: key must be a string');
-        }
-
-        if(!StringUtils::isString($newKey) || StringUtils::isEmpty($newKey)){
-
-            throw new InvalidArgumentException('HashMapObject->rename: newKey must be a string');
-        }
+        $this->_validateKeyFormat($key);
+        $this->_validateKeyFormat($newKey);
 
         if($this->isKey($newKey)){
 
@@ -281,15 +262,8 @@ class HashMapObject{
      */
     public function swap($key1, $key2){
 
-        if(!StringUtils::isString($key1) || StringUtils::isEmpty($key1)){
-
-            throw new InvalidArgumentException('HashMapObject->swap: key1 must be a string');
-        }
-
-        if(!StringUtils::isString($key2) || StringUtils::isEmpty($key2)){
-
-            throw new InvalidArgumentException('HashMapObject->swap: key2 must be a string');
-        }
+        $this->_validateKeyFormat($key1);
+        $this->_validateKeyFormat($key2);
 
         if(!$this->isKey($key1)){
 
@@ -463,6 +437,26 @@ class HashMapObject{
         $this->_array = array_reverse($this->_array);
 
         return true;
+    }
+
+
+    /**
+     * Checks that specified key value has a valid format (Non empty string)
+     *
+     * @param mixed $key The key value to test
+     *
+     * @throws InvalidArgumentException
+     *
+     * @return void
+     */
+    private function _validateKeyFormat($key){
+
+        // Check if key is a non empty string.
+        // We use the same logic as StringUtils::isEmpty but with some simplification for better performance
+        if(!is_string($key) || str_replace([' ', "\n", "\r", "\t"], '', $key) == ''){
+
+            throw new InvalidArgumentException('HashMapObject: key <'.$key.'> must be a non empty string');
+        }
     }
 }
 
