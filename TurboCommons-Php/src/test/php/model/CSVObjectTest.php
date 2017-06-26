@@ -47,8 +47,13 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
      */
     protected function setUp(){
 
+        $this->exceptionMessage = '';
+
         $this->emptyValues = [null, [], new stdClass(), 0];
         $this->emptyValuesCount = count($this->emptyValues);
+
+        $this->wrongValues = [123, [1, 2, 3], ['asdf'], new Exception()];
+        $this->wrongValuesCount = count($this->wrongValues);
 
         $this->filesManager = new FilesManager();
 
@@ -74,7 +79,10 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
      */
     protected function tearDown(){
 
-        // Nothing necessary here
+        if($this->exceptionMessage != ''){
+
+            $this->fail($this->exceptionMessage);
+        }
     }
 
 
@@ -97,9 +105,7 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	public function testConstruct(){
 
 	    // Test empty values
-	    $exceptionMessage = '';
-
-        $test = new CSVObject();
+	    $test = new CSVObject();
         $this->assertEquals(0, $test->countColumns());
         $this->assertEquals(0, $test->countRows());
 
@@ -108,24 +114,34 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(0, $test->countRows());
 
         $test = new CSVObject('     ');
-        $this->assertEquals(0, $test->countColumns());
-        $this->assertEquals(0, $test->countRows());
+        $this->assertEquals(1, $test->countColumns());
+        $this->assertEquals(1, $test->countRows());
+        $this->assertEquals('     ', $test->getCell(0, 0));
 
         $test = new CSVObject("\n\n\n");
-        $this->assertEquals(0, $test->countColumns());
-        $this->assertEquals(0, $test->countRows());
+        $this->assertEquals(1, $test->countColumns());
+        $this->assertEquals(1, $test->countRows());
+        $this->assertEquals("\n\n\n", $test->getCell(0, 0));
 
         for ($i = 0; $i < $this->emptyValuesCount; $i++) {
 
             try {
                 new CSVObject($this->emptyValues[$i]);
-                $exceptionMessage = $this->emptyValues[$i].' empty value did not cause exception';
+                $this->exceptionMessage = $this->emptyValues[$i].' empty value did not cause exception';
             } catch (Exception $e) {
                 // We expect an exception to happen
             }
 	    }
 
 	    // Test ok values
+
+	    // Single value csv
+	    $test = new CSVObject('value');
+	    $this->assertEquals('value', $test->getCell(0, 0));
+	    $this->assertEquals(1, $test->countRows());
+	    $this->assertEquals(1, $test->countColumns());
+	    $this->assertEquals('value', $test->getCell(0, 0));
+	    $this->assertTrue($test->isEqualTo('value'));
 
 	    // Simple one row empty csv
 	    $test = new CSVObject(',,');
@@ -268,15 +284,18 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	    }
 
 	    // Test wrong values
-	    // TODO
+	    for ($i = 0; $i < $this->wrongValuesCount; $i++) {
+
+	        try {
+	            new CSVObject($this->wrongValues[$i]);
+	            $this->exceptionMessage = $this->wrongValues[$i].' wrong value did not cause exception';
+	        } catch (Exception $e) {
+	            // We expect an exception to happen
+	        }
+	    }
 
 	    // Test exceptions
-	    // TODO
-
-	    if($exceptionMessage != ''){
-
-	        $this->fail($exceptionMessage);
-	    }
+	    // Already tested
 	}
 
 
@@ -288,16 +307,90 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	public function testSetCell(){
 
 	    // Test empty values
-	    // TODO
+	    $test = new CSVObject();
+	    $test->addColumns(5);
+	    $test->addRows(5);
+
+	    $this->assertTrue($test->getCell(0, 0) === null);
+	    $this->assertTrue($test->setCell(0, 0, '') === '');
+	    $this->assertTrue($test->getCell(0, 0) === '');
+
+	    for ($i = 0; $i < $this->emptyValuesCount; $i++) {
+
+	        try {
+	            $test->setCell(0, 0, $this->emptyValues[$i]);
+	            $this->exceptionMessage = $this->emptyValues[$i].' empty value did not cause exception';
+	        } catch (Exception $e) {
+	            // We expect an exception to happen
+	        }
+	    }
 
 	    // Test ok values
-	    // TODO
+	    $this->assertTrue($test->getCell(0, 2) === null);
+	    $this->assertTrue($test->setCell(0, 2, 'somevalue') === 'somevalue');
+	    $this->assertTrue($test->getCell(0, 2) === 'somevalue');
+
+	    $this->assertTrue($test->getCell(0, 4) === null);
+	    $this->assertTrue($test->setCell(0, 4, 'somevalue4') === 'somevalue4');
+	    $this->assertTrue($test->getCell(0, 4) === 'somevalue4');
+
+	    $this->assertTrue($test->getCell(2, 0) === null);
+	    $this->assertTrue($test->setCell(2, 0, '2-0') === '2-0');
+	    $this->assertTrue($test->getCell(2, 0) === '2-0');
+
+	    $this->assertTrue($test->getCell(2, 2) === null);
+	    $this->assertTrue($test->setCell(2, 2, '2-2') === '2-2');
+	    $this->assertTrue($test->getCell(2, 2) === '2-2');
+
+	    $this->assertTrue($test->getCell(4, 4) === null);
+	    $this->assertTrue($test->setCell(4, 4, '4-4') === '4-4');
+	    $this->assertTrue($test->getCell(4, 4) === '4-4');
 
 	    // Test wrong values
-	    // TODO
+	    try {
+	        $test->setCell(-1, 0, '');
+	        $this->exceptionMessage = '-1,0 value did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $test->setCell(10, 0, '');
+	        $this->exceptionMessage = '10,0 value did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $test->setCell(0, -1, '');
+	        $this->exceptionMessage = '0,-1 value did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $test->setCell(0, 10, '');
+	        $this->exceptionMessage = '0,10 value did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $test->setCell(0, 0, 10);
+	        $this->exceptionMessage = '10 value did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $test->setCell(0, 0, new stdClass());
+	        $this->exceptionMessage = 'new stdClass() value did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
 
 	    // Test exceptions
-	    // TODO
+	    // Already tested
 	}
 
 
@@ -307,6 +400,8 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	 * @return void
 	 */
 	public function testIsCSV(){
+
+	    $this->markTestIncomplete('This test has not been implemented yet.');
 
 	    // Test empty values
 	    // TODO
@@ -328,6 +423,8 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	 * @return void
 	 */
 	public function testIsEqualTo(){
+
+	    $this->markTestIncomplete('This test has not been implemented yet.');
 
 	    // Test empty values
 	    // TODO
@@ -351,16 +448,38 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	public function testToString(){
 
 	    // Test empty values
-	    // TODO
+	    $test = new CSVObject();
+	    $this->assertTrue($test->toString() === '');
+
+	    $test = new CSVObject('');
+	    $this->assertTrue($test->toString() === '');
+
+	    $test = new CSVObject('      ');
+	    $this->assertTrue($test->toString() === '      ');
+
+	    $test = new CSVObject("\n\n\n\n");
+	    $this->assertTrue($test->getCell(0, 0) === "\n\n\n\n");
+	    $this->assertTrue($test->toString() === "\n\n\n\n");
+
+	    $test = new CSVObject("\r\n\r\n\r\n\r\n");
+	    $this->assertTrue($test->getCell(0, 0) === "\r\n\r\n\r\n\r\n");
+	    $this->assertTrue($test->toString() === "\r\n\r\n\r\n\r\n");
 
 	    // Test ok values
-	    // TODO
+	    foreach ($this->csvFiles as $file) {
+
+	        $fileData = $this->filesManager->readFile($this->basePath.'/'.$file);
+
+	        $test = new CSVObject($fileData);
+
+	        $this->assertTrue($test->isEqualTo($test->toString()), $file.' has a problem');
+	    }
 
 	    // Test wrong values
-	    // TODO
+	    // Already tested at constructor test
 
 	    // Test exceptions
-	    // TODO
+	    // Already tested at constructor test
 	}
 
 }

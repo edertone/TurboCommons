@@ -11,6 +11,7 @@
 
 namespace org\turbocommons\src\main\php\model;
 
+use Exception;
 use UnexpectedValueException;
 use org\turbocommons\src\main\php\utils\StringUtils;
 use org\turbocommons\src\main\php\utils\ArrayUtils;
@@ -45,6 +46,14 @@ class CSVObject extends TableObject{
         parent::__construct();
 
         if(StringUtils::isEmpty($string)){
+
+            if($string !== ''){
+
+                $this->addRows(1);
+                $this->addColumns(1);
+
+                $this->setCell(0, 0, $string);
+            }
 
             return;
         }
@@ -168,21 +177,36 @@ class CSVObject extends TableObject{
      */
     public static function isCSV($value){
 
-        // TODO - implement this method
-        return true;
+        try {
+
+            $c = new CSVObject($value);
+
+            return $c->countCells() >= 0;
+
+        } catch (Exception $e) {
+
+            try {
+
+                return ($value != null) && (get_class($value) === 'org\\turbocommons\\src\\main\\php\\model\\CSVObject');
+
+            } catch (Exception $e) {
+
+                return false;
+            }
+        }
     }
 
 
     /**
      * Check if two provided CSV structures represent the same data
      *
-     * @param object $csv2 A valid string or CSVObject to compare with the other one
+     * @param mixed $csv A valid string or CSVObject to compare with the current one
      * @param boolean $strictColumnOrder TODO
      * @param boolean $strictRowOrder TODO
      *
      * @return boolean true if the two CSV elements are considered equal, false if not
      */
-    public function isEqualTo($csv2, $strictColumnOrder = true, $strictRowOrder = true){
+    public function isEqualTo($csv, $strictColumnOrder = true, $strictRowOrder = true){
 
         // TODO
         return true;
@@ -190,11 +214,47 @@ class CSVObject extends TableObject{
 
 
     /**
-     * TODO
+     * Generate the textual representation for the csv data stored on this object.
+     * The output of this method is ready to be stored on a physical .csv file.
+     *
+     * @return string A valid csv string ready to be stored on a .csv file
      */
     public function toString($delimiter = ',', $enclosure = '"'){
 
-        // TODO
+        $result = '';
+        $columns = $this->getColumnNames();
+        $rowsCount = $this->countRows();
+        $columnsCount = $this->countColumns();
+
+        for ($i = 0; $i < $rowsCount; $i++) {
+
+            $row = [];
+
+            for ($j = 0; $j < $columnsCount; $j++) {
+
+                $cell = $this->_cells->get($i.'-'.$j);
+
+                $cell = str_replace(["\r", "\n", '"'], ['\\r', '\\n', '""'], $cell);
+
+                if(strpos($cell, '"') !== false || strpos($cell, ',') !== false){
+
+                    $row[] = $enclosure.$cell.$enclosure;
+
+                }else{
+
+                    $row[] = $cell;
+                }
+            }
+
+            $result .= implode($delimiter, $row);
+
+            if($i < $rowsCount - 1){
+
+                $result .= "\r\n";
+            }
+        }
+
+        return $result;
     }
 
 
