@@ -107,16 +107,16 @@ class HashMapObject{
      */
     public function get($key){
 
-        if(!StringUtils::isString($key) || StringUtils::isEmpty($key)){
-
-            throw new InvalidArgumentException('HashMapObject->get: key must be a string');
-        }
-
         try {
 
             return $this->_array[$key];
 
         } catch (Exception $e) {
+
+            if(!StringUtils::isString($key) || StringUtils::isEmpty($key)){
+
+                throw new InvalidArgumentException('HashMapObject->get: key must be a string');
+            }
 
             throw new InvalidArgumentException('HashMapObject->get: key <'.$key.'> does not exist');
         }
