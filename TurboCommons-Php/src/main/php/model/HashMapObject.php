@@ -75,7 +75,7 @@ class HashMapObject{
 
         if(!StringUtils::isString($key) || StringUtils::isEmpty($key)){
 
-            throw new InvalidArgumentException('HashMapObject->set: key must be a string');
+            throw new InvalidArgumentException('HashMapObject->set: key must be a non empty string');
         }
 
         $this->_array[$key] = $value;
@@ -115,7 +115,7 @@ class HashMapObject{
 
             if(!StringUtils::isString($key) || StringUtils::isEmpty($key)){
 
-                throw new InvalidArgumentException('HashMapObject->get: key must be a string');
+                throw new InvalidArgumentException('HashMapObject->get: key must be a non empty string');
             }
 
             throw new InvalidArgumentException('HashMapObject->get: key <'.$key.'> does not exist');
@@ -192,12 +192,7 @@ class HashMapObject{
      */
     public function remove($key){
 
-        if(!StringUtils::isString($key) || StringUtils::isEmpty($key)){
-
-            throw new InvalidArgumentException('HashMapObject->delete: key must be a string');
-        }
-
-        if($this->isKey($key)){
+        try {
 
             $value = $this->_array[$key];
 
@@ -207,7 +202,12 @@ class HashMapObject{
 
             return $value;
 
-        }else{
+        } catch (Exception $e) {
+
+            if(!StringUtils::isString($key) || StringUtils::isEmpty($key)){
+
+                throw new InvalidArgumentException('HashMapObject->delete: key must be a non empty string');
+            }
 
             throw new InvalidArgumentException('HashMapObject->rename: key does not exist '.$key);
         }
