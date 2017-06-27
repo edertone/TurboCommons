@@ -159,7 +159,6 @@ class JavaPropertiesObject extends HashMapObject {
      */
     public function isEqualTo($properties, $strictOrder = false){
 
-        $object1Keys = $this->getKeys();
         $objectToCompare = null;
 
         try {
@@ -183,26 +182,27 @@ class JavaPropertiesObject extends HashMapObject {
 
         if($objectToCompare == null){
 
-            throw new UnexpectedValueException('JavaPropertiesUtils->isEqualTo properties does not contain valid java properties data');
+            throw new UnexpectedValueException('JavaPropertiesObject->isEqualTo properties does not contain valid java properties data');
         }
 
-        $object2Keys = $objectToCompare->getKeys();
+        $thisKeys = $this->getKeys();
+        $keysToCompare = $objectToCompare->getKeys();
 
-        if(count($object1Keys) != count($object2Keys) || ($strictOrder && !ArrayUtils::isEqualTo($object1Keys, $object2Keys))){
+        if(count($thisKeys) != count($keysToCompare) || ($strictOrder && !ArrayUtils::isEqualTo($thisKeys, $keysToCompare))){
 
             return false;
         }
 
         $validationManager = new ValidationManager();
 
-        foreach ($object1Keys as $key1) {
+        foreach ($thisKeys as $key) {
 
-            if(!$strictOrder && !$objectToCompare->isKey($key1)){
+            if(!$strictOrder && !$objectToCompare->isKey($key)){
 
                 return false;
             }
 
-            if(!$validationManager->isEqualTo($this->get($key1), $objectToCompare->get($key1))){
+            if(!$validationManager->isEqualTo($this->get($key), $objectToCompare->get($key))){
 
                 return false;
             }
