@@ -69,6 +69,8 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
                 $this->csvFiles[] = $file;
             }
         }
+
+        $this->csvFilesCount = count($this->csvFiles);
     }
 
 
@@ -142,7 +144,7 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	    $this->assertTrue($test->isEqualTo('value'));
 
 	    // Simple one row empty csv
-	    $test = new CSVObject(',,');
+	    $test = new CSVObject(',"",');
 	    $this->assertEquals('', $test->getCell(0, 0));
 	    $this->assertEquals('', $test->getCell(0, 1));
 	    $this->assertEquals('', $test->getCell(0, 2));
@@ -156,7 +158,7 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	    $this->assertEquals('', $test->getCell(0, 0));
 	    $this->assertEquals('', $test->getCell(0, 1));
 	    $this->assertEquals('', $test->getCell(0, 2));
-	    $this->assertTrue($test->isEqualTo("c1,c2,c3\n,,"));
+	    $this->assertTrue($test->isEqualTo("c1,\"c2\",c3\n,,"));
 
 	    // Simple one row csv without headers
 	    $test = new CSVObject('a,b,c');
@@ -190,14 +192,14 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	    $this->assertEquals('a', $test->getCell(0, 0));
 	    $this->assertEquals('b', $test->getCell(0, 1));
 	    $this->assertEquals('c', $test->getCell(0, 2));
-	    $this->assertTrue($test->isEqualTo('c1,c2,c3\na,b,c'));
+	    $this->assertTrue($test->isEqualTo("c1,c2,c3\na,b,c"));
 
 	    // Simple csv without headers and edge cases
 	    $test = new CSVObject(' a ,b  ,c  ');
 	    $this->assertEquals(' a ', $test->getCell(0, 0));
 	    $this->assertEquals('b  ', $test->getCell(0, 1));
 	    $this->assertEquals('c  ', $test->getCell(0, 2));
-	    $this->assertTrue($test->isEqualTo(' a ,b  ,c  '));
+	    $this->assertTrue($test->isEqualTo(' a ,"b  ",c  '));
 
 	    // Multiple lines csv with different newline characters (windows: \r\n, Linux/Unix: \n, Mac: \r)
 	    $test = new CSVObject("1,2,3\na,b,c\r\n4,5,6\r");
@@ -448,19 +450,90 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testIsEqualTo(){
 
-	    $this->markTestIncomplete('This test has not been implemented yet.');
-
 	    // Test empty values
-	    // TODO
+	    $test = new CSVObject();
 
-	    // Test ok values
-	    // TODO
+	    $this->assertTrue($test->isEqualTo(''));
+	    $this->assertTrue($test->isEqualTo(new CSVObject()));
 
-	    // Test wrong values
-	    // TODO
+	    try {
+	        $test->isEqualTo(null);
+	        $this->exceptionMessage = 'null value did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $test->isEqualTo([]);
+	        $exceptionMessage = '[] value did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $test->isEqualTo(new stdClass());
+	        $exceptionMessage = 'new stdClass() value did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $test->isEqualTo(0);
+	        $exceptionMessage = '0 value did not cause exception';
+	    } catch (Exception $e) {
+	        // We expect an exception to happen
+	    }
+
+	    // Test ok and wrong values
+	    for ($i = 1; $i < $this->csvFilesCount; $i++) {
+
+	        if($i == 1){
+
+	            $previousFileData = $this->filesManager->readFile($this->basePath.'/'.$this->csvFiles[$i-1]);
+	            $previousTest = new CSVObject($previousFileData, StringUtils::countStringOccurences($this->csvFiles[$i-1], 'WithHeader') === 1);
+
+	        }else{
+
+	            $previousFileData = $fileData;
+	            $previousTest = $test;
+	        }
+
+	        $fileData = $this->filesManager->readFile($this->basePath.'/'.$this->csvFiles[$i]);
+	        $test = new CSVObject($fileData, StringUtils::countStringOccurences($this->csvFiles[$i], 'WithHeader') === 1);
+
+	        // TODO - This is added for performance reasons. If performance is improved on
+	        // isEqualTo method, this constraint can be removed
+	        if($test->countRows() < 1000 && $previousTest->countRows() < 1000){
+
+	            $this->assertTrue($test->isEqualTo($fileData));
+	            $this->assertTrue($test->isEqualTo($test));
+
+	            $this->assertFalse($test->isEqualTo($previousFileData));
+	            $this->assertFalse($test->isEqualTo($previousTest));
+	        }
+        }
 
 	    // Test exceptions
-	    // TODO
+        try {
+            $test->isEqualTo(123234);
+            $exceptionMessage = '123234 value did not cause exception';
+        } catch (Exception $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            $test->isEqualTo([1,'dfgdfg']);
+            $exceptionMessage = '[1,"dfgdfg"] value did not cause exception';
+        } catch (Exception $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            $test->isEqualTo(new Exception());
+            $exceptionMessage = 'new Exception() value did not cause exception';
+        } catch (Exception $e) {
+            // We expect an exception to happen
+        }
 	}
 
 
@@ -541,9 +614,15 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 
 	        $fileData = $this->filesManager->readFile($this->basePath.'/'.$file);
 
-	        $test = new CSVObject($fileData);
+	        $test = new CSVObject($fileData, StringUtils::countStringOccurences($file, 'WithHeader') === 1);
 
-	        $this->assertTrue($test->isEqualTo($test->toString()), $file.' has a problem');
+	        // TODO - This is added for performance reasons. If performance is improved on
+	        // isEqualTo method, this constraint can be removed
+	        if($test->countRows() < 1000){
+
+	           $this->assertTrue($test->isEqualTo($test->toString()), $file.' has a problem');
+	           $this->assertTrue($test->isEqualTo($test), $file.' has a problem');
+	        }
 	    }
 
 	    // Test wrong values

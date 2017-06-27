@@ -26,7 +26,7 @@ class CSVObject extends TableObject{
     /**
      * True if the CSV data was loaded with headers enabled or false if not
      *
-     * @var string
+     * @var boolean
      */
     private $_hasHeaders = false;
 
@@ -203,14 +203,80 @@ class CSVObject extends TableObject{
      * Check if two provided CSV structures represent the same data
      *
      * @param mixed $csv A valid string or CSVObject to compare with the current one
-     * @param boolean $strictColumnOrder TODO
-     * @param boolean $strictRowOrder TODO
      *
      * @return boolean true if the two CSV elements are considered equal, false if not
      */
-    public function isEqualTo($csv, $strictColumnOrder = true, $strictRowOrder = true){
+    public function isEqualTo($csv){
 
-        // TODO
+        $objectToCompare = null;
+
+        try {
+
+            $objectToCompare = new CSVObject($csv, $this->_hasHeaders);
+
+        } catch (Exception $e) {
+
+            try {
+
+                if(get_class($csv) === 'org\\turbocommons\\src\\main\\php\\model\\CSVObject'){
+
+                    $objectToCompare = $csv;
+                }
+
+            } catch (Exception $e) {
+
+                // Nothing to do
+            }
+        }
+
+        if($objectToCompare == null){
+
+            throw new UnexpectedValueException('CSVObject->isEqualTo csv does not contain valid csv data');
+        }
+
+        $thisRows = $this->countRows();
+        $thisColumns = $this->countColumns();
+
+        if($this->countCells() === 0 && $objectToCompare->countCells() === 0){
+
+            return true;
+        }
+
+        if($this->_hasHeaders && !ArrayUtils::isEqualTo($this->getColumnNames(), $objectToCompare->getColumnNames())){
+
+            return false;
+        }
+
+        if($thisRows != $objectToCompare->countRows() || $thisColumns != $objectToCompare->countColumns()){
+
+            return false;
+        }
+
+        for ($i = 0; $i < $thisRows; $i++) {
+
+            for ($j = 0; $j < $thisColumns; $j++) {
+
+                $thisCell = $this->getCell($i, $j);
+
+                if($thisCell === null){
+
+                    $thisCell = '';
+                }
+
+                $cellToCompare = $objectToCompare->getCell($i, $j);
+
+                if($cellToCompare === null){
+
+                    $cellToCompare = '';
+                }
+
+                if($thisCell !== $cellToCompare){
+
+                    return false;
+                }
+            }
+        }
+
         return true;
     }
 
@@ -218,6 +284,9 @@ class CSVObject extends TableObject{
     /**
      * Generate the textual representation for the csv data stored on this object.
      * The output of this method is ready to be stored on a physical .csv file.
+     *
+     * @param string $delimiter The character that is used as the csv delimiter. ',' is set by default
+     * @param string $enclosure The character that is used to escape fields when special characters are found
      *
      * @return string A valid csv string ready to be stored on a .csv file
      */
@@ -227,8 +296,14 @@ class CSVObject extends TableObject{
 
         if($this->_hasHeaders){
 
-            $this->addRows(1, 0);
-            $this->setRow(0, $this->getColumnNames());
+            $row = [];
+
+            foreach ($this->getColumnNames() as $columnValue) {
+
+                $row[] = $this->_escapeField($columnValue, $delimiter, $enclosure);
+            }
+
+            $result .= implode($delimiter, $row)."\r\n";
         }
 
         $rowsCount = $this->countRows();
@@ -244,14 +319,7 @@ class CSVObject extends TableObject{
 
                 try {
 
-                    $cell = $this->_cells->get($i.'-'.$j);
-
-                    $cell = str_replace(["\r", "\n", '"'], ['\\r', '\\n', '""'], $cell);
-
-                    if(strpos($cell, '"') !== false || strpos($cell, ',') !== false){
-
-                        $cell = $enclosure.$cell.$enclosure;
-                    }
+                    $cell = $this->_escapeField($this->_cells->get($i.'-'.$j), $delimiter, $enclosure);
 
                 } catch (Exception $e) {
 
@@ -291,6 +359,28 @@ class CSVObject extends TableObject{
         }
 
         $this->_cells->set($currentRow.'-'.$currentColumn, $fieldValue);
+    }
+
+
+    /**
+     * Auxiliary method to correctly format a csv field so it can be stored as a string
+     *
+     * @param string $field The field that has to be formatted
+     * @param string $delimiter The character that is used as the csv delimiter. ',' is set by default
+     * @param string $enclosure The character that is used to escape fields when special characters are found
+     *
+     * @return string The field correctly scaped and ready to be stored on a string
+     */
+    private function _escapeField($field, $delimiter, $enclosure){
+
+        if(strpos($field, "\r") !== false || strpos($field, "\n") !== false || strpos($field, $enclosure) !== false || strpos($field, $delimiter) !== false){
+
+            $field = str_replace([$enclosure], [$enclosure.$enclosure], $field);
+
+            $field = $enclosure.$field.$enclosure;
+        }
+
+        return $field;
     }
 
 
