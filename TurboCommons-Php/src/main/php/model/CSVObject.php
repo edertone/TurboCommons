@@ -24,6 +24,14 @@ class CSVObject extends TableObject{
 
 
     /**
+     * True if the CSV data was loaded with headers enabled or false if not
+     *
+     * @var string
+     */
+    private $_hasHeaders = false;
+
+
+    /**
      * CSVObject stores all the information for a CSV document and provides easy access to all the
      * columns and values and allows us to operate with it's data easily.
      *
@@ -46,14 +54,6 @@ class CSVObject extends TableObject{
         parent::__construct();
 
         if(StringUtils::isEmpty($string)){
-
-            if($string !== ''){
-
-                $this->addRows(1);
-                $this->addColumns(1);
-
-                $this->setCell(0, 0, $string);
-            }
 
             return;
         }
@@ -155,6 +155,8 @@ class CSVObject extends TableObject{
      * @param mixed $column An integer or a string containing the index or label for the column that we want to set
      * @param string $value The value we want to set to the specified cell. Only string values are allowed
      *
+     * @see TableObject::setCell
+     *
      * @return mixed The assigned value after beign stored into the csv cell
      */
     public function setCell($row, $column, $value){
@@ -169,7 +171,7 @@ class CSVObject extends TableObject{
 
 
     /**
-     * Check if the provided object contains valid CSV information.
+     * Check if the provided value contains valid CSV information.
      *
      * @param mixed $value Object to test for valid CSV data. Accepted values are: Strings containing CSV data or CSVObject elements
      *
@@ -222,7 +224,13 @@ class CSVObject extends TableObject{
     public function toString($delimiter = ',', $enclosure = '"'){
 
         $result = '';
-        $columns = $this->getColumnNames();
+
+        if($this->_hasHeaders){
+
+            $this->addRows(1, 0);
+            $this->setRow(0, $this->getColumnNames());
+        }
+
         $rowsCount = $this->countRows();
         $columnsCount = $this->countColumns();
 
@@ -232,29 +240,32 @@ class CSVObject extends TableObject{
 
             for ($j = 0; $j < $columnsCount; $j++) {
 
-                $cell = $this->_cells->get($i.'-'.$j);
+                $cell = '';
 
-                $cell = str_replace(["\r", "\n", '"'], ['\\r', '\\n', '""'], $cell);
+                try {
 
-                if(strpos($cell, '"') !== false || strpos($cell, ',') !== false){
+                    $cell = $this->_cells->get($i.'-'.$j);
 
-                    $row[] = $enclosure.$cell.$enclosure;
+                    $cell = str_replace(["\r", "\n", '"'], ['\\r', '\\n', '""'], $cell);
 
-                }else{
+                    if(strpos($cell, '"') !== false || strpos($cell, ',') !== false){
 
-                    $row[] = $cell;
+                        $cell = $enclosure.$cell.$enclosure;
+                    }
+
+                } catch (Exception $e) {
+
+                    // Nothing necessary.
+                    // This try chatch is used only to improve performance over $this->_cells->isKey($i.'-'.$j)
                 }
+
+                $row[] = $cell;
             }
 
-            $result .= implode($delimiter, $row);
-
-            if($i < $rowsCount - 1){
-
-                $result .= "\r\n";
-            }
+            $result .= implode($delimiter, $row)."\r\n";
         }
 
-        return $result;
+        return $rowsCount > 0 ? substr($result, 0, strlen($result) - 2) : $result;
     }
 
 
@@ -354,6 +365,8 @@ class CSVObject extends TableObject{
         }
 
         $this->removeRow(0);
+
+        $this->_hasHeaders = true;
     }
 }
 

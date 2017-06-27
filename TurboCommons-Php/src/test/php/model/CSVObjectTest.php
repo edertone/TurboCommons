@@ -114,14 +114,12 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(0, $test->countRows());
 
         $test = new CSVObject('     ');
-        $this->assertEquals(1, $test->countColumns());
-        $this->assertEquals(1, $test->countRows());
-        $this->assertEquals('     ', $test->getCell(0, 0));
+        $this->assertEquals(0, $test->countColumns());
+        $this->assertEquals(0, $test->countRows());
 
         $test = new CSVObject("\n\n\n");
-        $this->assertEquals(1, $test->countColumns());
-        $this->assertEquals(1, $test->countRows());
-        $this->assertEquals("\n\n\n", $test->getCell(0, 0));
+        $this->assertEquals(0, $test->countColumns());
+        $this->assertEquals(0, $test->countRows());
 
         for ($i = 0; $i < $this->emptyValuesCount; $i++) {
 
@@ -401,19 +399,45 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testIsCSV(){
 
-	    $this->markTestIncomplete('This test has not been implemented yet.');
-
 	    // Test empty values
-	    // TODO
+	    $this->assertFalse(CSVObject::isCSV(null));
+	    $this->assertTrue(CSVObject::isCSV(''));
+	    $this->assertFalse(CSVObject::isCSV(0));
+	    $this->assertFalse(CSVObject::isCSV([]));
+	    $this->assertFalse(CSVObject::isCSV(new stdClass()));
+	    $this->assertTrue(CSVObject::isCSV('     '));
+	    $this->assertTrue(CSVObject::isCSV("\n\n\n"));
 
 	    // Test ok values
-	    // TODO
+	    $this->assertTrue(CSVObject::isCSV('value'));
+	    $this->assertTrue(CSVObject::isCSV(',,'));
+	    $this->assertTrue(CSVObject::isCSV("c1,c2,c3\r\n,,"));
+	    $this->assertTrue(CSVObject::isCSV('a,b,c'));
+	    $this->assertTrue(CSVObject::isCSV("c1,c2,c3\n1,2,3"));
+	    $this->assertTrue(CSVObject::isCSV('"a","b","c"'));
+	    $this->assertTrue(CSVObject::isCSV("c1,c2,c3\r\"a\",\"b\",\"c\""));
+	    $this->assertTrue(CSVObject::isCSV(' a ,b  ,c  '));
+	    $this->assertTrue(CSVObject::isCSV("1,2,3\na,b,c\r\n4,5,6\r"));
+	    $this->assertTrue(CSVObject::isCSV(' """"" 1",",,,2",    "3", "4,"   ,  "5 " '));
+	    $this->assertTrue(CSVObject::isCSV("\"1\",\"2\",\"3\"\r\n\"a\"\"a\",\"b\",\"c\""));
+	    $this->assertTrue(CSVObject::isCSV("c1,\"c,\"\"2\",c3\r1,\"2\", 3 \r\n\"a \"\",a\",b,\"c\""));
+
+	    foreach ($this->csvFiles as $file) {
+
+	        $fileData = $this->filesManager->readFile($this->basePath.'/'.$file);
+
+	        $this->assertTrue(CSVObject::isCSV($fileData));
+	    }
 
 	    // Test wrong values
-	    // TODO
+	    $this->assertFalse(CSVObject::isCSV(12));
+	    $this->assertFalse(CSVObject::isCSV([1,4,5,6]));
+	    $this->assertFalse(CSVObject::isCSV(['  ']));
+	    $this->assertFalse(CSVObject::isCSV(new Exception()));
+	    $this->assertFalse(CSVObject::isCSV(-1909));
 
 	    // Test exceptions
-	    // TODO
+	    // Not necessary
 	}
 
 
@@ -455,17 +479,64 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	    $this->assertTrue($test->toString() === '');
 
 	    $test = new CSVObject('      ');
-	    $this->assertTrue($test->toString() === '      ');
+	    $this->assertTrue($test->toString() === '');
 
 	    $test = new CSVObject("\n\n\n\n");
-	    $this->assertTrue($test->getCell(0, 0) === "\n\n\n\n");
-	    $this->assertTrue($test->toString() === "\n\n\n\n");
+	    $this->assertTrue($test->toString() === '');
 
 	    $test = new CSVObject("\r\n\r\n\r\n\r\n");
-	    $this->assertTrue($test->getCell(0, 0) === "\r\n\r\n\r\n\r\n");
-	    $this->assertTrue($test->toString() === "\r\n\r\n\r\n\r\n");
+	    $this->assertTrue($test->toString() === '');
 
 	    // Test ok values
+
+	    // Single value csv
+	    $test = new CSVObject('value');
+	    $this->assertEquals('value', $test->toString());
+
+	    // Simple one row empty csv
+	    $test = new CSVObject(',,');
+	    $this->assertEquals(',,', $test->toString());
+
+	    // Simple one row empty csv with headers
+	    $test = new CSVObject("c1,c2,c3\r\n,,", true);
+	    $this->assertEquals("c1,c2,c3\r\n,,", $test->toString());
+
+	    // Simple one row csv without headers
+	    $test = new CSVObject('a,b,c');
+	    $this->assertEquals('a,b,c', $test->toString());
+
+	    // Simple one row csv with headers
+	    $test = new CSVObject("c1,c2,c3\n1,2,3", true);
+	    $this->assertEquals("c1,c2,c3\r\n1,2,3", $test->toString());
+
+	    // Simple one row csv without headers and scaped fields
+	    $test = new CSVObject('"a","b","c"');
+	    $this->assertEquals('a,b,c', $test->toString());
+
+	    // Simple one row csv with headers and scaped fields
+	    $test = new CSVObject("c1,c2,c3\r\"a\",\"b\",\"c\"", true);
+	    $this->assertEquals("c1,c2,c3\r\na,b,c", $test->toString());
+
+	    // Simple csv without headers and edge cases
+	    $test = new CSVObject(' a ,b  ,c  ');
+	    $this->assertEquals(' a ,b  ,c  ', $test->toString());
+
+	    // Multiple lines csv with different newline characters (windows: \r\n, Linux/Unix: \n, Mac: \r)
+	    $test = new CSVObject("1,2,3\na,b,c\r\n4,5,6\r");
+	    $this->assertEquals("1,2,3\r\na,b,c\r\n4,5,6", $test->toString());
+
+	    // Simple csv without headers and scaped fields and characters with edge cases
+	    $test = new CSVObject(' """"" 1",",,,2",    "3", "4,"   ,  "5 " ');
+	    $this->assertEquals('""""" 1",",,,2",3,"4,",5 ', $test->toString());
+
+	    // Simple two row csv without headers and scaped fields and characters
+	    $test = new CSVObject("\"1\",\"2\",\"3\"\r\n\"a\"\"a\",\"b\",\"c\"");
+	    $this->assertEquals("1,2,3\r\n\"a\"\"a\",b,c", $test->toString());
+
+	    // Simple two row csv with headers and mixed scaped and non scaped fields and characters
+	    $test = new CSVObject("c1,\"c,\"\"2\",c3\r1,\"2\", 3 \r\n\"a \"\",a\",b,\"c\"", true);
+	    $this->assertEquals("c1,\"c,\"\"2\",c3\r\n1,2, 3 \r\n\"a \"\",a\",b,c", $test->toString());
+
 	    foreach ($this->csvFiles as $file) {
 
 	        $fileData = $this->filesManager->readFile($this->basePath.'/'.$file);
