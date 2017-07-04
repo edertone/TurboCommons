@@ -12,9 +12,10 @@
 namespace org\turbocommons\src\test\php\utils;
 
 use Exception;
+use Throwable;
 use stdClass;
 use org\turbocommons\src\main\php\utils\ArrayUtils;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 
 /**
@@ -22,7 +23,7 @@ use PHPUnit_Framework_TestCase;
  *
  * @return void
  */
-class ArrayUtilsTest extends PHPUnit_Framework_TestCase {
+class ArrayUtilsTest extends TestCase {
 
 
     /**
@@ -69,21 +70,21 @@ class ArrayUtilsTest extends PHPUnit_Framework_TestCase {
 		try {
 			ArrayUtils::isEqualTo(null, null);
 			$exceptionMessage = 'null did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			ArrayUtils::isEqualTo(1, 1);
 			$exceptionMessage = '1 did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			ArrayUtils::isEqualTo('asfasf1', '345345');
 			$exceptionMessage = 'asfasf1 did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
@@ -164,21 +165,21 @@ class ArrayUtilsTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        ArrayUtils::removeDuplicateElements(null);
 	        $exceptionMessage = 'null did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        ArrayUtils::removeDuplicateElements('');
 	        $exceptionMessage = '"" did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        ArrayUtils::removeDuplicateElements(new stdClass());
 	        $exceptionMessage = 'new stdClass() did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -226,21 +227,21 @@ class ArrayUtilsTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        ArrayUtils::hasDuplicateElements(null);
 	        $exceptionMessage = 'null did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        ArrayUtils::hasDuplicateElements('');
 	        $exceptionMessage = '"" did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        ArrayUtils::hasDuplicateElements(new stdClass());
 	        $exceptionMessage = 'new stdClass() did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -301,21 +302,21 @@ class ArrayUtilsTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        ArrayUtils::getDuplicateElements(null);
 	        $exceptionMessage = 'null did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        ArrayUtils::getDuplicateElements('');
 	        $exceptionMessage = '"" did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        ArrayUtils::getDuplicateElements(new stdClass());
 	        $exceptionMessage = 'new stdClass() did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
