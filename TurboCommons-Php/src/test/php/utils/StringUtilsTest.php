@@ -11,10 +11,11 @@
 
 namespace org\turbocommons\src\test\php\utils;
 
-use PHPUnit_Framework_TestCase;
 use org\turbocommons\src\main\php\utils\StringUtils;
+use Throwable;
 use stdClass;
 use Exception;
+use PHPUnit\Framework\TestCase;
 
 
 /**
@@ -22,11 +23,11 @@ use Exception;
  *
  * @return void
  */
-class StringUtilsTest extends PHPUnit_Framework_TestCase {
+class StringUtilsTest extends TestCase {
 
 
 	/**
-	 * @see PHPUnit_Framework_TestCase::setUpBeforeClass()
+	 * @see TestCase::setUpBeforeClass()
 	 *
 	 * @return void
 	 */
@@ -37,7 +38,7 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
-	 * @see PHPUnit_Framework_TestCase::setUp()
+	 * @see TestCase::setUp()
 	 *
 	 * @return void
 	 */
@@ -48,7 +49,7 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
-	 * @see PHPUnit_Framework_TestCase::tearDown()
+	 * @see TestCase::tearDown()
 	 *
 	 * @return void
 	 */
@@ -59,7 +60,7 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
-	 * @see PHPUnit_Framework_TestCase::tearDownAfterClass()
+	 * @see TestCase::tearDownAfterClass()
 	 *
 	 * @return void
 	 */
@@ -122,7 +123,7 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		try {
 			StringUtils::isEmpty(123);
 			$exceptionMessage = '123 did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
@@ -278,28 +279,28 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		try {
 			StringUtils::isCamelCase(123);
 			$exceptionMessage = '123 did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::isCamelCase([1,5,8]);
 			$exceptionMessage = '[1,5,8] did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::isCamelCase(new Exception());
 			$exceptionMessage = 'new Exception did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::isCamelCase('CamelCase', 67);
 			$exceptionMessage = '67 did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
@@ -400,28 +401,28 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		try {
 			StringUtils::isSnakeCase(123);
 			$exceptionMessage = '123 did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::isSnakeCase([1,5,8]);
 			$exceptionMessage = '[1,5,8] did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::isSnakeCase(new Exception());
 			$exceptionMessage = 'new Exception did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::isSnakeCase('SnakeCase', 67);
 			$exceptionMessage = '67 did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
@@ -455,21 +456,21 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		try {
 			StringUtils::countStringOccurences(null, null);
 			$exceptionMessage = 'null did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::countStringOccurences('', '');
 			$exceptionMessage = '"" did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::countStringOccurences('  ', '');
 			$exceptionMessage = '"" did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
@@ -550,21 +551,21 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		try {
 		    StringUtils::limitLen('', 0);
 		    $exceptionMessage = '0 did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 		    // We expect an exception to happen
 		}
 
 		try {
 			StringUtils::limitLen('hello', [1, 2]);
 			$exceptionMessage = '[1, 2] did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 		    StringUtils::limitLen('hello', null);
 		    $exceptionMessage = 'hello did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 		    // We expect an exception to happen
 		}
 
@@ -913,28 +914,28 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		try {
 			StringUtils::formatCase('helloWorld', '');
 			$exceptionMessage = 'empty string did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::formatCase(1, StringUtils::FORMAT_SENTENCE_CASE);
 			$exceptionMessage = '1 did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::formatCase([1,2,3], StringUtils::FORMAT_SENTENCE_CASE);
 			$exceptionMessage = '[1,2,3] did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::formatCase('Hello', 'invalidformat');
 			$exceptionMessage = 'invalidformat did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
@@ -966,14 +967,14 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 		try {
 			StringUtils::formatPath(['1']);
 			$exceptionMessage = '[1] did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::formatPath(1);
 			$exceptionMessage = '1 did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
@@ -1055,28 +1056,28 @@ class StringUtilsTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        StringUtils::removeNewLineCharacters(1);
 	        $exceptionMessage = '1 did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        StringUtils::removeNewLineCharacters([]);
 	        $exceptionMessage = '[] did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        StringUtils::removeNewLineCharacters(new stdClass());
 	        $exceptionMessage = 'new stdClass() did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        StringUtils::removeNewLineCharacters([1,2,3,4]);
 	        $exceptionMessage = '[1,2,3,4] did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
