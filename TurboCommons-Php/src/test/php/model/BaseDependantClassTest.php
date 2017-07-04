@@ -13,8 +13,8 @@ namespace org\turbocommons\src\test\php\model;
 
 use org\turbocommons\src\test\php\resources\model\baseDependantClass\DependantClass2;
 use org\turbocommons\src\test\php\resources\model\baseDependantClass\DependantClass;
-use PHPUnit_Framework_TestCase;
-use Exception;
+use PHPUnit\Framework\TestCase;
+use Throwable;
 
 
 /**
@@ -22,7 +22,7 @@ use Exception;
  *
  * @return void
  */
-class BaseDependantClassTest extends PHPUnit_Framework_TestCase {
+class BaseDependantClassTest extends TestCase {
 
 
 	/**
@@ -41,35 +41,35 @@ class BaseDependantClassTest extends PHPUnit_Framework_TestCase {
 		try {
 			$dependantClass->setDependencies(null);
 			$exceptionMessage = 'null did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			$dependantClass->setDependencies([]);
 			$exceptionMessage = '[] did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			$dependantClass->setDependencies(['']);
 			$exceptionMessage = '"" did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			$dependantClass->setDependencies(['a', 'b', 'c']);
 			$exceptionMessage = 'array did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			$dependantClass->setDependencies(['ertert']);
 			$exceptionMessage = 'string ertert did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
@@ -82,28 +82,28 @@ class BaseDependantClassTest extends PHPUnit_Framework_TestCase {
 		try {
 			$dependantClass->setDependencies(['_property1' => null]);
 			$exceptionMessage = 'null did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			$dependantClass->setDependencies(['_property1' => 235]);
 			$exceptionMessage = '235 did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			$dependantClass->setDependencies(['_property1' => 'string']);
 			$exceptionMessage = 'string did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			$dependantClass->setDependencies(['_property1' => new DependantClass2()]);
 			$exceptionMessage = 'DependantClass2 did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
@@ -111,14 +111,14 @@ class BaseDependantClassTest extends PHPUnit_Framework_TestCase {
 		try {
 			$dependantClass->setDependencies(['' => null]);
 			$exceptionMessage = '"" property did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			$dependantClass->setDependencies(['test1' => null]);
 			$exceptionMessage = 'test1 did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
@@ -126,7 +126,7 @@ class BaseDependantClassTest extends PHPUnit_Framework_TestCase {
 		try {
 			$dependantClass->setDependencies(['publicProp' => 123]);
 			$exceptionMessage = 'publicProp did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
