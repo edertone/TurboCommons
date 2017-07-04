@@ -12,8 +12,9 @@
 namespace org\turbocommons\src\test\php\utils;
 
 use Exception;
+use Throwable;
 use stdClass;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use org\turbocommons\src\main\php\utils\NumericUtils;
 
 
@@ -22,11 +23,11 @@ use org\turbocommons\src\main\php\utils\NumericUtils;
  *
  * @return void
  */
-class NumericUtilsTest extends PHPUnit_Framework_TestCase {
+class NumericUtilsTest extends TestCase {
 
 
 	/**
-	 * @see PHPUnit_Framework_TestCase::setUpBeforeClass()
+	 * @see TestCase::setUpBeforeClass()
 	 *
 	 * @return void
 	 */
@@ -37,7 +38,7 @@ class NumericUtilsTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
-	 * @see PHPUnit_Framework_TestCase::setUp()
+	 * @see TestCase::setUp()
 	 *
 	 * @return void
 	 */
@@ -48,7 +49,7 @@ class NumericUtilsTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
-	 * @see PHPUnit_Framework_TestCase::tearDown()
+	 * @see TestCase::tearDown()
 	 *
 	 * @return void
 	 */
@@ -59,7 +60,7 @@ class NumericUtilsTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
-	 * @see PHPUnit_Framework_TestCase::tearDownAfterClass()
+	 * @see TestCase::tearDownAfterClass()
 	 *
 	 * @return void
 	 */
@@ -210,21 +211,21 @@ class NumericUtilsTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        NumericUtils::getNumeric(null);
 	        $exceptionMessage = 'null did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        NumericUtils::getNumeric('');
 	        $exceptionMessage = '"" did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        NumericUtils::getNumeric([]);
 	        $exceptionMessage = '[] did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -272,28 +273,28 @@ class NumericUtilsTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        NumericUtils::getNumeric('abc');
 	        $exceptionMessage = 'abc did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        NumericUtils::getNumeric('1-');
 	        $exceptionMessage = '1- did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        NumericUtils::getNumeric('1,1');
 	        $exceptionMessage = '1,1 did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        NumericUtils::getNumeric(['hello']);
 	        $exceptionMessage = 'hello did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -338,14 +339,14 @@ class NumericUtilsTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        NumericUtils::generateRandomInteger(5, 5);
 	        $exceptionMessage = '5,5 values did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        NumericUtils::generateRandomInteger(5, 6);
 	        $exceptionMessage = '5,6 values did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -356,7 +357,7 @@ class NumericUtilsTest extends PHPUnit_Framework_TestCase {
 	            try {
 	                NumericUtils::generateRandomInteger($exceptionValues[$i], $exceptionValues[$j]);
 	                $exceptionMessage = 'exception value did not cause exception';
-	            } catch (Exception $e) {
+	            } catch (Throwable $e) {
 	                // We expect an exception to happen
 	            }
 	        }
