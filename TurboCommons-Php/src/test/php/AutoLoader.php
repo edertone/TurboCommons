@@ -12,9 +12,9 @@
 
 require_once __DIR__.'/../../main/php/AutoLoader.php';
 
-if(!class_exists('PHPUnit_TextUI_TestRunner')){
+if(!class_exists('PHPUnit\Framework\TestCase')){
 
-    require_once __DIR__.'/libs/phpunit-5.7.14.phar';
+    require_once __DIR__.'/libs/phpunit-6.2.3.phar';
 }
 
 
