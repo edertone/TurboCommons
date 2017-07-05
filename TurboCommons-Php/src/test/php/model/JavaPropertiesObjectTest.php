@@ -11,8 +11,8 @@
 
 namespace org\turbocommons\src\test\php\model;
 
-use Exception;
-use PHPUnit_Framework_TestCase;
+use Throwable;
+use PHPUnit\Framework\TestCase;
 use stdClass;
 use org\turbocommons\src\main\php\model\JavaPropertiesObject;
 use org\turbocommons\src\main\php\managers\FilesManager;
@@ -23,11 +23,11 @@ use org\turbocommons\src\main\php\managers\FilesManager;
  *
  * @return void
  */
-class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
+class JavaPropertiesObjectTest extends TestCase {
 
 
     /**
-     * @see PHPUnit_Framework_TestCase::setUpBeforeClass()
+     * @see TestCase::setUpBeforeClass()
      *
      * @return void
      */
@@ -38,7 +38,7 @@ class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
 
 
     /**
-     * @see PHPUnit_Framework_TestCase::setUp()
+     * @see TestCase::setUp()
      *
      * @return void
      */
@@ -56,7 +56,7 @@ class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
 
 
     /**
-     * @see PHPUnit_Framework_TestCase::tearDown()
+     * @see TestCase::tearDown()
      *
      * @return void
      */
@@ -67,7 +67,7 @@ class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
 
 
     /**
-     * @see PHPUnit_Framework_TestCase::tearDownAfterClass()
+     * @see TestCase::tearDownAfterClass()
      *
      * @return void
      */
@@ -96,14 +96,14 @@ class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
         try {
             new JavaPropertiesObject('       ');
             $exceptionMessage = '"        " value did not cause exception';
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
             new JavaPropertiesObject("\n\n\n");
             $exceptionMessage = '"\n\n\n" value did not cause exception';
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
@@ -262,7 +262,7 @@ class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
             try {
                 new JavaPropertiesObject($this->wrongValues[$i]);
                 $exceptionMessage = 'wrong value did not cause exception';
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 // We expect an exception to happen
             }
         }
@@ -335,28 +335,28 @@ class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
         try {
             $properties->isEqualTo(null);
             $exceptionMessage = 'null value did not cause exception';
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
             $properties->isEqualTo([]);
             $exceptionMessage = '[] value did not cause exception';
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
             $properties->isEqualTo(new stdClass());
             $exceptionMessage = 'new stdClass() value did not cause exception';
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
             $properties->isEqualTo(0);
             $exceptionMessage = '0 value did not cause exception';
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
@@ -383,7 +383,7 @@ class JavaPropertiesObjectTest extends PHPUnit_Framework_TestCase {
             try {
                 $properties->isEqualTo($this->wrongValues[$i]);
                 $exceptionMessage = $this->wrongValues[$i].' wrong value did not cause exception';
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 // We expect an exception to happen
             }
         }

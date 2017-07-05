@@ -11,7 +11,7 @@
 
 namespace org\turbocommons\src\main\php\model;
 
-use Exception;
+use Throwable;
 use UnexpectedValueException;
 use org\turbocommons\src\main\php\managers\ValidationManager;
 use org\turbocommons\src\main\php\utils\ArrayUtils;
@@ -134,13 +134,13 @@ class JavaPropertiesObject extends HashMapObject {
 
             return $p->length() >= 0;
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
 
             try {
 
                 return ($value != null) && (get_class($value) === 'org\\turbocommons\\src\\main\\php\\model\\JavaPropertiesObject');
 
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
 
                 return false;
             }
@@ -149,7 +149,7 @@ class JavaPropertiesObject extends HashMapObject {
 
 
     /**
-     * Check if two provided java properties are identical.
+     * Check if the provided java properties is identical to this instance
      * Only data is compared: Any comment that is found on both provided properties will be ignored.
      *
      * @param mixed $properties java properties value to compare (a string or a JavaPropertiesObject instance)
@@ -157,7 +157,7 @@ class JavaPropertiesObject extends HashMapObject {
      *
      * @return boolean true if both java properties data is exactly the same, false if not
      */
-    public function isEqualTo($properties, $strictOrder = false){
+    public function isEqualTo($properties, bool $strictOrder = false){
 
         $objectToCompare = null;
 
@@ -165,7 +165,7 @@ class JavaPropertiesObject extends HashMapObject {
 
             $objectToCompare = new JavaPropertiesObject($properties);
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
 
             try {
 
@@ -174,7 +174,7 @@ class JavaPropertiesObject extends HashMapObject {
                     $objectToCompare = $properties;
                 }
 
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
 
                 // Nothing to do
             }
