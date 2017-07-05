@@ -11,7 +11,6 @@
 
 namespace org\turbocommons\src\main\php\model;
 
-use Exception;
 use Throwable;
 use UnexpectedValueException;
 use org\turbocommons\src\main\php\utils\StringUtils;
@@ -160,7 +159,7 @@ class CSVObject extends TableObject{
      *
      * @return mixed The assigned value after beign stored into the csv cell
      */
-    public function setCell($row, $column, $value){
+    public function setCell(int $row, $column, $value){
 
         if(!StringUtils::isString($value)){
 
