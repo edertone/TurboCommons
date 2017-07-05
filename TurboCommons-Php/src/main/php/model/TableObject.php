@@ -65,7 +65,7 @@ class TableObject{
      *
      * @return TableObject The constructed TableObject
      */
-    public function __construct($rows = 0, $columns = 0){
+    public function __construct(int $rows = 0, $columns = 0){
 
         if(NumericUtils::isInteger($rows) && $rows >= 0){
 
@@ -198,7 +198,7 @@ class TableObject{
      *
      * @return string The column label for the specified numeric index
      */
-    public function getColumnName($columnIndex){
+    public function getColumnName(int $columnIndex){
 
         $key = (string)$this->_validateColumnIndex($columnIndex);
 
@@ -275,7 +275,7 @@ class TableObject{
      * @throws UnexpectedValueException
      * @return boolean True if the operation was successful
      */
-    public function addColumns($number, array $names = [], $at = -1){
+    public function addColumns($number, array $names = [], int $at = -1){
 
         if(!NumericUtils::isInteger($number) || $number <= 0){
 
@@ -428,7 +428,7 @@ class TableObject{
      *
      * @return mixed The value for the cell that is located at the specified row and column
      */
-    public function getCell($row, $column){
+    public function getCell(int $row, $column){
 
         $rowIndex = $this->_validateRowIndex($row);
         $columnIndex = $this->_validateColumnIndex($column);
@@ -455,7 +455,7 @@ class TableObject{
      *
      * @return mixed The assigned value after beign stored into the table cell
      */
-    public function setCell($row, $column, $value){
+    public function setCell(int $row, $column, $value){
 
         $rowIndex = $this->_validateRowIndex($row);
         $columnIndex = $this->_validateColumnIndex($column);
@@ -471,7 +471,7 @@ class TableObject{
      *
      * @return array All the table elements that belong to the required row
      */
-    public function getRow($row){
+    public function getRow(int $row){
 
         $result = [];
 
@@ -495,7 +495,7 @@ class TableObject{
      * @throws UnexpectedValueException
      * @return boolean True if the operation was successful
      */
-    public function addRows($number, $at = -1){
+    public function addRows($number, int $at = -1){
 
         if(!NumericUtils::isInteger($number) || $number <= 0){
 
@@ -538,7 +538,7 @@ class TableObject{
      * @throws UnexpectedValueException
      * @return void
      */
-    public function setRow($row, $data){
+    public function setRow(int $row, array $data){
 
         $dataCount = count($data);
 
@@ -568,7 +568,7 @@ class TableObject{
      *
      * @return void
      */
-    public function removeRow($row){
+    public function removeRow(int $row){
 
         $rowIndex = $this->_validateRowIndex($row);
 
@@ -670,7 +670,7 @@ class TableObject{
 
         if($columnIndex < 0 || $columnIndex >= $this->_columnsCount){
 
-            throw new UnexpectedValueException('TableObject->_calculateColumnIndex Invalid column value <'.$column.'>');
+            throw new UnexpectedValueException('TableObject->_calculateColumnIndex Invalid column value');
         }
 
         return $columnIndex;
@@ -686,7 +686,7 @@ class TableObject{
      *
      * @return integer A valid row index based on the specified integer
      */
-    private function _validateRowIndex($row){
+    private function _validateRowIndex(int $row){
 
         $rowIndex = NumericUtils::isInteger($row) ? $row : -1;
 

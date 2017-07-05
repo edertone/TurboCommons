@@ -11,8 +11,8 @@
 
 namespace org\turbocommons\src\test\php\model;
 
-use Exception;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
+use Throwable;
 use stdClass;
 use org\turbocommons\src\main\php\model\TableObject;
 use org\turbocommons\src\main\php\utils\NumericUtils;
@@ -23,11 +23,11 @@ use org\turbocommons\src\main\php\utils\NumericUtils;
  *
  * @return void
  */
-class TableObjectTest extends PHPUnit_Framework_TestCase {
+class TableObjectTest extends TestCase {
 
 
     /**
-     * @see PHPUnit_Framework_TestCase::setUpBeforeClass()
+     * @see TestCase::setUpBeforeClass()
      *
      * @return void
      */
@@ -38,7 +38,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 
 
     /**
-     * @see PHPUnit_Framework_TestCase::setUp()
+     * @see TestCase::setUp()
      *
      * @return void
      */
@@ -50,7 +50,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 
 
     /**
-     * @see PHPUnit_Framework_TestCase::tearDown()
+     * @see TestCase::tearDown()
      *
      * @return void
      */
@@ -61,7 +61,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 
 
     /**
-     * @see PHPUnit_Framework_TestCase::tearDownAfterClass()
+     * @see TestCase::tearDownAfterClass()
      *
      * @return void
      */
@@ -98,7 +98,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
     	        try {
     	            new TableObject($this->emptyValues[$i], $this->emptyValues[$j]);
     	            $exceptionMessage = 'empty value did not cause exception';
-    	        } catch (Exception $e) {
+    	        } catch (Throwable $e) {
     	            // We expect an exception to happen
     	        }
     	    }
@@ -125,49 +125,49 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        new TableObject(0, NumericUtils::generateRandomInteger(10000000));
 	        $exceptionMessage = '0,N value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        new TableObject(NumericUtils::generateRandomInteger(10000000), 0);
 	        $exceptionMessage = 'N,0 value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        new TableObject(NumericUtils::generateRandomInteger(10000000) * -1, NumericUtils::generateRandomInteger(10000000) * -1);
 	        $exceptionMessage = 'negative values did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        new TableObject('hello', 'hello');
 	        $exceptionMessage = 'hello did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        new TableObject([], []);
 	        $exceptionMessage = '[] values did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        new TableObject(NumericUtils::generateRandomInteger(10000000) * -1, NumericUtils::generateRandomInteger(10000000));
 	        $exceptionMessage = 'neg pos values did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        new TableObject(NumericUtils::generateRandomInteger(10000000), NumericUtils::generateRandomInteger(10000000) * -1);
 	        $exceptionMessage = 'pos neg values did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -206,7 +206,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
     	        try {
     	            $test->setColumnName($j, $this->emptyValues[$i]);
     	            $exceptionMessage = 'empty value did not cause exception';
-    	        } catch (Exception $e) {
+    	        } catch (Throwable $e) {
     	            // We expect an exception to happen
     	        }
 	        }
@@ -252,7 +252,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
             try {
                 $test->setColumnName($this->wrongValues[$i], 'name');
                 $exceptionMessage = 'empty value did not cause exception';
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 // We expect an exception to happen
             }
 	    }
@@ -262,7 +262,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	        try {
 	            $test->setColumnName(1, $this->wrongValues[$i]);
 	            $exceptionMessage = 'empty second parameter value did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 	    }
@@ -270,7 +270,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->setColumnName(40, 'name');
 	        $exceptionMessage = '40 did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -301,7 +301,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
             try {
                 $test->setColumnNames($this->emptyValues[$i]);
                 $exceptionMessage = 'empty value did not cause exception';
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 // We expect an exception to happen
             }
 	    }
@@ -335,7 +335,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->setColumnNames(['column1']);
 	        $exceptionMessage = '["column1"] value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -344,14 +344,14 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->setColumnNames(['column', 'column']);
 	        $exceptionMessage = '["column", "column"] array with duplicate values did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->setColumnNames(['column', 1]);
 	        $exceptionMessage = '["column", 1] array with non string value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -372,7 +372,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	            try {
 	                $test->setColumnNames($columns);
 	                $exceptionMessage = '$columns value did not cause exception';
-	            } catch (Exception $e) {
+	            } catch (Throwable $e) {
 	                // We expect an exception to happen
 	            }
 	        }
@@ -452,7 +452,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->getColumnName(0);
 	        $exceptionMessage = '0 did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -461,7 +461,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	        try {
 	            $test->getColumnName($this->emptyValues[$i]);
 	            $exceptionMessage = 'empty value did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 	    }
@@ -500,21 +500,21 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->getColumnName(-1);
 	        $exceptionMessage = '-1 value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->getColumnName(111);
 	        $exceptionMessage = '111 value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->getColumnName('nonexistantkey');
 	        $exceptionMessage = 'nonexistantkey value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -545,7 +545,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	        try {
 	            $test->getColumnIndex($this->emptyValues[$i]);
 	            $exceptionMessage = 'empty value did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 	    }
@@ -567,14 +567,14 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->getColumnIndex(123);
 	        $exceptionMessage = 'empty value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->getColumnIndex('non existant key');
 	        $exceptionMessage = 'empty value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -604,7 +604,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	        new TableObject();
 	        $test->getColumn(0);
 	        $exceptionMessage = '0 did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -614,7 +614,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
                 new TableObject();
                 $test->getColumn($this->emptyValues[$i]);
                 $exceptionMessage = 'empty value did not cause exception';
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 // We expect an exception to happen
             }
 	    }
@@ -640,7 +640,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	        new TableObject();
 	        $test->getColumn(-1);
 	        $exceptionMessage = '-1 value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -648,7 +648,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	        new TableObject();
 	        $test->getColumn(11);
 	        $exceptionMessage = '-1 value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -656,7 +656,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	        new TableObject();
 	        $test->getColumn('non existant');
 	        $exceptionMessage = 'non existant value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -685,7 +685,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->addColumns(0);
 	        $exceptionMessage = 'empty value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -694,14 +694,14 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	        try {
 	            $test->addColumns($this->emptyValues[$i]);
 	            $exceptionMessage = 'empty value did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 
 	        try {
 	            $test->addColumns(1, ['col'], $this->emptyValues[$i]);
 	            $exceptionMessage = 'empty value did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 
@@ -710,7 +710,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	            try {
 	                $test->addColumns(1, $this->emptyValues[$i]);
 	                $exceptionMessage = 'empty value did not cause exception';
-	            } catch (Exception $e) {
+	            } catch (Throwable $e) {
 	                // We expect an exception to happen
 	            }
 	        }
@@ -803,7 +803,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	        try {
 	            $test->addColumns($this->wrongValues[$i]);
 	            $exceptionMessage = $this->wrongValues[$i].'wrong value did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 	    }
@@ -811,14 +811,14 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->addColumns(1, [], 4);
 	        $exceptionMessage = 'wrong column index did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->addColumns(1, ['a', 'b']);
 	        $exceptionMessage = 'different names number did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -846,7 +846,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->setColumn(0, []);
 	        $exceptionMessage = 'empty value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -857,14 +857,14 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	        try {
 	            $test->setColumn($this->emptyValues[$i]);
 	            $exceptionMessage = $this->emptyValues[$i].' empty value did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 
 	        try {
 	            $test->setColumn(0, $this->emptyValues[$i]);
 	            $exceptionMessage = $this->emptyValues[$i].' empty parameter 2 did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 	    }
@@ -899,42 +899,42 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->setColumn(-1, ['a', 'b', 'c', 'd']);
 	        $exceptionMessage = '-1 did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->setColumn(4, ['a', 'b', 'c', 'd']);
 	        $exceptionMessage = '4 did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->setColumn(5, ['a', 'b', 'c', 'd']);
 	        $exceptionMessage = '5 did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->setColumn('ooo', ['a', 'b', 'c', 'd']);
 	        $exceptionMessage = 'ooo did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->setColumn(0, ['a', 'b', 'c']);
 	        $exceptionMessage = 'array did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->setColumn(0, ['a', 'b', 'c', 'd', 'e']);
 	        $exceptionMessage = 'array did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -963,7 +963,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->removeColumn(0);
 	        $exceptionMessage = '0 did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -974,7 +974,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	        try {
 	            $test->removeColumn($this->emptyValues[$i]);
 	            $exceptionMessage = $this->emptyValues[$i].' empty value did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 	    }
@@ -1040,21 +1040,21 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->removeColumn(-1);
 	        $exceptionMessage = '-1 value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->removeColumn(50);
 	        $exceptionMessage = '50 value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->removeColumn('col');
 	        $exceptionMessage = 'col value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -1083,7 +1083,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->getCell(0, 0);
 	        $exceptionMessage = '0, 0 did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -1094,14 +1094,14 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	        try {
 	            $test->getCell($this->emptyValues[$i], 0);
 	            $exceptionMessage = $this->emptyValues[$i].' empty parameter 1 did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 
 	        try {
 	            $test->getCell(0, $this->emptyValues[$i]);
 	            $exceptionMessage = $this->emptyValues[$i].' empty parameter 2 did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 	    }
@@ -1155,28 +1155,28 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
         try {
             $test->getCell(0, -1);
             $exceptionMessage = '0 -1 did not cause exception';
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
             $test->getCell(-1, 0);
             $exceptionMessage = '-1 0 did not cause exception';
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
             $test->getCell(0, 3);
             $exceptionMessage = '0 3 did not cause exception';
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
             $test->getCell(3, 0);
             $exceptionMessage = '3 0 did not cause exception';
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
@@ -1205,7 +1205,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->setCell(0, 0, null);
 	        $exceptionMessage = '0, 0, null did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -1216,14 +1216,14 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	        try {
 	            $test->setCell($this->emptyValues[$i], 0, null);
 	            $exceptionMessage = $this->emptyValues[$i].' empty parameter 1 did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 
 	        try {
 	            $test->setCell(0, $this->emptyValues[$i], null);
 	            $exceptionMessage = $this->emptyValues[$i].' empty parameter 2 did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 
@@ -1260,42 +1260,42 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->setCell(-1, 0, 'v');
 	        $exceptionMessage = '-1 0 did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->setCell(11, 0, 'v');
 	        $exceptionMessage = '11 0 did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->setCell(0, -1, 'v');
 	        $exceptionMessage = '0 -1 did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->setCell(0, 11, 'v');
 	        $exceptionMessage = '0 11 did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->setCell(0, 'no', 'v');
 	        $exceptionMessage = '0 no did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->setCell('no', 0, 'v');
 	        $exceptionMessage = 'no 0 did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -1325,7 +1325,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	        new TableObject();
 	        $test->getRow(0);
 	        $exceptionMessage = '0 did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -1335,7 +1335,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	            new TableObject();
 	            $test->getRow($this->emptyValues[$i]);
 	            $exceptionMessage = $i.' empty value did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 	    }
@@ -1365,7 +1365,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	        new TableObject();
 	        $test->getRow(-1);
 	        $exceptionMessage = '-1 value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -1373,7 +1373,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	        new TableObject(9, 9);
 	        $test->getRow(11);
 	        $exceptionMessage = '11 value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -1381,7 +1381,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	        new TableObject();
 	        $test->getRow('string');
 	        $exceptionMessage = 'string value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -1410,7 +1410,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->addRows(0);
 	        $exceptionMessage = 'empty value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -1419,7 +1419,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	        try {
 	            $test->addRows($this->emptyValues[$i]);
 	            $exceptionMessage = 'empty value did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 
@@ -1428,7 +1428,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	            try {
 	                $test->addRows(1, $this->emptyValues[$i]);
 	                $exceptionMessage = 'empty param 2 did not cause exception';
-	            } catch (Exception $e) {
+	            } catch (Throwable $e) {
 	                // We expect an exception to happen
 	            }
 	        }
@@ -1506,7 +1506,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	        try {
 	            $test->addRows($this->wrongValues[$i]);
 	            $exceptionMessage = $this->wrongValues[$i].'wrong value did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 	    }
@@ -1514,7 +1514,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->addRows(1, 4);
 	        $exceptionMessage = 'wrong row index did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -1542,7 +1542,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->setRow(0, []);
 	        $exceptionMessage = 'empty value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -1553,14 +1553,14 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	        try {
 	            $test->setRow($this->emptyValues[$i]);
 	            $exceptionMessage = $this->emptyValues[$i].' empty value did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 
 	        try {
 	            $test->setRow(0, $this->emptyValues[$i]);
 	            $exceptionMessage = $this->emptyValues[$i].' empty parameter 2 did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 	    }
@@ -1596,42 +1596,42 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->setRow(-1, ['a', 'b', 'c', 'd']);
 	        $exceptionMessage = '-1 did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->setRow(4, ['a', 'b', 'c', 'd']);
 	        $exceptionMessage = '4 did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->setRow(5, ['a', 'b', 'c', 'd']);
 	        $exceptionMessage = '5 did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->setRow('ooo', ['a', 'b', 'c', 'd']);
 	        $exceptionMessage = 'ooo did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->setRow(0, ['a', 'b', 'c']);
 	        $exceptionMessage = 'array did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->setRow(0, ['a', 'b', 'c', 'd', 'e']);
 	        $exceptionMessage = 'array did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -1660,7 +1660,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->removeRow(0);
 	        $exceptionMessage = '0 did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -1671,7 +1671,7 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	        try {
 	            $test->removeRow($this->emptyValues[$i]);
 	            $exceptionMessage = $this->emptyValues[$i].' empty value did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 	    }
@@ -1721,21 +1721,21 @@ class TableObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->removeRow(-1);
 	        $exceptionMessage = '-1 value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->removeRow(50);
 	        $exceptionMessage = '50 value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->removeRow('col');
 	        $exceptionMessage = 'col value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
