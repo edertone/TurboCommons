@@ -144,7 +144,7 @@ class LocalesManager extends BaseSingletonClass{
      *
      * @return string The localized text
      */
-    public function get($key, $bundle = '', $locale = ''){
+    public function get(string $key, string $bundle = '', string $locale = ''){
 
         // We copy the locales array to prevent it from being altered by this method
         $localesArray = $this->locales;
@@ -218,7 +218,7 @@ class LocalesManager extends BaseSingletonClass{
      *
      * @return void
      */
-    private function _loadBundle($bundle, $locale){
+    private function _loadBundle(string $bundle, string $locale){
 
         $filesManager = new FilesManager();
         $pathStructureArray = $this->pathStructure;

@@ -11,8 +11,8 @@
 
 namespace org\turbocommons\src\test\php\managers;
 
-use Exception;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
+use Throwable;
 use org\turbocommons\src\main\php\managers\LocalesManager;
 
 
@@ -21,7 +21,7 @@ use org\turbocommons\src\main\php\managers\LocalesManager;
  *
  * @return void
  */
-class LocalesManagerTest extends PHPUnit_Framework_TestCase {
+class LocalesManagerTest extends TestCase {
 
 
     /**
@@ -75,7 +75,7 @@ class LocalesManagerTest extends PHPUnit_Framework_TestCase {
         try {
             $localesManager->get('NOT_TO_BE_FOUND', 'Locales');
             $exceptionMessage = 'locale not found did not cause exception';
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
