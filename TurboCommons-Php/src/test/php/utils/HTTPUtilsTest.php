@@ -11,9 +11,8 @@
 
 namespace org\turbocommons\src\test\php\utils;
 
-use Exception;
-use org\turbocommons\src\main\php\utils\HTTPUtils;
-use PHPUnit_Framework_TestCase;
+use Throwable;
+use PHPUnit\Framework\TestCase;
 use org\turbocommons\src\test\php\resources\utils\httpUtils\HTTPUtilsMocked;
 
 
@@ -22,7 +21,7 @@ use org\turbocommons\src\test\php\resources\utils\httpUtils\HTTPUtilsMocked;
  *
  * @return void
  */
-class HTTPUtilsTest extends PHPUnit_Framework_TestCase {
+class HTTPUtilsTest extends TestCase {
 
 
 	/**
@@ -51,7 +50,7 @@ class HTTPUtilsTest extends PHPUnit_Framework_TestCase {
 		try {
 			HTTPUtilsMocked::urlExists(123);
 			$exceptionMessage = '123 did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
