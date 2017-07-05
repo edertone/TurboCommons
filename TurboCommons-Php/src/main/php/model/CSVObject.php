@@ -12,6 +12,7 @@
 namespace org\turbocommons\src\main\php\model;
 
 use Exception;
+use Throwable;
 use UnexpectedValueException;
 use org\turbocommons\src\main\php\utils\StringUtils;
 use org\turbocommons\src\main\php\utils\ArrayUtils;
@@ -44,7 +45,7 @@ class CSVObject extends TableObject{
      *
      * @return CSVObject The constructed CSVObject
      */
-    public function __construct($string = '', $headers = false, $delimiter = ',', $enclosure = '"'){
+    public function __construct($string = '', bool $headers = false, string $delimiter = ',', string $enclosure = '"'){
 
         if(!StringUtils::isString($string)){
 
@@ -185,13 +186,13 @@ class CSVObject extends TableObject{
 
             return $c->countCells() >= 0;
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
 
             try {
 
                 return ($value != null) && (get_class($value) === 'org\\turbocommons\\src\\main\\php\\model\\CSVObject');
 
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
 
                 return false;
             }
@@ -214,7 +215,7 @@ class CSVObject extends TableObject{
 
             $objectToCompare = new CSVObject($csv, $this->_hasHeaders);
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
 
             try {
 
@@ -223,7 +224,7 @@ class CSVObject extends TableObject{
                     $objectToCompare = $csv;
                 }
 
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
 
                 // Nothing to do
             }
@@ -290,7 +291,7 @@ class CSVObject extends TableObject{
      *
      * @return string A valid csv string ready to be stored on a .csv file
      */
-    public function toString($delimiter = ',', $enclosure = '"'){
+    public function toString(string $delimiter = ',', string $enclosure = '"'){
 
         $result = '';
 
@@ -321,7 +322,7 @@ class CSVObject extends TableObject{
 
                     $cell = $this->_escapeField($this->_cells->get($i.'-'.$j), $delimiter, $enclosure);
 
-                } catch (Exception $e) {
+                } catch (Throwable $e) {
 
                     // Nothing necessary.
                     // This try chatch is used only to improve performance over $this->_cells->isKey($i.'-'.$j)
@@ -346,7 +347,7 @@ class CSVObject extends TableObject{
      *
      * @return void
      */
-    private function _insertField($currentRow, $currentColumn, $fieldValue){
+    private function _insertField(int $currentRow, int $currentColumn, string $fieldValue){
 
         if ($currentRow >= $this->_rowsCount){
 
@@ -371,7 +372,7 @@ class CSVObject extends TableObject{
      *
      * @return string The field correctly scaped and ready to be stored on a string
      */
-    private function _escapeField($field, $delimiter, $enclosure){
+    private function _escapeField(string $field, string $delimiter, string $enclosure){
 
         if(strpos($field, "\r") !== false || strpos($field, "\n") !== false || strpos($field, $enclosure) !== false || strpos($field, $delimiter) !== false){
 
@@ -393,7 +394,7 @@ class CSVObject extends TableObject{
      *
      * @return integer The index where the next delimiter or newline character is found
      */
-    private function _findNextDelimiterIndex($string, $currentIndex, $delimiter, $stringLen){
+    private function _findNextDelimiterIndex(string $string, int $currentIndex, string $delimiter, int $stringLen){
 
         for ($i = $currentIndex + 1; $i < $stringLen; $i++) {
 

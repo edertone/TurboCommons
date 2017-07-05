@@ -12,7 +12,8 @@
 namespace org\turbocommons\src\test\php\model;
 
 use Exception;
-use PHPUnit_Framework_TestCase;
+use Throwable;
+use PHPUnit\Framework\TestCase;
 use stdClass;
 use org\turbocommons\src\main\php\managers\FilesManager;
 use org\turbocommons\src\main\php\model\CSVObject;
@@ -26,11 +27,11 @@ use org\turbocommons\src\main\php\utils\NumericUtils;
  *
  * @return void
  */
-class CSVObjectTest extends PHPUnit_Framework_TestCase {
+class CSVObjectTest extends TestCase {
 
 
     /**
-     * @see PHPUnit_Framework_TestCase::setUpBeforeClass()
+     * @see TestCase::setUpBeforeClass()
      *
      * @return void
      */
@@ -41,7 +42,7 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 
 
     /**
-     * @see PHPUnit_Framework_TestCase::setUp()
+     * @see TestCase::setUp()
      *
      * @return void
      */
@@ -75,7 +76,7 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 
 
     /**
-     * @see PHPUnit_Framework_TestCase::tearDown()
+     * @see TestCase::tearDown()
      *
      * @return void
      */
@@ -89,7 +90,7 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 
 
     /**
-     * @see PHPUnit_Framework_TestCase::tearDownAfterClass()
+     * @see TestCase::tearDownAfterClass()
      *
      * @return void
      */
@@ -128,7 +129,7 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
             try {
                 new CSVObject($this->emptyValues[$i]);
                 $this->exceptionMessage = $this->emptyValues[$i].' empty value did not cause exception';
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 // We expect an exception to happen
             }
 	    }
@@ -289,7 +290,7 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	        try {
 	            new CSVObject($this->wrongValues[$i]);
 	            $this->exceptionMessage = $this->wrongValues[$i].' wrong value did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 	    }
@@ -320,7 +321,7 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	        try {
 	            $test->setCell(0, 0, $this->emptyValues[$i]);
 	            $this->exceptionMessage = $this->emptyValues[$i].' empty value did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 	    }
@@ -350,42 +351,42 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->setCell(-1, 0, '');
 	        $this->exceptionMessage = '-1,0 value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->setCell(10, 0, '');
 	        $this->exceptionMessage = '10,0 value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->setCell(0, -1, '');
 	        $this->exceptionMessage = '0,-1 value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->setCell(0, 10, '');
 	        $this->exceptionMessage = '0,10 value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->setCell(0, 0, 10);
 	        $this->exceptionMessage = '10 value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->setCell(0, 0, new stdClass());
 	        $this->exceptionMessage = 'new stdClass() value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -459,28 +460,28 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $test->isEqualTo(null);
 	        $this->exceptionMessage = 'null value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->isEqualTo([]);
 	        $exceptionMessage = '[] value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->isEqualTo(new stdClass());
 	        $exceptionMessage = 'new stdClass() value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $test->isEqualTo(0);
 	        $exceptionMessage = '0 value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -517,21 +518,21 @@ class CSVObjectTest extends PHPUnit_Framework_TestCase {
         try {
             $test->isEqualTo(123234);
             $exceptionMessage = '123234 value did not cause exception';
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
             $test->isEqualTo([1,'dfgdfg']);
             $exceptionMessage = '[1,"dfgdfg"] value did not cause exception';
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
             $test->isEqualTo(new Exception());
             $exceptionMessage = 'new Exception() value did not cause exception';
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             // We expect an exception to happen
         }
 	}
