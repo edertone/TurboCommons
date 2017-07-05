@@ -101,7 +101,7 @@ class FilesManager extends BaseStrictClass{
      *
      * @return boolean True if directory is empty, false if not. If it does not exist or cannot be read, an exception will be generated
      */
-    public function isDirectoryEmpty($path) {
+    public function isDirectoryEmpty(string $path) {
 
         if (!is_readable($path)){
 
@@ -153,7 +153,7 @@ class FilesManager extends BaseStrictClass{
      *
      * @return string A directory name that can be safely created on the specified path, cause no one exists with the same name (No path is returned with this method, only a directory name. For example: 'folder-1', 'directoryName-5', etc..).
      */
-    public function findUniqueDirectoryName($path, $desiredName = '', $text = '', $separator = '-', $isPrefix = false){
+    public function findUniqueDirectoryName(string $path, string $desiredName = '', string $text = '', string $separator = '-', bool $isPrefix = false){
 
         $i = 1;
         $path = StringUtils::formatPath($path);
@@ -187,7 +187,7 @@ class FilesManager extends BaseStrictClass{
      *
      * @return string A file name that can be safely created on the specified path, cause no one exists with the same name (No path is returned with this method, only a file name. For example: 'file-1', 'fileName-5', etc..).
      */
-    public function findUniqueFileName($path, $desiredName = '', $text = '', $separator = '-', $isPrefix = false){
+    public function findUniqueFileName(string $path, string $desiredName = '', string $text = '', string $separator = '-', bool $isPrefix = false){
 
         $i = 1;
         $path = StringUtils::formatPath($path);
@@ -221,7 +221,7 @@ class FilesManager extends BaseStrictClass{
      *
      * @return string The generated name
      */
-    private function _generateUniqueNameAux($i, $desiredName, $text, $separator, $isPrefix){
+    private function _generateUniqueNameAux(int $i, string $desiredName, string $text, string $separator, bool $isPrefix){
 
         $result = [];
 
@@ -268,7 +268,7 @@ class FilesManager extends BaseStrictClass{
      *
      * @return bool Returns true on success or false if the folder already exists (an exception may be thrown if a file exists with the same name or folder cannot be created).
      */
-    public function createDirectory($path, $recursive = false){
+    public function createDirectory(string $path, bool $recursive = false){
 
         // If folder already exists we won't create it
         if(is_dir($path)){
@@ -317,7 +317,7 @@ class FilesManager extends BaseStrictClass{
      *
      * @return string The full path to the newly created temporary directory, including the directory itself (without a trailing slash). For example: C:\Users\Me\AppData\Local\Temp\MyDesiredName
      */
-    public function createTempDirectory($desiredName, $deleteOnExecutionEnd = true) {
+    public function createTempDirectory(string $desiredName, $deleteOnExecutionEnd = true) {
 
         $tempRoot = StringUtils::formatPath(sys_get_temp_dir());
 
@@ -358,7 +358,7 @@ class FilesManager extends BaseStrictClass{
      *
      * @return array The list of item names inside the specified path sorted as requested, or an empty array if no items found inside the folder.
      */
-    public function getDirectoryList($path, $sort = ''){
+    public function getDirectoryList(string $path, string $sort = ''){
 
         // If folder does not exist, we will throw an exception
         if(!is_dir($path)){
@@ -436,7 +436,7 @@ class FilesManager extends BaseStrictClass{
      *
      * @return int the size of the file in bytes, or false (and generates an error of level E_WARNING) in case of an error.
      */
-    public function getDirectorySize($path){
+    public function getDirectorySize(string $path){
 
         $result = 0;
 
@@ -477,7 +477,7 @@ class FilesManager extends BaseStrictClass{
      *
      * @return bool Returns true on success or false on failure.
      */
-    public function deleteDirectory($path, $deleteDirectoryItself = true){
+    public function deleteDirectory(string $path, bool $deleteDirectoryItself = true){
 
         $path = StringUtils::formatPath($path);
 
@@ -533,7 +533,7 @@ class FilesManager extends BaseStrictClass{
      *
      * @return bool Returns true on success or false on failure.
      */
-    public function createFile($path, $fileData = '', $permisions = ''){
+    public function createFile(string $path, string $fileData = '', string $permisions = ''){
 
         $fp = fopen($path, 'wb');
 
@@ -577,7 +577,7 @@ class FilesManager extends BaseStrictClass{
      *
      * @return int the size of the file in bytes, or false (and generates an error of level E_WARNING) in case of an error.
      */
-    public function getFileSize($path){
+    public function getFileSize(string $path){
 
         return filesize($path);
     }
@@ -594,7 +594,7 @@ class FilesManager extends BaseStrictClass{
      *
      * @return string The file contents (binary or string). If the file is not found or cannot be read, an exception will be thrown.
      */
-    public function readFile($path){
+    public function readFile(string $path){
 
         $fileFound = true;
 
@@ -638,7 +638,7 @@ class FilesManager extends BaseStrictClass{
      *
      * @return int the number of bytes read from the file.
      */
-    public function readFileBuffered($path, $downloadRateLimit = 0){
+    public function readFileBuffered(string $path, int $downloadRateLimit = 0){
 
         if(!is_file($path)){
 
@@ -710,7 +710,7 @@ class FilesManager extends BaseStrictClass{
      *
      * @return boolean Returns true on success or false on failure.
      */
-    public function copyFile($sourcePath, $destPath){
+    public function copyFile(string $sourcePath, string $destPath){
 
         return copy($sourcePath, $destPath);
 
@@ -726,7 +726,7 @@ class FilesManager extends BaseStrictClass{
      *
      * @return boolean Returns true on success or false on failure.
      */
-    public function deleteFile($path){
+    public function deleteFile(string $path){
 
         if(!is_file($path)){
 

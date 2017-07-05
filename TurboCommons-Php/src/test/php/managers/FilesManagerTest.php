@@ -373,12 +373,22 @@ class FilesManagerTest extends TestCase {
 		$basePath = $filesManager->createTempDirectory('');
 		$this->assertTrue($filesManager->isDirectoryEmpty($basePath));
 
-		$basePath = $filesManager->createTempDirectory(null);
-		$this->assertTrue($filesManager->isDirectoryEmpty($basePath));
-		$this->assertTrue(strpos($basePath, 'null') === false);
-
 		// Test wrong parameters
 		$exceptionMessage = '';
+
+		try {
+		    $filesManager->createTempDirectory(null);
+		    $exceptionMessage = 'null did not cause exception';
+		} catch (Throwable $e) {
+		    // We expect an exception to happen
+		}
+
+		try {
+		    $filesManager->createTempDirectory('   ');
+		    $exceptionMessage = '"    " did not cause exception';
+		} catch (Throwable $e) {
+		    // We expect an exception to happen
+		}
 
 		try {
 			$filesManager->createTempDirectory([]);
