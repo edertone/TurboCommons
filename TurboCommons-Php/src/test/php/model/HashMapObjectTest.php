@@ -11,8 +11,8 @@
 
 namespace org\turbocommons\src\test\php\model;
 
-use Exception;
-use PHPUnit_Framework_TestCase;
+use Throwable;
+use PHPUnit\Framework\TestCase;
 use stdClass;
 use org\turbocommons\src\main\php\model\HashMapObject;
 use org\turbocommons\src\main\php\utils\ArrayUtils;
@@ -24,11 +24,11 @@ use org\turbocommons\src\main\php\utils\ObjectUtils;
  *
  * @return void
  */
-class HashMapObjectTest extends PHPUnit_Framework_TestCase {
+class HashMapObjectTest extends TestCase {
 
 
     /**
-     * @see PHPUnit_Framework_TestCase::setUpBeforeClass()
+     * @see TestCase::setUpBeforeClass()
      *
      * @return void
      */
@@ -39,7 +39,7 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 
 
     /**
-     * @see PHPUnit_Framework_TestCase::setUp()
+     * @see TestCase::setUp()
      *
      * @return void
      */
@@ -62,7 +62,7 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 
 
     /**
-     * @see PHPUnit_Framework_TestCase::tearDown()
+     * @see TestCase::tearDown()
      *
      * @return void
      */
@@ -73,7 +73,7 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 
 
     /**
-     * @see PHPUnit_Framework_TestCase::tearDownAfterClass()
+     * @see TestCase::tearDownAfterClass()
      *
      * @return void
      */
@@ -100,7 +100,7 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 	        try {
 	            $h->set($this->emptyValues[$i], null);
 	            $exceptionMessage = 'empty value did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 	    }
@@ -177,7 +177,7 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 	        try {
 	            $this->populatedHashMap->get($this->emptyValues[$i]);
 	            $exceptionMessage = 'empty value did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 	    }
@@ -207,14 +207,14 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $this->populatedHashMap->get('J');
 	        $exceptionMessage = 'J value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $this->populatedHashMap->get('undefined');
 	        $exceptionMessage = 'undefined value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -302,7 +302,7 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 	        try {
 	            $this->populatedHashMap->isKey($this->emptyValues[$i]);
 	            $exceptionMessage = 'empty value did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 	    }
@@ -342,7 +342,7 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 	        try {
 	            $this->populatedHashMap->remove($this->emptyValues[$i]);
 	            $exceptionMessage = 'empty value did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 	    }
@@ -360,14 +360,14 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 	        try {
 	            $this->populatedHashMap->remove($key);
 	            $exceptionMessage = $key.' value did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 
 	        try {
 	            $this->populatedHashMap->get($key);
 	            $exceptionMessage = $key.' value did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 	    }
@@ -378,14 +378,14 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $this->populatedHashMap->remove('J');
 	        $exceptionMessage = 'J did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $this->populatedHashMap->remove('undefinedKey');
 	        $exceptionMessage = 'undefinedKey did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -415,21 +415,21 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 	            try {
 	                $this->populatedHashMap->rename($this->emptyValues[$i], $this->emptyValues[$j]);
 	                $exceptionMessage = 'empty value did not cause exception';
-    	        } catch (Exception $e) {
+    	        } catch (Throwable $e) {
     	            // We expect an exception to happen
     	        }
 
     	        try {
     	            $this->populatedHashMap->rename($this->emptyValues[$i], 'a');
     	            $exceptionMessage = 'empty value did not cause exception';
-    	        } catch (Exception $e) {
+    	        } catch (Throwable $e) {
     	            // We expect an exception to happen
     	        }
 
     	        try {
     	            $this->populatedHashMap->rename('a', $this->emptyValues[$j]);
     	            $exceptionMessage = 'empty value did not cause exception';
-    	        } catch (Exception $e) {
+    	        } catch (Throwable $e) {
     	            // We expect an exception to happen
     	        }
 	        }
@@ -448,7 +448,7 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $this->populatedHashMap->get('a');
 	        $exceptionMessage = 'empty value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -456,21 +456,21 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $this->populatedHashMap->rename('unknown', 'b');
 	        $exceptionMessage = 'unknown value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $this->populatedHashMap->rename('a1', 'b');
 	        $exceptionMessage = 'a1 for existing b key did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $this->populatedHashMap->rename('nonexistant', 'newkey');
 	        $exceptionMessage = 'nonexistant did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -500,21 +500,21 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 	            try {
 	                $this->populatedHashMap->swap($this->emptyValues[$i], $this->emptyValues[$j]);
 	                $exceptionMessage = 'empty value did not cause exception';
-	            } catch (Exception $e) {
+	            } catch (Throwable $e) {
 	                // We expect an exception to happen
 	            }
 
 	            try {
 	                $this->populatedHashMap->swap($this->emptyValues[$i], 'a');
 	                $exceptionMessage = 'empty value did not cause exception';
-	            } catch (Exception $e) {
+	            } catch (Throwable $e) {
 	                // We expect an exception to happen
 	            }
 
 	            try {
 	                $this->populatedHashMap->swap('a', $this->emptyValues[$j]);
 	                $exceptionMessage = 'empty value did not cause exception';
-	            } catch (Exception $e) {
+	            } catch (Throwable $e) {
 	                // We expect an exception to happen
 	            }
 	        }
@@ -540,7 +540,7 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 
 	        $this->assertFalse($this->populatedHashMap->swap('K', 'a'));
 	        $exceptionMessage = 'K value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -548,7 +548,7 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 
 	        $this->assertFalse($this->populatedHashMap->swap('no', 'string'));
 	        $exceptionMessage = 'no value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -556,7 +556,7 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 
 	        $this->assertFalse($this->populatedHashMap->swap('string', 'no'));
 	        $exceptionMessage = 'no value did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -584,14 +584,14 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 	        try {
                 $this->populatedHashMap->sortByKey($this->emptyValues[$i]);
                 $exceptionMessage = 'empty value did not cause exception';
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 // We expect an exception to happen
             }
 
             try {
                 $this->populatedHashMap->sortByKey(HashMapObject::SORT_METHOD_NUMERIC, $this->emptyValues[$i]);
                 $exceptionMessage = 'empty param 2 did not cause exception';
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 // We expect an exception to happen
             }
 	    }
@@ -667,7 +667,7 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 
 	            $this->populatedHashMap->sortByValue($this->emptyValues[$i]);
 	            $exceptionMessage = 'empty value did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 
@@ -675,7 +675,7 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 
 	            $this->populatedHashMap->sortByValue(HashMapObject::SORT_METHOD_NUMERIC, $this->emptyValues[$i]);
 	            $exceptionMessage = 'empty parameter 2 did not cause exception';
-	        } catch (Exception $e) {
+	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 	    }
@@ -777,7 +777,7 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 
 	        $h->shift();
 	        $exceptionMessage = 'shift() did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
@@ -831,7 +831,7 @@ class HashMapObjectTest extends PHPUnit_Framework_TestCase {
 
 	        $h->pop();
 	        $exceptionMessage = 'pop() did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 

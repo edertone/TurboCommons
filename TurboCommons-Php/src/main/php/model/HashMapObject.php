@@ -11,7 +11,6 @@
 
 namespace org\turbocommons\src\main\php\model;
 
-use Exception;
 use InvalidArgumentException;
 use UnexpectedValueException;
 
@@ -103,16 +102,14 @@ class HashMapObject{
      */
     public function get($key){
 
-        try {
+        if(array_key_exists($key, $this->_array)){
 
             return $this->_array[$key];
-
-        } catch (Exception $e) {
-
-            $this->_validateKeyFormat($key);
-
-            throw new InvalidArgumentException('HashMapObject->get: key <'.$key.'> does not exist');
         }
+
+        $this->_validateKeyFormat($key);
+
+        throw new InvalidArgumentException('HashMapObject->get: key <'.$key.'> does not exist');
     }
 
 
@@ -128,6 +125,7 @@ class HashMapObject{
 
         // Keys must be strictly converted to strings
         foreach ($keys as $k) {
+
             $result[] = (string)$k;
         }
 
@@ -162,16 +160,7 @@ class HashMapObject{
      */
     public function isKey($key){
 
-        try {
-
-            $this->_array[$key];
-
-            return true;
-
-        } catch (Exception $e) {
-
-            return false;
-        }
+        return array_key_exists($key, $this->_array);
     }
 
 
@@ -185,7 +174,7 @@ class HashMapObject{
      */
     public function remove($key){
 
-        try {
+        if(array_key_exists($key, $this->_array)){
 
             $value = $this->_array[$key];
 
@@ -194,13 +183,11 @@ class HashMapObject{
             $this->_length -= 1;
 
             return $value;
-
-        } catch (Exception $e) {
-
-            $this->_validateKeyFormat($key);
-
-            throw new InvalidArgumentException('HashMapObject->rename: key does not exist '.$key);
         }
+
+        $this->_validateKeyFormat($key);
+
+        throw new InvalidArgumentException('HashMapObject->rename: key does not exist '.$key);
     }
 
 
@@ -313,7 +300,7 @@ class HashMapObject{
      * @throws InvalidArgumentException
      * @return boolean True if sort was successful false on failure
      */
-    public function sortByKey($method = self::SORT_METHOD_STRING, $order = self::SORT_ORDER_ASCENDING){
+    public function sortByKey(string $method = self::SORT_METHOD_STRING, string $order = self::SORT_ORDER_ASCENDING){
 
         $methodFlag = null;
 
@@ -356,7 +343,7 @@ class HashMapObject{
      * @throws InvalidArgumentException
      * @return boolean True if sort was successful
      */
-    public function sortByValue($method = self::SORT_METHOD_NUMERIC, $order = self::SORT_ORDER_ASCENDING){
+    public function sortByValue(string $method = self::SORT_METHOD_NUMERIC, string $order = self::SORT_ORDER_ASCENDING){
 
         $methodFlag = null;
 
@@ -455,7 +442,7 @@ class HashMapObject{
         // We use the same logic as StringUtils::isEmpty but with some simplification for better performance
         if(!is_string($key) || str_replace([' ', "\n", "\r", "\t"], '', $key) == ''){
 
-            throw new InvalidArgumentException('HashMapObject: key <'.$key.'> must be a non empty string');
+            throw new InvalidArgumentException('HashMapObject: key must be a non empty string');
         }
     }
 }
