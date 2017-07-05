@@ -622,7 +622,7 @@
                                     <xs:attribute name="coverageReport" use="required" type="xs:boolean">
                                         <xs:annotation>
                                             <xs:documentation>
-                                                Enables or disables the coverage report generation as part of the unit tests execution. Note that phpunit requires Xdebug to be enabled on the php installation to work.
+                                                Enables or disables the coverage report generation as part of the unit tests execution. Note that phpunit requires Xdebug to be enabled on the php installation to work and will consume a lot more time than normal tests execution.
                                             </xs:documentation>
                                         </xs:annotation>
                                     </xs:attribute>

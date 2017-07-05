@@ -111,7 +111,7 @@
 		<property name="Tools.jpgOptimizerPath" value="${Tools.path}/jpegtran/jpegtran.exe" />
 		<property name="Tools.cssValidatorPath" value="${Tools.path}/W3c-css-validator/css-validator.jar" />
 		<property name="Tools.phpDocPath" value="${Tools.path}/PhpDocumentor/phpDocumentor.phar" />
-		<property name="Tools.phpUnitPath" value="${Tools.path}/PhpUnit/phpunit-5.7.14.phar" />
+		<property name="Tools.phpUnitPath" value="${Tools.path}/PhpUnit/phpunit-6.2.3.phar" />
 
 		<property name="Tools.mysqlPath" value="C:/xampp/mysql/bin/mysql.exe" />
 		<property name="Tools.jsDocPath" value="C:/Program Files/nodejs/node_modules/.bin/jsdoc.cmd" />
