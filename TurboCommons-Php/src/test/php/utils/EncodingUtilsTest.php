@@ -11,8 +11,8 @@
 
 namespace org\turbocommons\src\test\php\utils;
 
-use Exception;
-use PHPUnit_Framework_TestCase;
+use Throwable;
+use PHPUnit\Framework\TestCase;
 use stdClass;
 use org\turbocommons\src\main\php\utils\EncodingUtils;
 
@@ -22,11 +22,11 @@ use org\turbocommons\src\main\php\utils\EncodingUtils;
  *
  * @return void
  */
-class EncodingUtilsTest extends PHPUnit_Framework_TestCase {
+class EncodingUtilsTest extends TestCase {
 
 
 	/**
-	 * @see PHPUnit_Framework_TestCase::setUpBeforeClass()
+	 * @see TestCase::setUpBeforeClass()
 	 *
 	 * @return void
 	 */
@@ -37,7 +37,7 @@ class EncodingUtilsTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
-	 * @see PHPUnit_Framework_TestCase::setUp()
+	 * @see TestCase::setUp()
 	 *
 	 * @return void
 	 */
@@ -48,7 +48,7 @@ class EncodingUtilsTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
-	 * @see PHPUnit_Framework_TestCase::tearDown()
+	 * @see TestCase::tearDown()
 	 *
 	 * @return void
 	 */
@@ -59,7 +59,7 @@ class EncodingUtilsTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
-	 * @see PHPUnit_Framework_TestCase::tearDownAfterClass()
+	 * @see TestCase::tearDownAfterClass()
 	 *
 	 * @return void
 	 */
@@ -87,28 +87,28 @@ class EncodingUtilsTest extends PHPUnit_Framework_TestCase {
 	    try {
             EncodingUtils::unicodeEscapedCharsToUtf8(null);
             $exceptionMessage = 'null did not cause exception';
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
             EncodingUtils::unicodeEscapedCharsToUtf8(0);
             $exceptionMessage = '0 did not cause exception';
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
             EncodingUtils::unicodeEscapedCharsToUtf8([]);
             $exceptionMessage = '[] did not cause exception';
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
             EncodingUtils::unicodeEscapedCharsToUtf8(new stdClass());
             $exceptionMessage = 'new stdClass() did not cause exception';
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
@@ -158,28 +158,28 @@ class EncodingUtilsTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        EncodingUtils::utf8ToUnicodeEscapedChars(null);
 	        $exceptionMessage = 'null did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        EncodingUtils::utf8ToUnicodeEscapedChars(0);
 	        $exceptionMessage = '0 did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        EncodingUtils::utf8ToUnicodeEscapedChars([]);
 	        $exceptionMessage = '[] did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        EncodingUtils::utf8ToUnicodeEscapedChars(new stdClass());
 	        $exceptionMessage = 'new stdClass() did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
