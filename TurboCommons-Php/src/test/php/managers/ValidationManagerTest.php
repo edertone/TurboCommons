@@ -12,8 +12,9 @@
 namespace org\turbocommons\src\test\php\managers;
 
 use org\turbocommons\src\main\php\managers\ValidationManager;
+use PHPUnit\Framework\TestCase;
+use Throwable;
 use stdClass;
-use PHPUnit_Framework_TestCase;
 use Exception;
 
 
@@ -22,11 +23,11 @@ use Exception;
  *
  * @return void
  */
-class ValidationManagerTest extends PHPUnit_Framework_TestCase {
+class ValidationManagerTest extends TestCase {
 
 
     /**
-     * @see PHPUnit_Framework_TestCase::setUpBeforeClass()
+     * @see TestCase::setUpBeforeClass()
      *
      * @return void
      */
@@ -37,7 +38,7 @@ class ValidationManagerTest extends PHPUnit_Framework_TestCase {
 
 
     /**
-     * @see PHPUnit_Framework_TestCase::setUp()
+     * @see TestCase::setUp()
      *
      * @return void
      */
@@ -48,7 +49,7 @@ class ValidationManagerTest extends PHPUnit_Framework_TestCase {
 
 
     /**
-     * @see PHPUnit_Framework_TestCase::tearDown()
+     * @see TestCase::tearDown()
      *
      * @return void
      */
@@ -59,7 +60,7 @@ class ValidationManagerTest extends PHPUnit_Framework_TestCase {
 
 
     /**
-     * @see PHPUnit_Framework_TestCase::tearDownAfterClass()
+     * @see TestCase::tearDownAfterClass()
      *
      * @return void
      */
@@ -307,14 +308,14 @@ class ValidationManagerTest extends PHPUnit_Framework_TestCase {
 		try {
 			$this->validationManager->isUrl([12341]);
 			$exceptionMessage = '[12341] did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			$this->validationManager->isUrl(12341);
 			$exceptionMessage = '12341 did not cause exception';
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
@@ -438,21 +439,21 @@ class ValidationManagerTest extends PHPUnit_Framework_TestCase {
 	    try {
 	        $this->validationManager->isFilledIn(125);
 	        $exceptionMessage = '125 did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $this->validationManager->isFilledIn([125]);
 	        $exceptionMessage = '[125] did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $this->validationManager->isFilledIn(new Exception());
 	        $exceptionMessage = 'new Exception() did not cause exception';
-	    } catch (Exception $e) {
+	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
