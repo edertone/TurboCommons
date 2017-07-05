@@ -149,7 +149,7 @@ class StringUtils {
      *
      * @return boolean True if the given string is accepted as camel case for the specified variant.
      */
-    public static function isCamelCase($string, $type = self::FORMAT_CAMEL_CASE){
+    public static function isCamelCase($string, string $type = self::FORMAT_CAMEL_CASE){
 
         if($string == null || $string == ''){
 
@@ -212,7 +212,7 @@ class StringUtils {
      *
      * @return boolean True if the given string is accepted as snake case for the specified variant.
      */
-    public static function isSnakeCase($string, $type = self::FORMAT_SNAKE_CASE){
+    public static function isSnakeCase($string, string $type = self::FORMAT_SNAKE_CASE){
 
         if($string == null || $string == ''){
 
@@ -263,7 +263,7 @@ class StringUtils {
      *
      * @return int The number of times that $findMe appears on $string
      */
-    public static function countStringOccurences($string, $findMe){
+    public static function countStringOccurences($string, string $findMe){
 
         return substr_count($string, $findMe);
     }
@@ -292,7 +292,7 @@ class StringUtils {
      *
      * @return int The number of words (elements divided by the wordSeparator value) that are present on the string
      */
-    public static function countWords($string, $wordSeparator = ' '){
+    public static function countWords($string, string $wordSeparator = ' '){
 
         $count = 0;
         $lines = self::getLines($string);
@@ -326,7 +326,7 @@ class StringUtils {
      *
      * @return string The specified string but limited in length if necessary. Final result will never exceed the specified limit, also with the limiterString appended.
      */
-    public static function limitLen($string, $limit = 100, $limiterString = ' ...'){
+    public static function limitLen($string, int $limit = 100, string $limiterString = ' ...'){
 
         if($limit <= 0 || !NumericUtils::isNumeric($limit)){
 
@@ -419,7 +419,7 @@ class StringUtils {
      *
      * @return array The list of keywords that have been extracted from the given text
      */
-    public static function getKeyWords($string, $max = 25, $longerThan = 3, $shorterThan = 15, $ignoreNumericWords = false){
+    public static function getKeyWords($string, int $max = 25, int $longerThan = 3, int $shorterThan = 15, bool $ignoreNumericWords = false){
 
         if($string == null){
 
@@ -575,7 +575,7 @@ class StringUtils {
      *
      * @return string The given string converted to the specified case format.
      */
-    public static function formatCase($string, $format){
+    public static function formatCase($string, string $format){
 
         // null values will return an empty string
         if($string == null){
@@ -765,7 +765,7 @@ class StringUtils {
      *
      * @return string The resulting string
      */
-    public static function formatForFullTextSearch($string, $wordSeparator = ' '){
+    public static function formatForFullTextSearch($string, string $wordSeparator = ' '){
 
         // Remove accents
         $res = self::removeAccents($string);
@@ -793,7 +793,7 @@ class StringUtils {
      *
      * @return string
      */
-    public static function generateRandomPassword($lenght = 5, $useuppercase = true){
+    public static function generateRandomPassword(int $lenght = 5, bool $useuppercase = true){
 
         // Set the characters to use in the random password
         $chars = 'abcdefghijkmnopqrstuvwxyz023456789';
@@ -977,7 +977,7 @@ class StringUtils {
      *
      * @return string The string without the removed words
      */
-    public static function removeWordsShorterThan($string, $shorterThan = 3, $wordSeparator = ' '){
+    public static function removeWordsShorterThan($string, int $shorterThan = 3, string $wordSeparator = ' '){
 
         if($string == null){
 
@@ -1009,7 +1009,7 @@ class StringUtils {
      *
      * @return string The string without the removed words
      */
-    public static function removeWordsLongerThan($string, $longerThan = 3, $wordSeparator = ' '){
+    public static function removeWordsLongerThan($string, int $longerThan = 3, string $wordSeparator = ' '){
 
         if($string == null){
 
@@ -1040,7 +1040,7 @@ class StringUtils {
      *
      * @return string The string without the urls
      */
-    public static function removeUrls($string, $replacement = 'xxxx') {
+    public static function removeUrls($string, string $replacement = 'xxxx') {
 
         return preg_replace('/[a-zA-Z]*[:\/\/]*[A-Za-z0-9\-_]+\.+[A-Za-z0-9\.\/%&=\?\-_]+/i', $replacement, $string);
     }
@@ -1055,7 +1055,7 @@ class StringUtils {
      *
      * @return string The string without any text that represents an email inside it.
      */
-    public static function removeEmails($string, $replacement = 'xxxx'){
+    public static function removeEmails($string, string $replacement = 'xxxx'){
 
         return preg_replace('/[^@\s]*@[^@\s]*\.[^@\s]*/', $replacement, $string);
     }
@@ -1069,7 +1069,7 @@ class StringUtils {
      *
      * @return string The string without the html code
      */
-    public static function removeHtmlCode($string, $allowedTags = ''){
+    public static function removeHtmlCode($string, string $allowedTags = ''){
 
         return strip_tags($string , $allowedTags);
     }
