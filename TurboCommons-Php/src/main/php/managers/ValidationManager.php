@@ -63,14 +63,9 @@ class ValidationManager extends BaseStrictClass{
 	 *
 	 * @return boolean False in case the validation fails or true if validation succeeds.
 	 */
-	public function isTrue($value, string $errorMessage = '', bool $isWarning = false){
+	public function isTrue($value, string $errorMessage = 'value is not true', bool $isWarning = false){
 
-		// Set optional parameters default values
-		$errorMessage = StringUtils::isEmpty($errorMessage) ? 'value is not true' : $errorMessage;
-
-		$res = $value !== true ? $errorMessage : '';
-
-		return $this->_updateValidationStatus($res, $isWarning);
+		return $this->_updateValidationStatus($value === true, $errorMessage, $isWarning);
 	}
 
 
@@ -83,14 +78,9 @@ class ValidationManager extends BaseStrictClass{
 	 *
 	 * @return boolean False in case the validation fails or true if validation succeeds.
 	 */
-	public function isBoolean($value, string $errorMessage = '', bool $isWarning = false){
+	public function isBoolean($value, string $errorMessage = 'value is not a boolean', bool $isWarning = false){
 
-		// Set optional parameters default values
-		$errorMessage = StringUtils::isEmpty($errorMessage) ? 'value is not a boolean' : $errorMessage;
-
-		$res = !is_bool($value) ? $errorMessage : '';
-
-		return $this->_updateValidationStatus($res, $isWarning);
+		return $this->_updateValidationStatus(is_bool($value), $errorMessage, $isWarning);
 	}
 
 
@@ -103,14 +93,9 @@ class ValidationManager extends BaseStrictClass{
 	 *
 	 * @return boolean False in case the validation fails or true if validation succeeds.
 	 */
-	public function isNumeric($value, string $errorMessage = '', bool $isWarning = false){
+	public function isNumeric($value, string $errorMessage = 'value is not a number', bool $isWarning = false){
 
-		// Set optional parameters default values
-		$errorMessage = StringUtils::isEmpty($errorMessage) ? 'value is not a number' : $errorMessage;
-
-		$res = !NumericUtils::isNumeric($value) ? $errorMessage : '';
-
-		return $this->_updateValidationStatus($res, $isWarning);
+	    return $this->_updateValidationStatus(NumericUtils::isNumeric($value), $errorMessage, $isWarning);
 	}
 
 
@@ -123,14 +108,9 @@ class ValidationManager extends BaseStrictClass{
 	 *
 	 * @return boolean False in case the validation fails or true if validation succeeds.
 	 */
-	public function isString($value, string $errorMessage = '', bool $isWarning = false){
+	public function isString($value, string $errorMessage = 'value is not a string', bool $isWarning = false){
 
-		// Set optional parameters default values
-		$errorMessage = StringUtils::isEmpty($errorMessage) ? 'value is not a string' : $errorMessage;
-
-		$res = (!StringUtils::isString($value)) ? $errorMessage : '';
-
-		return $this->_updateValidationStatus($res, $isWarning);
+		return $this->_updateValidationStatus(is_string($value), $errorMessage, $isWarning);
 	}
 
 
@@ -143,16 +123,11 @@ class ValidationManager extends BaseStrictClass{
 	 *
 	 * @return boolean False in case the validation fails or true if validation succeeds.
 	 */
-	public function isUrl($value, string $errorMessage = '', bool $isWarning = false){
+	public function isUrl($value, string $errorMessage = 'value is not an URL', bool $isWarning = false){
 
-	    $validationManager = new ValidationManager();
+	    $res = false;
 
-	    // Set optional parameters default values
-	    $errorMessage = (!$validationManager->isFilledIn($errorMessage)) ? 'value is not an URL' : $errorMessage;
-
-		$res = $errorMessage;
-
-		if($validationManager->isFilledIn($value) && $validationManager->isString($value)){
+		if(!StringUtils::isEmpty($value) && is_string($value)){
 
 			// This amazingly good solution's been found at https://jkwl.io/php/regex/2015/05/18/url-validation-php-regex.html
 			$urlRegex = '#^(?:(?:https?|ftp):\\/\\/)?(?:\\S+(?::\\S*)?@)?(?:(?!(?:10|127)(?:\\.\\d{1,3}){3})(?!(?:169\\.254|192\\.168)(?:\\.\\d{1,3}){2})(?!172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|' .
@@ -167,10 +142,10 @@ class ValidationManager extends BaseStrictClass{
 			        // resource path
 			        '(?:\\/\\S*)?$#ui';
 
-			$res = !(strlen($value) < 2083 && preg_match($urlRegex, $value)) ? $errorMessage : '';
+			$res = (strlen($value) < 2083 && preg_match($urlRegex, $value));
 		}
 
-		return $this->_updateValidationStatus($res, $isWarning);
+		return $this->_updateValidationStatus($res, $errorMessage, $isWarning);
 	}
 
 
@@ -183,14 +158,9 @@ class ValidationManager extends BaseStrictClass{
 	 *
 	 * @return boolean False in case the validation fails or true if validation succeeds.
 	 */
-	public function isArray($value, string $errorMessage = '', bool $isWarning = false){
+	public function isArray($value, string $errorMessage = 'value is not an array', bool $isWarning = false){
 
-		// Set optional parameters default values
-		$errorMessage = StringUtils::isEmpty($errorMessage) ? 'value is not an array' : $errorMessage;
-
-		$res = (!ArrayUtils::isArray($value)) ? $errorMessage : '';
-
-		return $this->_updateValidationStatus($res, $isWarning);
+		return $this->_updateValidationStatus(is_array($value), $errorMessage, $isWarning);
 	}
 
 
@@ -203,14 +173,9 @@ class ValidationManager extends BaseStrictClass{
 	 *
 	 * @return boolean False in case the validation fails or true if validation succeeds.
 	 */
-	public function isObject($value, string $errorMessage = '', bool $isWarning = false){
+	public function isObject($value, string $errorMessage = 'value is not an object', bool $isWarning = false){
 
-		// Set optional parameters default values
-		$errorMessage = StringUtils::isEmpty($errorMessage) ? 'value is not an object' : $errorMessage;
-
-		$res = (!ObjectUtils::isObject($value)) ? $errorMessage : '';
-
-		return $this->_updateValidationStatus($res, $isWarning);
+		return $this->_updateValidationStatus(is_object($value), $errorMessage, $isWarning);
 	}
 
 
@@ -227,14 +192,9 @@ class ValidationManager extends BaseStrictClass{
 	 *
 	 * @return boolean False in case the validation fails or true if validation succeeds.
 	 */
-	public function isFilledIn($value, array $emptyChars = [], string $errorMessage = '', bool $isWarning = false){
+	public function isFilledIn($value, array $emptyChars = [], string $errorMessage = 'value is required', bool $isWarning = false){
 
-		// Set optional parameters default values
-		$errorMessage = StringUtils::isEmpty($errorMessage) ? 'value is required' : $errorMessage;
-
-		$res = StringUtils::isEmpty($value, $emptyChars) ? $errorMessage : '';
-
-		return $this->_updateValidationStatus($res, $isWarning);
+		return $this->_updateValidationStatus(!StringUtils::isEmpty($value, $emptyChars), $errorMessage, $isWarning);
 	}
 
 
@@ -266,34 +226,31 @@ class ValidationManager extends BaseStrictClass{
 	 *
 	 * @return boolean False in case the validation fails or true if validation succeeds.
 	 */
-	public function isEqualTo($value, $value2, string $errorMessage = '', bool $isWarning = false){
+	public function isEqualTo($value, $value2, string $errorMessage = 'values are not equal', bool $isWarning = false){
 
-	    // Set optional parameters default values
-		$errorMessage = StringUtils::isEmpty($errorMessage) ? 'values are not equal' : $errorMessage;
-
-		$res = $errorMessage;
+	    $res = false;
 
 		// Compare elements depending on its type
-		if(ArrayUtils::isArray($value) && ArrayUtils::isArray($value2)){
+		if(is_array($value) && is_array($value2)){
 
-			$res = ArrayUtils::isEqualTo($value, $value2) ? '' : $res;
+			$res = ArrayUtils::isEqualTo($value, $value2);
 
 		}else{
 
-		    if(ObjectUtils::isObject($value) && ObjectUtils::isObject($value2)){
+		    if(is_object($value) && is_object($value2)){
 
-				$res = ObjectUtils::isEqualTo($value, $value2) ? '' : $res;
+				$res = ObjectUtils::isEqualTo($value, $value2);
 
 			}else{
 
 				if($value === $value2){
 
-					$res = '';
+					$res = true;
 				}
 			}
 		}
 
-		return $this->_updateValidationStatus($res, $isWarning);
+		return $this->_updateValidationStatus($res, $errorMessage, $isWarning);
 	}
 
 
@@ -373,10 +330,10 @@ class ValidationManager extends BaseStrictClass{
 	 *
 	 * @return boolean True if received errorMessage was '' (validation passed) or false if some error message was received (validation failed)
 	 */
-	private function _updateValidationStatus(string $errorMessage, bool $isWarning){
+	private function _updateValidationStatus(bool $result, string $errorMessage, bool $isWarning){
 
 		// If the validation fails, we must change the validation status
-		if($errorMessage != ''){
+	    if(!$result){
 
 		    $this->failedMessagesList[] = $errorMessage;
 		    $this->lastMessage = $errorMessage;
@@ -400,7 +357,7 @@ class ValidationManager extends BaseStrictClass{
 			}
 		}
 
-		return $errorMessage == '';
+		return $result;
 	}
 }
 
