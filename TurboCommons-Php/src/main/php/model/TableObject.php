@@ -82,7 +82,7 @@ class TableObject{
 
         }else{
 
-            if(ArrayUtils::isArray($columns)){
+            if(is_array($columns)){
 
                 $this->_columnsCount = count($columns);
 
