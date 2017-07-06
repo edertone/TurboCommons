@@ -30,14 +30,14 @@ class EncodingUtils{
 	 */
     public static function unicodeEscapedCharsToUtf8($string){
 
-        if(!StringUtils::isString($string)){
+        if(is_string($string)){
 
-            throw new InvalidArgumentException('EncodingUtils->unicodeEscapedCharsToUtf8: Specified value must be a string');
+            return preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($match) {
+                return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
+            }, $string);
         }
 
-        return preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($match) {
-            return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
-        }, $string);
+        throw new InvalidArgumentException('EncodingUtils->unicodeEscapedCharsToUtf8: Specified value must be a string');
 	}
 
 
@@ -50,7 +50,7 @@ class EncodingUtils{
 	 */
 	public static function utf8ToUnicodeEscapedChars($string){
 
-	    if(!StringUtils::isString($string)){
+	    if(!is_string($string)){
 
 	        throw new InvalidArgumentException('EncodingUtils->utf8ToUnicodeEscapedChars: Specified value must be a string');
 	    }
