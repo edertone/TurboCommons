@@ -29,7 +29,7 @@ class NumericUtils {
      */
     public static function isNumeric($value){
 
-        if(StringUtils::isString($value)){
+        if(is_string($value)){
 
             $value = trim($value);
         }
