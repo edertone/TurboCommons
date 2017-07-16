@@ -21,21 +21,6 @@ class BrowserManager extends BaseSingletonClass{
 
 
 	/**
-	 * Returns the global singleton instance.
-	 *
-	 * @return BrowserManager The singleton instance.
-	 */
-	public static function getInstance(){
-
-		// This method is overriden from the singleton one simply to get correct
-		// autocomplete annotations when returning the instance
-		 $instance = parent::getInstance();
-
-		 return $instance;
-	}
-
-
-	/**
 	 * TODO
 	 */
 	public function someMethod(){

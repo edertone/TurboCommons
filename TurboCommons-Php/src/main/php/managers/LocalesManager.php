@@ -118,21 +118,6 @@ class LocalesManager extends BaseSingletonClass{
 
 
     /**
-     * Returns the global LocalesManager singleton instance.
-     *
-     * @return LocalesManager The Locales Manager instance.
-     */
-    public static function getInstance(){
-
-        // This method is overriden from the singleton one simply to get correct
-        // autocomplete annotations when returning the instance
-        $instance = parent::getInstance();
-
-        return $instance;
-    }
-
-
-    /**
      * Reads the value for the specified bundle, key and locale.
      *
      * @param string $key The key we want to read from the specified resource bundle

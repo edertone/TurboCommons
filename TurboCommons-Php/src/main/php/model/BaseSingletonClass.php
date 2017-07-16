@@ -12,6 +12,8 @@
 namespace org\turbocommons\src\main\php\model;
 
 
+use phpDocumentor\Reflection\Types\This;
+
 /**
  * A base class that implements the singleton pattern for PHP and can be extended to convert a class to a singleton object
  */
@@ -26,13 +28,9 @@ abstract class BaseSingletonClass extends BaseStrictClass{
 
 
 	/**
-	 * Returns the *Singleton* instance of this class.
-	 * IMPORTANT: If you want autocomplete for the returned instance, you can assign it to a variable using doc annotations like this:
-	 * /* @var $shoppingCartManager ShoppingCartManager *&#47;<br>$shoppingCartManager = ShoppingCartManager::getInstance();
+	 * Returns the Singleton instance of this class.
 	 *
-	 * @staticvar Singleton $instance The *Singleton* instances of this class.
-	 *
-	 * @return Singleton The *Singleton* instance.
+	 * @return self The Singleton instance.
 	 */
 	public static function getInstance(){
 

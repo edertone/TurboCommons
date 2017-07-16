@@ -69,21 +69,6 @@ class ErrorManager extends BaseSingletonClass{
 
 
 	/**
-	 * Returns the global singleton instance.
-	 *
-	 * @return ErrorManager The singleton instance.
-	 */
-	public static function getInstance(){
-
-		// This method is overriden from the singleton one simply to get correct
-		// autocomplete annotations when returning the instance
-		 $instance = parent::getInstance();
-
-		 return $instance;
-	}
-
-
-	/**
 	 * Use this method to initialize the error management class.
 	 * The ErrorManager will not be doing anything till this method is called. Once intialized, the custom error handlers will take care of
 	 * all the exceptions and errors that happen.
