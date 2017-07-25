@@ -11,6 +11,7 @@
 
 namespace org\turbocommons\src\test\php\model;
 
+use Exception;
 use Throwable;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -45,6 +46,8 @@ class HashMapObjectTest extends TestCase {
      */
     protected function setUp(){
 
+        $this->exceptionMessage = '';
+
         $this->emptyValues = [null, '', [], new stdClass(), '     ', "\n\n\n", 0];
         $this->emptyValuesCount = count($this->emptyValues);
 
@@ -68,7 +71,10 @@ class HashMapObjectTest extends TestCase {
      */
     protected function tearDown(){
 
-        // Nothing necessary here
+        if($this->exceptionMessage != ''){
+
+            $this->fail($this->exceptionMessage);
+        }
     }
 
 
@@ -83,6 +89,87 @@ class HashMapObjectTest extends TestCase {
     }
 
 
+    /**
+     * testConstruct
+     *
+     * @return void
+     */
+    public function testConstruct(){
+
+        // Test empty values
+        $test = new HashMapObject();
+        $this->assertTrue($test->length() === 0);
+
+        $test = new HashMapObject(null);
+        $this->assertTrue($test->length() === 0);
+
+        $test = new HashMapObject([]);
+        $this->assertTrue($test->length() === 0);
+
+        $this->emptyValues = ['', new stdClass(), '     ', "\n\n\n", 0];
+        $this->emptyValuesCount = count($this->emptyValues);
+
+        for ($i = 0; $i < $this->emptyValuesCount; $i++) {
+
+            try {
+                $test = new HashMapObject($this->emptyValues[$i]);
+                $this->exceptionMessage = 'empty value did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+        }
+
+        // Test ok values
+        $test = new HashMapObject(['a']);
+        $this->assertTrue($test->length() === 1);
+        $this->assertTrue($test->get('0') === 'a');
+
+        $test = new HashMapObject(['a' => 1]);
+        $this->assertTrue($test->length() === 1);
+        $this->assertTrue($test->get('a') === 1);
+
+        $test = new HashMapObject([1, 2, 3]);
+        $this->assertTrue($test->length() === 3);
+        $this->assertTrue($test->get('0') === 1);
+        $this->assertTrue($test->get('2') === 3);
+
+        $test = new HashMapObject(['a', 'b', 'c', 'd', 'e', 'f']);
+        $this->assertTrue($test->length() === 6);
+        $this->assertTrue($test->get('0') === 'a');
+        $this->assertTrue($test->get('3') === 'd');
+        $this->assertTrue($test->get('5') === 'f');
+
+        $test = new HashMapObject(['1' => 'a', '2' => 'b', '3' => 'c', '4' => 'd', '5' => 'e', '6' => 'f']);
+        $this->assertTrue($test->length() === 6);
+        $this->assertTrue($test->get('1') === 'a');
+        $this->assertTrue($test->get('4') === 'd');
+        $this->assertTrue($test->get('6') === 'f');
+
+        $test = new HashMapObject([1 => 'a', 2 => 'b', 3 => 'c', 4 => 'd', 5 => 'e', 6 => 'f']);
+        $this->assertTrue($test->length() === 6);
+        $this->assertTrue($test->get('1') === 'a');
+        $this->assertTrue($test->get('4') === 'd');
+        $this->assertTrue($test->get('6') === 'f');
+
+        // Test wrong values
+        // Tested with exceptions
+
+        // Test exceptions
+        $this->exceptionValues = [123, 'hello', new Exception(), -1, 0.23];
+        $this->exceptionValuesCount = count($this->exceptionValues);
+
+        for ($i = 0; $i < $this->exceptionValuesCount; $i++) {
+
+            try {
+                $test = new HashMapObject($this->exceptionValues[$i]);
+                $this->exceptionMessage = 'exception value did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+        }
+    }
+
+
 	/**
 	 * testSet
 	 *
@@ -93,21 +180,14 @@ class HashMapObjectTest extends TestCase {
 	    $h = new HashMapObject();
 
 	    // Test empty values
-	    $exceptionMessage = '';
-
 	    for ($i = 0; $i < $this->emptyValuesCount; $i++) {
 
 	        try {
 	            $h->set($this->emptyValues[$i], null);
-	            $exceptionMessage = 'empty value did not cause exception';
+	            $this->exceptionMessage = 'empty value did not cause exception';
 	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
-	    }
-
-	    if($exceptionMessage != ''){
-
-	        $this->fail($exceptionMessage);
 	    }
 
 	    // Test ok values
@@ -170,21 +250,14 @@ class HashMapObjectTest extends TestCase {
 	public function testGet(){
 
 	    // Test empty values
-	    $exceptionMessage = '';
-
 	    for ($i = 0; $i < $this->emptyValuesCount; $i++) {
 
 	        try {
 	            $this->populatedHashMap->get($this->emptyValues[$i]);
-	            $exceptionMessage = 'empty value did not cause exception';
+	            $this->exceptionMessage = 'empty value did not cause exception';
 	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
-	    }
-
-	    if($exceptionMessage != ''){
-
-	        $this->fail($exceptionMessage);
 	    }
 
 	    // Test ok values
@@ -206,21 +279,16 @@ class HashMapObjectTest extends TestCase {
 	    // Test exceptions
 	    try {
 	        $this->populatedHashMap->get('J');
-	        $exceptionMessage = 'J value did not cause exception';
+	        $this->exceptionMessage = 'J value did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $this->populatedHashMap->get('undefined');
-	        $exceptionMessage = 'undefined value did not cause exception';
+	        $this->exceptionMessage = 'undefined value did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
-	    }
-
-	    if($exceptionMessage != ''){
-
-	        $this->fail($exceptionMessage);
 	    }
 	}
 
@@ -295,16 +363,9 @@ class HashMapObjectTest extends TestCase {
 	public function testIsKey(){
 
 	    // Test empty values
-	    $exceptionMessage = '';
-
 	    for ($i = 0; $i < $this->emptyValuesCount; $i++) {
 
-	        try {
-	            $this->populatedHashMap->isKey($this->emptyValues[$i]);
-	            $exceptionMessage = 'empty value did not cause exception';
-	        } catch (Throwable $e) {
-	            // We expect an exception to happen
-	        }
+	        $this->assertFalse($this->populatedHashMap->isKey($this->emptyValues[$i]));
 	    }
 
 	    // Test ok values
@@ -335,13 +396,11 @@ class HashMapObjectTest extends TestCase {
 	public function testRemove(){
 
 	    // Test empty values
-	    $exceptionMessage = '';
-
 	    for ($i = 0; $i < $this->emptyValuesCount; $i++) {
 
 	        try {
 	            $this->populatedHashMap->remove($this->emptyValues[$i]);
-	            $exceptionMessage = 'empty value did not cause exception';
+	            $this->exceptionMessage = 'empty value did not cause exception';
 	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
@@ -359,14 +418,14 @@ class HashMapObjectTest extends TestCase {
 
 	        try {
 	            $this->populatedHashMap->remove($key);
-	            $exceptionMessage = $key.' value did not cause exception';
+	            $this->exceptionMessage = $key.' value did not cause exception';
 	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
 
 	        try {
 	            $this->populatedHashMap->get($key);
-	            $exceptionMessage = $key.' value did not cause exception';
+	            $this->exceptionMessage = $key.' value did not cause exception';
 	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
@@ -377,24 +436,20 @@ class HashMapObjectTest extends TestCase {
 	    // Test wrong values
 	    try {
 	        $this->populatedHashMap->remove('J');
-	        $exceptionMessage = 'J did not cause exception';
+	        $this->exceptionMessage = 'J did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $this->populatedHashMap->remove('undefinedKey');
-	        $exceptionMessage = 'undefinedKey did not cause exception';
+	        $this->exceptionMessage = 'undefinedKey did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    // Test exceptions
 	    // Tested at empty values
-	    if($exceptionMessage != ''){
-
-	        $this->fail($exceptionMessage);
-	    }
 	}
 
 
@@ -406,29 +461,27 @@ class HashMapObjectTest extends TestCase {
 	public function testRename(){
 
 	    // Test empty values
-	    $exceptionMessage = '';
-
 	    for ($i = 0; $i < $this->emptyValuesCount; $i++) {
 
 	        for ($j = 0; $j < $this->emptyValuesCount; $j++) {
 
 	            try {
 	                $this->populatedHashMap->rename($this->emptyValues[$i], $this->emptyValues[$j]);
-	                $exceptionMessage = 'empty value did not cause exception';
+	                $this->exceptionMessage = 'empty value did not cause exception';
     	        } catch (Throwable $e) {
     	            // We expect an exception to happen
     	        }
 
     	        try {
     	            $this->populatedHashMap->rename($this->emptyValues[$i], 'a');
-    	            $exceptionMessage = 'empty value did not cause exception';
+    	            $this->exceptionMessage = 'empty value did not cause exception';
     	        } catch (Throwable $e) {
     	            // We expect an exception to happen
     	        }
 
     	        try {
     	            $this->populatedHashMap->rename('a', $this->emptyValues[$j]);
-    	            $exceptionMessage = 'empty value did not cause exception';
+    	            $this->exceptionMessage = 'empty value did not cause exception';
     	        } catch (Throwable $e) {
     	            // We expect an exception to happen
     	        }
@@ -447,7 +500,7 @@ class HashMapObjectTest extends TestCase {
 
 	    try {
 	        $this->populatedHashMap->get('a');
-	        $exceptionMessage = 'empty value did not cause exception';
+	        $this->exceptionMessage = 'empty value did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
@@ -455,31 +508,27 @@ class HashMapObjectTest extends TestCase {
 	    // Test wrong values
 	    try {
 	        $this->populatedHashMap->rename('unknown', 'b');
-	        $exceptionMessage = 'unknown value did not cause exception';
+	        $this->exceptionMessage = 'unknown value did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $this->populatedHashMap->rename('a1', 'b');
-	        $exceptionMessage = 'a1 for existing b key did not cause exception';
+	        $this->exceptionMessage = 'a1 for existing b key did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        $this->populatedHashMap->rename('nonexistant', 'newkey');
-	        $exceptionMessage = 'nonexistant did not cause exception';
+	        $this->exceptionMessage = 'nonexistant did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    // Test exceptions
 	    // Tested at empty values
-	    if($exceptionMessage != ''){
-
-	        $this->fail($exceptionMessage);
-	    }
 	}
 
 
@@ -491,29 +540,27 @@ class HashMapObjectTest extends TestCase {
 	public function testSwap(){
 
 	    // Test empty values
-	    $exceptionMessage = '';
-
 	    for ($i = 0; $i < $this->emptyValuesCount; $i++) {
 
 	        for ($j = 0; $j < $this->emptyValuesCount; $j++) {
 
 	            try {
 	                $this->populatedHashMap->swap($this->emptyValues[$i], $this->emptyValues[$j]);
-	                $exceptionMessage = 'empty value did not cause exception';
+	                $this->exceptionMessage = 'empty value did not cause exception';
 	            } catch (Throwable $e) {
 	                // We expect an exception to happen
 	            }
 
 	            try {
 	                $this->populatedHashMap->swap($this->emptyValues[$i], 'a');
-	                $exceptionMessage = 'empty value did not cause exception';
+	                $this->exceptionMessage = 'empty value did not cause exception';
 	            } catch (Throwable $e) {
 	                // We expect an exception to happen
 	            }
 
 	            try {
 	                $this->populatedHashMap->swap('a', $this->emptyValues[$j]);
-	                $exceptionMessage = 'empty value did not cause exception';
+	                $this->exceptionMessage = 'empty value did not cause exception';
 	            } catch (Throwable $e) {
 	                // We expect an exception to happen
 	            }
@@ -539,7 +586,7 @@ class HashMapObjectTest extends TestCase {
 	    try {
 
 	        $this->assertFalse($this->populatedHashMap->swap('K', 'a'));
-	        $exceptionMessage = 'K value did not cause exception';
+	        $this->exceptionMessage = 'K value did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
@@ -547,7 +594,7 @@ class HashMapObjectTest extends TestCase {
 	    try {
 
 	        $this->assertFalse($this->populatedHashMap->swap('no', 'string'));
-	        $exceptionMessage = 'no value did not cause exception';
+	        $this->exceptionMessage = 'no value did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
@@ -555,17 +602,13 @@ class HashMapObjectTest extends TestCase {
 	    try {
 
 	        $this->assertFalse($this->populatedHashMap->swap('string', 'no'));
-	        $exceptionMessage = 'no value did not cause exception';
+	        $this->exceptionMessage = 'no value did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    // Test exceptions
 	    // Tested at empty values
-	    if($exceptionMessage != ''){
-
-	        $this->fail($exceptionMessage);
-	    }
 	}
 
 
@@ -577,20 +620,18 @@ class HashMapObjectTest extends TestCase {
 	public function testSortByKey(){
 
 	    // Test empty values
-	    $exceptionMessage = '';
-
 	    for ($i = 0; $i < $this->emptyValuesCount; $i++) {
 
 	        try {
                 $this->populatedHashMap->sortByKey($this->emptyValues[$i]);
-                $exceptionMessage = 'empty value did not cause exception';
+                $this->exceptionMessage = 'empty value did not cause exception';
             } catch (Throwable $e) {
                 // We expect an exception to happen
             }
 
             try {
                 $this->populatedHashMap->sortByKey(HashMapObject::SORT_METHOD_NUMERIC, $this->emptyValues[$i]);
-                $exceptionMessage = 'empty param 2 did not cause exception';
+                $this->exceptionMessage = 'empty param 2 did not cause exception';
             } catch (Throwable $e) {
                 // We expect an exception to happen
             }
@@ -644,10 +685,6 @@ class HashMapObjectTest extends TestCase {
 
 	    // Test exceptions
 	    // Tested at empty values
-	    if($exceptionMessage != ''){
-
-	        $this->fail($exceptionMessage);
-	    }
 	}
 
 
@@ -659,14 +696,12 @@ class HashMapObjectTest extends TestCase {
 	public function testSortByValue(){
 
 	    // Test empty values
-	    $exceptionMessage = '';
-
 	    for ($i = 0; $i < $this->emptyValuesCount; $i++) {
 
 	        try {
 
 	            $this->populatedHashMap->sortByValue($this->emptyValues[$i]);
-	            $exceptionMessage = 'empty value did not cause exception';
+	            $this->exceptionMessage = 'empty value did not cause exception';
 	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
@@ -674,7 +709,7 @@ class HashMapObjectTest extends TestCase {
 	        try {
 
 	            $this->populatedHashMap->sortByValue(HashMapObject::SORT_METHOD_NUMERIC, $this->emptyValues[$i]);
-	            $exceptionMessage = 'empty parameter 2 did not cause exception';
+	            $this->exceptionMessage = 'empty parameter 2 did not cause exception';
 	        } catch (Throwable $e) {
 	            // We expect an exception to happen
 	        }
@@ -727,10 +762,6 @@ class HashMapObjectTest extends TestCase {
 
 	    // Test exceptions
 	    // Tested at empty values
-	    if($exceptionMessage != ''){
-
-	        $this->fail($exceptionMessage);
-	    }
 	}
 
 
@@ -771,19 +802,12 @@ class HashMapObjectTest extends TestCase {
 	    // Test exceptions
 	    $h = new HashMapObject();
 
-	    $exceptionMessage = '';
-
 	    try {
 
 	        $h->shift();
-	        $exceptionMessage = 'shift() did not cause exception';
+	        $this->exceptionMessage = 'shift() did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
-	    }
-
-	    if($exceptionMessage != ''){
-
-	        $this->fail($exceptionMessage);
 	    }
 	}
 
@@ -825,19 +849,12 @@ class HashMapObjectTest extends TestCase {
 	    // Test exceptions
 	    $h = new HashMapObject();
 
-	    $exceptionMessage = '';
-
 	    try {
 
 	        $h->pop();
-	        $exceptionMessage = 'pop() did not cause exception';
+	        $this->exceptionMessage = 'pop() did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
-	    }
-
-	    if($exceptionMessage != ''){
-
-	        $this->fail($exceptionMessage);
 	    }
 	}
 

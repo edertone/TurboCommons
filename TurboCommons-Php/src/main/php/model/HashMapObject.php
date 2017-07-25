@@ -16,7 +16,7 @@ use UnexpectedValueException;
 
 
 /**
- * An Object that defines a sorted collection of key/value pairs and all their related operations.
+ * HashMapObject abstraction
  */
 class HashMapObject{
 
@@ -57,6 +57,39 @@ class HashMapObject{
      * @var integer
      */
     protected $_length = 0;
+
+
+    /**
+     * An Object that defines a sorted collection of key/value pairs and all their related operations.
+     *
+     * @param array $data List of values that will be added to the HashMapObject
+     */
+    public function __construct(array $data = null){
+
+        if(($dataCount = count($data)) > 0){
+
+            $isAssociative = array_keys($data) !== range(0, $dataCount - 1);
+
+            if($isAssociative){
+
+                foreach ($data as $key => $value) {
+
+                    $this->set((string)$key, $value);
+                }
+
+            }else{
+
+                $i = 0;
+
+                foreach ($data as $value) {
+
+                    $this->set((string)$i, $value);
+
+                    $i++;
+                }
+            }
+        }
+    }
 
 
     /**
@@ -159,12 +192,14 @@ class HashMapObject{
     /**
      * Tells if the provided value matches a key that's stored inside the HashMapObject
      *
-     * @param string $key A value to find on the currently stored keys.
-     * @return boolean
+     * @param mixed $key A value to find on the currently stored keys.
+     *
+     * @return boolean True if the provided value is a valid HashMap key, false in any other case
      */
     public function isKey($key){
 
-        return array_key_exists($key, $this->_array);
+
+        return is_string($key) && array_key_exists($key, $this->_array);
     }
 
 
