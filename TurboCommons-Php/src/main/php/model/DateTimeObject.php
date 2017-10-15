@@ -15,16 +15,17 @@ use DateTime;
 use DateTimeZone;
 use UnexpectedValueException;
 use org\turbocommons\src\main\php\utils\NumericUtils;
+use org\turbocommons\src\main\php\utils\StringUtils;
 
 
 /**
- * date and time format object abstraction based on ISO 8601
+ * date and time format object abstraction based on ISO 8601 standard
  */
 class DateTimeObject{
 
 
     /**
-     * String that defines the ISO 8601 format to be used when calling the format method on DateTime Php class.
+     * String that defines the ISO 8601 format to be used internally when calling the format method on DateTime Php class.
      *
      * @var string
      */
@@ -32,7 +33,7 @@ class DateTimeObject{
 
 
     /**
-     * An ISO 8601 string that contains the current date and time values for this instance
+     * The date and time values that are stored on this instance are saved as an ISO 8601 string
      *
      * @var string
      */
@@ -41,7 +42,6 @@ class DateTimeObject{
 
     /**
      * Object that represents a date and time value and its related operations.
-     * TODO - revisar documentacio
      *
      * All the class methods are based and expect values that follow the ISO 8601 format, which is the international standard for the
      * representation of dates and times. Any other date/time format will be considered as invalid.<br><br>
@@ -55,24 +55,33 @@ class DateTimeObject{
      * - UUU is an arbitrary number of digits decimal seconds fraction value<br>
      * - +TT:TT is the timezone offset value, like +03:00
      *
-     * @see https://es.wikipedia.org/wiki/ISO_8601
+     * @param string $dateTimeString A string containing a valid ISO 8601 date/time value that will be used to initialize this instance.
+     * If string is empty, the current system date/time and timezone will be used. If string is incomplete, the missing parts will be filled with
+     * arbitrary values. If timezone offset is missing, the timezone that is currently defined on the system will be used.
      *
-     * @param int $year TODO
-     * @param int $month TODO
-     * @param int $day TODO
-     * @param int $hour TODO
-     * @param int $minute TODO
-     * @param int $second TODO
-     * @param int $microSecond TODO
-     * @param int $timeZoneOffset TODO
-     * @throws UnexpectedValueException TODO
+     * @example '1996' Will create a DateTimeObject with the specified year and arbitrary month, day and time values based on the current system defined timezone
+     * @example '1996-12' Will create a DateTimeObject with the specified year, month and arbitrary day and time values based on the current system defined timezone
+     * @example This is a fully valid ISO 8601 string value: '2017-10-14T17:55:25.163583+02:00'
+     *
+     * @see https://es.wikipedia.org/wiki/ISO_8601
      *
      * @return DateTimeObject The created instance
      */
-    public function __construct(int $dateTimeString = ''){
+    public function __construct($dateTimeString = ''){
 
-        // TODO - This method is incomplete and pending
-        // TODO - a partir del string rebut, es genera un string ISO8601 valid i es guarda a $this->_dateTimeString
+        if(StringUtils::isEmpty($dateTimeString)){
+
+            $this->_dateTimeString = (new DateTime())->format($this->_iso8601FormatString);
+
+        }else{
+
+            if(!DateTimeObject::isValidDateTime($dateTimeString)){
+
+                throw new UnexpectedValueException('DateTimeObject->__construct : Provided value is not a valid ISO 8601 date time format');
+            }
+
+            $this->_dateTimeString = (new DateTime($dateTimeString))->format($this->_iso8601FormatString);
+        }
     }
 
 
@@ -109,7 +118,7 @@ class DateTimeObject{
             }
         }
 
-        return get_class($dateTime) === 'org\\turbocommons\\src\\main\\php\\model\\DateTimeObject';
+        return (is_object($dateTime) && get_class($dateTime) === 'org\\turbocommons\\src\\main\\php\\model\\DateTimeObject');
     }
 
 
@@ -126,39 +135,6 @@ class DateTimeObject{
     public static function isEqual($dateTime1, $dateTime2){
 
         return self::compare($dateTime1, $dateTime2) === 0;
-    }
-
-
-    /**
-     * Given two valid dateTime values, this method will check if they have the same timezone offset.
-     *
-     * @param mixed $dateTime1 A valid ISO 8601 dateTime string or a DateTimeObject instance.
-     * @param mixed $dateTime2 A valid ISO 8601 dateTime string or a DateTimeObject instance.
-     *
-     * @see DateTimeObject::__construct
-     *
-     * @throws UnexpectedValueException If an invalid dateTime was provided on any of the two parameters
-     *
-     * @return boolean True if the time zone on both dateTime values is the same
-     */
-    public static function isSameTimeZone($dateTime1, $dateTime2){
-
-        if(self::isValidDateTime($dateTime1) && self::isValidDateTime($dateTime2)){
-
-            if(is_string($dateTime1)){
-
-                $dateTime1 = new DateTimeObject($dateTime1);
-            }
-
-            if(is_string($dateTime2)){
-
-                $dateTime2 = new DateTimeObject($dateTime2);
-            }
-
-            return $dateTime1->getTimeZoneOffset() === $dateTime2->getTimeZoneOffset();
-        }
-
-        throw new UnexpectedValueException('DateTimeObject::isSameTimeZone : Provided params are not valid date time values');
     }
 
 
@@ -206,13 +182,11 @@ class DateTimeObject{
     /**
      * Get the year based on current system date and timezone
      *
-     * @return int A 4 digits numeric value representing the current year
+     * @return int A numeric value representing the current year
      */
     public static function getCurrentYear(){
 
-        $now = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''), new DateTimeZone('UTC'));
-
-        return $now->format('Y');
+        return (int) (new DateTime())->format('Y');
     }
 
 
@@ -223,9 +197,7 @@ class DateTimeObject{
      */
     public static function getCurrentMonth(){
 
-        $now = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''), new DateTimeZone('UTC'));
-
-        return $now->format('n');
+        return (int) (new DateTime())->format('n');
     }
 
 
@@ -236,9 +208,7 @@ class DateTimeObject{
      */
     public static function getCurrentDay(){
 
-        $now = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''), new DateTimeZone('UTC'));
-
-        return $now->format('j');
+        return (int) (new DateTime())->format('j');
     }
 
 
@@ -251,9 +221,7 @@ class DateTimeObject{
      */
     public static function getCurrentDayOfWeek(){
 
-        $now = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''), new DateTimeZone('UTC'));
-
-        return $now->format('w') + 1;
+        return (int) ((new DateTime())->format('w') + 1);
     }
 
 
@@ -264,9 +232,7 @@ class DateTimeObject{
      */
     public static function getCurrentHour(){
 
-        $now = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''), new DateTimeZone('UTC'));
-
-        return $now->format('H');
+        return (int) (new DateTime())->format('H');
     }
 
 
@@ -277,9 +243,7 @@ class DateTimeObject{
      */
     public static function getCurrentMinute(){
 
-        $now = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''), new DateTimeZone('UTC'));
-
-        return $now->format('i');
+        return (int) (new DateTime())->format('i');
     }
 
 
@@ -290,9 +254,7 @@ class DateTimeObject{
      */
     public static function getCurrentSecond(){
 
-        $now = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''), new DateTimeZone('UTC'));
-
-        return $now->format('s');
+        return (int) (new DateTime())->format('s');
     }
 
 
@@ -314,9 +276,29 @@ class DateTimeObject{
      */
     public static function getCurrentMicroSecond(){
 
-        $now = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''), new DateTimeZone('UTC'));
+        return (int) (new DateTime())->format('u');
+    }
 
-        return $now->format('u');
+
+    /**
+     * Get the timezone name based on current system date and timezone
+     *
+     * @return string The timezone name
+     */
+    public static function getCurrentTimeZoneName(){
+
+        return timezone_name_from_abbr('', self::getCurrentTimeZoneOffset(), 0);
+    }
+
+
+    /**
+     * Get the timezone offset based on current system date and timezone as a numeric value (in seconds)
+     *
+     * @return int The timezone offset as a numeric value in seconds
+     */
+    public static function getCurrentTimeZoneOffset(){
+
+        return (new DateTime())->getOffset();
     }
 
 
@@ -346,8 +328,8 @@ class DateTimeObject{
                 $dateTime2 = new DateTimeObject($dateTime2);
             }
 
-            $dateTime1->convertToUTCTimeZone();
-            $dateTime2->convertToUTCTimeZone();
+            $dateTime1->toUTC();
+            $dateTime2->toUTC();
 
             $date1 = $dateTime1->toString();
             $date2 = $dateTime2->toString();
@@ -405,17 +387,6 @@ class DateTimeObject{
 
 
     /**
-     * Get this instance's defined month name as an english upper case string
-     *
-     * @return string The month name in english and with capital letters, like for example: JANUARY, FEBRUARY...
-     */
-    public function getMonthName(){
-
-        self::getMonthName($this->getMonth());
-    }
-
-
-    /**
      * Get this instance's defined day as a numeric value from 1 to 31
      *
      * @return int A value between 1 and 31 or -1 if no day information is available
@@ -430,17 +401,6 @@ class DateTimeObject{
         }
 
         return -1;
-    }
-
-
-    /**
-     * Get this instance's defined month name as an english upper case string
-     *
-     * @return string The month name in english and with capital letters, like for example: JANUARY, FEBRUARY...
-     */
-    public function getDayName(){
-
-        self::getDayName($this->getDay());
     }
 
 
@@ -564,6 +524,17 @@ class DateTimeObject{
 
 
     /**
+     * Get this instance's defined timezone name
+     *
+     * @return int The UTC timezone name
+     */
+    public function getTimeZoneName(){
+
+        return timezone_name_from_abbr('', $this->getTimeZoneOffset(), 0);
+    }
+
+
+    /**
      * Get this instance's defined timezone offset as a numeric value (in seconds)
      *
      * @return int The UTC timezone offset in seconds
@@ -588,7 +559,9 @@ class DateTimeObject{
      */
     public function getFirstDayOfMonth(){
 
-        return (new DateTime($this->_dateTimeString))->format('Y-m-01\\TH:i:s.uP');
+        $dateTime = (new DateTime($this->_dateTimeString))->format('Y-m-01\\TH:i:s.uP');
+
+        return new DateTimeObject($dateTime);
     }
 
 
@@ -599,7 +572,28 @@ class DateTimeObject{
      */
     public function getLastDayOfMonth(){
 
-        return (new DateTime($this->_dateTimeString))->format('Y-m-t\\TH:i:s.uP');
+        $dateTime = (new DateTime($this->_dateTimeString))->format('Y-m-t\\TH:i:s.uP');
+
+        return new DateTimeObject($dateTime);
+    }
+
+
+    /**
+     * Convert the current instance date and time values to the UTC zero timezone offset.
+     *
+     * @example If this instance contains a +02:00 timezone offset, after calling this method the offset will be +00:00
+     *
+     * @param mixed $dateTime A valid ISO 8601 dateTime value or a DateTimeObject instance.
+     *
+     * @return void
+     */
+    public function toUTC(){
+
+        $dateTimeInstance = new DateTime($this->_dateTimeString);
+
+        $dateTimeInstance->setTimezone(new DateTimeZone('UTC'));
+
+        $this->_dateTimeString = $dateTimeInstance->format($this->_iso8601FormatString);
     }
 
 
@@ -621,54 +615,58 @@ class DateTimeObject{
      * - S with a two digit seconds value<br>
      * - s with a one or two digit seconds value<br>
      * - U with a 6 digit microseconds value<br>
-     * - u with a 3 digit miliseconds value
+     * - u with a 3 digit miliseconds value<br>
+     * - Offset with the timezone offset value
      *
      * @return string The dateTime with the specified format.
      */
-    public function toString($formatString = 'Y-M-DTH:N:S.U+TimeZone'){
+    public function toString($formatString = 'Y-M-DTH:N:S.U+Offset'){
 
-        if(($year = self::getYear($this->_dateTimeString)) > 0){
+        $offset = $this->getTimeZoneOffset();
+        $formatString = str_replace('Offset', $offset, $formatString);
+
+        if(($year = $this->getYear($this->_dateTimeString)) > 0){
 
             $formatString = str_replace('Y', $year, $formatString);
             $formatString = str_replace('y', substr($year, 2), $formatString);
         }
 
-        if(($month = self::getMonth($this->_dateTimeString)) > 0){
+        if(($month = $this->getMonth($this->_dateTimeString)) > 0){
 
             $formatString = str_replace('M', str_pad($month, 2, '0', STR_PAD_LEFT), $formatString);
             $formatString = str_replace('m', (int)$month, $formatString);
         }
 
-        if(($day = self::getDay($this->_dateTimeString)) > 0){
+        if(($day = $this->getDay($this->_dateTimeString)) > 0){
 
             $formatString = str_replace('D', str_pad($day, 2, '0', STR_PAD_LEFT), $formatString);
             $formatString = str_replace('d', (int)$day, $formatString);
         }
 
-        if(($hour = self::getHour($this->_dateTimeString)) >= 0){
+        if(($hour = $this->getHour($this->_dateTimeString)) >= 0){
 
             $formatString = str_replace('H', str_pad($hour, 2, '0', STR_PAD_LEFT), $formatString);
             $formatString = str_replace('h', (int)$hour, $formatString);
         }
 
-        if(($minutes = self::getMinutes($this->_dateTimeString)) >= 0){
+        if(($minutes = $this->getMinute($this->_dateTimeString)) >= 0){
 
             $formatString = str_replace('N', str_pad($minutes, 2, '0', STR_PAD_LEFT), $formatString);
             $formatString = str_replace('n', (int)$minutes, $formatString);
         }
 
-        if(($seconds = self::getSeconds($this->_dateTimeString)) >= 0){
+        if(($seconds = $this->getSecond($this->_dateTimeString)) >= 0){
 
             $formatString = str_replace('S', str_pad($seconds, 2, '0', STR_PAD_LEFT), $formatString);
             $formatString = str_replace('s', (int)$seconds, $formatString);
         }
 
-        if(($miliSeconds = self::getMiliSeconds($this->_dateTimeString)) >= 0){
+        if(($miliSeconds = $this->getMiliSecond($this->_dateTimeString)) >= 0){
 
             $formatString = str_replace('u', str_pad($miliSeconds, 3, '0', STR_PAD_LEFT), $formatString);
         }
 
-        if(($microSeconds = self::getMicroSeconds($this->_dateTimeString)) >= 0){
+        if(($microSeconds = $this->getMicroSecond($this->_dateTimeString)) >= 0){
 
             $formatString = str_replace('U', str_pad($microSeconds, 6, '0', STR_PAD_LEFT), $formatString);
         }
