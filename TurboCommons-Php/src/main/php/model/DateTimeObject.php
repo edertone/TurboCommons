@@ -56,11 +56,11 @@ class DateTimeObject{
      * - +TT:TT is the timezone offset value, like +03:00
      *
      * @param string $dateTimeString A string containing a valid ISO 8601 date/time value that will be used to initialize this instance.
-     * If string is empty, the current system date/time and timezone will be used. If string is incomplete, the missing parts will be filled with
-     * arbitrary values. If timezone offset is missing, the timezone that is currently defined on the system will be used.
+     * If string is empty, the current system date/time and timezone will be used. If string is incomplete, all missing parts will be filled
+     * with the lowest possible value. If timezone offset is missing, the timezone that is currently defined on the system will be used.
      *
-     * @example '1996' Will create a DateTimeObject with the specified year and arbitrary month, day and time values based on the current system defined timezone
-     * @example '1996-12' Will create a DateTimeObject with the specified year, month and arbitrary day and time values based on the current system defined timezone
+     * @example '1996' Will create a DateTimeObject with the value '1996-01-01T00:00:00.000000+XX:XX' based on the current system defined timezone
+     * @example '1996-12' Will create a DateTimeObject with the value '1996-12-01T00:00:00.000000+XX:XX' based on the current system defined timezone
      * @example This is a fully valid ISO 8601 string value: '2017-10-14T17:55:25.163583+02:00'
      *
      * @see https://es.wikipedia.org/wiki/ISO_8601
@@ -579,13 +579,28 @@ class DateTimeObject{
 
 
     /**
+     * Convert the current instance date and time values to the local timezone offset.
+     *
+     * @return DateTimeObject This object instance
+     */
+    public function toLocalTimeZone(){
+
+        $dateTime = new DateTime($this->_dateTimeString);
+
+        $dateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
+
+        $this->_dateTimeString = $dateTime->format($this->_iso8601FormatString);
+
+        return $this;
+    }
+
+
+    /**
      * Convert the current instance date and time values to the UTC zero timezone offset.
      *
      * @example If this instance contains a +02:00 timezone offset, after calling this method the offset will be +00:00
      *
-     * @param mixed $dateTime A valid ISO 8601 dateTime value or a DateTimeObject instance.
-     *
-     * @return void
+     * @return DateTimeObject This object instance
      */
     public function toUTC(){
 
@@ -594,6 +609,8 @@ class DateTimeObject{
         $dateTimeInstance->setTimezone(new DateTimeZone('UTC'));
 
         $this->_dateTimeString = $dateTimeInstance->format($this->_iso8601FormatString);
+
+        return $this;
     }
 
 
@@ -676,7 +693,7 @@ class DateTimeObject{
 
 
     /**
-     * Compares the current datetime instance values to the given one and tells if they
+     * Compares the current datetime instance value to the given one and tells if they
      * are exactly the same or which one represents a later time value than the other.
      * Timezones from the both dateTime values are taken into consideration for the comparison.
      *
