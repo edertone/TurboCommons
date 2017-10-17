@@ -71,7 +71,8 @@ class DateTimeObjectTest extends TestCase {
             '2007-11-03T33:18:05.987-03:00', '2010-02-18T16:63:48.541-06:00', '2010-02-18T16:23:68.541-06:00', '2010-02-18T16:23:48.541-96:00',
             '2010-02-31T16:23:48.541+06:00', '2010-06-31T16:23:48.541+06:00', '2010-02-31T16:23:48.541+06:00', '2010-11-31T16:23:48.541+06:00',
             '2010-02-30T16:23:48.541+06:00', '0000-00-00T00:00:00.000000+00:00', '2010-02-18t16:23:48.54123-01:00', '2015-05-25T18T16:23:48',
-            '2008-18', '2015-01-32', '2015-00-32', [1,2,3], ['abc', 123]
+            '2008-18', '2015-01-32', '2015-00-32', [1,2,3], ['abc', 123], '2010-2-1T16:23:48.541+06:00', '2010-02-18T1:23:48.541+06:00',
+            '2010-02-18T16:23:4.541+06:00', '2010-02-18T16:2:48.541+06:00'
         ];
         $this->invalidDateTimeValuesCount = count($this->invalidDateTimeValues);
     }
@@ -110,110 +111,114 @@ class DateTimeObjectTest extends TestCase {
     public function testConstruct(){
 
         // Test empty values
-        for ($i = 0; $i < $this->emptyStringValuesCount; $i++) {
+        foreach ($this->emptyStringValues as $value) {
 
-            $d = new DateTimeObject($this->emptyStringValues[$i]);
-            $this->assertSame(DateTimeObject::getCurrentYear(), $d->getYear());
-            $this->assertSame(DateTimeObject::getCurrentMonth(), $d->getMonth());
-            $this->assertSame(DateTimeObject::getCurrentDay(), $d->getDay());
-            $this->assertSame(DateTimeObject::getCurrentDayOfWeek(), $d->getDayOfWeek());
-            $this->assertSame(DateTimeObject::getCurrentHour(), $d->getHour());
-            $this->assertSame(DateTimeObject::getCurrentMinute(), $d->getMinute());
-            $this->assertSame(DateTimeObject::getCurrentSecond(), $d->getSecond());
-            $this->assertGreaterThanOrEqual($d->getMiliSecond(), DateTimeObject::getCurrentMiliSecond());
-            $this->assertGreaterThanOrEqual($d->getMicroSecond(), DateTimeObject::getCurrentMicroSecond());
-            $this->assertSame(DateTimeObject::getCurrentTimeZoneOffset(), $d->getTimeZoneOffset());
-            $this->assertContains('Europe', $d->getTimeZoneName());
+            $dateTime = new DateTimeObject($value);
+            $this->assertSame(DateTimeObject::getCurrentYear(), $dateTime->getYear());
+            $this->assertSame(DateTimeObject::getCurrentMonth(), $dateTime->getMonth());
+            $this->assertSame(DateTimeObject::getCurrentDay(), $dateTime->getDay());
+            $this->assertSame(DateTimeObject::getCurrentDayOfWeek(), $dateTime->getDayOfWeek());
+            $this->assertSame(DateTimeObject::getCurrentHour(), $dateTime->getHour());
+            $this->assertSame(DateTimeObject::getCurrentMinute(), $dateTime->getMinute());
+            $this->assertSame(DateTimeObject::getCurrentSecond(), $dateTime->getSecond());
+            $this->assertGreaterThanOrEqual($dateTime->getMiliSecond(), DateTimeObject::getCurrentMiliSecond());
+            $this->assertGreaterThanOrEqual($dateTime->getMicroSecond(), DateTimeObject::getCurrentMicroSecond());
+            $this->assertSame(DateTimeObject::getCurrentTimeZoneOffset(), $dateTime->getTimeZoneOffset());
+            $this->assertContains('Europe', $dateTime->getTimeZoneName());
         }
 
         try {
-            $d = new DateTimeObject(new stdClass());
+            $dateTime = new DateTimeObject(new stdClass());
             $this->exceptionMessage = 'new stdClass() value did not cause exception';
         } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         // Test ok values
+        $dateTime = new DateTimeObject('2015-10-17');
+        $this->assertSame(7200, $dateTime->getTimeZoneOffset());
+        $this->assertContains('Europe', $dateTime->getTimeZoneName());
 
-        for ($i = 1900; $i < 2800; $i += 150) {
+        for ($year = 1000; $year < 4000; $year += 857) {
 
             // Only year is provided
-            $d = new DateTimeObject((string) $i);
-            $this->assertSame($i, $d->getYear());
-            $this->assertSame(1, $d->getMonth());
-            $this->assertSame(1, $d->getDay());
-            $this->assertSame(0, $d->getHour());
-            $this->assertSame(0, $d->getMinute());
-            $this->assertSame(0, $d->getSecond());
-            $this->assertContains('Europe', $d->getTimeZoneName());
+            $dateTime = new DateTimeObject((string) $year);
+            $this->assertSame($year, $dateTime->getYear());
+            $this->assertSame(1, $dateTime->getMonth());
+            $this->assertSame(1, $dateTime->getDay());
+            $this->assertSame(0, $dateTime->getHour());
+            $this->assertSame(0, $dateTime->getMinute());
+            $this->assertSame(0, $dateTime->getSecond());
+            $this->assertContains('Europe', $dateTime->getTimeZoneName());
 
-            for ($j = 1; $j < 13; $j += 2) {
+            for ($m = 1; $m < 13; $m += 7) {
 
                 // Year and month is provided
-                $d = new DateTimeObject($i.'-'.$j);
-                $this->assertSame($i, $d->getYear());
-                $this->assertSame($j, $d->getMonth());
-                $this->assertSame(1, $d->getDay());
-                $this->assertSame(0, $d->getHour());
-                $this->assertSame(0, $d->getMinute());
-                $this->assertSame(0, $d->getSecond());
-                $this->assertContains('Europe', $d->getTimeZoneName());
+                $month = str_pad((string) $m, 2, '0', STR_PAD_LEFT);
+
+                $dateTime = new DateTimeObject($year.'-'.$month);
+                $this->assertSame($year, $dateTime->getYear());
+                $this->assertSame($m, $dateTime->getMonth());
+                $this->assertSame(1, $dateTime->getDay());
+                $this->assertSame(0, $dateTime->getHour());
+                $this->assertSame(0, $dateTime->getMinute());
+                $this->assertSame(0, $dateTime->getSecond());
+                $this->assertContains('Europe', $dateTime->getTimeZoneName());
+
+                for ($d = 1; $d < 25; $d += 9) {
+
+                    // Year, month and day are provided
+                    $day = str_pad((string) $d, 2, '0', STR_PAD_LEFT);
+
+                    $dateTime = new DateTimeObject($year.'-'.$month.'-'.$day);
+                    $this->assertSame($year, $dateTime->getYear());
+                    $this->assertSame($m, $dateTime->getMonth());
+                    $this->assertSame($d, $dateTime->getDay());
+                    $this->assertSame(0, $dateTime->getHour());
+                    $this->assertSame(0, $dateTime->getMinute());
+                    $this->assertSame(0, $dateTime->getSecond());
+                    $this->assertContains('Europe', $dateTime->getTimeZoneName());
+
+                    for ($h = 0; $h < 24; $h += 9) {
+
+                        for ($t = 0; $t < 60; $t += 17) {
+
+                            // Year, month, day and time are provided
+                            $hour = str_pad((string) $h, 2, '0', STR_PAD_LEFT);
+                            $time = str_pad((string) $t, 2, '0', STR_PAD_LEFT);
+
+                            $dateTime = new DateTimeObject($year.'-'.$month.'-'.$day.'T'.$hour.':'.$time.':'.$time);
+                            $this->assertSame($year, $dateTime->getYear());
+                            $this->assertSame($m, $dateTime->getMonth());
+                            $this->assertSame($d, $dateTime->getDay());
+                            $this->assertSame($h, $dateTime->getHour());
+                            $this->assertSame($t, $dateTime->getMinute());
+                            $this->assertSame($t, $dateTime->getSecond());
+                            $this->assertContains('Europe', $dateTime->getTimeZoneName());
+                        }
+                    }
+                }
             }
         }
 
-// TODO - aixo segurament sobra
-//         $d = new DateTimeObject('1996');
-//         $this->assertSame(1996, $d->getYear());
-//         $this->assertSame(7200, $d->getTimeZoneOffset());
-//         $this->assertContains('Europe', $d->getTimeZoneName());
-
-//         $d = new DateTimeObject('2015');
-//         $this->assertSame(2015, $d->getYear());
-//         $this->assertSame(7200, $d->getTimeZoneOffset());
-//         $this->assertContains('Europe', $d->getTimeZoneName());
-
-        // Year and month is provided
-        $d = new DateTimeObject('1996-12');
-        $this->assertSame(1996, $d->getYear());
-        $this->assertSame(12, $d->getMonth());
-        $this->assertSame(3600, $d->getTimeZoneOffset());
-        $this->assertContains('Europe', $d->getTimeZoneName());
-
-        // Year month and day are provided
-        $d = new DateTimeObject('1996-12-31');
-        $this->assertSame(1996, $d->getYear());
-        $this->assertSame(12, $d->getMonth());
-        $this->assertSame(31, $d->getDay());
-        $this->assertSame(3600, $d->getTimeZoneOffset());
-        $this->assertContains('Europe', $d->getTimeZoneName());
-
-        $d = new DateTimeObject('1996-06-12T17:55:25');
-        $this->assertSame(1996, $d->getYear());
-        $this->assertSame(6, $d->getMonth());
-        $this->assertSame(12, $d->getDay());
-        $this->assertSame(17, $d->getHour());
-        $this->assertSame(55, $d->getMinute());
-        $this->assertSame(25, $d->getSecond());
-        $this->assertSame(7200, $d->getTimeZoneOffset());
-        $this->assertContains('Europe', $d->getTimeZoneName());
-
-        $d = new DateTimeObject('1996-06-12T17:55:25.163583+07:00');
-        $this->assertSame(1996, $d->getYear());
-        $this->assertSame(6, $d->getMonth());
-        $this->assertSame(12, $d->getDay());
-        $this->assertSame(17, $d->getHour());
-        $this->assertSame(55, $d->getMinute());
-        $this->assertSame(25, $d->getSecond());
-        $this->assertSame(163583, $d->getMicroSecond());
-        $this->assertSame(25200, $d->getTimeZoneOffset());
-        $this->assertContains('Asia', $d->getTimeZoneName());
+        // Year, month, day, time and timezone offset are provided
+        $dateTime = new DateTimeObject('1996-06-12T17:55:25.163583+07:00');
+        $this->assertSame(1996, $dateTime->getYear());
+        $this->assertSame(6, $dateTime->getMonth());
+        $this->assertSame(12, $dateTime->getDay());
+        $this->assertSame(17, $dateTime->getHour());
+        $this->assertSame(55, $dateTime->getMinute());
+        $this->assertSame(25, $dateTime->getSecond());
+        $this->assertSame(163583, $dateTime->getMicroSecond());
+        $this->assertSame(25200, $dateTime->getTimeZoneOffset());
+        $this->assertContains('Asia', $dateTime->getTimeZoneName());
 
         // Test wrong values
-        for ($i = 0; $i < $this->invalidDateTimeValuesCount; $i++) {
+        foreach ($this->invalidDateTimeValues as $value) {
 
             try {
-                $d = new DateTimeObject($this->invalidDateTimeValues[$i]);
-                $this->exceptionMessage = $this->invalidDateTimeValues[$i].' value did not cause exception';
+                $dateTime = new DateTimeObject($value);
+                $this->exceptionMessage = $value.' value did not cause exception';
             } catch (Throwable $e) {
                 // We expect an exception to happen
             }
@@ -221,9 +226,6 @@ class DateTimeObjectTest extends TestCase {
 
         // Test exceptions
         // Already tested at wrong values
-
-        // TODO - acabar de fer be el test
-        $this->markTestIncomplete('This test has not been implemented yet.');
     }
 
 

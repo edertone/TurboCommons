@@ -73,15 +73,47 @@ class DateTimeObject{
 
             $this->_dateTimeString = (new DateTime())->format($this->_iso8601FormatString);
 
-        }else{
-
-            if(!DateTimeObject::isValidDateTime($dateTimeString)){
-
-                throw new UnexpectedValueException('DateTimeObject->__construct : Provided value is not a valid ISO 8601 date time format');
-            }
-
-            $this->_dateTimeString = (new DateTime($dateTimeString))->format($this->_iso8601FormatString);
+            return;
         }
+
+        if(!DateTimeObject::isValidDateTime($dateTimeString)){
+
+            throw new UnexpectedValueException('DateTimeObject->__construct : Provided value is not a valid ISO 8601 date time format');
+        }
+
+        $dateValues = $this->_explodeISO8601String($dateTimeString);
+
+        if($dateValues[1] === ''){
+
+            $dateValues[1] = '01';
+        }
+
+        if($dateValues[2] === ''){
+
+            $dateValues[2] = '01';
+        }
+
+        if($dateValues[3] === ''){
+
+            $dateValues[3] = '00';
+        }
+
+        if($dateValues[4] === ''){
+
+            $dateValues[4] = '00';
+        }
+
+        if($dateValues[5] === ''){
+
+            $dateValues[5] = '00';
+        }
+
+        if($dateValues[6] === ''){
+
+            $dateValues[6] = '000000';
+        }
+
+        $this->_dateTimeString = (new DateTime($this->_implodeISO8601String($dateValues)))->format($this->_iso8601FormatString);
     }
 
 
@@ -778,6 +810,110 @@ class DateTimeObject{
     public function substract($value, $type = 'minutes'){
 
         return $this->add(-$value, $type);
+    }
+
+
+    /**
+     * Auxiliary method that is used to generate an array with all the values that are defined on an ISO 8601 string
+     *
+     * @param string $string A valid ISO 8601 string
+     *
+     * @return array An array with all the date time values extracted
+     */
+    private function _explodeISO8601String(string $dateTimeString){
+
+        $year = '';
+        $month = '';
+        $day = '';
+        $hour = '';
+        $minute = '';
+        $second = '';
+        $microSecond = '';
+        $timeZoneOffset = '';
+
+        $string = $dateTimeString;
+
+        if(strlen($string) >= 4){
+
+            $year = substr($string, 0, 4);
+            $string = substr($string, 5);
+
+            if(strlen($string) >= 2){
+
+                $month = substr($string, 0, 2);
+                $string = substr($string, 3);
+
+                if(strlen($string) >= 2){
+
+                    $day = substr($string, 0, 2);
+                    $string = substr($string, 3);
+
+                    if(strlen($string) >= 2){
+
+                        $hour = substr($string, 0, 2);
+                        $string = substr($string, 3);
+
+                        if(strlen($string) >= 2){
+
+                            $minute = substr($string, 0, 2);
+                            $string = substr($string, 3);
+
+                            if(strlen($string) >= 2){
+
+                                $second = substr($string, 0, 2);
+                                $string = substr($string, 3);
+
+                                $aux = explode('+', $string);
+
+                                $microSecond = $aux[0];
+
+                                if(count($aux) > 1){
+
+                                    $timeZoneOffset = $aux[1];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return [$year, $month, $day, $hour, $minute, $second, $microSecond, $timeZoneOffset];
+    }
+
+
+    /**
+     * Auxiliary method that is used to reconstruct a previously exploded ISO 8601 string
+     *
+     * @param array $array An array of strings containing 8 elements that represent each of the ISO 8601 values sepparated
+     *
+     * @return string A valid ISO 8601 string
+     */
+    private function _implodeISO8601String(array $array){
+
+        $result = $array[0];
+
+        if($array[1] !== ''){
+
+            $result .= '-'.$array[1];
+
+            if($array[2] !== ''){
+
+                $result .= '-'.$array[2];
+
+                if($array[3] !== ''){
+
+                    $result .= 'T'.$array[3].':'.$array[4].':'.$array[5].'.'.$array[6];
+
+                    if($array[7] !== ''){
+
+                        $result .= '+'.$array[7];
+                    }
+                }
+            }
+        }
+
+        return $result;
     }
 }
 
