@@ -357,54 +357,39 @@ class DateTimeObject{
     /**
      * Get this instance's defined year as a numeric value
      *
-     * @return int A 4 digits numeric value or -1 if no year information is available
+     * @return int A 4 digits numeric value
      */
     public function getYear(){
 
         $parsedDate = explode('-', $this->_dateTimeString);
 
-        if(count($parsedDate) >= 1){
-
-            return (int) $parsedDate[0];
-        }
-
-        return -1;
+        return (int) $parsedDate[0];
     }
 
 
     /**
      * Get this instance's defined month as a numeric value from 1 to 12
      *
-     * @return int A value between 1 and 12 or -1 if no month information is available
+     * @return int A value between 1 and 12
      */
     public function getMonth(){
 
         $parsedDate = explode('-', $this->_dateTimeString);
 
-        if(count($parsedDate) >= 2){
-
-            return (int) substr($parsedDate[1], 0, 2);
-        }
-
-        return -1;
+        return (int) substr($parsedDate[1], 0, 2);
     }
 
 
     /**
      * Get this instance's defined day as a numeric value from 1 to 31
      *
-     * @return int A value between 1 and 31 or -1 if no day information is available
+     * @return int A value between 1 and 31
      */
     public function getDay(){
 
         $parsedDate = explode('-', $this->_dateTimeString);
 
-        if(count($parsedDate) >= 3){
-
-            return (int) substr($parsedDate[2], 0, 2);
-        }
-
-        return -1;
+        return (int) substr($parsedDate[2], 0, 2);
     }
 
 
@@ -413,117 +398,85 @@ class DateTimeObject{
      * to be the first one:<br>
      * 1 = Sunday, 2 = Monday, 3 = Tuesday, etc ...
      *
-     * @return int A numeric value between 1 and 7 or -1 if no day of week information is available
+     * @return int A numeric value between 1 and 7
      */
     public function getDayOfWeek(){
 
         $parsedDate = explode('-', $this->_dateTimeString);
 
-        if(count($parsedDate) >= 3){
+        $dateTimeInstance = new DateTime();
 
-            $dateTimeInstance = new DateTime();
+        $dateTimeInstance->setDate($parsedDate[0], $parsedDate[1], substr($parsedDate[2], 0, 2));
 
-            $dateTimeInstance->setDate($parsedDate[0], $parsedDate[1], substr($parsedDate[2], 0, 2));
-
-            return $dateTimeInstance->format('w') + 1;
-        }
-
-        return -1;
+        return $dateTimeInstance->format('w') + 1;
     }
 
 
     /**
      * Get this instance's defined hour as a numeric value from 0 to 23
      *
-     * @return int A value between 0 and 23 or -1 if no hour information is available
+     * @return int A value between 0 and 23
      */
     public function getHour(){
 
         $parsedDate = explode('-', $this->_dateTimeString);
 
-        if(count($parsedDate) >= 3 && strlen($parsedDate[2]) > 2){
-
-            return (int) substr($parsedDate[2], 3, 2);
-        }
-
-        return -1;
+        return (int) substr($parsedDate[2], 3, 2);
     }
 
 
     /**
      * Get this instance's defined minute as a numeric value from 0 to 59
      *
-     * @return int A value between 0 and 59 or -1 if no minutes information is available
+     * @return int A value between 0 and 59
      */
     public function getMinute(){
 
         $parsedDate = explode(':', $this->_dateTimeString);
 
-        if(count($parsedDate) > 1){
-
-            return (int) substr($parsedDate[1], 0, 2);
-        }
-
-        return -1;
+        return (int) substr($parsedDate[1], 0, 2);
     }
 
 
     /**
      * Get this instance's defined second as a numeric value from 0 to 59
      *
-     * @return int A value between 0 and 59 or -1 if no seconds information is available
+     * @return int A value between 0 and 59
      */
     public function getSecond(){
 
         $parsedDate = explode(':', $this->_dateTimeString);
 
-        if(count($parsedDate) > 2){
-
-            return (int) substr($parsedDate[2], 0, 2);
-        }
-
-        return -1;
+        return (int) substr($parsedDate[2], 0, 2);
     }
 
 
     /**
      * Get this instance's defined miliseconds as a numeric value up to 3 digit
      *
-     * @return int A value up to 3 digit or -1 if no miliseconds information is available
+     * @return int A value up to 3 digit
      */
     public function getMiliSecond(){
 
-        $result = $this->getMicroSecond();
-
-        if($result >= 0){
-
-            $result = round($result / 1000);
-        }
-
-        return $result;
+        return round($this->getMicroSecond() / 1000);
     }
 
 
     /**
      * Get this instance's defined microseconds as a numeric value up to 6 digit
      *
-     * @return int A value up to 6 digit or -1 if no microseconds information is available
+     * @return int A value up to 6 digit
      */
     public function getMicroSecond(){
 
         $parsedDate = explode('.', $this->_dateTimeString);
 
-        if(count($parsedDate) == 2){
+        $parsedDate = $parsedDate[1];
+        $parsedDate = str_replace('-', '+', $parsedDate);
+        $parsedDate = explode('+', $parsedDate);
+        $parsedDate = preg_replace('/[^0-9]/', '', $parsedDate[0]);
 
-            $parsedDate = $parsedDate[1];
-            $parsedDate = str_replace('-', '+', $parsedDate);
-            $parsedDate = explode('+', $parsedDate);
-            $parsedDate = preg_replace('/[^0-9]/', '', $parsedDate[0]);
-
-            return (int) str_pad($parsedDate, 6, '0', STR_PAD_RIGHT);
-        }
-
-        return -1;
+        return (int) str_pad($parsedDate, 6, '0', STR_PAD_RIGHT);
     }
 
 
@@ -552,14 +505,7 @@ class DateTimeObject{
      */
     public function getTimeZoneOffset(){
 
-        $dateTime = $this->_dateTimeString;
-
-        if(substr_count($dateTime, '-') != 3 && substr_count($dateTime, '+') != 1){
-
-            return 0;
-        }
-
-        return (new DateTime($dateTime))->getOffset();
+        return (new DateTime($this->_dateTimeString))->getOffset();
     }
 
 

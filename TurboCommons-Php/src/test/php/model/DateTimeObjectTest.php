@@ -122,7 +122,7 @@ class DateTimeObjectTest extends TestCase {
             $this->assertSame(DateTimeObject::getCurrentDayOfWeek(), $dateTime->getDayOfWeek());
             $this->assertSame(DateTimeObject::getCurrentHour(), $dateTime->getHour());
             $this->assertSame(DateTimeObject::getCurrentMinute(), $dateTime->getMinute());
-            $this->assertSame(DateTimeObject::getCurrentSecond(), $dateTime->getSecond());
+            $this->assertGreaterThanOrEqual($dateTime->getSecond(), DateTimeObject::getCurrentSecond());
             $this->assertGreaterThanOrEqual($dateTime->getMiliSecond(), DateTimeObject::getCurrentMiliSecond());
             $this->assertGreaterThanOrEqual($dateTime->getMicroSecond(), DateTimeObject::getCurrentMicroSecond());
             $this->assertSame(DateTimeObject::getCurrentTimeZoneOffset(), $dateTime->getTimeZoneOffset());
@@ -584,6 +584,7 @@ class DateTimeObjectTest extends TestCase {
     public function testGetYear(){
 
         // Test valid values
+        $this->assertTrue((new DateTimeObject('2015'))->getYear() == 2015);
         $this->assertTrue((new DateTimeObject('2015-05'))->getYear() == 2015);
         $this->assertTrue((new DateTimeObject('1915-12-15'))->getYear() == 1915);
         $this->assertTrue((new DateTimeObject('2007-11-03T13:18:05'))->getYear() == 2007);
@@ -612,6 +613,7 @@ class DateTimeObjectTest extends TestCase {
     public function testGetMonth(){
 
         // Test valid values
+        $this->assertTrue((new DateTimeObject('2015'))->getMonth() == 1);
         $this->assertTrue((new DateTimeObject('2015-05'))->getMonth() == 5);
         $this->assertTrue((new DateTimeObject('2015-12-15'))->getMonth() == 12);
         $this->assertTrue((new DateTimeObject('2007-11-03T13:18:05'))->getMonth() == 11);
@@ -642,6 +644,8 @@ class DateTimeObjectTest extends TestCase {
     public function testGetDay(){
 
         // Test valid values
+        $this->assertTrue((new DateTimeObject('2015'))->getDay() == 1);
+        $this->assertTrue((new DateTimeObject('2015-12'))->getDay() == 1);
         $this->assertTrue((new DateTimeObject('2015-12-15'))->getDay() == 15);
         $this->assertTrue((new DateTimeObject('2007-11-03T13:18:05'))->getDay() == 3);
         $this->assertTrue((new DateTimeObject('1994-11-05T13:15:30+01:00'))->getDay() == 5);
@@ -700,6 +704,9 @@ class DateTimeObjectTest extends TestCase {
     public function testGetHour(){
 
         // Test valid values
+        $this->assertTrue((new DateTimeObject('2015'))->getHour() == 0);
+        $this->assertTrue((new DateTimeObject('2015-12'))->getHour() == 0);
+        $this->assertTrue((new DateTimeObject('2015-12-15'))->getHour() == 0);
         $this->assertTrue((new DateTimeObject('2015-12-15T13:40'))->getHour() == 13);
         $this->assertTrue((new DateTimeObject('2015-12-15 19:40'))->getHour() == 19);
         $this->assertTrue((new DateTimeObject('2007-11-03T00:18:05'))->getHour() == 0);
@@ -732,6 +739,9 @@ class DateTimeObjectTest extends TestCase {
     public function testGetMinute(){
 
         // Test valid values
+        $this->assertTrue((new DateTimeObject('2015'))->getMinute() == 0);
+        $this->assertTrue((new DateTimeObject('2015-12'))->getMinute() == 0);
+        $this->assertTrue((new DateTimeObject('2015-12-15'))->getMinute() == 0);
         $this->assertTrue((new DateTimeObject('2015-12-15T13:40'))->getMinute() == 40);
         $this->assertTrue((new DateTimeObject('2015-12-15 19:40'))->getMinute() == 40);
         $this->assertTrue((new DateTimeObject('2007-11-03T00:18:05'))->getMinute() == 18);
@@ -764,6 +774,9 @@ class DateTimeObjectTest extends TestCase {
     public function testGetSecond(){
 
         // Test valid values
+        $this->assertTrue((new DateTimeObject('1994'))->getSecond() == 0);
+        $this->assertTrue((new DateTimeObject('1994-11'))->getSecond() == 0);
+        $this->assertTrue((new DateTimeObject('1994-11-05'))->getSecond() == 0);
         $this->assertTrue((new DateTimeObject('1994-11-05T06:15:10'))->getSecond() == 10);
         $this->assertTrue((new DateTimeObject('2007-11-03T00:18:05'))->getSecond() == 5);
         $this->assertTrue((new DateTimeObject('1994-11-05T06:15:30+01:00'))->getSecond() == 30);
@@ -838,6 +851,7 @@ class DateTimeObjectTest extends TestCase {
     public function testGetMicroSecond(){
 
         // Test valid values
+        $this->assertTrue((new DateTimeObject('2007-11-03T10:08:05+01:00'))->getMicroSecond() == 0);
         $this->assertTrue((new DateTimeObject('2007-11-03T10:08:05.987+01:00'))->getMicroSecond() == 987000);
         $this->assertTrue((new DateTimeObject('2010-02-18 16:23:48.54123+01:00'))->getMicroSecond() == 541230);
         $this->assertTrue((new DateTimeObject('2010-02-18T23:23:00.54123-01:00'))->getMicroSecond() == 541230);
