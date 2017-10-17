@@ -81,39 +81,11 @@ class DateTimeObject{
             throw new UnexpectedValueException('DateTimeObject->__construct : Provided value is not a valid ISO 8601 date time format');
         }
 
-        $dateValues = $this->_explodeISO8601String($dateTimeString);
+        $v = $this->_explodeISO8601String($dateTimeString);
 
-        if($dateValues[1] === ''){
+        $string = $v[0].'-'.$v[1].'-'.$v[2].'T'.$v[3].':'.$v[4].':'.$v[5].'.'.$v[6].$v[7];
 
-            $dateValues[1] = '01';
-        }
-
-        if($dateValues[2] === ''){
-
-            $dateValues[2] = '01';
-        }
-
-        if($dateValues[3] === ''){
-
-            $dateValues[3] = '00';
-        }
-
-        if($dateValues[4] === ''){
-
-            $dateValues[4] = '00';
-        }
-
-        if($dateValues[5] === ''){
-
-            $dateValues[5] = '00';
-        }
-
-        if($dateValues[6] === ''){
-
-            $dateValues[6] = '000000';
-        }
-
-        $this->_dateTimeString = (new DateTime($this->_implodeISO8601String($dateValues)))->format($this->_iso8601FormatString);
+        $this->_dateTimeString = (new DateTime($string))->format($this->_iso8601FormatString);
     }
 
 
@@ -558,11 +530,18 @@ class DateTimeObject{
     /**
      * Get this instance's defined timezone name
      *
-     * @return int The UTC timezone name
+     * @return string The UTC timezone name or empty string if no timezone name could be found
      */
     public function getTimeZoneName(){
 
-        return timezone_name_from_abbr('', $this->getTimeZoneOffset(), 0);
+        $name = timezone_name_from_abbr('', $this->getTimeZoneOffset(), 0);
+
+        if($name === false){
+
+            return '';
+        }
+
+        return $name;
     }
 
 
@@ -820,97 +799,36 @@ class DateTimeObject{
      *
      * @return array An array with all the date time values extracted
      */
-    private function _explodeISO8601String(string $dateTimeString){
+    private function _explodeISO8601String(string $string){
 
-        $year = '';
-        $month = '';
-        $day = '';
-        $hour = '';
-        $minute = '';
-        $second = '';
-        $microSecond = '';
-        $timeZoneOffset = '';
+        $result = ['', '01', '01', '00', '00', '00', '000000', ''];
 
-        $string = $dateTimeString;
+        if(strtolower(substr($string, strlen($string) - 1, 1)) === 'z'){
 
-        if(strlen($string) >= 4){
-
-            $year = substr($string, 0, 4);
-            $string = substr($string, 5);
-
-            if(strlen($string) >= 2){
-
-                $month = substr($string, 0, 2);
-                $string = substr($string, 3);
-
-                if(strlen($string) >= 2){
-
-                    $day = substr($string, 0, 2);
-                    $string = substr($string, 3);
-
-                    if(strlen($string) >= 2){
-
-                        $hour = substr($string, 0, 2);
-                        $string = substr($string, 3);
-
-                        if(strlen($string) >= 2){
-
-                            $minute = substr($string, 0, 2);
-                            $string = substr($string, 3);
-
-                            if(strlen($string) >= 2){
-
-                                $second = substr($string, 0, 2);
-                                $string = substr($string, 3);
-
-                                $aux = explode('+', $string);
-
-                                $microSecond = $aux[0];
-
-                                if(count($aux) > 1){
-
-                                    $timeZoneOffset = $aux[1];
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            $string = substr($string, 0, strlen($string) - 1).'+00:00';
         }
 
-        return [$year, $month, $day, $hour, $minute, $second, $microSecond, $timeZoneOffset];
-    }
+        $splitted = preg_split('/[+-.: TZ]/', $string);
 
+        $i = 0;
 
-    /**
-     * Auxiliary method that is used to reconstruct a previously exploded ISO 8601 string
-     *
-     * @param array $array An array of strings containing 8 elements that represent each of the ISO 8601 values sepparated
-     *
-     * @return string A valid ISO 8601 string
-     */
-    private function _implodeISO8601String(array $array){
+        while(count($splitted) > 0 && $i < 6){
 
-        $result = $array[0];
+            $result[$i] = array_shift($splitted);
 
-        if($array[1] !== ''){
+            $i++;
+        }
 
-            $result .= '-'.$array[1];
+        $splittedCount = count($splitted);
 
-            if($array[2] !== ''){
+        if($splittedCount === 1 || $splittedCount === 3){
 
-                $result .= '-'.$array[2];
+            $result[6] = array_shift($splitted);
+        }
 
-                if($array[3] !== ''){
+        if($splittedCount === 2 || $splittedCount === 3){
 
-                    $result .= 'T'.$array[3].':'.$array[4].':'.$array[5].'.'.$array[6];
-
-                    if($array[7] !== ''){
-
-                        $result .= '+'.$array[7];
-                    }
-                }
-            }
+            $result[7] = substr($string, strlen($string) - 6, 1).$splitted[0].':'.$splitted[1];
         }
 
         return $result;
