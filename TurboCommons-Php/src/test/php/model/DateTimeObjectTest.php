@@ -928,7 +928,11 @@ class DateTimeObjectTest extends TestCase {
     public function testGetTimeZoneOffset(){
 
         // Test valid values
-        $this->assertSame(7200, (new DateTimeObject('2015'))->getTimeZoneOffset());
+        $this->assertSame(3600, (new DateTimeObject('1000'))->getTimeZoneOffset());
+        $this->assertSame(3600, (new DateTimeObject('1000-05'))->getTimeZoneOffset());
+        $this->assertSame(3600, (new DateTimeObject('1900'))->getTimeZoneOffset());
+        $this->assertSame(3600, (new DateTimeObject('1900-08'))->getTimeZoneOffset());
+        $this->assertSame(3600, (new DateTimeObject('2015'))->getTimeZoneOffset());
         $this->assertSame(7200, (new DateTimeObject('2015-05'))->getTimeZoneOffset());
         $this->assertSame(7200, (new DateTimeObject('2015-05-25'))->getTimeZoneOffset());
         $this->assertSame(7200, (new DateTimeObject('2015-05-25T16:23:48'))->getTimeZoneOffset());
@@ -1021,27 +1025,28 @@ class DateTimeObjectTest extends TestCase {
     public function testToLocalTimeZone(){
 
         // Test valid values
-//         $this->assertSame('2015', (new DateTimeObject('2015'))->toLocalTimeZone()->toString('Y'));
-//         $this->assertSame('2015-11', (new DateTimeObject('2015-11'))->toLocalTimeZone()->toString('Y-M-D H:N:S'));
-//         $this->assertSame(DateTimeObject::convertToLocalTimeZone('2015-01-01') == '2015-01-01T00:00:00.000000+01:00');
-//         $this->assertSame(DateTimeObject::convertToLocalTimeZone('2010-02-18T16:23:48.541+06:00') == '2010-02-18T11:23:48.541000+01:00');
-//         $this->assertSame(DateTimeObject::convertToLocalTimeZone('2007-11-03T13:18:05') == '2007-11-03T13:18:05.000000+01:00');
-//         $this->assertSame(DateTimeObject::convertToLocalTimeZone('2008-09-15T15:53:00+05:00') == '2008-09-15T12:53:00.000000+02:00');
-//         $this->assertSame(DateTimeObject::convertToLocalTimeZone('1994-11-05T08:15:30-05:00') == '1994-11-05T14:15:30.000000+01:00');
-//         $this->assertSame(DateTimeObject::convertToLocalTimeZone('1994-11-05T13:15:30Z') == '1994-11-05T14:15:30.000000+01:00');
+        $this->assertSame('2015-01-01T00:00:00.000000+01:00', (new DateTimeObject('2015'))->toLocalTimeZone()->toString());
+        $this->assertSame('2015-11-01T00:00:00.000000+01:00', (new DateTimeObject('2015-11'))->toLocalTimeZone()->toString());
+        $this->assertSame('2015-01-01T00:00:00.000000+01:00', (new DateTimeObject('2015-01-01'))->toLocalTimeZone()->toString());
+        $this->assertSame('2010-02-18T11:23:48.541000+01:00', (new DateTimeObject('2010-02-18T16:23:48.541+06:00'))->toLocalTimeZone()->toString());
+        $this->assertSame('2007-11-03T13:18:05.000000+01:00', (new DateTimeObject('2007-11-03T13:18:05'))->toLocalTimeZone()->toString());
+        $this->assertSame('2008-09-15T12:53:00.000000+02:00', (new DateTimeObject('2008-09-15T15:53:00+05:00'))->toLocalTimeZone()->toString());
+        $this->assertSame('1994-11-05T14:15:30.000000+01:00', (new DateTimeObject('1994-11-05T08:15:30-05:00'))->toLocalTimeZone()->toString());
+        $this->assertSame('2008-09-15T06:53:00.000000+02:00', (new DateTimeObject('2008-09-15T15:53:00+11:00'))->toLocalTimeZone()->toString());
+        $this->assertSame('2008-09-16T04:53:00.000000+02:00', (new DateTimeObject('2008-09-15T15:53:00-11:00'))->toLocalTimeZone()->toString());
+        $this->assertSame('1994-11-05T14:15:30.000000+01:00', (new DateTimeObject('1994-11-05T13:15:30Z'))->toLocalTimeZone()->toString());
+        $this->assertSame('3100-12-12T18:10:30.000000+01:00', (new DateTimeObject('3100-12-12T17:10:30Z'))->toLocalTimeZone()->toString());
 
-//         // test exceptions
-//         foreach ($this->invalidValues as $value) {
+        // test exceptions
+        foreach ($this->invalidDateTimeValues as $value) {
 
-//             try {
-//                 DateTimeObject::convertToLocalTimeZone($value);
-//                 $this->exceptionMessage = $value.' did not cause exception';
-//             } catch (Throwable $e) {
-//                 // We expect an exception to happen
-//             }
-//         }
-
-        $this->markTestIncomplete('This test has not been implemented yet.');
+            try {
+                (new DateTimeObject($value))->toLocalTimeZone();
+                $this->exceptionMessage = $value.' did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+        }
     }
 
 
@@ -1065,7 +1070,7 @@ class DateTimeObjectTest extends TestCase {
 //         $this->assertTrue(DateTimeObject::convertToUTCTimeZone('2001-12-31T23:59:59.12+04:00') == '2001-12-31T19:59:59.120000+00:00');
 
 //         // test exceptions
-//         foreach ($this->invalidValues as $value) {
+//         foreach ($this->invalidDateTimeValues as $value) {
 
 //             try {
 //                 DateTimeObject::convertToUTCTimeZone($value);
@@ -1184,9 +1189,9 @@ class DateTimeObjectTest extends TestCase {
         $this->assertTrue(!DateTimeObject::isSameDateTime('2015-11-05T13:15:30.123456+05:00', '2015-11-05T08:15:30.123457+00:00'));
 
         // test exceptions
-        foreach ($this->invalidValues as $value1) {
+        foreach ($this->invalidDateTimeValues as $value1) {
 
-            foreach ($this->invalidValues as $value2) {
+            foreach ($this->invalidDateTimeValues as $value2) {
 
                 try {
                     DateTimeObject::isSameDateTime($value1, $value2);
@@ -1254,7 +1259,7 @@ class DateTimeObjectTest extends TestCase {
         // TODO - Pending
 
         // test exceptions
-        foreach ($this->invalidValues as $value) {
+        foreach ($this->invalidDateTimeValues as $value) {
 
             try {
                 DateTimeObject::add($value, 1, 'y');

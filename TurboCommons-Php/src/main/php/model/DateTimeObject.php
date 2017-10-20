@@ -596,56 +596,40 @@ class DateTimeObject{
      */
     public function toString($formatString = 'Y-M-DTH:N:S.U+Offset'){
 
-        $offset = $this->getTimeZoneOffset();
-        $formatString = str_replace('Offset', $offset, $formatString);
+        $exploded = $this->_explodeISO8601String($this->_dateTimeString);
 
-        if(($year = $this->getYear($this->_dateTimeString)) > 0){
+        // Get the time zone offset
+        $formatString = str_replace('Offset', substr($exploded[7], 1), $formatString);
 
-            $formatString = str_replace('Y', $year, $formatString);
-            $formatString = str_replace('y', substr($year, 2), $formatString);
-        }
+        // Get the year
+        $formatString = str_replace('Y', $exploded[0], $formatString);
+        $formatString = str_replace('y', substr($exploded[0], 2), $formatString);
 
-        if(($month = $this->getMonth($this->_dateTimeString)) > 0){
+        // Get the month
+        $formatString = str_replace('M', $exploded[1], $formatString);
+        $formatString = str_replace('m', (int)$exploded[1], $formatString);
 
-            $formatString = str_replace('M', str_pad($month, 2, '0', STR_PAD_LEFT), $formatString);
-            $formatString = str_replace('m', (int)$month, $formatString);
-        }
+        // Get the day
+        $formatString = str_replace('D', $exploded[2], $formatString);
+        $formatString = str_replace('d', (int)$exploded[2], $formatString);
 
-        if(($day = $this->getDay($this->_dateTimeString)) > 0){
+        // Get the hour
+        $formatString = str_replace('H', $exploded[3], $formatString);
+        $formatString = str_replace('h', (int)$exploded[3], $formatString);
 
-            $formatString = str_replace('D', str_pad($day, 2, '0', STR_PAD_LEFT), $formatString);
-            $formatString = str_replace('d', (int)$day, $formatString);
-        }
+        // Get the minute
+        $formatString = str_replace('N', $exploded[4], $formatString);
+        $formatString = str_replace('n', (int)$exploded[4], $formatString);
 
-        if(($hour = $this->getHour($this->_dateTimeString)) >= 0){
+        // Get the second
+        $formatString = str_replace('S', $exploded[5], $formatString);
+        $formatString = str_replace('s', (int)$exploded[5], $formatString);
 
-            $formatString = str_replace('H', str_pad($hour, 2, '0', STR_PAD_LEFT), $formatString);
-            $formatString = str_replace('h', (int)$hour, $formatString);
-        }
+        // Get the milisecond
+        $formatString = str_replace('u', str_pad($exploded[6], 3, '0', STR_PAD_LEFT), $formatString);
 
-        if(($minutes = $this->getMinute($this->_dateTimeString)) >= 0){
-
-            $formatString = str_replace('N', str_pad($minutes, 2, '0', STR_PAD_LEFT), $formatString);
-            $formatString = str_replace('n', (int)$minutes, $formatString);
-        }
-
-        if(($seconds = $this->getSecond($this->_dateTimeString)) >= 0){
-
-            $formatString = str_replace('S', str_pad($seconds, 2, '0', STR_PAD_LEFT), $formatString);
-            $formatString = str_replace('s', (int)$seconds, $formatString);
-        }
-
-        if(($miliSeconds = $this->getMiliSecond($this->_dateTimeString)) >= 0){
-
-            $formatString = str_replace('u', str_pad($miliSeconds, 3, '0', STR_PAD_LEFT), $formatString);
-        }
-
-        if(($microSeconds = $this->getMicroSecond($this->_dateTimeString)) >= 0){
-
-            $formatString = str_replace('U', str_pad($microSeconds, 6, '0', STR_PAD_LEFT), $formatString);
-        }
-
-        return $formatString;
+        // Get the microsecond
+        return str_replace('U', str_pad($exploded[6], 6, '0', STR_PAD_LEFT), $formatString);
     }
 
 
