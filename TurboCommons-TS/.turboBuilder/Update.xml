@@ -65,6 +65,10 @@
 		</delete>
 		
 		<!-- Update the builder files -->
+		<get src="https://raw.githubusercontent.com/edertone/TurboBuilder/master/TurboBuilder-Ant/turboBuilder/README.md"
+			 dest="README.md"
+			 httpusecaches="false" />
+				
 		<get src="https://raw.githubusercontent.com/edertone/TurboBuilder/master/TurboBuilder-Ant/turboBuilder/Builder.xml"
 			 dest="Builder.xml"
 			 httpusecaches="false" />

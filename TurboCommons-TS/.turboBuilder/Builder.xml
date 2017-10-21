@@ -87,9 +87,8 @@
 		<property name="Build.keepUnPackedFiles" value="false" />
 
 		<property name="Release.generate" value="false" />
-		<property name="Release.phpDoc" value="false" />
-		<property name="Release.jsDoc" value="false" />
-		<property name="Release.gitChangeLog" value="false" />
+		<property name="Release.generateCodeDocumentation" value="true" />
+		<property name="Release.gitChangeLog" value="true" />
 		<property name="Release.gitChangeLogCount" value="5" />
 		<property name="Release.optimizePictures" value="true" />
 		<property name="Release.optimizePhp" value="false" />
@@ -100,6 +99,8 @@
 
 		<property name="Test.Php.enabled" value="false" />
 		<property name="Test.Php.mode" value="commandLine" />
+		<property name="Test.Php.coverageReport" value="true" />
+		<property name="Test.Php.coverageReportOpenAfterTests" value="true" />
 		<property name="Test.Js.enabled" value="false" />
 
 		<property name="Tools.path" value="${user.home}/TurboBuilder-Tools" />
@@ -110,6 +111,7 @@
 		<property name="Tools.jpgOptimizerPath" value="${Tools.path}/jpegtran/jpegtran.exe" />
 		<property name="Tools.cssValidatorPath" value="${Tools.path}/W3c-css-validator/css-validator.jar" />
 		<property name="Tools.phpDocPath" value="${Tools.path}/PhpDocumentor/phpDocumentor.phar" />
+		<property name="Tools.phpUnitPath" value="${Tools.path}/PhpUnit/phpunit-6.2.3.phar" />
 
 		<property name="Tools.mysqlPath" value="C:/xampp/mysql/bin/mysql.exe" />
 		<property name="Tools.jsDocPath" value="C:/Program Files/nodejs/node_modules/.bin/jsdoc.cmd" />
@@ -205,7 +207,12 @@
 				}
 									
 				if(project.getProperty("Release.generate") == "true"){
+					
 					self.project.executeTarget("createReleaseVersion");
+			
+					if(project.getProperty("Build.Php.createPhar") == "true"){
+						self.project.executeTarget("createPharRelease");
+					}
 				}
 			
 				if(project.getProperty("Test.Php.enabled") == "true"){
@@ -380,19 +387,61 @@
 	<!-- Launch the PHP unit tests via Command line -->
 	<target name="runPhpTestsCmd">
 
-		<copy todir="${targetFolderPath}/${projectBaseName}/test" overwrite="true">
+		<sync todir="${targetFolderPath}/${projectBaseName}/test" overwrite="true">
 			<fileset dir="${srcFolderPath}/test" casesensitive="false" />
-		</copy>
-
-		<exec executable="${Tools.phpPath}" failonerror="true" >
-			<arg value="${targetFolderPath}/${projectBaseName}/test/php/index.php" />
-		</exec>
-
+		</sync>
+		
+		<script language="javascript">
+			<![CDATA[
+			    
+				var coverageReportPath = project.getProperty("targetFolderPath") + '/' + project.getProperty("projectBaseName") + '/coverage/php';
+						
+				var exec = project.createTask("exec");
+				exec.setExecutable(project.getProperty("Tools.phpPath"));
+				exec.setResultProperty('RuntimeProperty-runPhpTestsCmd-TestsResult');
+				exec.setFailonerror(false);
+				
+				exec.createArg().setLine('"' + project.getProperty("Tools.phpUnitPath") + '"');
+							
+				if(project.getProperty("Test.Php.coverageReport") !== "false"){
+				
+					exec.createArg().setLine('--coverage-html "' + coverageReportPath + '"');							
+				}
+			
+				exec.createArg().setLine('--configuration "' + project.getProperty("targetFolderPath") + '/' + project.getProperty("projectBaseName") + '/test/php/PhpUnitSetup.xml"');
+				
+				// Path to the tests to be executed				
+				exec.createArg().setLine('"' + project.getProperty("targetFolderPath") + "/" + project.getProperty("projectBaseName") + '/"');
+							
+				exec.perform();
+							
+				// Open the coverage report if necessary
+				if(project.getProperty("Test.Php.coverageReport") !== "false"
+					&& project.getProperty("Test.Php.coverageReportOpenAfterTests") !== "false"){
+				
+					var exec = project.createTask("exec");
+					exec.setExecutable("cmd");
+					exec.setSpawn(true);
+					exec.createArg().setValue("/c");
+					exec.createArg().setValue('"' + coverageReportPath + '/index.html"');				
+					exec.perform();
+				}		
+			
+				// Fail if unit tests failed. This is done here otherwise if the tests exec task failed, the coverage report won't be shown
+				if(project.getProperty("RuntimeProperty-runPhpTestsCmd-TestsResult") !== '0'){
+			
+					fail = project.createTask("fail");
+		            fail.setMessage("There are PHP unit test failures");
+		            fail.perform();
+				}			
+			]]>
+		</script>
+		
 		<delete dir="${targetFolderPath}/${projectBaseName}/test" failonerror="true" />
 
 	</target>
-
-
+	
+	
 	<!-- Launch the PHP unit tests via local web server -->
 	<target name="runPhpTestsLocalServer">
 
@@ -626,12 +675,15 @@
 			
 				var fsExcludes = [];
 			
-				if(project.getProperty("Release.phpDoc") == "true"){
-					self.project.executeTarget("createPhpDoc");
-				}
-			
-				if(project.getProperty("Release.jsDoc") == "true"){
-					self.project.executeTarget("createJsDoc");
+				if(project.getProperty("Release.generateCodeDocumentation") == "true"){
+					
+					if(project.getProperty("Build.Php.enabled") == "true"){
+						self.project.executeTarget("createPhpDoc");
+					}
+
+					if(project.getProperty("Build.Js.enabled") == "true"){
+						self.project.executeTarget("createJsDoc");
+					}
 				}
 			
 				if(project.getProperty("Release.gitChangeLog") == "true"){
@@ -1020,16 +1072,6 @@
 			<arg value="-r" />
 			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}/${projectBaseName}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}.phar'); $p->startBuffering(); $p->setStub('${phpStubFile}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}/main'); $p->compressFiles(Phar::GZ); $p->stopBuffering();" />
 		</exec>
-
-		<script language="javascript">
-			<![CDATA[
-				
-				if(project.getProperty("Release.generate") == "true"){
-					self.project.executeTarget("createPharRelease");
-				}
-			
-		    ]]>
-		</script>
 
 	</target>
 

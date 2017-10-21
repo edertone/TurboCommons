@@ -24,12 +24,12 @@
 				   	  
 		<CopyrightHeaders enabled="true">
 		
-			<Header path="assets/copyrightHeaders/TsFiles-Header.txt" 
+			<Header path="support/copyrightHeaders/TsFiles-Header.txt" 
 					appliesTo="src"
 					includes="**/*.ts"
 					excludes="" />
 					
-			<Header path="assets/copyrightHeaders/JsFiles-Header.txt" 
+			<Header path="support/copyrightHeaders/JsFiles-Header.txt" 
 					appliesTo="src"
 					includes="**/*.js"
 					excludes="**/libs/**" />
