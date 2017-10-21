@@ -323,7 +323,7 @@ namespace org_turbocommons_utils {
          */
         public static getFileNameWithExtension(path:string){
         
-            var osSeparator:string = (new org_turbocommons_managers.FilesManager()).getDirectorySeparator();
+            var osSeparator:string = '/';
     
             if(StringUtils.isEmpty(path)){
     
@@ -451,7 +451,7 @@ namespace org_turbocommons_utils {
          */
         public static formatPath(path:string):string {
         
-           var osSeparator:string = (new org_turbocommons_managers.FilesManager()).getDirectorySeparator();
+           var osSeparator:string = '/';
     
             if(path == null || path == undefined){
     

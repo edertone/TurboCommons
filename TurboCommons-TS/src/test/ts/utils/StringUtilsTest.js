@@ -356,7 +356,7 @@ QUnit.test("formatCase", function(assert) {
  */
 QUnit.test("formatPath", function(assert) {
 
-    var osSeparator = (new org_turbocommons_managers.FilesManager()).getDirectorySeparator();
+    var osSeparator = '/';
 
     assert.ok(StringUtils.formatPath(null) === '');
     assert.ok(StringUtils.formatPath('') === '');
