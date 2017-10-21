@@ -102,7 +102,8 @@ class StringUtilsTest extends TestCase {
 	 */
 	public function testIsEmpty(){
 
-		$this->assertTrue(StringUtils::isEmpty(null));
+	    $this->assertTrue(StringUtils::isEmpty(null));
+	    $this->assertTrue(StringUtils::isEmpty(0));
 		$this->assertTrue(StringUtils::isEmpty(''));
 		$this->assertTrue(StringUtils::isEmpty([]));
 		$this->assertTrue(StringUtils::isEmpty('      '));

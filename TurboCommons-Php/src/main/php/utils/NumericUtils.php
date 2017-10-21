@@ -67,7 +67,7 @@ class NumericUtils {
 
         if(self::isNumeric($value)){
 
-            return $value + 0;
+            return trim($value) + 0;
         }
 
         throw new UnexpectedValueException('NumericUtils->getNumeric : Provided value is not numeric');
