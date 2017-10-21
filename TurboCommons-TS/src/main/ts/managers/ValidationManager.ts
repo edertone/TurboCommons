@@ -9,7 +9,9 @@
  
 namespace org_turbocommons_managers {
  
- 
+ // TODO - Tota aquesta classe cal actualitzarla amb la versio php !!!!!
+            
+            
     import BaseStrictClass = org_turbocommons_src_main_ts_model.BaseStrictClass;
     
     
@@ -269,7 +271,6 @@ namespace org_turbocommons_managers {
          */
         public isEqualTo(value:any, value2:any, errorMessage:string = '', isWarning:boolean = false):boolean {
         
-            var validationManager = new org_turbocommons_managers.ValidationManager();
             var StringUtils = org_turbocommons_utils.StringUtils;
             var ArrayUtils = org_turbocommons_utils.ArrayUtils;
             var ObjectUtils = org_turbocommons_utils.ObjectUtils;
@@ -280,13 +281,13 @@ namespace org_turbocommons_managers {
             var res:string = errorMessage;
         
             // Compare elements depending on its type
-            if(validationManager.isArray(value) && validationManager.isArray(value2)){
+            if(ArrayUtils.isArray(value) && ArrayUtils.isArray(value2)){
         
                 res = ArrayUtils.isEqualTo(value, value2) ? '' : res;
         
             }else{
         
-                if(validationManager.isObject(value) && validationManager.isObject(value2)){
+                if(ObjectUtils.isObject(value) && ObjectUtils.isObject(value2)){
         
                     res = ObjectUtils.isEqualTo(value, value2) ? '' : res;
         

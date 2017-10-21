@@ -365,7 +365,7 @@
 						}
 			
 						exec.createArg().setLine('--target ' + targets[i]);	
-						exec.createArg().setLine('--out "' + targetProjectBase + '/' + projectBaseName + '-' + targets[i] + '.js"');
+						exec.createArg().setLine('--outFile "' + targetProjectBase + '/' + projectBaseName + '-' + targets[i] + '.js"');
 						exec.createArg().setLine('--project "' + targetMainPath + '/ts"');							
 						exec.perform();
 					}
