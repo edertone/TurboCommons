@@ -92,14 +92,14 @@ if(project.getProperty("Validate.ProjectStructure.enabled") !== "false"){
 	
 	validateAllowedFolders("Validate.ProjectStructure -> ", [projectBaseDir + "src/main", projectBaseDir + "src/test"], ["css", "js", "ts", "php", "java", "resources"]);
 	
-	if(project.getProperty("Validate.ProjectStructure.forceAssetsFolder") !== "false" && !fileExists(projectBaseDir + "assets")){
+	if(project.getProperty("Validate.ProjectStructure.forceSupportFolder") !== "false" && !fileExists(projectBaseDir + "support")){
 			
-		antErrors.push("Validate.ProjectStructure.forceAssetsFolder -> " + projectBaseDir + "assets folder does not exist");
+		antErrors.push("Validate.ProjectStructure.forceSupportFolder -> " + projectBaseDir + "support folder does not exist");
 	}
 	
-	if(project.getProperty("Validate.ProjectStructure.forceTODOFile") !== "false" && !fileExists(projectBaseDir + "assets/TODO.txt")){
+	if(project.getProperty("Validate.ProjectStructure.forceTODOFile") !== "false" && !fileExists(projectBaseDir + "support/TODO.txt")){
 			
-		antErrors.push("Validate.ProjectStructure.forceTODOFile -> " + projectBaseDir + "assets/TODO.txt file does not exist");
+		antErrors.push("Validate.ProjectStructure.forceTODOFile -> " + projectBaseDir + "support/TODO.txt file does not exist");
 	}
 
 	if(project.getProperty("Validate.ProjectStructure.resourcesStructure") !== "false"){

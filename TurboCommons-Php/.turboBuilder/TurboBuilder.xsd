@@ -512,7 +512,7 @@
 												<xs:attribute name="path" use="required" type="xs:string">
 													<xs:annotation>
 														<xs:documentation>
-															Full path including the filename (based on the project root) where a file containing a copyright header is located. For example: "assets/copyrightHeaders/HeaderTempate.txt"
+															Full path including the filename (based on the project root) where a file containing a copyright header is located. For example: "support/copyrightHeaders/HeaderTempate.txt"
 														</xs:documentation>
 													</xs:annotation>
 												</xs:attribute>	

@@ -11,6 +11,9 @@
 
 namespace org\turbocommons\src\main\php\managers;
 
+use Exception;
+use org\turbocommons\src\main\php\model\BaseStrictClass;
+
 
 /**
  * Class that acts as an interface to email sending operations
@@ -85,7 +88,7 @@ class MailManager extends BaseStrictClass {
 	 *
 	 * @return boolean True if the mail was queued to be sent (does not mean it will reach its destination), False if the mail could not be delivered.
 	 */
-	public function sendMail($senderAddress, $receiverAddress, $subject, $message, $htmlMode = false, $encoding = self::UTF8, $dispositionRequire = false){
+	public function sendMail($senderAddress, $receiverAddress, $subject, $message, bool $htmlMode = false, $encoding = self::UTF8, bool $dispositionRequire = false){
 
 		// Sanitize the sender and receiver addresses to remove non email characters
 		$senderAddress = trim(filter_var($senderAddress, FILTER_SANITIZE_EMAIL));
@@ -124,7 +127,7 @@ class MailManager extends BaseStrictClass {
 		}
 
 		// Check if the mail is in html format
-		if($htmlMode == true){
+		if($htmlMode){
 
 			$tmp = 'Content-type: text/html; '.$encoding;
 
@@ -269,72 +272,6 @@ class MailManager extends BaseStrictClass {
 
 	}
 
-
-	/**
-	 * Method that is used to replace values on a template file (normally an HTML template), so it gets ready to be sent via mail.
-	 *
-	 * @param string $templatePath The full file path to the template, including the file name.
-	 * @param array $valuesToReplace Associative array containing the values that must be found and replaced with the respective value on the given template.
-	 * @param boolean $replaceConstants True if we want to replace the currently defined runtime constants on the template with their respective values. True by default
-	 * @param string $replaceConstantsContaining Use this to filter which constants will be replaced on the template. For example, if we set this to 'LOC_' only the constants which name contains this string will be replaced on the template. Alert: To improve performance, it is recommended to define this parameter.
-	 *
-	 * @return string The read template with all the found values replaced and ready to be sent.
-	 */
-	public static function processTemplate($templatePath, array $valuesToReplace, $replaceConstants = true, $replaceConstantsContaining = ''){
-
-		$filesManager = new FilesManager();
-
-		// Read the template text from the specified path
-		$templateText = $filesManager->readFile($templatePath);
-
-		// We must sort all the values to replace by name lenght. Longest must be first, to prevent unwanted replacements. This is important!
-		$valuesToReplaceKeys = array_keys($valuesToReplace);
-
-		usort($valuesToReplaceKeys, function($a, $b) {
-
-		    return strlen($b) - strlen($a);
-		});
-
-		// Replace all provided values
-		foreach($valuesToReplaceKeys as $key){
-
-			if (strpos($templateText, $key) === false) {
-
-				trigger_error('MailManager::processTemplate Specified key <'.$key.'> not found on template', E_USER_WARNING);
-			}
-
-			$templateText = str_replace($key, $valuesToReplace[$key], $templateText);
-		}
-
-		// Replace all constant values
-		if($replaceConstants){
-
-			$constants = array_keys(get_defined_constants(false));
-
-			// We must sort the constants by name lenght. Longest must be first, to prevent unwanted replacements. This is important!
-			usort($constants, function($a, $b) {
-
-			    return strlen($b) - strlen($a);
-			});
-
-			foreach($constants as $constantName){
-
-				if($replaceConstantsContaining == ''){
-
-					$templateText = str_replace($constantName, constant($constantName), $templateText);
-
-				}else{
-
-					if(strpos($constantName, $replaceConstantsContaining) !== false){
-
-						$templateText = str_replace($constantName, constant($constantName), $templateText);
-					}
-				}
-			}
-		}
-
-		return $templateText;
-	}
 }
 
 ?>
