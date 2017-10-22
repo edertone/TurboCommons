@@ -12,7 +12,7 @@ namespace org_turbocommons_managers {
  // TODO - Tota aquesta classe cal actualitzarla amb la versio php !!!!!
             
             
-    import BaseStrictClass = org_turbocommons_src_main_ts_model.BaseStrictClass;
+    import BaseStrictClass = org_turbocommons_model.BaseStrictClass;
     
     
     /**

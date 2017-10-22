@@ -7,7 +7,7 @@
  * CopyRight : -> Copyright 2015 Edertone Advanded Solutions (08211 Castellar del Vallès, Barcelona). http://www.edertone.com
  */
  
-namespace org_turbocommons_src_main_ts_model {
+namespace org_turbocommons_model {
  
     
     /**
