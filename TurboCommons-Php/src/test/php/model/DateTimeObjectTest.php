@@ -1058,29 +1058,27 @@ class DateTimeObjectTest extends TestCase {
     public function testToUTC(){
 
         // Test valid values
-//         $this->assertTrue(DateTimeObject::convertToUTCTimeZone('2015') == '2015');
-//         $this->assertTrue(DateTimeObject::convertToUTCTimeZone('2015-11') == '2015-11');
-//         $this->assertTrue(DateTimeObject::convertToUTCTimeZone('2015-01-01') == '2014-12-31T23:00:00.000000+00:00');
-//         $this->assertTrue(DateTimeObject::convertToUTCTimeZone('2015-11-11') == '2015-11-10T23:00:00.000000+00:00');
-//         $this->assertTrue(DateTimeObject::convertToUTCTimeZone('2010-02-18T16:23:48.541+06:00') == '2010-02-18T10:23:48.541000+00:00');
-//         $this->assertTrue(DateTimeObject::convertToUTCTimeZone('2007-11-03T13:18:05') == '2007-11-03T12:18:05.000000+00:00');
-//         $this->assertTrue(DateTimeObject::convertToUTCTimeZone('2008-09-15T15:53:00+05:00') == '2008-09-15T10:53:00.000000+00:00');
-//         $this->assertTrue(DateTimeObject::convertToUTCTimeZone('1994-11-05T08:15:30-05:00') == '1994-11-05T13:15:30.000000+00:00');
-//         $this->assertTrue(DateTimeObject::convertToUTCTimeZone('1994-11-05T13:15:30Z') == '1994-11-05T13:15:30.000000+00:00');
-//         $this->assertTrue(DateTimeObject::convertToUTCTimeZone('2001-12-31T23:59:59.12+04:00') == '2001-12-31T19:59:59.120000+00:00');
+        $this->assertSame('2014-12-31T23:00:00.000000+00:00', (new DateTimeObject('2015'))->toUTC()->toString());
+        $this->assertSame('2015-10-31T23:00:00.000000+00:00', (new DateTimeObject('2015-11'))->toUTC()->toString());
+        $this->assertSame('2014-12-31T23:00:00.000000+00:00', (new DateTimeObject('2015-01-01'))->toUTC()->toString());
+        $this->assertSame('2015-11-10T23:00:00.000000+00:00', (new DateTimeObject('2015-11-11'))->toUTC()->toString());
+        $this->assertSame('2010-02-18T10:23:48.541000+00:00', (new DateTimeObject('2010-02-18T16:23:48.541+06:00'))->toUTC()->toString());
+        $this->assertSame('2007-11-03T12:18:05.000000+00:00', (new DateTimeObject('2007-11-03T13:18:05'))->toUTC()->toString());
+        $this->assertSame('2008-09-15T10:53:00.000000+00:00', (new DateTimeObject('2008-09-15T15:53:00+05:00'))->toUTC()->toString());
+        $this->assertSame('1994-11-05T13:15:30.000000+00:00', (new DateTimeObject('1994-11-05T08:15:30-05:00'))->toUTC()->toString());
+        $this->assertSame('1994-11-05T13:15:30.000000+00:00', (new DateTimeObject('1994-11-05T13:15:30Z'))->toUTC()->toString());
+        $this->assertSame('2001-12-31T19:59:59.120000+00:00', (new DateTimeObject('2001-12-31T23:59:59.12+04:00'))->toUTC()->toString());
 
-//         // test exceptions
-//         foreach ($this->invalidDateTimeValues as $value) {
+        // test exceptions
+        foreach ($this->invalidDateTimeValues as $value) {
 
-//             try {
-//                 DateTimeObject::convertToUTCTimeZone($value);
-//                 $this->exceptionMessage = $value.' did not cause exception';
-//             } catch (Throwable $e) {
-//                 // We expect an exception to happen
-//             }
-//         }
-
-        $this->markTestIncomplete('This test has not been implemented yet.');
+            try {
+                (new DateTimeObject($value))->convertToUTCTimeZone();
+                $this->exceptionMessage = $value.' did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+        }
     }
 
 
@@ -1094,7 +1092,7 @@ class DateTimeObjectTest extends TestCase {
         // Test valid values
         $this->assertSame('15', (new DateTimeObject('2015'))->toString('y'));
         $this->assertSame('2015', (new DateTimeObject('2015'))->toString('Y'));
-        $this->assertSame('m-D-15 h:m:s-U', (new DateTimeObject('2015'))->toString('m-D-y h:m:s-U'));
+        $this->assertSame('1-01-15 0:0:0-000000', (new DateTimeObject('2015'))->toString('m-D-y h:n:s-U'));
         $this->assertSame('1-15', (new DateTimeObject('2015-01'))->toString('m-y'));
         $this->assertSame('01-15', (new DateTimeObject('2015-01'))->toString('M-y'));
         $this->assertSame('11-2015', (new DateTimeObject('2015-11'))->toString('M-Y'));
@@ -1104,12 +1102,12 @@ class DateTimeObjectTest extends TestCase {
         $this->assertSame('6/12/98', (new DateTimeObject('1998-12-06'))->toString('d/m/y'));
         $this->assertSame('06/12/1998', (new DateTimeObject('1998-12-06'))->toString('D/M/Y'));
         $this->assertSame('1_01_2015', (new DateTimeObject('2015-01-01'))->toString('d_M_Y'));
-        $this->assertSame('18-2-10 16:n:s', (new DateTimeObject('2010-02-18T16'))->toString('d-m-y h:n:s'));
-        $this->assertSame('18-2-10 6:n:s', (new DateTimeObject('2010-02-18T06'))->toString('d-m-y h:n:s'));
-        $this->assertSame('18-2-10 06:n:s', (new DateTimeObject('2010-02-18T06'))->toString('d-m-y H:n:s'));
-        $this->assertSame('18-2-10 16:20:s', (new DateTimeObject('2010-02-18T16:20'))->toString('d-m-y h:n:s'));
-        $this->assertSame('18-2-10 16:1:s', (new DateTimeObject('2010-02-18T16:01'))->toString('d-m-y h:n:s'));
-        $this->assertSame('18-2-10 16:01:s', (new DateTimeObject('2010-02-18T16:01'))->toString('d-m-y h:N:s'));
+        $this->assertSame('18-2-10 16:0:0', (new DateTimeObject('2010-02-18T16'))->toString('d-m-y h:n:s'));
+        $this->assertSame('18-2-10 6:0:0', (new DateTimeObject('2010-02-18T06'))->toString('d-m-y h:n:s'));
+        $this->assertSame('18-2-10 06:0:0', (new DateTimeObject('2010-02-18T06'))->toString('d-m-y H:n:s'));
+        $this->assertSame('18-2-10 16:20:0', (new DateTimeObject('2010-02-18T16:20'))->toString('d-m-y h:n:s'));
+        $this->assertSame('18-2-10 16:1:0', (new DateTimeObject('2010-02-18T16:01'))->toString('d-m-y h:n:s'));
+        $this->assertSame('18-2-10 16:01:0', (new DateTimeObject('2010-02-18T16:01'))->toString('d-m-y h:N:s'));
         $this->assertSame('18-2-10 0:0:0', (new DateTimeObject('2010-02-18T00:00:00.541+06:00'))->toString('d-m-y h:n:s'));
         $this->assertSame('18-2-10 16:23:48', (new DateTimeObject('2010-02-18T16:23:48.541+06:00'))->toString('d-m-y h:n:s'));
         $this->assertSame('18-02-2010 1:3:8', (new DateTimeObject('2010-02-18T01:03:08.541+06:00'))->toString('D-M-Y h:n:s'));
@@ -1119,7 +1117,7 @@ class DateTimeObjectTest extends TestCase {
         $this->assertSame('09-15-08 15:53:10-876', (new DateTimeObject('2008-09-15T15:53:10.876467+05:00'))->toString('M-D-y h:n:s-u'));
         $this->assertSame('09-15-08 15:53:10-000', (new DateTimeObject('2008-09-15T15:53:10.000001+05:00'))->toString('M-D-y h:n:s-u'));
         $this->assertSame('09-15-08 15:53:10-001000', (new DateTimeObject('2008-09-15T15:53:10.001+05:00'))->toString('M-D-y h:n:s-U'));
-        $this->assertSame('94-5-11 13:15:30:U', (new DateTimeObject('1994-11-05T13:15:30Z'))->toString('y-d-m h:n:s:U'));
+        $this->assertSame('94-5-11 13:15:30:000000', (new DateTimeObject('1994-11-05T13:15:30Z'))->toString('y-d-m h:n:s:U'));
         $this->assertSame('94-5-11 13:15:30:123000', (new DateTimeObject('1994-11-05T13:15:30.123Z'))->toString('y-d-m h:n:s:U'));
         $this->assertSame('94-5-11 13:15:30:123456', (new DateTimeObject('1994-11-05T13:15:30.123456Z'))->toString('y-d-m h:n:s:U'));
 
@@ -1133,8 +1131,6 @@ class DateTimeObjectTest extends TestCase {
                 // We expect an exception to happen
             }
         }
-
-        $this->markTestIncomplete('This test has not been implemented yet.');
     }
 
 
@@ -1169,24 +1165,27 @@ class DateTimeObjectTest extends TestCase {
     public function testIsEqualTo(){
 
         // Test valid values
-        $this->assertTrue(DateTimeObject::isSameDateTime('2015', '2015'));
-        $this->assertTrue(DateTimeObject::isSameDateTime('2015-06', '2015-06'));
-        $this->assertTrue(DateTimeObject::isSameDateTime('2015-06-21', '2015-06-21'));
-        $this->assertTrue(DateTimeObject::isSameDateTime('2015-06-21T19:31:05', '2015-06-21T19:31:05'));
-        $this->assertTrue(DateTimeObject::isSameDateTime('1994-11-05T13:15:30.123456Z', '1994-11-05T13:15:30.123456Z'));
-        $this->assertTrue(DateTimeObject::isSameDateTime('1994-11-05T13:15:30.123456+00:00', '1994-11-05T13:15:30.123456+00:00'));
-        $this->assertTrue(DateTimeObject::isSameDateTime('1994-11-05T13:15:30.123456+01:00', '1994-11-05T12:15:30.123456+00:00'));
-        $this->assertTrue(DateTimeObject::isSameDateTime('2015-11-05T13:15:30.123456+05:00', '2015-11-05T08:15:30.123456+00:00'));
+        $this->assertTrue((new DateTimeObject('2015'))->isEqualTo('2015'));
+        $this->assertTrue((new DateTimeObject('2015'))->isEqualTo('2015-01-01'));
+        $this->assertTrue((new DateTimeObject('2015-01-01'))->isEqualTo('2015'));
+        $this->assertTrue((new DateTimeObject('2015-06'))->isEqualTo('2015-06'));
+        $this->assertTrue((new DateTimeObject('2015-06-21'))->isEqualTo('2015-06-21'));
+        $this->assertTrue((new DateTimeObject('2015-06-21T19:31:05'))->isEqualTo('2015-06-21T19:31:05'));
+        $this->assertTrue((new DateTimeObject('2015-06-21T19:31:05.000000'))->isEqualTo('2015-06-21T19:31:05'));
+        $this->assertTrue((new DateTimeObject('1994-11-05T13:15:30.123456Z'))->isEqualTo('1994-11-05T13:15:30.123456Z'));
+        $this->assertTrue((new DateTimeObject('1994-11-05T13:15:30.123456+00:00'))->isEqualTo('1994-11-05T13:15:30.123456+00:00'));
+        $this->assertTrue((new DateTimeObject('1994-11-05T13:15:30.123456+01:00'))->isEqualTo('1994-11-05T12:15:30.123456+00:00'));
+        $this->assertTrue((new DateTimeObject('2015-11-05T13:15:30.123456+05:00'))->isEqualTo('2015-11-05T08:15:30.123456+00:00'));
 
         // Test invalid values
-        $this->assertTrue(!DateTimeObject::isSameDateTime('2015', '2016'));
-        $this->assertTrue(!DateTimeObject::isSameDateTime('2015-06', '2015-11'));
-        $this->assertTrue(!DateTimeObject::isSameDateTime('2015-06-11', '2015-06-21'));
-        $this->assertTrue(!DateTimeObject::isSameDateTime('2015-06-21T19:31:05', '2015-06-21T19:32:05'));
-        $this->assertTrue(!DateTimeObject::isSameDateTime('1994-11-05T13:15:30.124456Z', '1994-11-05T13:15:30.123456Z'));
-        $this->assertTrue(!DateTimeObject::isSameDateTime('1994-11-05T13:15:30.123456+00:00', '1994-11-05T14:15:30.123456+00:00'));
-        $this->assertTrue(!DateTimeObject::isSameDateTime('1994-11-05T13:15:30.123456+02:00', '1994-11-05T12:15:30.123456+00:00'));
-        $this->assertTrue(!DateTimeObject::isSameDateTime('2015-11-05T13:15:30.123456+05:00', '2015-11-05T08:15:30.123457+00:00'));
+        $this->assertFalse((new DateTimeObject('2015'))->isEqualTo('2016'));
+        $this->assertFalse((new DateTimeObject('2015-06'))->isEqualTo('2015-11'));
+        $this->assertFalse((new DateTimeObject('2015-06-11'))->isEqualTo('2015-06-21'));
+        $this->assertFalse((new DateTimeObject('2015-06-21T19:31:05'))->isEqualTo('2015-06-21T19:32:05'));
+        $this->assertFalse((new DateTimeObject('1994-11-05T13:15:30.124456Z'))->isEqualTo('1994-11-05T13:15:30.123456Z'));
+        $this->assertFalse((new DateTimeObject('1994-11-05T13:15:30.123456+00:00'))->isEqualTo('1994-11-05T14:15:30.123456+00:00'));
+        $this->assertFalse((new DateTimeObject('1994-11-05T13:15:30.123456+02:00'))->isEqualTo('1994-11-05T12:15:30.123456+00:00'));
+        $this->assertFalse((new DateTimeObject('2015-11-05T13:15:30.123456+05:00'))->isEqualTo('2015-11-05T08:15:30.123457+00:00'));
 
         // test exceptions
         foreach ($this->invalidDateTimeValues as $value1) {
@@ -1194,15 +1193,13 @@ class DateTimeObjectTest extends TestCase {
             foreach ($this->invalidDateTimeValues as $value2) {
 
                 try {
-                    DateTimeObject::isSameDateTime($value1, $value2);
+                    (new DateTimeObject($value1))->isEqualTo($value2);
                     $this->exceptionMessage = $value.' did not cause exception';
                 } catch (Throwable $e) {
                     // We expect an exception to happen
                 }
             }
         }
-
-        $this->markTestIncomplete('This test has not been implemented yet.');
     }
 
 
