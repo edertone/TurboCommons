@@ -361,9 +361,7 @@ class DateTimeObject{
      */
     public function getYear(){
 
-        $parsedDate = explode('-', $this->_dateTimeString);
-
-        return (int) $parsedDate[0];
+        return (int) self::_explodeISO8601String($this->_dateTimeString)[0];
     }
 
 
@@ -374,9 +372,7 @@ class DateTimeObject{
      */
     public function getMonth(){
 
-        $parsedDate = explode('-', $this->_dateTimeString);
-
-        return (int) substr($parsedDate[1], 0, 2);
+        return (int) self::_explodeISO8601String($this->_dateTimeString)[1];
     }
 
 
@@ -387,9 +383,7 @@ class DateTimeObject{
      */
     public function getDay(){
 
-        $parsedDate = explode('-', $this->_dateTimeString);
-
-        return (int) substr($parsedDate[2], 0, 2);
+        return (int) self::_explodeISO8601String($this->_dateTimeString)[2];
     }
 
 
@@ -402,11 +396,11 @@ class DateTimeObject{
      */
     public function getDayOfWeek(){
 
-        $parsedDate = explode('-', $this->_dateTimeString);
+        $v = self::_explodeISO8601String($this->_dateTimeString);
 
         $dateTimeInstance = new DateTime();
 
-        $dateTimeInstance->setDate($parsedDate[0], $parsedDate[1], substr($parsedDate[2], 0, 2));
+        $dateTimeInstance->setDate($v[0], $v[1], $v[2]);
 
         return $dateTimeInstance->format('w') + 1;
     }
@@ -419,9 +413,7 @@ class DateTimeObject{
      */
     public function getHour(){
 
-        $parsedDate = explode('-', $this->_dateTimeString);
-
-        return (int) substr($parsedDate[2], 3, 2);
+        return (int) self::_explodeISO8601String($this->_dateTimeString)[3];
     }
 
 
@@ -432,9 +424,7 @@ class DateTimeObject{
      */
     public function getMinute(){
 
-        $parsedDate = explode(':', $this->_dateTimeString);
-
-        return (int) substr($parsedDate[1], 0, 2);
+        return (int) self::_explodeISO8601String($this->_dateTimeString)[4];
     }
 
 
@@ -445,9 +435,7 @@ class DateTimeObject{
      */
     public function getSecond(){
 
-        $parsedDate = explode(':', $this->_dateTimeString);
-
-        return (int) substr($parsedDate[2], 0, 2);
+        return (int) self::_explodeISO8601String($this->_dateTimeString)[5];
     }
 
 
@@ -469,14 +457,7 @@ class DateTimeObject{
      */
     public function getMicroSecond(){
 
-        $parsedDate = explode('.', $this->_dateTimeString);
-
-        $parsedDate = $parsedDate[1];
-        $parsedDate = str_replace('-', '+', $parsedDate);
-        $parsedDate = explode('+', $parsedDate);
-        $parsedDate = preg_replace('/[^0-9]/', '', $parsedDate[0]);
-
-        return (int) str_pad($parsedDate, 6, '0', STR_PAD_RIGHT);
+        return (int) self::_explodeISO8601String($this->_dateTimeString)[6];
     }
 
 
@@ -676,10 +657,13 @@ class DateTimeObject{
      */
     public function add(int $value, $type = 'minutes'){
 
+        $v = $this->_explodeISO8601String($this->_dateTimeString);
+
         switch (strtolower($type)) {
 
             case 'years':
-                return (substr($this->_dateTimeString, 0, 4) + $value).substr($this->_dateTimeString, 4);
+                $v[0]  = (string) $v[0] += $value;
+                break;
 
             case 'months':
                 throw new UnexpectedValueException('DateTimeUtils->add : months type is not implemented yet');
@@ -712,6 +696,8 @@ class DateTimeObject{
             default:
                 throw new UnexpectedValueException('DateTimeUtils->add : Invalid type specified');
         }
+
+        return $v[0].'-'.$v[1].'-'.$v[2].'T'.$v[3].':'.$v[4].':'.$v[5].'.'.$v[6].$v[7];
     }
 
 
