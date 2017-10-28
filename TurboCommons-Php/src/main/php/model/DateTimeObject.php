@@ -679,7 +679,7 @@ class DateTimeObject{
         switch (strtolower($type)) {
 
             case 'years':
-                return (substr($dateTime, 0, 4) + $value).substr($dateTime, 4);
+                return (substr($this->_dateTimeString, 0, 4) + $value).substr($this->_dateTimeString, 4);
 
             case 'months':
                 throw new UnexpectedValueException('DateTimeUtils->add : months type is not implemented yet');
