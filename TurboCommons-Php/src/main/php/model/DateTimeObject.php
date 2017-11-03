@@ -468,11 +468,30 @@ class DateTimeObject{
      */
     public function getTimeZoneName(){
 
-        $name = timezone_name_from_abbr('', $this->getTimeZoneOffset(), 0);
+        $isDst = date('I');
+        $offset = $this->getTimeZoneOffset();
+        $name = timezone_name_from_abbr('', $offset, $isDst);
 
-        if($name === false){
+        // This code is based on an example found at
+        // http://www.php.net/manual/en/function.timezone-name-from-abbr.php#89155
+        if ($name === false){
 
-            return '';
+            foreach (timezone_abbreviations_list() as $abbr){
+
+                foreach ($abbr as $city){
+
+                    if ((bool)$city['dst'] === (bool)$isDst && strlen($city['timezone_id']) > 0 && $city['offset'] == $offset){
+
+                        $name = $city['timezone_id'];
+                        break;
+                    }
+                }
+
+                if ($name !== false){
+
+                    break;
+                }
+            }
         }
 
         return $name;

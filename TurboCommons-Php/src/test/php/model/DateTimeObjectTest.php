@@ -964,7 +964,7 @@ class DateTimeObjectTest extends TestCase {
         $this->assertContains('Pacific', (new DateTimeObject('2010-02-18T23:23:59.001001-11:00'))->getTimeZoneName());
         $this->assertContains('Pacific', (new DateTimeObject('2010-02-18T23:23:59.010001-11:00'))->getTimeZoneName());
         $this->assertContains('Pacific', (new DateTimeObject('2010-02-18T23:23:59.100000-11:00'))->getTimeZoneName());
-        $this->assertContains('TODO', (new DateTimeObject('2010-02-18T23:23:59.100000+11:00'))->getTimeZoneName());
+        $this->assertContains('Pacific', (new DateTimeObject('2010-02-18T23:23:59.100000+11:00'))->getTimeZoneName());
         $this->assertContains('Europe', (new DateTimeObject('1994-11-05T13:15:30.123Z'))->getTimeZoneName());
 
         // Test invalid values
@@ -979,8 +979,6 @@ class DateTimeObjectTest extends TestCase {
                 // We expect an exception to happen
             }
         }
-
-        $this->markTestIncomplete('This test has not been implemented yet.');
     }
 
 
