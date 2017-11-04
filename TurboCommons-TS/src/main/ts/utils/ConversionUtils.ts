@@ -8,7 +8,7 @@
  */
 
 
-import StringUtils from './StringUtils';
+import { StringUtils } from './StringUtils';
 
 
 /**
@@ -28,7 +28,7 @@ import StringUtils from './StringUtils';
  * 
  * @class
  */
-export default class ConversionUtils {
+export class ConversionUtils {
 
 
 	/**

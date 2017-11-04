@@ -7,14 +7,11 @@
  * CopyRight : -> Copyright 2015 Edertone Advanded Solutions (08211 Castellar del Vallès, Barcelona). http://www.edertone.com
  */
  
-namespace org_turbocommons_model {
- 
     
-    /**
-     * TODO - Copy doc from php
-     */
-    export class XmlObjectObject {
-    
-       // TODO - translate from php
-    }
+/**
+ * TODO - Copy doc from php
+ */
+export class XmlObjectObject {
+
+   // TODO - translate from php
 }

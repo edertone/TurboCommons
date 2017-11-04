@@ -6,15 +6,12 @@
  * License Url : -> http://www.apache.org/licenses/LICENSE-2.0
  * CopyRight : -> Copyright 2015 Edertone Advanded Solutions (08211 Castellar del Vallès, Barcelona). http://www.edertone.com
  */
- 
-namespace org_turbocommons_model {
- 
+
     
-    /**
-     * TODO - Copy doc from php
-     */
-    export class HashMapObject {
-    
-       // TODO - translate from php
-    }
+/**
+ * TODO - Copy doc from php
+ */
+export class HashMapObject {
+
+   // TODO - translate from php
 }

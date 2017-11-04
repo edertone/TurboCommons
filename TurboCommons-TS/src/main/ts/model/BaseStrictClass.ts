@@ -6,15 +6,12 @@
  * License Url : -> http://www.apache.org/licenses/LICENSE-2.0
  * CopyRight : -> Copyright 2015 Edertone Advanded Solutions (08211 Castellar del Vallès, Barcelona). http://www.edertone.com
  */
- 
-namespace org_turbocommons_model {
- 
+
     
-    /**
-     * A base class that can be extended to protect created objects from access/read to undefined properties, and all other defensive OOP best practices
-     */
-    export class BaseStrictClass {
-    
-       
-    }
+/**
+ * A base class that can be extended to protect created objects from access/read to undefined properties, and all other defensive OOP best practices
+ */
+export class BaseStrictClass {
+
+   
 }

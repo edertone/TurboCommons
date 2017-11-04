@@ -303,13 +303,6 @@
 	<!-- Compile and merge all typeScript files if necessary -->
 	<target name="typeScript-compile">
 
-		<!-- Copy all the unprocessed ts files to dist folder -->
-		<sync todir="${targetFolderPath}/${projectBaseName}/dist/TS" overwrite="true">
-			<fileset dir="${mainFolderPath}/ts" casesensitive="false">
-				<exclude name="**/tsconfig.json**" />
-			</fileset>
-		</sync>
-			
 		<!-- Execute the tsc compiler for each one of the project .ts files and javascript targets -->
 		<script language="javascript">
 			<![CDATA[
@@ -329,41 +322,38 @@
 		            fail.perform();
 				}				
 			
-				// TODO -right now, the only compilation that works is the dist/TS folder. JS merged files must be reviewed and re investigated
-			
 				for(var i=0; i < targets.length; i++){
 				
-					// Compile the files for the current js target
-					if(project.getProperty("Build.keepUnPackedFiles") == "true"){		
+					// Generate the module package
+			
+					var exec = project.createTask("exec");
+					exec.setFailonerror(true);
+					exec.setExecutable(project.getProperty("Tools.tsCompilerPath"));
 					
-						var exec = project.createTask("exec");
-						exec.setFailonerror(true);
-						exec.setExecutable(project.getProperty("Tools.tsCompilerPath"));
-						
-						exec.createArg().setLine('--alwaysStrict');	
-						
-						if(project.getProperty("Build.Ts.compilerStrict") != "false"){
-							exec.createArg().setLine('--strict');
-						}
-			
-						if(project.getProperty("Build.Ts.compilerDeclarationFile") != "false"){
-							exec.createArg().setLine('--declaration');
-						}
-			
-						if(project.getProperty("Build.Ts.compilerSourceMap") == "true"){
-							exec.createArg().setLine('--sourceMap');
-						}
-			
-						exec.createArg().setLine('--target ' + targets[i]);
-						exec.createArg().setLine('--outDir "' + targetProjectBase + '/dist/' + targets[i] + '/umd"');
-						exec.createArg().setLine('--module umd');
-						exec.createArg().setLine('--rootDir "' + targetMainPath + '/ts"'); 		
-						exec.createArg().setLine('--project "' + targetMainPath + '/ts"');							
-						exec.perform();
+					if(project.getProperty("Build.Ts.compilerStrict") != "false"){
+						exec.createArg().setLine('--strict');
 					}
-			
+		
+					if(project.getProperty("Build.Ts.compilerDeclarationFile") != "false"){
+						exec.createArg().setLine('--declaration');
+					}
+		
+					if(project.getProperty("Build.Ts.compilerSourceMap") == "true"){
+						exec.createArg().setLine('--sourceMap');
+					}
+		
+					exec.createArg().setLine('--alwaysStrict');				
+					exec.createArg().setLine('--target ' + targets[i]);
+					exec.createArg().setLine('--outDir "' + targetProjectBase + '/dist/' + targets[i] + '/commonjs"');
+					exec.createArg().setLine('--module commonjs');
+					exec.createArg().setLine('--rootDir "' + targetMainPath + '/ts"'); 		
+					exec.createArg().setLine('--project "' + targetMainPath + '/ts"');							
+					exec.perform();
+							
 					// Generate the merged JS file for the current target if merged JS is enabled			
-					if(project.getProperty("Build.Ts.createMergedJs") == "true"){
+					// TODO -right now, the only compilation that works is the dist/TS folder. JS merged files must be reviewed and re investigated
+						
+					/* if(project.getProperty("Build.Ts.createMergedJs") == "true"){
 								
 						exec = project.createTask("exec");
 						exec.setFailonerror(true);
@@ -386,7 +376,7 @@
 						exec.createArg().setLine('--outFile "' + targetProjectBase + '/dist/' + targets[i] + '/glob/' + projectBaseName + '-' + targets[i] + '.js"');
 						exec.createArg().setLine('--project "' + targetMainPath + '/ts"');							
 						exec.perform();
-					}
+					}*/
 				}
 			
 		    ]]>

@@ -8,7 +8,7 @@
  */
     
     
-import ObjectUtils from './ObjectUtils';
+import { ObjectUtils } from './ObjectUtils';
 
 
 /**
@@ -16,7 +16,7 @@ import ObjectUtils from './ObjectUtils';
  * 
  * @class
  */
-export default class ArrayUtils {
+export class ArrayUtils {
 
 
     /**

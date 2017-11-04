@@ -8,13 +8,13 @@
  */
  
  
-import StringUtils from './StringUtils';
+import { StringUtils } from './StringUtils';
 
     
 /**
  * Common operations and tools related with numbers
  */ 
-export default class NumericUtils {
+export class NumericUtils {
     
     
     /**

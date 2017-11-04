@@ -8,8 +8,8 @@
  */
  
 
-import NumericUtils from './NumericUtils';
-import ValidationManager from "../managers/ValidationManager";
+import { NumericUtils } from './NumericUtils';
+import { ValidationManager } from "../managers/ValidationManager";
 
     
 /**
@@ -28,7 +28,7 @@ import ValidationManager from "../managers/ValidationManager";
  * 
  * @class
  */   
-export default class StringUtils {
+export class StringUtils {
     
     
     /**

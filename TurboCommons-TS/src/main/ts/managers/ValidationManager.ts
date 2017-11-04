@@ -8,10 +8,10 @@
  */
  
 
-import StringUtils from '../utils/StringUtils';
-import NumericUtils from '../utils/NumericUtils';
-import ArrayUtils from '../utils/ArrayUtils';
-import ObjectUtils from '../utils/ObjectUtils';
+import { StringUtils } from '../utils/StringUtils';
+import { NumericUtils } from '../utils/NumericUtils';
+import { ArrayUtils } from '../utils/ArrayUtils';
+import { ObjectUtils } from '../utils/ObjectUtils';
  
  // TODO - Tota aquesta classe cal actualitzarla amb la versio php !!!!!
             
@@ -21,7 +21,7 @@ import ObjectUtils from '../utils/ObjectUtils';
  * We can create as many instances as we want, and each instance will store the validation history and global validation state,
  * so we can use this class to validate complex forms or multiple elements globally
  */ 
-export default class ValidationManager{
+export class ValidationManager{
 
 
     /** Constant that defines the correct validation status */

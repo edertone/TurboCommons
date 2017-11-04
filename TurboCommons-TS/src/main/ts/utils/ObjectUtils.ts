@@ -8,8 +8,8 @@
  */
 
 
-import ArrayUtils from './ArrayUtils';
-import ValidationManager from '../managers/ValidationManager';
+import { ArrayUtils } from './ArrayUtils';
+import { ValidationManager } from '../managers/ValidationManager';
 
 
 /**
@@ -17,7 +17,7 @@ import ValidationManager from '../managers/ValidationManager';
  * 
  * @class
  */
-export default class ObjectUtils {
+export class ObjectUtils {
 
 
     /**

@@ -1,7 +1,8 @@
 {
 
 	"compilerOptions": {}, 
-	"include": ["model/*",
+	"include": ["index.ts",
+				"model/*",
 				"utils/*",
 				"managers/*"]
 
