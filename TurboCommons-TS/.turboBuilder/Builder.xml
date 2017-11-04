@@ -303,6 +303,13 @@
 	<!-- Compile and merge all typeScript files if necessary -->
 	<target name="typeScript-compile">
 
+		<!-- Copy all the unprocessed ts files to dist folder -->
+		<sync todir="${targetFolderPath}/${projectBaseName}/dist/TS" overwrite="true">
+			<fileset dir="${mainFolderPath}/ts" casesensitive="false">
+				<exclude name="**/tsconfig.json**" />
+			</fileset>
+		</sync>
+			
 		<!-- Execute the tsc compiler for each one of the project .ts files and javascript targets -->
 		<script language="javascript">
 			<![CDATA[
@@ -321,6 +328,8 @@
 		            fail.setMessage("Could not find typescript config file at: " + targetMainPath + '/ts/tsconfig.json');
 		            fail.perform();
 				}				
+			
+				// TODO -right now, the only compilation that works is the dist/TS folder. JS merged files must be reviewed and re investigated
 			
 				for(var i=0; i < targets.length; i++){
 				
@@ -346,7 +355,8 @@
 						}
 			
 						exec.createArg().setLine('--target ' + targets[i]);
-						exec.createArg().setLine('--outDir "' + targetMainPath + '/ts-' + targets[i] + '"');
+						exec.createArg().setLine('--outDir "' + targetProjectBase + '/dist/' + targets[i] + '/umd"');
+						exec.createArg().setLine('--module umd');
 						exec.createArg().setLine('--rootDir "' + targetMainPath + '/ts"'); 		
 						exec.createArg().setLine('--project "' + targetMainPath + '/ts"');							
 						exec.perform();
@@ -372,7 +382,8 @@
 						}
 			
 						exec.createArg().setLine('--target ' + targets[i]);	
-						exec.createArg().setLine('--outFile "' + targetProjectBase + '/' + projectBaseName + '-' + targets[i] + '.js"');
+						exec.createArg().setLine('--module amd');
+						exec.createArg().setLine('--outFile "' + targetProjectBase + '/dist/' + targets[i] + '/glob/' + projectBaseName + '-' + targets[i] + '.js"');
 						exec.createArg().setLine('--project "' + targetMainPath + '/ts"');							
 						exec.perform();
 					}
@@ -695,6 +706,8 @@
 					fsExcludes.push("**/*.jpg");
 				}
 
+				fsExcludes.push("**/*.phar");
+			
 				if(releaseOptimizePhp == "true"){					
 					fsExcludes.push("**/*.php");
 				}
@@ -772,7 +785,7 @@
 
 		<mkdir dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/doc/php"/>
 
-		<exec executable="${Tools.phpPath}" failonerror="true" outputproperty="createPhpDocOutputRedir">
+		<exec executable="${Tools.phpPath}" failonerror="false" outputproperty="createPhpDocOutputRedir">
 			<arg value="${Tools.phpDocPath}" />
 			<arg value="--template=&quot;responsive-twig&quot;" />
 			<arg value="--visibility=&quot;public&quot;" />
@@ -1067,10 +1080,12 @@
 		<property name="phpStubFile" value="&lt;?php Phar::mapPhar(); include \'phar://${projectBaseName}.phar/php/AutoLoader.php\'; __HALT_COMPILER(); ?>"/>
 
 		<!-- Create the phar using the current project name -->
+		<mkdir dir="${targetFolderPath}/${projectBaseName}/dist"/>
+
 		<exec executable="${Tools.phpPath}" failonerror="true">
 			<arg value="-d display_errors" />
 			<arg value="-r" />
-			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}/${projectBaseName}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}.phar'); $p->startBuffering(); $p->setStub('${phpStubFile}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}/main'); $p->compressFiles(Phar::GZ); $p->stopBuffering();" />
+			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}/dist/${projectBaseName}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}.phar'); $p->startBuffering(); $p->setStub('${phpStubFile}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}/main'); $p->compressFiles(Phar::GZ); $p->stopBuffering();" />
 		</exec>
 
 	</target>
@@ -1082,11 +1097,10 @@
 		<!--Define the contents for the stub file that will be autoexecuted when the phar file is included -->
 		<property name="phpStubFileRelease" value="&lt;?php Phar::mapPhar(); include \'phar://${projectBaseName}-${Build.versionNumber}.${build.number}.phar/php/AutoLoader.php\'; __HALT_COMPILER(); ?>"/>
 
-		<!-- Create the phar using the current project name and version -->
 		<exec executable="${Tools.phpPath}" failonerror="true">
 			<arg value="-d display_errors" />
 			<arg value="-r" />
-			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/${projectBaseName}-${Build.versionNumber}.${build.number}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}-${Build.versionNumber}.${build.number}.phar'); $p->startBuffering(); $p->setStub('${phpStubFileRelease}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main'); $p->compressFiles(Phar::GZ); $p->stopBuffering();" />
+			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/dist/${projectBaseName}-${Build.versionNumber}.${build.number}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}-${Build.versionNumber}.${build.number}.phar'); $p->startBuffering(); $p->setStub('${phpStubFileRelease}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main'); $p->compressFiles(Phar::GZ); $p->stopBuffering();" />
 		</exec>
 
 	</target>

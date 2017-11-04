@@ -7,95 +7,91 @@
  * CopyRight : -> Copyright 2015 Edertone Advanded Solutions (08211 Castellar del Vallès, Barcelona). http://www.edertone.com
  */
  
-namespace org_turbocommons_utils {
  
+import StringUtils from './StringUtils';
+
+    
+/**
+ * Common operations and tools related with numbers
+ */ 
+export default class NumericUtils {
+    
     
     /**
-     * Common operations and tools related with numbers
-     */ 
-    export class NumericUtils {
+     * Tells if the given value is numeric or not
+     *
+     * @param {any} value A value to check
+     *
+     * @returns {boolean} true if the given value is numeric or represents a numeric value, false otherwise
+     */
+    public static isNumeric(value:any):boolean {
         
-        
-        /**
-         * Tells if the given value is numeric or not
-         *
-         * @param {any} value A value to check
-         *
-         * @returns {boolean} true if the given value is numeric or represents a numeric value, false otherwise
-         */
-        public static isNumeric(value:any):boolean {
+        if(StringUtils.isString(value)){
             
-            var StringUtils = org_turbocommons_utils.StringUtils;
-            
-            if(StringUtils.isString(value)){
-                
-                value = String(value).trim();
-            }
-            
-            return !isNaN(parseFloat(value)) && isFinite(value);
+            value = String(value).trim();
         }
         
-        
-        /**
-         * Tells if the given value is a numeric integer or not
-         *
-         * @param {any} value A value to check
-         *
-         * @returns {boolean} true if the given value is a numeric integer or represents a a numeric integer value, false otherwise
-         */
-        public static isInteger(value:any):boolean {
-            
-            if(!NumericUtils.isNumeric(value)){
-
-                return false;
-            }
-
-            return String(value).indexOf('.') < 0;
-        }
-        
-        
-        /**
-         * Get the number represented by the given value
-         *
-         * @param any $value A value to convert to a number
-         *
-         * @returns number The numeric type representation from the given value. For example, a string '0001' will return 1
-         */
-        public static getNumeric(value:any):number {
-        
-            var StringUtils = org_turbocommons_utils.StringUtils;
-            
-            if(NumericUtils.isNumeric(value)){
-
-                return Number(value);
-            }
-
-            throw new Error('NumericUtils.getNumeric : Provided value is not numeric');
-        }
-        
-        
-        /**
-         * Generate a random integer
-         *
-         * @param max highest value to be returned
-         * @param min lowest value to be returned (default: 0)
-         *
-         * @return A random integer value between min (or 0) and max
-         * @throws Exception if max is equal or less than min.
-         */
-        public static generateRandomInteger(max:number, min:number = 0):number {
-            
-            if(!NumericUtils.isInteger(max) || max < 0 || !NumericUtils.isInteger(min) || min < 0){
-
-                throw new Error('NumericUtils.generateRandomInteger : Provided max and min must be positive integers');
-            }
-            
-            if(max <= min){
-
-                throw new Error('NumericUtils.generateRandomInteger : Provided max must be higher than min');
-            }
-            
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }        
+        return !isNaN(parseFloat(value)) && isFinite(value);
     }
+    
+    
+    /**
+     * Tells if the given value is a numeric integer or not
+     *
+     * @param {any} value A value to check
+     *
+     * @returns {boolean} true if the given value is a numeric integer or represents a a numeric integer value, false otherwise
+     */
+    public static isInteger(value:any):boolean {
+        
+        if(!NumericUtils.isNumeric(value)){
+
+            return false;
+        }
+
+        return String(value).indexOf('.') < 0;
+    }
+    
+    
+    /**
+     * Get the number represented by the given value
+     *
+     * @param any $value A value to convert to a number
+     *
+     * @returns number The numeric type representation from the given value. For example, a string '0001' will return 1
+     */
+    public static getNumeric(value:any):number {
+    
+        if(NumericUtils.isNumeric(value)){
+
+            return Number(value);
+        }
+
+        throw new Error('NumericUtils.getNumeric : Provided value is not numeric');
+    }
+    
+    
+    /**
+     * Generate a random integer
+     *
+     * @param max highest value to be returned
+     * @param min lowest value to be returned (default: 0)
+     *
+     * @return A random integer value between min (or 0) and max
+     * @throws Exception if max is equal or less than min.
+     */
+    public static generateRandomInteger(max:number, min:number = 0):number {
+        
+        if(!NumericUtils.isInteger(max) || max < 0 || !NumericUtils.isInteger(min) || min < 0){
+
+            throw new Error('NumericUtils.generateRandomInteger : Provided max and min must be positive integers');
+        }
+        
+        if(max <= min){
+
+            throw new Error('NumericUtils.generateRandomInteger : Provided max must be higher than min');
+        }
+        
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }        
 }
