@@ -1,1 +1,8 @@
-// TODO
+{
+  "extends": [
+    "tslint:recommended"   
+  ],
+  "jsRules": {},
+  "rules": {},
+  "rulesDirectory": []
+}
