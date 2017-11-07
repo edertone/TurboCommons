@@ -82,7 +82,6 @@
 		<property name="Build.Ts.createMergedJs" value="false" />
 		<property name="Build.Ts.compilerStrict" value="true" />
 		<property name="Build.Ts.compilerSourceMap" value="false" />
-		<property name="Build.Ts.compilerTargets" value="ES3,ES5,ES6" />
 
 		<property name="Build.keepUnPackedFiles" value="false" />
 
@@ -118,6 +117,7 @@
 		<property name="Tools.jsDocTemplatePath" value="C:/Program Files/nodejs/node_modules/ink-docstrap/template" />
 		<property name="Tools.phpPath" value="C:/xampp/php/php.exe" />
 		<property name="Tools.tsCompilerPath" value="${user.home}/AppData/Roaming/npm/tsc.cmd" />
+		<property name="Tools.webpackPath" value="${user.home}/AppData/Roaming/npm/webpack.cmd" />
 
 		<property name="Update.builder" value="false" />
 
@@ -309,9 +309,17 @@
 							
 				load(project.getProperty("basedir") + '/Utils.js');
 			
-				var projectBaseName = project.getProperty("projectBaseName");						
-				var targets = project.getProperty("Build.Ts.compilerTargets").split(",");
-				var targetProjectBase = project.getProperty("targetFolderPath") + "/" + project.getProperty("projectBaseName")
+				var targets = [];
+				var targetFileNames = [];
+			
+				if(project.getProperty("Build.Ts.CompilerTarget.target") != null){
+
+					targets = project.getProperty("Build.Ts.CompilerTarget.target").split(",");
+					targetFileNames = project.getProperty("Build.Ts.CompilerTarget.mergedFileName").split(",");
+				}
+							
+				var projectBaseName = project.getProperty("projectBaseName");	
+				var targetProjectBase = project.getProperty("targetFolderPath") + "/" + project.getProperty("projectBaseName");
 				var targetMainPath = targetProjectBase + "/main";
 			
 				// The tsconfig.json file must exist to define the ts files that need to be included in the build and their proper sort
@@ -320,62 +328,75 @@
 					fail = project.createTask("fail");
 		            fail.setMessage("Could not find typescript config file at: " + targetMainPath + '/ts/tsconfig.json');
 		            fail.perform();
-				}				
+				}
 			
-				for(var i=0; i < targets.length; i++){
+				// Generate the Typescript compatible dist		
+				var exec = project.createTask("exec");
+				exec.setFailonerror(true);
+				exec.setExecutable(project.getProperty("Tools.tsCompilerPath"));
 				
-					// Compile the files for the current js target
-					if(project.getProperty("Build.keepUnPackedFiles") == "true"){		
+				if(project.getProperty("Build.Ts.compilerStrict") != "false"){
+					exec.createArg().setLine('--strict');
+				}
+	
+				if(project.getProperty("Build.Ts.compilerDeclarationFile") != "false"){
+					exec.createArg().setLine('--declaration');
+				}
+	
+				if(project.getProperty("Build.Ts.compilerSourceMap") == "true"){
+					exec.createArg().setLine('--sourceMap');
+				}
+	
+				exec.createArg().setLine('--alwaysStrict');				
+				exec.createArg().setLine('--target ES6');
+				exec.createArg().setLine('--outDir "' + targetProjectBase + '/dist/TS"');
+				exec.createArg().setLine('--module commonjs');
+				exec.createArg().setLine('--rootDir "' + targetMainPath + '/ts"'); 		
+				exec.createArg().setLine('--project "' + targetMainPath + '/ts"');							
+				exec.perform();
+			
+				// Generate the javascript versions
+				for(var i=0; i < targets.length; i++){
 					
-						var exec = project.createTask("exec");
-						exec.setFailonerror(true);
-						exec.setExecutable(project.getProperty("Tools.tsCompilerPath"));
-						
-						exec.createArg().setLine('--alwaysStrict');	
-						
-						if(project.getProperty("Build.Ts.compilerStrict") != "false"){
-							exec.createArg().setLine('--strict');
-						}
-			
-						if(project.getProperty("Build.Ts.compilerDeclarationFile") != "false"){
-							exec.createArg().setLine('--declaration');
-						}
-			
-						if(project.getProperty("Build.Ts.compilerSourceMap") == "true"){
-							exec.createArg().setLine('--sourceMap');
-						}
-			
-						exec.createArg().setLine('--target ' + targets[i]);
-						exec.createArg().setLine('--outDir "' + targetMainPath + '/ts-' + targets[i] + '"');
-						exec.createArg().setLine('--rootDir "' + targetMainPath + '/ts"'); 		
-						exec.createArg().setLine('--project "' + targetMainPath + '/ts"');							
-						exec.perform();
+					var exec = project.createTask("exec");
+					exec.setFailonerror(true);
+					exec.setExecutable(project.getProperty("Tools.tsCompilerPath"));
+					
+					if(project.getProperty("Build.Ts.compilerStrict") != "false"){
+						exec.createArg().setLine('--strict');
 					}
-			
-					// Generate the merged JS file for the current target if merged JS is enabled			
-					if(project.getProperty("Build.Ts.createMergedJs") == "true"){
-								
-						exec = project.createTask("exec");
-						exec.setFailonerror(true);
-						exec.setExecutable(project.getProperty("Tools.tsCompilerPath"));
-						
-						if(project.getProperty("Build.Ts.compilerStrict") != "false"){
-							exec.createArg().setLine('--strict');
-						}
-			
-						if(project.getProperty("Build.Ts.compilerDeclarationFile") != "false"){
-							exec.createArg().setLine('--declaration');
-						}
-			
-						if(project.getProperty("Build.Ts.compilerSourceMap") == "true"){
-							exec.createArg().setLine('--sourceMap');
-						}
-			
-						exec.createArg().setLine('--target ' + targets[i]);	
-						exec.createArg().setLine('--outFile "' + targetProjectBase + '/' + projectBaseName + '-' + targets[i] + '.js"');
-						exec.createArg().setLine('--project "' + targetMainPath + '/ts"');							
-						exec.perform();
+		
+					if(project.getProperty("Build.Ts.compilerDeclarationFile") != "false"){
+						exec.createArg().setLine('--declaration');
 					}
+		
+					if(project.getProperty("Build.Ts.compilerSourceMap") == "true"){
+						exec.createArg().setLine('--sourceMap');
+					}
+		
+					exec.createArg().setLine('--alwaysStrict');				
+					exec.createArg().setLine('--target ' + targets[i]);
+					exec.createArg().setLine('--outDir "' + targetProjectBase + '/dist/' + targets[i] + '/tmp"');
+					exec.createArg().setLine('--module commonjs');
+					exec.createArg().setLine('--rootDir "' + targetMainPath + '/ts"'); 		
+					exec.createArg().setLine('--project "' + targetMainPath + '/ts"');							
+					exec.perform();
+							
+					// Generate via webpack the merged JS file for the current target
+					exec = project.createTask("exec");
+					exec.setFailonerror(true);
+					exec.setExecutable(project.getProperty("Tools.webpackPath"));
+					
+					exec.createArg().setLine('"' + targetProjectBase + '/dist/' + targets[i] + '/tmp/index.js"');
+					exec.createArg().setLine('"' + targetProjectBase + '/dist/' + targets[i] + '/' + (targetFileNames[i] == undefined ? projectBaseName : targetFileNames[i]) + '.js"');
+					//exec.createArg().setLine('-p');
+					exec.createArg().setLine('--output-library org_turbocommons');							
+					exec.perform();
+			
+					// Delete temp folder
+					var deltask = project.createTask("delete");
+					deltask.setDir(new java.io.File(targetProjectBase + '/dist/' + targets[i] + '/tmp'));
+					deltask.perform();
 				}
 			
 		    ]]>
@@ -695,6 +716,8 @@
 					fsExcludes.push("**/*.jpg");
 				}
 
+				fsExcludes.push("**/*.phar");
+			
 				if(releaseOptimizePhp == "true"){					
 					fsExcludes.push("**/*.php");
 				}
@@ -772,7 +795,7 @@
 
 		<mkdir dir="${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/doc/php"/>
 
-		<exec executable="${Tools.phpPath}" failonerror="true" outputproperty="createPhpDocOutputRedir">
+		<exec executable="${Tools.phpPath}" failonerror="false" outputproperty="createPhpDocOutputRedir">
 			<arg value="${Tools.phpDocPath}" />
 			<arg value="--template=&quot;responsive-twig&quot;" />
 			<arg value="--visibility=&quot;public&quot;" />
@@ -1067,10 +1090,12 @@
 		<property name="phpStubFile" value="&lt;?php Phar::mapPhar(); include \'phar://${projectBaseName}.phar/php/AutoLoader.php\'; __HALT_COMPILER(); ?>"/>
 
 		<!-- Create the phar using the current project name -->
+		<mkdir dir="${targetFolderPath}/${projectBaseName}/dist"/>
+
 		<exec executable="${Tools.phpPath}" failonerror="true">
 			<arg value="-d display_errors" />
 			<arg value="-r" />
-			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}/${projectBaseName}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}.phar'); $p->startBuffering(); $p->setStub('${phpStubFile}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}/main'); $p->compressFiles(Phar::GZ); $p->stopBuffering();" />
+			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}/dist/${projectBaseName}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}.phar'); $p->startBuffering(); $p->setStub('${phpStubFile}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}/main'); $p->compressFiles(Phar::GZ); $p->stopBuffering();" />
 		</exec>
 
 	</target>
@@ -1082,11 +1107,10 @@
 		<!--Define the contents for the stub file that will be autoexecuted when the phar file is included -->
 		<property name="phpStubFileRelease" value="&lt;?php Phar::mapPhar(); include \'phar://${projectBaseName}-${Build.versionNumber}.${build.number}.phar/php/AutoLoader.php\'; __HALT_COMPILER(); ?>"/>
 
-		<!-- Create the phar using the current project name and version -->
 		<exec executable="${Tools.phpPath}" failonerror="true">
 			<arg value="-d display_errors" />
 			<arg value="-r" />
-			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/${projectBaseName}-${Build.versionNumber}.${build.number}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}-${Build.versionNumber}.${build.number}.phar'); $p->startBuffering(); $p->setStub('${phpStubFileRelease}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main'); $p->compressFiles(Phar::GZ); $p->stopBuffering();" />
+			<arg value="$p = new Phar('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/dist/${projectBaseName}-${Build.versionNumber}.${build.number}.phar', FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME, '${projectBaseName}-${Build.versionNumber}.${build.number}.phar'); $p->startBuffering(); $p->setStub('${phpStubFileRelease}'); $p->buildFromDirectory('${targetFolderPath}/${projectBaseName}-${Build.versionNumber}.${build.number}/main'); $p->compressFiles(Phar::GZ); $p->stopBuffering();" />
 		</exec>
 
 	</target>
