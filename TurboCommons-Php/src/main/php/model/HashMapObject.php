@@ -49,7 +49,7 @@ class HashMapObject{
      * Structure that contains the HashMapObject data
      * @var array
      */
-    protected $_array = [];
+    protected $_data = [];
 
 
     /**
@@ -62,7 +62,9 @@ class HashMapObject{
     /**
      * An Object that defines a sorted collection of key/value pairs and all their related operations.
      *
-     * @param array $data List of values that will be added to the HashMapObject
+     * @param array $data A value that will be used to initialize the HashMapObject. It can be an associative array
+     * (where each key/value will be directly assigned to the HashMap), or a plain array in which case the keys will be
+     * copied from each element numeric index
      */
     public function __construct(array $data = null){
 
@@ -109,9 +111,9 @@ class HashMapObject{
         // This should be a call to $this->_validateKeyFormat but we inline it here to get a big performance improvement
         if(is_string($key) && str_replace([' ', "\n", "\r", "\t"], '', $key) !== ''){
 
-            $this->_array[$key] = $value;
+            $this->_data[$key] = $value;
 
-            $this->_length = count($this->_array);
+            $this->_length = count($this->_data);
 
             return $value;
         }
@@ -141,9 +143,9 @@ class HashMapObject{
      */
     public function get($key){
 
-        if(array_key_exists($key, $this->_array)){
+        if(array_key_exists($key, $this->_data)){
 
-            return $this->_array[$key];
+            return $this->_data[$key];
         }
 
         throw new InvalidArgumentException('HashMapObject->get: key does not exist or is invalid');
@@ -158,7 +160,7 @@ class HashMapObject{
     public function getKeys(){
 
         $result = [];
-        $keys = array_keys($this->_array);
+        $keys = array_keys($this->_data);
 
         // Keys must be strictly converted to strings
         foreach ($keys as $k) {
@@ -199,7 +201,7 @@ class HashMapObject{
     public function isKey($key){
 
 
-        return is_string($key) && array_key_exists($key, $this->_array);
+        return is_string($key) && array_key_exists($key, $this->_data);
     }
 
 
@@ -213,11 +215,11 @@ class HashMapObject{
      */
     public function remove($key){
 
-        if(array_key_exists($key, $this->_array)){
+        if(array_key_exists($key, $this->_data)){
 
-            $value = $this->_array[$key];
+            $value = $this->_data[$key];
 
-            unset($this->_array[$key]);
+            unset($this->_data[$key]);
 
             $this->_length -= 1;
 
@@ -258,15 +260,15 @@ class HashMapObject{
 
                 if($k == $key){
 
-                    $result[$newKey] = $this->_array[$key];
+                    $result[$newKey] = $this->_data[$key];
 
                 }else{
 
-                    $result[$k] = $this->_array[$k];
+                    $result[$k] = $this->_data[$k];
                 }
             }
 
-            $this->_array = $result;
+            $this->_data = $result;
 
             return true;
 
@@ -319,12 +321,12 @@ class HashMapObject{
                     break;
 
                 default:
-                    $result[$k] = $this->_array[$k];
+                    $result[$k] = $this->_data[$k];
                     break;
             }
         }
 
-        $this->_array = $result;
+        $this->_data = $result;
 
         return true;
     }
@@ -360,12 +362,12 @@ class HashMapObject{
 
         if($order === self::SORT_ORDER_ASCENDING){
 
-            return ksort($this->_array, $methodFlag);
+            return ksort($this->_data, $methodFlag);
         }
 
         if($order === self::SORT_ORDER_DESCENDING){
 
-            return krsort($this->_array, $methodFlag);
+            return krsort($this->_data, $methodFlag);
         }
 
         throw new InvalidArgumentException('HashMapObject->sortByKey: Unknown sort order');
@@ -403,12 +405,12 @@ class HashMapObject{
 
         if($order === self::SORT_ORDER_ASCENDING){
 
-            return asort($this->_array, $methodFlag);
+            return asort($this->_data, $methodFlag);
         }
 
         if($order === self::SORT_ORDER_DESCENDING){
 
-            return arsort($this->_array, $methodFlag);
+            return arsort($this->_data, $methodFlag);
         }
 
         throw new InvalidArgumentException('HashMapObject->sortByValue: Unknown sort order');
@@ -430,7 +432,7 @@ class HashMapObject{
 
         $this->_length -= 1;
 
-        return array_shift($this->_array);
+        return array_shift($this->_data);
     }
 
 
@@ -449,7 +451,7 @@ class HashMapObject{
 
         $this->_length -= 1;
 
-        return array_pop($this->_array);
+        return array_pop($this->_data);
     }
 
 
@@ -460,7 +462,7 @@ class HashMapObject{
      */
     public function reverse(){
 
-        $this->_array = array_reverse($this->_array);
+        $this->_data = array_reverse($this->_data);
 
         return true;
     }
