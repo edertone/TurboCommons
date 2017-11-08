@@ -82,7 +82,6 @@
 		<property name="Build.Ts.createMergedJs" value="false" />
 		<property name="Build.Ts.compilerStrict" value="true" />
 		<property name="Build.Ts.compilerSourceMap" value="false" />
-		<property name="Build.Ts.compilerTargets" value="ES3,ES5,ES6" />
 
 		<property name="Build.keepUnPackedFiles" value="false" />
 
@@ -118,6 +117,7 @@
 		<property name="Tools.jsDocTemplatePath" value="C:/Program Files/nodejs/node_modules/ink-docstrap/template" />
 		<property name="Tools.phpPath" value="C:/xampp/php/php.exe" />
 		<property name="Tools.tsCompilerPath" value="${user.home}/AppData/Roaming/npm/tsc.cmd" />
+		<property name="Tools.webpackPath" value="${user.home}/AppData/Roaming/npm/webpack.cmd" />
 
 		<property name="Update.builder" value="false" />
 
@@ -309,9 +309,19 @@
 							
 				load(project.getProperty("basedir") + '/Utils.js');
 			
-				var projectBaseName = project.getProperty("projectBaseName");						
-				var targets = project.getProperty("Build.Ts.compilerTargets").split(",");
-				var targetProjectBase = project.getProperty("targetFolderPath") + "/" + project.getProperty("projectBaseName")
+				var targets = [];
+				var targetFileNames = [];
+				var targetGlobalVars = [];
+			
+				if(project.getProperty("Build.Ts.CompilerTarget.target") != null){
+
+					targets = project.getProperty("Build.Ts.CompilerTarget.target").split(",");
+					targetFileNames = project.getProperty("Build.Ts.CompilerTarget.mergedFileName").split(",");
+					targetGlobalVars = project.getProperty("Build.Ts.CompilerTarget.globalVar").split(",");
+				}
+							
+				var projectBaseName = project.getProperty("projectBaseName");	
+				var targetProjectBase = project.getProperty("targetFolderPath") + "/" + project.getProperty("projectBaseName");
 				var targetMainPath = targetProjectBase + "/main";
 			
 				// The tsconfig.json file must exist to define the ts files that need to be included in the build and their proper sort
@@ -320,12 +330,36 @@
 					fail = project.createTask("fail");
 		            fail.setMessage("Could not find typescript config file at: " + targetMainPath + '/ts/tsconfig.json');
 		            fail.perform();
-				}				
+				}
 			
-				for(var i=0; i < targets.length; i++){
+				// Generate the Typescript compatible dist		
+				var exec = project.createTask("exec");
+				exec.setFailonerror(true);
+				exec.setExecutable(project.getProperty("Tools.tsCompilerPath"));
 				
-					// Generate the module package
+				if(project.getProperty("Build.Ts.compilerStrict") != "false"){
+					exec.createArg().setLine('--strict');
+				}
+	
+				if(project.getProperty("Build.Ts.compilerDeclarationFile") != "false"){
+					exec.createArg().setLine('--declaration');
+				}
+	
+				if(project.getProperty("Build.Ts.compilerSourceMap") == "true"){
+					exec.createArg().setLine('--sourceMap');
+				}
+	
+				exec.createArg().setLine('--alwaysStrict');				
+				exec.createArg().setLine('--target ES6');
+				exec.createArg().setLine('--outDir "' + targetProjectBase + '/dist/TS"');
+				exec.createArg().setLine('--module commonjs');
+				exec.createArg().setLine('--rootDir "' + targetMainPath + '/ts"'); 		
+				exec.createArg().setLine('--project "' + targetMainPath + '/ts"');							
+				exec.perform();
 			
+				// Generate the javascript versions
+				for(var i=0; i < targets.length; i++){
+					
 					var exec = project.createTask("exec");
 					exec.setFailonerror(true);
 					exec.setExecutable(project.getProperty("Tools.tsCompilerPath"));
@@ -344,39 +378,27 @@
 		
 					exec.createArg().setLine('--alwaysStrict');				
 					exec.createArg().setLine('--target ' + targets[i]);
-					exec.createArg().setLine('--outDir "' + targetProjectBase + '/dist/' + targets[i] + '/commonjs"');
+					exec.createArg().setLine('--outDir "' + targetProjectBase + '/dist/' + targets[i] + '/tmp"');
 					exec.createArg().setLine('--module commonjs');
 					exec.createArg().setLine('--rootDir "' + targetMainPath + '/ts"'); 		
 					exec.createArg().setLine('--project "' + targetMainPath + '/ts"');							
 					exec.perform();
 							
-					// Generate the merged JS file for the current target if merged JS is enabled			
-					// TODO -right now, the only compilation that works is the dist/TS folder. JS merged files must be reviewed and re investigated
-						
-					/* if(project.getProperty("Build.Ts.createMergedJs") == "true"){
-								
-						exec = project.createTask("exec");
-						exec.setFailonerror(true);
-						exec.setExecutable(project.getProperty("Tools.tsCompilerPath"));
-						
-						if(project.getProperty("Build.Ts.compilerStrict") != "false"){
-							exec.createArg().setLine('--strict');
-						}
+					// Generate via webpack the merged JS file for the current target
+					exec = project.createTask("exec");
+					exec.setFailonerror(true);
+					exec.setExecutable(project.getProperty("Tools.webpackPath"));
+					
+					exec.createArg().setLine('"' + targetProjectBase + '/dist/' + targets[i] + '/tmp/index.js"');
+					exec.createArg().setLine('"' + targetProjectBase + '/dist/' + targets[i] + '/' + (targetFileNames[i] == undefined ? projectBaseName : targetFileNames[i]) + '.js"');
+					exec.createArg().setLine('--output-library ' + targetGlobalVars[i]);							
+					exec.setOutputproperty('devnull');
+					exec.perform();
 			
-						if(project.getProperty("Build.Ts.compilerDeclarationFile") != "false"){
-							exec.createArg().setLine('--declaration');
-						}
-			
-						if(project.getProperty("Build.Ts.compilerSourceMap") == "true"){
-							exec.createArg().setLine('--sourceMap');
-						}
-			
-						exec.createArg().setLine('--target ' + targets[i]);	
-						exec.createArg().setLine('--module amd');
-						exec.createArg().setLine('--outFile "' + targetProjectBase + '/dist/' + targets[i] + '/glob/' + projectBaseName + '-' + targets[i] + '.js"');
-						exec.createArg().setLine('--project "' + targetMainPath + '/ts"');							
-						exec.perform();
-					}*/
+					// Delete temp folder
+					var deltask = project.createTask("delete");
+					deltask.setDir(new java.io.File(targetProjectBase + '/dist/' + targets[i] + '/tmp'));
+					deltask.perform();
 				}
 			
 		    ]]>
@@ -587,26 +609,42 @@
 				var projectBaseName = project.getProperty("projectBaseName");
 				var buildVersionNumber = project.getProperty("Build.versionNumber");
 				var buildNumber = project.getProperty("build.number");
-				var targets = project.getProperty("Test.Ts.targets").split(",");
+			
+				var targetsToRun = project.getProperty("Test.Ts.targets").split(",");
+				var targets = [];
+				var targetFileNames = [];
+			
+				if(project.getProperty("Build.Ts.CompilerTarget.target") != null){
+
+					targets = project.getProperty("Build.Ts.CompilerTarget.target").split(",");
+					targetFileNames = project.getProperty("Build.Ts.CompilerTarget.mergedFileName").split(",");
+				}
+			
 				
 				for(var i=0; i < targets.length; i++){
 					
-					// Copy all the test files to local server on the current target
+					if(targetsToRun.indexOf(targets[i]) == -1){
+			
+						continue;
+					}
+			
+					// Copy all the test files structure to local server on the current target
 					copyFolderTo(project.getProperty("srcFolderPath") + '/test/ts', localServerPath + '/' + projectBaseName + '-unitTests/ts-' + targets[i]);
 			
+					// Add the compiled js project to the tests index file
 					var fs = project.createDataType("fileset");
 					
 					fs.setCaseSensitive(false);
 					
 					if(project.getProperty("Release.generate") == "true"){
 			
-						fs.setDir(new java.io.File(targetFolderPath + '/' + projectBaseName + '-' + buildVersionNumber + '.' + buildNumber));
-						fs.setIncludes(projectBaseName + '-' + targets[i] + '-' + buildVersionNumber + '.' + buildNumber + '.min.js');
+						fs.setDir(new java.io.File(targetFolderPath + '/' + projectBaseName + '-' + buildVersionNumber + '.' + buildNumber + '/dist/' + targets[i]));
+						fs.setIncludes(targetFileNames[i] + '-' + buildVersionNumber + '.' + buildNumber + '.js');
 	
 					}else{
 						
-						fs.setDir(new java.io.File(targetFolderPath + '/' + projectBaseName));
-						fs.setIncludes(projectBaseName + '-' + targets[i] + '.js');
+						fs.setDir(new java.io.File(targetFolderPath + '/' + projectBaseName + '/dist/' + targets[i]));
+						fs.setIncludes(targetFileNames[i] + '.js');
 					}
 				
 					var concat = project.createDataType("concat");
@@ -749,20 +787,15 @@
 				// Rename the merged files if exist to add the version number
 				var fs = project.createDataType("fileset");
 				
-				fs.setDir(new java.io.File(releaseFolderPath));
-				fs.setIncludes(projectBaseName + "*.js");
+				fs.setDir(new java.io.File(releaseFolderPath + '/dist'));
+				fs.setIncludes("**/*.js");
+				fs.setExcludes("TS/**");
 				   
 			    var mergedFiles = fs.getDirectoryScanner(project).getIncludedFiles();
 			    
 			    for (var i = 0; i < mergedFiles.length; i++){
 			        
-					if(releaseOptimizeJs == "true"){
-			
-						renameFile(releaseFolderPath + '/' + mergedFiles[i], releaseFolderPath + '/' + mergedFiles[i].substring(0, mergedFiles[i].length - 3) + "-" + buildVersionNumber + "." + buildNumber + '.min.js');
-						copyFileTo(targetFolderPath + '/' + projectBaseName + '/' + mergedFiles[i], releaseFolderPath);
-					}
-					
-					renameFile(releaseFolderPath + '/' + mergedFiles[i], releaseFolderPath + '/' + mergedFiles[i].substring(0, mergedFiles[i].length - 3) + "-" + buildVersionNumber + "." + buildNumber + '.js');
+					renameFile(releaseFolderPath + '/dist/' + mergedFiles[i], releaseFolderPath + '/dist/' + mergedFiles[i].substring(0, mergedFiles[i].length - 3) + "-" + buildVersionNumber + "." + buildNumber + '.js');
 				}
 		    ]]>
 		</script>

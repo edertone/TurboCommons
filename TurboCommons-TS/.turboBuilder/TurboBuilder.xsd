@@ -128,6 +128,47 @@
 								
 								<xs:complexType>
 								
+                                    <xs:sequence>
+                        
+                                        <!-- CompilerTarget element -->
+                                        <xs:element name="CompilerTarget" minOccurs="0" maxOccurs="unbounded">
+                                            
+                                            <xs:annotation>
+                                                <xs:documentation>TODO</xs:documentation>
+                                            </xs:annotation>
+                                            
+                                            <xs:complexType>
+                                            
+                                                <xs:attribute name="target" use="required" type="xs:string">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            TODO
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:attribute>
+                                                
+                                                <xs:attribute name="mergedFileName" use="required" type="xs:string">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            TODO
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:attribute> 
+                                                
+                                                <xs:attribute name="globalVar" use="required" type="xs:string">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            TODO
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:attribute>   
+                                                                                
+                                            </xs:complexType>
+                                            
+                                        </xs:element>
+                                    
+                                    </xs:sequence>
+                                
 									<xs:attribute name="enabled" use="required" type="xs:boolean">
 										<xs:annotation>
 											<xs:documentation>
@@ -136,24 +177,6 @@
 										</xs:annotation>
 									</xs:attribute>
 									
-									<xs:attribute name="createMergedJs" use="required" type="xs:boolean">
-										<xs:annotation>
-											<xs:documentation>
-												Generate a .js file on the target folder containing all the compiled ts files merged. 
-												A separate file will be generated for each one of the defined compiler targets.
-												These files can then be easily distributed or used on other projects.
-											</xs:documentation>
-										</xs:annotation>
-									</xs:attribute>
-                                    
-                                    <xs:attribute name="createMergedTs" use="optional" default="false" type="xs:boolean">
-                                        <xs:annotation>
-                                            <xs:documentation>
-                                                Generate a .ts file on the target folder containing all the ts files merged so the project can be easily distributed in pure Typescript format
-                                            </xs:documentation>
-                                        </xs:annotation>
-                                    </xs:attribute>
-								
 									<xs:attribute name="compilerDeclarationFile" use="required" type="xs:boolean">
 										<xs:annotation>
 											<xs:documentation>Enable or disable the generation of d.ts files as part of the compilation process. These files allow us to use the compiled javascript source in other ts projects while retaining type information.</xs:documentation>
@@ -169,14 +192,6 @@
 									<xs:attribute name="compilerSourceMap" use="required" type="xs:boolean">
 										<xs:annotation>
 											<xs:documentation>TODO - this description is missing</xs:documentation>
-										</xs:annotation>
-									</xs:attribute>
-									
-									<xs:attribute name="compilerTargets" use="required" type="xs:string">
-										<xs:annotation>
-											<xs:documentation>
-												Defines the javascript language versions that will be generated when compiling the ts files (Each language version will be generated independently).
-											</xs:documentation>
 										</xs:annotation>
 									</xs:attribute>
 																											
