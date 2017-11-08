@@ -155,13 +155,13 @@ class HashMapObjectTest extends TestCase {
         // Tested with exceptions
 
         // Test exceptions
-        $this->exceptionValues = [123, 'hello', new Exception(), -1, 0.23];
-        $this->exceptionValuesCount = count($this->exceptionValues);
+        $exceptionValues = [123, 'hello', new Exception(), -1, 0.23];
+        $exceptionValuesCount = count($exceptionValues);
 
-        for ($i = 0; $i < $this->exceptionValuesCount; $i++) {
+        for ($i = 0; $i < $exceptionValuesCount; $i++) {
 
             try {
-                $test = new HashMapObject($this->exceptionValues[$i]);
+                $test = new HashMapObject($exceptionValues[$i]);
                 $this->exceptionMessage = 'exception value did not cause exception';
             } catch (Throwable $e) {
                 // We expect an exception to happen
