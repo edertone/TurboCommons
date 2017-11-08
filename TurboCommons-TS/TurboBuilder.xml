@@ -3,13 +3,19 @@
 			xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/edertone/TurboBuilder/master/TurboBuilder-Ant/turboBuilder/TurboBuilder.xsd">
 
 	<Build>
-	
-		<Ts enabled="true"
-			createMergedJs="true"
-			compilerDeclarationFile="true"
-			compilerStrict="true"
-			compilerSourceMap="false"
-			compilerTargets="ES3,ES5,ES6" />
+	            
+        <Ts enabled="true"
+            compilerDeclarationFile="true"
+            compilerStrict="true"
+            compilerSourceMap="true">
+        
+            <CompilerTarget target="ES3" mergedFileName="TurboCommons-ES3" globalVar="org_turbocommons" />
+            
+            <CompilerTarget target="ES5" mergedFileName="TurboCommons-ES5" globalVar="org_turbocommons" />
+            
+            <CompilerTarget target="ES6" mergedFileName="TurboCommons-ES6" globalVar="org_turbocommons" />
+            
+        </Ts>
 		   
 	</Build>
 
@@ -17,11 +23,6 @@
 	
 	<Validate enabled="true">
 	
-		<TsNamespaces enabled="true"
-				   	  mandatory="true"		
-				   	  mustContain="org_turbocommons_,$1"
-				   	  excludes="**/test/**" />
-				   	  
 		<CopyrightHeaders enabled="true">
 		
 			<Header path="support/copyrightHeaders/TsFiles-Header.txt" 
