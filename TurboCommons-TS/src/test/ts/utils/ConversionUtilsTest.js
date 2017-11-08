@@ -12,7 +12,7 @@
 QUnit.module("ConversionUtilsTest", {
     beforeEach : function() {
 
-        window.ConversionUtils = org_turbocommons_utils.ConversionUtils;
+        window.ConversionUtils = org_turbocommons.ConversionUtils;
     },
 
     afterEach : function() {

@@ -12,8 +12,8 @@
 QUnit.module("ObjectUtilsTest", {
     beforeEach : function() {
 
-        window.ArrayUtils = org_turbocommons_utils.ArrayUtils;
-        window.ObjectUtils = org_turbocommons_utils.ObjectUtils;
+        window.ArrayUtils = org_turbocommons.ArrayUtils;
+        window.ObjectUtils = org_turbocommons.ObjectUtils;
     },
 
     afterEach : function() {

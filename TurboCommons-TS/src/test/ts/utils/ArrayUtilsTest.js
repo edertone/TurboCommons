@@ -12,7 +12,7 @@
 QUnit.module("ArrayUtilsTest", {
     beforeEach : function() {
 
-        window.ArrayUtils = org_turbocommons_utils.ArrayUtils;
+        window.ArrayUtils = org_turbocommons.ArrayUtils;
     },
 
     afterEach : function() {

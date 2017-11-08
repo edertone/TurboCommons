@@ -12,8 +12,8 @@
 QUnit.module("ValidationManagerTest", {
     beforeEach : function() {
 
-        window.ValidationManager = org_turbocommons_managers.ValidationManager;
-        window.validationManager = new org_turbocommons_managers.ValidationManager();
+        window.ValidationManager = org_turbocommons.ValidationManager;
+        window.validationManager = new org_turbocommons.ValidationManager();
     },
 
     afterEach : function() {

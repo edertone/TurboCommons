@@ -12,7 +12,7 @@
 QUnit.module("NumericUtilsTest", {
     beforeEach : function(){
 
-        window.NumericUtils = org_turbocommons_utils.NumericUtils;
+        window.NumericUtils = org_turbocommons.NumericUtils;
     },
 
     afterEach : function(){
