@@ -399,7 +399,14 @@ QUnit.test("formatUrl", function(assert) {
     assert.ok(StringUtils.formatUrl('foo.com/blah_blah/') === 'http://foo.com/blah_blah/');
     assert.ok(StringUtils.formatUrl('ftp://test.com   ') === 'ftp://test.com');
     assert.ok(StringUtils.formatUrl('http:\\\\test.com') === 'http://test.com');
-
+    assert.ok(StringUtils.formatUrl('https://angular.io/guide/http') === 'https://angular.io/guide/http');
+    assert.ok(StringUtils.formatUrl('https://angular.io\\guide/http') === 'https://angular.io/guide/http');
+    assert.ok(StringUtils.formatUrl('https://angular.io\\guide/////http') === 'https://angular.io/guide/http');
+    assert.ok(StringUtils.formatUrl('https://angular.io/api/common/http/HttpErrorResponse') === 'https://angular.io/api/common/http/HttpErrorResponse');
+    assert.ok(StringUtils.formatUrl('https://www.youtube.com/watch?v=dp5hsDgENLk&feature=youtu.be') === 'https://www.youtube.com/watch?v=dp5hsDgENLk&feature=youtu.be');
+    assert.ok(StringUtils.formatUrl('https://www.ovh.com/auth/?action=gotomanager&from=https://www.ovh.es/') === 'https://www.ovh.com/auth/?action=gotomanager&from=https://www.ovh.es/');
+    assert.ok(StringUtils.formatUrl('https://stackoverflow.com/questions/10161177/url-with-multiple-forward-slashes-does-it-break-anything') === 'https://stackoverflow.com/questions/10161177/url-with-multiple-forward-slashes-does-it-break-anything');
+        
     // Format incorrect urls
     assert.ok(StringUtils.formatUrl('        ') === '        ');
     assert.ok(StringUtils.formatUrl('123f56ccaca') === '123f56ccaca');

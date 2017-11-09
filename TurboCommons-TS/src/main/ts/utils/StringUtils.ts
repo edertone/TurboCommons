@@ -451,7 +451,7 @@ export class StringUtils {
      */
     public static formatPath(path:string):string {
     
-       var osSeparator:string = '/';
+        var osSeparator:string = '/';
 
         if(path == null || path == undefined){
 
@@ -500,6 +500,7 @@ export class StringUtils {
      */
     public static formatUrl(url:string) {
         
+        var urlSeparator:string = '/';
         var validationManager = new ValidationManager();
 
         if(url == null || url == undefined || url == ''){
@@ -519,9 +520,20 @@ export class StringUtils {
 
         // Trim and replace all slashes on the url with the correct url slash
         url = url.trim();
-        url = url.replace(/\//g, '/');
-        url = url.replace(/\\/g, '/');
+        url = url.replace(/\//g, urlSeparator);
+        url = url.replace(/\\/g, urlSeparator);
+        
+        // Remove duplicate path separator characters. We replace :// with @@
+        // to prevent the first two // from being replaced with a single one
+        url = url.replace(/\:\/\//g, '@@@');
+        
+        while(url.indexOf(urlSeparator + urlSeparator) >= 0) {
 
+            url = url.replace(urlSeparator + urlSeparator, urlSeparator);
+        }
+
+        url = url.replace(/@@@/g, '://');
+        
         // get the url scheme
         var scheme:string = this.getSchemeFromUrl(url);
 
