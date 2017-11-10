@@ -360,6 +360,7 @@
 				// Generate the javascript versions
 				for(var i=0; i < targets.length; i++){
 					
+					// Compile the typescript project with the current JS target into a temp folder
 					var exec = project.createTask("exec");
 					exec.setFailonerror(true);
 					exec.setExecutable(project.getProperty("Tools.tsCompilerPath"));
@@ -383,8 +384,8 @@
 					exec.createArg().setLine('--rootDir "' + targetMainPath + '/ts"'); 		
 					exec.createArg().setLine('--project "' + targetMainPath + '/ts"');							
 					exec.perform();
-							
-					// Generate via webpack the merged JS file for the current target
+			
+					// Generate via webpack the merged JS file for the current target		
 					exec = project.createTask("exec");
 					exec.setFailonerror(true);
 					exec.setExecutable(project.getProperty("Tools.webpackPath"));
@@ -392,6 +393,12 @@
 					exec.createArg().setLine('"' + targetProjectBase + '/dist/' + targets[i] + '/tmp/index.js"');
 					exec.createArg().setLine('"' + targetProjectBase + '/dist/' + targets[i] + '/' + (targetFileNames[i] == undefined ? projectBaseName : targetFileNames[i]) + '.js"');
 					exec.createArg().setLine('--output-library ' + targetGlobalVars[i]);							
+					
+					if(project.getProperty("Build.Ts.compilerSourceMap") == "true"){
+						createFile(targetProjectBase + '/dist/' + targets[i] + '/tmp/webpack.config.js', "module.exports = {devtool: 'source-map'};");
+						exec.createArg().setLine('--config "' + targetProjectBase + '/dist/' + targets[i] + '/tmp/webpack.config.js"');		
+					}
+			
 					exec.setOutputproperty('devnull');
 					exec.perform();
 			
@@ -652,6 +659,24 @@
 					concat.addFileset(fs);
 					concat.setAppend(false);
 					concat.perform();
+			
+					// Copy source maps if exist to the local server so browsers can read them
+					var mapFile = targetFolderPath + '/' + projectBaseName + '/dist/' + targets[i] + '/' + targetFileNames[i] + '.js.map';
+					if(fileExists(mapFile)){
+						copyFileTo(mapFile, localServerPath + '/' + projectBaseName + '-unitTests/ts-' + targets[i] + '/');
+					}
+			
+					mapFile = targetFolderPath + '/' + projectBaseName + '/dist/' + targets[i] + '/' + targetFileNames[i] + '-' + buildVersionNumber + '.' + buildNumber + '.js.map';
+					if(fileExists(mapFile)){
+						copyFileTo(mapFile, localServerPath + '/' + projectBaseName + '-unitTests/ts-' + targets[i] + '/');
+					}
+			
+					// Add two blank lines to the index file to prevent errors when adding the tests
+					var echo = project.createTask("echo");
+			    	echo.setFile(new java.io.File(localServerPath + '/' + projectBaseName + '-unitTests/ts-' + targets[i] + '/index.js'));
+					echo.setAppend(true);
+			    	echo.setMessage("\n\n\n");
+			    	echo.perform();
 			
 					// Append all the tests to the index.js file 
 					var fs = project.createDataType("fileset");

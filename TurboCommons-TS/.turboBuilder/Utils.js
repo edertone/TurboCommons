@@ -11,16 +11,16 @@
  * Check that the specified value is found inside an array
  */
 function inArray(value, array){
-	
-	for(var i = 0; i < array.length; i++){
-		
-		if(array[i] === value){
-			
-			return true;
-		}
-	}
-	
-	return false;
+
+    for(var i = 0; i < array.length; i++){
+
+        if(array[i] === value){
+
+            return true;
+        }
+    }
+
+    return false;
 }
 
 
@@ -29,18 +29,18 @@ function inArray(value, array){
  */
 function fileExists(path){
 
-	try{
-	
-		var f = new java.io.File(path);
-	    
-		return f.exists();
-		
-	}catch(e){
+    try{
 
-		// Nothing to do
-	}
-	
-	return false;
+        var f = new java.io.File(path);
+
+        return f.exists();
+
+    }catch(e){
+
+        // Nothing to do
+    }
+
+    return false;
 }
 
 
@@ -49,26 +49,26 @@ function fileExists(path){
  */
 function loadFileAsString(path, replaceWhiteSpaces){
 
-	var file = new java.io.File(path);
-	var fr = new java.io.FileReader(file);
-	var br = new java.io.BufferedReader(fr);
+    var file = new java.io.File(path);
+    var fr = new java.io.FileReader(file);
+    var br = new java.io.BufferedReader(fr);
 
-	var line;
-	var lines = "";
+    var line;
+    var lines = "";
 
-	while((line = br.readLine()) != null){
+    while((line = br.readLine()) != null){
 
-		if(replaceWhiteSpaces){
+        if(replaceWhiteSpaces){
 
-			lines = lines + line.replace(" ", "");
+            lines = lines + line.replace(" ", "");
 
-		}else{
+        }else{
 
-			lines = lines + line;
-		}
-	}
+            lines = lines + line;
+        }
+    }
 
-	return lines;
+    return lines;
 }
 
 
@@ -82,21 +82,21 @@ function loadFileAsString(path, replaceWhiteSpaces){
  * resulting folders may be like "php", "css", ... and so.
  */
 function getFoldersList(path){
-	
-	var ds = project.createDataType("dirset");
-	
-	ds.setDir(new java.io.File(path));
-	ds.setIncludes("*");
-	
-	var srcFolders = ds.getDirectoryScanner(project).getIncludedDirectories();
-    
+
+    var ds = project.createDataType("dirset");
+
+    ds.setDir(new java.io.File(path));
+    ds.setIncludes("*");
+
+    var srcFolders = ds.getDirectoryScanner(project).getIncludedDirectories();
+
     var result = [];
-    
-    for (var i = 0; i<srcFolders.length; i++){
-        
-    	result.push(srcFolders[i]);
+
+    for(var i = 0; i < srcFolders.length; i++){
+
+        result.push(srcFolders[i]);
     }
-    
+
     return result;
 }
 
@@ -113,34 +113,34 @@ function getFoldersList(path){
  * resulting files may be like "php/managers/BigManager.php", ... and so.
  */
 function getFilesList(path, includes, excludes){
-	
-	// Init default vars values
-	includes = (includes === undefined || includes == null || includes == '') ? "**" : includes;
-	excludes = (excludes === undefined || excludes == null || excludes == '') ? "" : excludes;
-	
-	var fs = project.createDataType("fileset");
-	
-	fs.setDir(new java.io.File(path));
-    
-	if(includes != ""){
-	
-		fs.setIncludes(includes);
-	}	
-    
+
+    // Init default vars values
+    includes = (includes === undefined || includes == null || includes == '') ? "**" : includes;
+    excludes = (excludes === undefined || excludes == null || excludes == '') ? "" : excludes;
+
+    var fs = project.createDataType("fileset");
+
+    fs.setDir(new java.io.File(path));
+
+    if(includes != ""){
+
+        fs.setIncludes(includes);
+    }
+
     if(excludes != ""){
-    
-    	fs.setExcludes(excludes);
-    }    
+
+        fs.setExcludes(excludes);
+    }
 
     var srcFiles = fs.getDirectoryScanner(project).getIncludedFiles();
-    
+
     var result = [];
-    
-    for (var i = 0; i<srcFiles.length; i++){
-        
-    	result.push(srcFiles[i]);
+
+    for(var i = 0; i < srcFiles.length; i++){
+
+        result.push(srcFiles[i]);
     }
-    
+
     return result;
 }
 
@@ -154,17 +154,17 @@ function getFilesList(path, includes, excludes){
  * @returns void
  */
 function copyFolderTo(source, dest){
-	
-	var fs = project.createDataType("fileset");
 
-	fs.setDir(new java.io.File(source));
-    	
-	var copy = project.createTask("copy");
-	
-	copy.setTodir(new java.io.File(dest));
-	copy.setOverwrite(true);
-	copy.addFileset(fs);
-	copy.perform();
+    var fs = project.createDataType("fileset");
+
+    fs.setDir(new java.io.File(source));
+
+    var copy = project.createTask("copy");
+
+    copy.setTodir(new java.io.File(dest));
+    copy.setOverwrite(true);
+    copy.addFileset(fs);
+    copy.perform();
 }
 
 
@@ -177,13 +177,13 @@ function copyFolderTo(source, dest){
  * @returns void
  */
 function copyFileTo(source, dest){
-	
-	var copy = project.createTask("copy");
-	
-	copy.setFile(new java.io.File(source));
-	copy.setTodir(new java.io.File(dest));
-	copy.setOverwrite(true);
-	copy.perform();
+
+    var copy = project.createTask("copy");
+
+    copy.setFile(new java.io.File(source));
+    copy.setTodir(new java.io.File(dest));
+    copy.setOverwrite(true);
+    copy.perform();
 }
 
 
@@ -196,12 +196,17 @@ function copyFileTo(source, dest){
  * @returns void
  */
 function createFile(path, contents){
-	
-	var echo = project.createTask("echo");
-	
-	echo.setFile(new java.io.File(path));
-	echo.setMessage(contents);
-	echo.perform();
+
+    var touch = project.createTask("touch");
+
+    touch.setFile(new java.io.File(path));
+    touch.perform();
+
+    var echo = project.createTask("echo");
+
+    echo.setFile(new java.io.File(path));
+    echo.setMessage(contents);
+    echo.perform();
 }
 
 
@@ -214,12 +219,12 @@ function createFile(path, contents){
  * @returns void
  */
 function renameFile(from, to){
-	
-	var move = project.createTask("move");
-	
-	move.setFile(new java.io.File(from));
-	move.setTofile(new java.io.File(to));
-	move.perform();
+
+    var move = project.createTask("move");
+
+    move.setFile(new java.io.File(from));
+    move.setTofile(new java.io.File(to));
+    move.perform();
 }
 
 
@@ -232,12 +237,12 @@ function renameFile(from, to){
  * @returns void
  */
 function launchOnBrowser(url, browserExecutable){
-	
-	var exec = project.createTask("exec");
-	exec.setExecutable(browserExecutable);
-	exec.setSpawn(true);
 
-	exec.createArg().setLine(encodeURI(url));
-	
-	exec.perform();
+    var exec = project.createTask("exec");
+    exec.setExecutable(browserExecutable);
+    exec.setSpawn(true);
+
+    exec.createArg().setLine(encodeURI(url));
+
+    exec.perform();
 }
