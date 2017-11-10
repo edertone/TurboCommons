@@ -106,13 +106,13 @@ class HashMapObjectTest extends TestCase {
         $test = new HashMapObject([]);
         $this->assertTrue($test->length() === 0);
 
-        $this->emptyValues = ['', new stdClass(), '     ', "\n\n\n", 0];
-        $this->emptyValuesCount = count($this->emptyValues);
+        $exceptionEmptyValues = ['', new stdClass(), '     ', "\n\n\n", 0];
+        $exceptionEmptyValuesCount = count($exceptionEmptyValues);
 
-        for ($i = 0; $i < $this->emptyValuesCount; $i++) {
+        for ($i = 0; $i < $exceptionEmptyValuesCount; $i++) {
 
             try {
-                $test = new HashMapObject($this->emptyValues[$i]);
+                $test = new HashMapObject($exceptionEmptyValues[$i]);
                 $this->exceptionMessage = 'empty value did not cause exception';
             } catch (Throwable $e) {
                 // We expect an exception to happen
