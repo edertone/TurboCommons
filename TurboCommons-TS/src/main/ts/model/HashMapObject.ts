@@ -200,7 +200,7 @@ export class HashMapObject {
      */
     isKey(key: any){
 
-        return StringUtils.isString(key) && this._data.includes(key);
+        return StringUtils.isString(key) && this._data.hasOwnProperty(key);
     }
     
     
@@ -214,7 +214,7 @@ export class HashMapObject {
      */
     remove(key: any){
 
-        if(this._data.includes(key)){
+        if(this._data.hasOwnProperty(key)){
 
             let value = this._data[key];
 
@@ -431,7 +431,13 @@ export class HashMapObject {
 
         this._length -= 1;
 
-        return this._data.shift(); // TODO - aixo no funcionara
+        var result = this._data[this.getKeys()[0]];
+        
+        delete this._data[this.getKeys()[0]];
+        
+        return result;
+        
+     // TODO - el ordre en objects no esta garantit. caldra guardar array amb keys i treballar-hi
     }
 
 
@@ -450,7 +456,13 @@ export class HashMapObject {
 
         this._length -= 1;
 
-        return this._data.pop(); // TODO - aixo no funcionara
+        var result = this._data[this.getKeys()[this._length]];
+        
+        delete this._data[this.getKeys()[this._length]];
+        
+        return result;
+        
+        // TODO - el ordre en objects no esta garantit. caldra guardar array amb keys i treballar-hi
     }
 
 
@@ -480,7 +492,7 @@ export class HashMapObject {
         
         // Check if key is a non empty string.
         // We use the same logic as StringUtils.isEmpty but with some simplification for better performance
-        if(StringUtils.isString(key) && key.replace(/ |\n|\r|\t/gi, '') !== ''){
+        if(!StringUtils.isString(key) || key.replace(/ |\n|\r|\t/gi, '') == ''){
 
             throw new Error('HashMapObject: key must be a non empty string');
         }
