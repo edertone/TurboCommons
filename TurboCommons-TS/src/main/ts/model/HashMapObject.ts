@@ -373,34 +373,30 @@ export class HashMapObject {
      */
     sortByKey(method = HashMapObject.SORT_METHOD_STRING, order = HashMapObject.SORT_ORDER_ASCENDING){
 
-        let sortFunction = null;
+        switch (method + order) {
 
-        if(method === HashMapObject.SORT_METHOD_STRING){
+            case HashMapObject.SORT_METHOD_STRING + HashMapObject.SORT_ORDER_ASCENDING:
+                this._keys.sort();
+                break;
 
-            sortFunction = undefined;
+            case HashMapObject.SORT_METHOD_STRING + HashMapObject.SORT_ORDER_DESCENDING:
+                this._keys.sort();
+                this._keys.reverse();
+                break;
+
+            case HashMapObject.SORT_METHOD_NUMERIC + HashMapObject.SORT_ORDER_ASCENDING:
+                this._keys.sort((a: any, b: any) => {return a-b});
+                break;
+
+            case HashMapObject.SORT_METHOD_NUMERIC + HashMapObject.SORT_ORDER_DESCENDING:
+                this._keys.sort((a: any, b: any) => {return b-a});
+                break;
+
+            default:
+                throw new Error('HashMapObject->sortByKey: Unknown sort method or order');
         }
 
-        if(method === HashMapObject.SORT_METHOD_NUMERIC){
-
-            sortFunction = undefined; //function(a, b){return a-b};
-        }
-
-        if(sortFunction === null){
-
-            throw new Error('HashMapObject->sortByKey: Unknown sort method');
-        }
-
-        if(order === HashMapObject.SORT_ORDER_ASCENDING){
-
-            return this._keys.sort(sortFunction);
-        }
-
-        if(order === HashMapObject.SORT_ORDER_DESCENDING){
-
-            // TODO
-        }
-
-        throw new Error('HashMapObject->sortByKey: Unknown sort order');
+        return true;        
     }
     
     
