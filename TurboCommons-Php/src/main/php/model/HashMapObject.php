@@ -366,34 +366,29 @@ class HashMapObject{
      */
     public function sortByKey(string $method = self::SORT_METHOD_STRING, string $order = self::SORT_ORDER_ASCENDING){
 
-        $methodFlag = null;
+        switch ($method.$order) {
 
-        if($method === self::SORT_METHOD_STRING){
+            case self::SORT_METHOD_STRING.self::SORT_ORDER_ASCENDING:
+                ksort($this->_data, SORT_STRING);
+                break;
 
-            $methodFlag = SORT_STRING;
+            case self::SORT_METHOD_STRING.self::SORT_ORDER_DESCENDING:
+                krsort($this->_data, SORT_STRING);
+                break;
+
+            case self::SORT_METHOD_NUMERIC.self::SORT_ORDER_ASCENDING:
+                ksort($this->_data, SORT_NUMERIC);
+                break;
+
+            case self::SORT_METHOD_NUMERIC.self::SORT_ORDER_DESCENDING:
+                krsort($this->_data, SORT_NUMERIC);
+                break;
+
+            default:
+                throw new InvalidArgumentException('HashMapObject->sortByKey: Unknown sort method or order');
         }
 
-        if($method === self::SORT_METHOD_NUMERIC){
-
-            $methodFlag = SORT_NUMERIC;
-        }
-
-        if($methodFlag === null){
-
-            throw new InvalidArgumentException('HashMapObject->sortByKey: Unknown sort method');
-        }
-
-        if($order === self::SORT_ORDER_ASCENDING){
-
-            return ksort($this->_data, $methodFlag);
-        }
-
-        if($order === self::SORT_ORDER_DESCENDING){
-
-            return krsort($this->_data, $methodFlag);
-        }
-
-        throw new InvalidArgumentException('HashMapObject->sortByKey: Unknown sort order');
+        return true;
     }
 
 
