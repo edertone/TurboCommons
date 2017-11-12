@@ -294,6 +294,99 @@ class HashMapObjectTest extends TestCase {
 
 
 	/**
+	 * testGetAt
+	 *
+	 * @return void
+	 */
+	public function testGetAt(){
+
+	    // Test empty values
+	    for ($i = 0; $i < $this->emptyValuesCount; $i++) {
+
+	        if($this->emptyValues[$i] === 0){
+
+	            $this->assertTrue($this->populatedHashMap->getAt(0) === 1);
+
+	        }else{
+
+	            try {
+	                $this->populatedHashMap->getAt($this->emptyValues[$i]);
+	                $this->exceptionMessage = 'empty value did not cause exception';
+	            } catch (Throwable $e) {
+	                // We expect an exception to happen
+	            }
+	        }
+	    }
+
+	    try {
+	        $this->populatedHashMap->getAt('0');
+	        $this->exceptionMessage = '0 value did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->populatedHashMap->getAt('00');
+	        $this->exceptionMessage = '00 value did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    // Test ok values
+	    $this->assertTrue($this->populatedHashMap->getAt(1) === 2);
+	    $this->assertTrue($this->populatedHashMap->getAt(2) === 3);
+	    $this->assertTrue($this->populatedHashMap->getAt(4) === 5);
+	    $this->assertTrue($this->populatedHashMap->getAt(6) === 7);
+	    $this->assertTrue($this->populatedHashMap->getAt(7) === 'myValue');
+	    $this->assertTrue($this->populatedHashMap->getAt(8) === [1, 2, 3, 4]);
+
+	    // Test wrong values
+	    $this->assertFalse($this->populatedHashMap->getAt(8) === 11);
+	    $this->assertFalse($this->populatedHashMap->getAt(5) === 1);
+	    $this->assertFalse($this->populatedHashMap->getAt(3) === 3);
+	    $this->assertFalse($this->populatedHashMap->getAt(2) === 9);
+	    $this->assertFalse($this->populatedHashMap->getAt(1) === '-myValue');
+	    $this->assertFalse($this->populatedHashMap->getAt(0) === [1, 2, 3, 4, 5]);
+
+	    // Test exceptions
+	    try {
+	        $this->populatedHashMap->getAt(-1);
+	        $this->exceptionMessage = '-1 value did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->populatedHashMap->getAt(20);
+	        $this->exceptionMessage = '20 value did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->populatedHashMap->getAt(2.1);
+	        $this->exceptionMessage = '2.1 value did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->populatedHashMap->getAt('4');
+	        $this->exceptionMessage = '4 value did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->populatedHashMap->getAt('adfa');
+	        $this->exceptionMessage = 'adfa value did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+	}
+
+
+	/**
 	 * testGetKeys
 	 *
 	 * @return void
@@ -308,10 +401,11 @@ class HashMapObjectTest extends TestCase {
 
 	    $h = new HashMapObject();
 	    $h->set('0', 0);
+	    $h->set('00', 0);
 	    $h->set('01', 1);
 	    $h->set('002', 2);
 	    $h->set('a', 'a');
-	    $this->assertTrue($h->getKeys() === ['0', '01', '002', 'a']);
+	    $this->assertTrue($h->getKeys() === ['0', '00', '01', '002', 'a']);
 
 	    // Test wrong values
 	    $this->assertFalse($this->populatedHashMap->getKeys() === ['b', 'c', 'd', 'e', 'f', 'g', 'string', 'array']);
@@ -492,6 +586,7 @@ class HashMapObjectTest extends TestCase {
 	    $this->assertTrue($this->populatedHashMap->rename('a', 'a1'));
 	    $this->assertTrue($this->populatedHashMap->get('a1') === 1);
 	    $this->assertTrue($this->populatedHashMap->length() === 9);
+	    $this->assertTrue(count($this->populatedHashMap->getValues()) === 9);
 
 	    $this->assertTrue($this->populatedHashMap->rename('c', 'somekey'));
 	    $this->assertTrue($this->populatedHashMap->get('somekey') === 3);

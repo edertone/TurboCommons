@@ -111,10 +111,10 @@ class JavaPropertiesObject extends HashMapObject {
                 $value = EncodingUtils::unicodeEscapedCharsToUtf8($value);
             }
 
-            $this->_array[$key] = $value;
+            $this->_data[$key] = $value;
         }
 
-        $this->_length = count($this->_array);
+        $this->_length = count($this->_data);
     }
 
 

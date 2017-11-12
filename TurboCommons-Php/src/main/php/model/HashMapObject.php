@@ -46,7 +46,11 @@ class HashMapObject{
 
 
     /**
-     * Structure that contains the HashMapObject data
+     * Structure that contains the HashMapObject data.
+     * Note that php associative arrays are specifically designed as sorted hash tables,
+     * so we use an associative array as the main data structure that contains the key / value
+     * pairs that can be sorted by key or even by value
+     *
      * @var array
      */
     protected $_data = [];
@@ -141,7 +145,7 @@ class HashMapObject{
      * @throws InvalidArgumentException If key does not exist or is invalid
      * @return mixed The value that is associated to the provided key
      */
-    public function get($key){
+    public function get(string $key){
 
         if(array_key_exists($key, $this->_data)){
 
@@ -149,6 +153,25 @@ class HashMapObject{
         }
 
         throw new InvalidArgumentException('HashMapObject->get: key does not exist or is invalid');
+    }
+
+
+    /**
+     * Get the value that is located at a certain position at the ordered list of key/pair values
+     *
+     * @param int $index The position we are looking for
+     *
+     * @throws InvalidArgumentException If index does not exist or is invalid
+     * @return mixed The value that is located at the specified position
+     */
+    public function getAt($index){
+
+        if(is_integer($index) && $index >= 0 && $index < $this->_length){
+
+            return $this->_data[array_keys($this->_data)[$index]];
+        }
+
+        throw new InvalidArgumentException('HashMapObject->getAt: index does not exist or is invalid');
     }
 
 
@@ -180,11 +203,12 @@ class HashMapObject{
     public function getValues(){
 
         $result = [];
-        $keys = $this->getKeys();
+        $keys = array_keys($this->_data);
 
         // Keys must be strictly converted to strings
         foreach ($keys as $k) {
-            $result[] = $this->get($k);
+
+            $result[] = $this->_data[$k];
         }
 
         return $result;
@@ -221,7 +245,7 @@ class HashMapObject{
 
             unset($this->_data[$key]);
 
-            $this->_length -= 1;
+            $this->_length --;
 
             return $value;
         }
@@ -430,7 +454,7 @@ class HashMapObject{
             throw new UnexpectedValueException('HashMapObject->shift: No elements');
         }
 
-        $this->_length -= 1;
+        $this->_length --;
 
         return array_shift($this->_data);
     }
@@ -449,7 +473,7 @@ class HashMapObject{
             throw new UnexpectedValueException('HashMapObject->pop: No elements');
         }
 
-        $this->_length -= 1;
+        $this->_length --;
 
         return array_pop($this->_data);
     }
