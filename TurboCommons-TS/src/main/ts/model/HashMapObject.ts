@@ -11,6 +11,7 @@
 import { StringUtils } from "../utils/StringUtils";
 import { ObjectUtils } from "../utils/ObjectUtils";
 import { ArrayUtils } from "../utils/ArrayUtils";
+import { NumericUtils } from "../utils/NumericUtils";
 
     
 /**
@@ -43,10 +44,19 @@ export class HashMapObject {
     
     
     /**
+     * Javascript objects specification does not guarantee object keys order. So we must keep 
+     * a sepparate array with the currently sorted hashmap keys to be sure that sorting is guaranteed
+     */
+    protected _keys: string[] = [];
+    
+    
+    /**
      * Structure that contains the HashMapObject data
+     * Note that javascript objects do not guarantee key order, so we must also keep a 
+     * sepparate array with the sorted list of keys
      */
     protected _data: {[key:string] : any} = {};
-    
+        
     
     /**
      * Stores the number of elements inside the HashMapObject
@@ -110,11 +120,14 @@ export class HashMapObject {
         // This should be a call to this._validateKeyFormat but we inline it here to get a big performance improvement
         if(StringUtils.isString(key) && key.replace(/ |\n|\r|\t/gi, '') !== ''){
     
-            this._data[key] = value;
-    
-            this._length = ObjectUtils.getKeys(this._data).length;
-    
-            return value;
+            if(!this._data.hasOwnProperty(key)){
+                
+                this._keys.push(key);
+                
+                this._length ++;
+            }
+            
+            return this._data[key] = value;
         }
     
         throw new Error('HashMapObject: key must be a non empty string');
@@ -151,6 +164,25 @@ export class HashMapObject {
     }
     
     
+    /** 
+     * Get the value that is located at a certain position at the ordered list of key/pair values
+     *
+     * @param index The position we are looking for
+     *
+     * @throws Error If index does not exist or is invalid
+     * @return The value that is located at the specified position
+     */
+    getAt(index: number){
+
+        if(typeof index === 'number' && NumericUtils.isInteger(index) && index >= 0 && index < this._length){
+         
+            return this._data[this._keys[index]];
+        }
+        
+        throw new Error('HashMapObject->getAt: index does not exist or is invalid');
+    }
+    
+    
     /**
      * Get a list with all the keys from the HashMapObject with the same order as they are stored.
      *
@@ -158,16 +190,7 @@ export class HashMapObject {
      */
     getKeys(){
 
-        let result = [];
-        let keys =  ObjectUtils.getKeys(this._data);
-
-        // Keys must be strictly converted to strings
-        for (var i = 0; i < keys.length; i++) {
-	
-            result.push(keys[i]);
-        }
-
-        return result;
+        return this._keys;
     }
     
     
@@ -179,12 +202,11 @@ export class HashMapObject {
     getValues(){
 
         let result = [];
-        let keys = this.getKeys();
-
+        
         // Keys must be strictly converted to strings
-        for (var i = 0; i < keys.length; i++) {
-	
-            result.push(this.get(keys[i]));
+        for (var i = 0; i < this._keys.length; i++) {
+    
+            result.push(this.get(this._keys[i]));
         }
 
         return result;
@@ -219,8 +241,10 @@ export class HashMapObject {
             let value = this._data[key];
 
             delete this._data[key];
+            
+            delete this._keys[this._keys.indexOf(key)];
 
-            this._length -= 1;
+            this._length --;
 
             return value;
         }
@@ -253,22 +277,23 @@ export class HashMapObject {
         if(this.isKey(key)){
 
             let result: {[key:string] : any} = {};
-            let keys = this.getKeys();
+            
+            for (var i = 0; i < this._keys.length; i++) {
 
-            for (var i = 0; i < keys.length; i++) {
-
-                if(keys[i] == key){
+                if(this._keys[i] == key){
 
                     result[newKey] = this._data[key];
 
                 }else{
 
-                    result[keys[i]] = this._data[keys[i]];
+                    result[this._keys[i]] = this._data[this._keys[i]];
                 }
             }
 
             this._data = result;
 
+            this._keys[this._keys.indexOf(key)] = newKey;
+            
             return true;
 
         }else{
@@ -303,13 +328,12 @@ export class HashMapObject {
         }
 
         let result: {[key:string] : any} = {};
-        let keys = this.getKeys();
         let key1Value = this.get(key1);
         let key2Value = this.get(key2);
 
-        for (var i = 0; i < keys.length; i++) {
+        for (var i = 0; i < this._keys.length; i++) {
 
-            switch (keys[i]) {
+            switch (this._keys[i]) {
 
                 case key1:
                     result[key2] = key2Value;
@@ -320,13 +344,20 @@ export class HashMapObject {
                     break;
 
                 default:
-                    result[keys[i]] = this._data[keys[i]];
+                    result[this._keys[i]] = this._data[this._keys[i]];
                     break;
             }
         }
 
         this._data = result;
-
+        
+        // Swap keys
+        let key1Index = this._keys.indexOf(key1);
+        let key2Index = this._keys.indexOf(key2);
+        
+        this._keys[key1Index] = key2;
+        this._keys[key2Index] = key1;
+        
         return true;
     }
     
@@ -342,31 +373,31 @@ export class HashMapObject {
      */
     sortByKey(method = HashMapObject.SORT_METHOD_STRING, order = HashMapObject.SORT_ORDER_ASCENDING){
 
-        let methodFlag = null;
+        let sortFunction = null;
 
         if(method === HashMapObject.SORT_METHOD_STRING){
 
-            methodFlag = undefined;
+            sortFunction = undefined;
         }
 
         if(method === HashMapObject.SORT_METHOD_NUMERIC){
 
-            methodFlag = null; //function(a, b){return a-b};
+            sortFunction = undefined; //function(a, b){return a-b};
         }
 
-        if(methodFlag === null){
+        if(sortFunction === null){
 
             throw new Error('HashMapObject->sortByKey: Unknown sort method');
         }
 
         if(order === HashMapObject.SORT_ORDER_ASCENDING){
 
-            return this._data.sort(methodFlag);
+            return this._keys.sort(sortFunction);
         }
 
         if(order === HashMapObject.SORT_ORDER_DESCENDING){
 
-            // TODO return krsort($this->_data, $methodFlag);
+            // TODO
         }
 
         throw new Error('HashMapObject->sortByKey: Unknown sort order');
@@ -385,34 +416,7 @@ export class HashMapObject {
      */
     sortByValue(method = HashMapObject.SORT_METHOD_NUMERIC, order = HashMapObject.SORT_ORDER_ASCENDING){
 
-        let methodFlag = null;
-
-        if(method === HashMapObject.SORT_METHOD_STRING){
-
-            methodFlag = "SORT_STRING";
-        }
-
-        if(method === HashMapObject.SORT_METHOD_NUMERIC){
-
-            methodFlag = "SORT_NUMERIC";
-        }
-
-        if(methodFlag === null){
-
-            throw new Error('HashMapObject->sortByValue: Unknown sort method');
-        }
-
-        if(order === HashMapObject.SORT_ORDER_ASCENDING){
-
-            // TODO return asort($this->_data, $methodFlag);
-        }
-
-        if(order === HashMapObject.SORT_ORDER_DESCENDING){
-
-            // TODO return arsort($this->_data, $methodFlag);
-        }
-
-        throw new Error('HashMapObject->sortByValue: Unknown sort order');
+     // TODO - copy from php
     }
     
     
@@ -429,15 +433,15 @@ export class HashMapObject {
             throw new Error('HashMapObject->shift: No elements');
         }
 
-        this._length -= 1;
+        this._length --;
 
-        var result = this._data[this.getKeys()[0]];
+        var result = this._data[this._keys[0]];
         
-        delete this._data[this.getKeys()[0]];
+        delete this._data[this._keys[0]];
+        
+        this._keys.shift();
         
         return result;
-        
-     // TODO - el ordre en objects no esta garantit. caldra guardar array amb keys i treballar-hi
     }
 
 
@@ -454,15 +458,15 @@ export class HashMapObject {
             throw new Error('HashMapObject->pop: No elements');
         }
 
-        this._length -= 1;
+        this._length --;
 
-        var result = this._data[this.getKeys()[this._length]];
+        var result = this._data[this._keys[this._length]];
         
-        delete this._data[this.getKeys()[this._length]];
+        delete this._data[this._keys[this._length]];
+        
+        this._keys.pop();
         
         return result;
-        
-        // TODO - el ordre en objects no esta garantit. caldra guardar array amb keys i treballar-hi
     }
 
 
@@ -473,7 +477,7 @@ export class HashMapObject {
      */
     reverse(){
 
-     // TODO - aixo no funcionara this._data = array_reverse($this->_data);
+        this._keys.reverse();
 
         return true;
     }

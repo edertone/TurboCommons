@@ -220,6 +220,73 @@ QUnit.test("testGet", function(assert){
 
 
 /**
+ * testGetAt
+ */
+QUnit.test("testGetAt", function(assert){
+ 
+    // Test empty values
+    for (var i = 0; i < window.emptyValuesCount; i++){
+
+        if(window.emptyValues[i] === 0){
+
+            assert.ok(window.populatedHashMap.getAt(0) === 1);
+
+        }else{
+
+            assert.throws(function() {
+                window.populatedHashMap.getAt(window.emptyValues[i]);
+            });
+        }
+    }
+
+    assert.throws(function() {
+        window.populatedHashMap.getAt('0');
+    });
+
+    assert.throws(function() {
+        window.populatedHashMap.getAt('00');
+    });
+
+    // Test ok values
+    assert.ok(window.populatedHashMap.getAt(1) === 2);
+    assert.ok(window.populatedHashMap.getAt(2) === 3);
+    assert.ok(window.populatedHashMap.getAt(4) === 5);
+    assert.ok(window.populatedHashMap.getAt(6) === 7);
+    assert.ok(window.populatedHashMap.getAt(7) === 'myValue');
+    assert.ok(ArrayUtils.isEqualTo(window.populatedHashMap.getAt(8), [1, 2, 3, 4]));
+
+    // Test wrong values
+    assert.notOk(window.populatedHashMap.getAt(8) === 11);
+    assert.notOk(window.populatedHashMap.getAt(5) === 1);
+    assert.notOk(window.populatedHashMap.getAt(3) === 3);
+    assert.notOk(window.populatedHashMap.getAt(2) === 9);
+    assert.notOk(window.populatedHashMap.getAt(1) === '-myValue');
+    assert.notOk(window.populatedHashMap.getAt(0) === [1, 2, 3, 4, 5]);
+
+    // Test exceptions
+    assert.throws(function() {
+        window.populatedHashMap.getAt(-1);
+    });
+
+    assert.throws(function() {
+        window.populatedHashMap.getAt(20);
+    });
+
+    assert.throws(function() {
+        window.populatedHashMap.getAt(2.1);
+    });
+
+    assert.throws(function() {
+        window.populatedHashMap.getAt('4');
+    });
+
+    assert.throws(function() {
+        window.populatedHashMap.getAt('adfa');
+    });
+});
+
+
+/**
  * testGetKeys
  */
 QUnit.test("testGetKeys", function(assert){
@@ -232,10 +299,11 @@ QUnit.test("testGetKeys", function(assert){
 
     var h = new HashMapObject();
     h.set('0', 0);
+    h.set('00', 0);
     h.set('01', 1);
     h.set('002', 2);
     h.set('a', 'a');
-    assert.ok(ArrayUtils.isEqualTo(h.getKeys(), ['0', '01', '002', 'a']));
+    assert.ok(ArrayUtils.isEqualTo(h.getKeys(), ['0', '00', '01', '002', 'a']));
 
     // Test wrong values
     assert.notOk(ArrayUtils.isEqualTo(window.populatedHashMap.getKeys(), ['b', 'c', 'd', 'e', 'f', 'g', 'string', 'array']));
@@ -388,6 +456,7 @@ QUnit.test("testRename", function(assert){
     assert.ok(window.populatedHashMap.rename('a', 'a1'));
     assert.ok(window.populatedHashMap.get('a1') === 1);
     assert.ok(window.populatedHashMap.length() === 9);
+    assert.ok(window.populatedHashMap.getValues().length === 9);
 
     assert.ok(window.populatedHashMap.rename('c', 'somekey'));
     assert.ok(window.populatedHashMap.get('somekey') === 3);
