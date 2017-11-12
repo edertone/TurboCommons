@@ -224,7 +224,6 @@ class HashMapObject{
      */
     public function isKey($key){
 
-
         return is_string($key) && array_key_exists($key, $this->_data);
     }
 
