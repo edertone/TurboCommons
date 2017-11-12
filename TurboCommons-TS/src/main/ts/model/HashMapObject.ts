@@ -411,8 +411,8 @@ export class HashMapObject {
      * @return True if sort was successful
      */
     sortByValue(method = HashMapObject.SORT_METHOD_NUMERIC, order = HashMapObject.SORT_ORDER_ASCENDING){
-
-     // TODO - copy from php
+        
+        // TODO - copy from php
     }
     
     
@@ -488,7 +488,7 @@ export class HashMapObject {
      *
      * @return void
      */
-    _validateKeyFormat(key: any){
+    private _validateKeyFormat(key: any){
         
         // Check if key is a non empty string.
         // We use the same logic as StringUtils.isEmpty but with some simplification for better performance
