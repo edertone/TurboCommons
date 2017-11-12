@@ -393,49 +393,6 @@ class HashMapObject{
 
 
     /**
-     * Sort the key/value pairs inside the HashMapObject by their values.
-     * Note that applying a sort method on values with different types than the expected by the sort method will give unexpected results.
-     *
-     * @param string $method Defines sort mode: HashMapObject::SORT_STRING or HashMapObject::SORT_NUMERIC
-     * @param string $order Defines the order for the sorted elements: self::SORT_ORDER_ASCENDING (default) or self::SORT_ORDER_DESCENDING
-     *
-     * @throws InvalidArgumentException
-     * @return boolean True if sort was successful
-     */
-    public function sortByValue(string $method = self::SORT_METHOD_NUMERIC, string $order = self::SORT_ORDER_ASCENDING){
-
-        $methodFlag = null;
-
-        if($method === self::SORT_METHOD_STRING){
-
-            $methodFlag = SORT_STRING;
-        }
-
-        if($method === self::SORT_METHOD_NUMERIC){
-
-            $methodFlag = SORT_NUMERIC;
-        }
-
-        if($methodFlag === null){
-
-            throw new InvalidArgumentException('HashMapObject->sortByValue: Unknown sort method');
-        }
-
-        if($order === self::SORT_ORDER_ASCENDING){
-
-            return asort($this->_data, $methodFlag);
-        }
-
-        if($order === self::SORT_ORDER_DESCENDING){
-
-            return arsort($this->_data, $methodFlag);
-        }
-
-        throw new InvalidArgumentException('HashMapObject->sortByValue: Unknown sort order');
-    }
-
-
-    /**
      * Remove and get the first element value from the HashMapObject sorted list
      *
      * @throws UnexpectedValueException If the HashMapObject is empty
