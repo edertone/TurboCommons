@@ -401,22 +401,6 @@ export class HashMapObject {
     
     
     /**
-     * Sort the key/value pairs inside the HashMapObject by their values.
-     * Note that applying a sort method on values with different types than the expected by the sort method will give unexpected results.
-     *
-     * @param method Defines sort mode: HashMapObject.SORT_STRING or HashMapObject.SORT_NUMERIC
-     * @param order Defines the order for the sorted elements: HashMapObject.SORT_ORDER_ASCENDING (default) or HashMapObject.SORT_ORDER_DESCENDING
-     *
-     * @throws Error
-     * @return True if sort was successful
-     */
-    sortByValue(method = HashMapObject.SORT_METHOD_NUMERIC, order = HashMapObject.SORT_ORDER_ASCENDING){
-        
-        // TODO - copy from php
-    }
-    
-    
-    /**
      * Remove and get the first element value from the HashMapObject sorted list
      *
      * @throws Error If the HashMapObject is empty
