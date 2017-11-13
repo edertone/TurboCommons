@@ -15,7 +15,8 @@ export { ValidationManager} from './managers/ValidationManager';
 export { BaseStrictClass } from './model/BaseStrictClass';
 export { HashMapObject } from './model/HashMapObject';
 export { JavaPropertiesObject } from './model/JavaPropertiesObject';
-export { XmlObjectObject } from './model/XmlObject';
+export { TableObject } from './model/TableObject';
+export { XMLObject } from './model/XMLObject';
 
 // Utils package
 export { ArrayUtils } from './utils/ArrayUtils';
