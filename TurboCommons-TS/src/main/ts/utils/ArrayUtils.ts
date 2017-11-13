@@ -9,12 +9,11 @@
     
     
 import { ObjectUtils } from './ObjectUtils';
+import { ValidationManager } from "../managers/ValidationManager";
 
 
 /**
  * Utilities to perform common array operations
- * 
- * @class
  */
 export class ArrayUtils {
 
@@ -22,9 +21,9 @@ export class ArrayUtils {
     /**
      * Tells if the given value is an array or not
      *
-     * @param {any} value A value to check
+     * @param value A value to check
      *
-     * @returns {boolean} true if the given value is an array, false otherwise
+     * @returns true if the given value is an array, false otherwise
      */
     public static isArray(value:any):boolean {
         
@@ -35,12 +34,10 @@ export class ArrayUtils {
 	/**
 	 * Check if two provided arrays are identical
 	 * 
-	 * @static
-	 * 
-	 * @param {array} array1 First array to compare
-	 * @param {array} array2 Second array to compare
+	 * @param array1 First array to compare
+	 * @param array2 Second array to compare
 	 *
-	 * @returns boolean true if arrays are exactly the same, false if not
+	 * @returns true if arrays are exactly the same, false if not
 	 */
 	public static isEqualTo(array1:any[], array2:any[]):boolean{
 
@@ -89,12 +86,10 @@ export class ArrayUtils {
 	/**
 	 * Remove the specified item from an array
 	 * 
-	 * @static
-	 * 
-	 * @param {array} array An array (it will not be modified by this method)
-	 * @param {object} element The element that must be removed from the given array
+	 * @param array An array (it will not be modified by this method)
+	 * @param element The element that must be removed from the given array
 	 *
-	 * @returns {array} The provided array but without the specified element (if found). Note that originally received array is not modified by this method
+	 * @returns The provided array but without the specified element (if found). Note that originally received array is not modified by this method
 	 */
 	public static removeElement(array:any[], element:any){
 
@@ -136,4 +131,121 @@ export class ArrayUtils {
 
 		return res;
 	}
+	
+	
+	/**
+     * remove all the duplicate values on the provided array
+     * Duplicate values with different data types won't be considered as equal ('1', 1 will not be removed)
+     *
+     * @param array An array with possible duplicate values
+     *
+     * @return The same provided array but without duplicate elements
+     */
+    public static removeDuplicateElements(array: any[]){
+
+        // Provided array must be an array
+        if(!ArrayUtils.isArray(array)){
+
+            throw new Error("ArrayUtils.removeDuplicateElements: Provided parameter must be an array");
+        }
+        
+        let result = [];
+        let numElements = array.length;
+
+        let validationManager = new ValidationManager();
+
+        for (let i = 0; i < numElements; i++) {
+
+            let found = false;
+
+            let resultCount = result.length;
+
+            for (let j = 0; j < resultCount; j++) {
+
+                if(validationManager.isEqualTo(array[i], result[j])){
+
+                    found = true;
+                    break;
+                }
+            }
+
+            if(!found){
+
+                result.push(array[i]);
+            }
+        }
+
+        return result;
+    }
+    
+    
+    /**
+     * Check if the given array contains duplicate values or not.
+     * Duplicate values with different data types won't be considered as equal ('1', 1 will return false)
+     *
+     * @param array An array containing some elements to test
+     *
+     * @return True if there are duplicate values, false otherwise
+     */
+    public static hasDuplicateElements(array: any[]){
+
+        // Provided array must be an array
+        if(!ArrayUtils.isArray(array)){
+
+            throw new Error("ArrayUtils.hasDuplicateElements: Provided parameter must be an array");
+        }
+        
+        let numElements = array.length;
+
+        let validationManager = new ValidationManager();
+
+        for (let i = 0; i < numElements; i++) {
+
+            for (let j = i + 1; j < numElements; j++) {
+
+                if(validationManager.isEqualTo(array[i], array[j])){
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Get all the duplicate values on the provided array
+     * Duplicate values with different data types won't be considered as equal ('1', 1 will return false)
+     *
+     * @param array An array containing some elements to test
+     *
+     * @return list with all the elements that are duplicated on the provided array
+     */
+    public static getDuplicateElements(array: any[]){
+
+        // Provided array must be an array
+        if(!ArrayUtils.isArray(array)){
+
+            throw new Error("ArrayUtils.getDuplicateElements: Provided parameter must be an array");
+        }
+        
+        let result = [];
+        let numElements = array.length;
+
+        let validationManager = new ValidationManager();
+
+        for (let i = 0; i < numElements; i++) {
+
+            for (let j = i + 1; j < numElements; j++) {
+
+                if(validationManager.isEqualTo(array[i], array[j])){
+
+                    result.push(array[i]);
+                }
+            }
+        }
+
+        return ArrayUtils.removeDuplicateElements(result);
+    }
 }
