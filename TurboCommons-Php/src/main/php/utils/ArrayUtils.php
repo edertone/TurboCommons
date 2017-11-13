@@ -84,11 +84,47 @@ class ArrayUtils {
 
 
 	/**
-	 * TODO - translate from js
+	 * Remove the specified item from an array
+	 *
+	 * @param array $array An array (it will not be modified by this method)
+	 * @param mixed $element The element that must be removed from the given array
+	 *
+	 * @returns array The provided array but without the specified element (if found). Note that originally received array is not modified by this method
 	 */
-	public static function removeElement(){
+	public static function removeElement(array $array, $element){
 
-		// TODO - translate from js
+	    $res = [];
+	    $arrayCount = count($array);
+
+	    if(self::isArray($element)){
+
+	        for($i = 0; $i < $arrayCount; $i++){
+
+	            if(!self::isArray($array[$i])){
+
+	                array_push($res, $array[$i]);
+
+	            }else{
+
+	                if(!self::isEqualTo($element, $array[$i])){
+
+	                    array_push($res, $array[$i]);
+	                }
+	            }
+	        }
+
+	    }else{
+
+	        for($j = 0; $j < $arrayCount; $j++){
+
+	            if($element !== $array[$j]){
+
+	                array_push($res, $array[$j]);
+	            }
+	        }
+	    }
+
+	    return $res;
 	}
 
 

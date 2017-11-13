@@ -188,7 +188,40 @@ class ArrayUtilsTest extends TestCase {
 	 */
 	public function testRemoveElement(){
 
-		// TODO - Translate from JS
+	    // Test non array values must launch exception
+	    try {
+	        ArrayUtils::removeElement(null, null);
+	        $this->exceptionMessage = 'null did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+        try {
+            ArrayUtils::removeElement(1, 1);
+            $this->exceptionMessage = '1 did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            ArrayUtils::removeElement("asfasf1", "345345");
+            $this->exceptionMessage = 'asfasf1 did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        // Test several arrays
+        $this->assertEquals(ArrayUtils::removeElement([], null), []);
+        $this->assertEquals(ArrayUtils::removeElement([], 1), []);
+        $this->assertEquals(ArrayUtils::removeElement([1], 1), []);
+        $this->assertEquals(ArrayUtils::removeElement(["1"], 1), ["1"]);
+        $this->assertEquals(ArrayUtils::removeElement(["1"], "1"), []);
+        $this->assertEquals(ArrayUtils::removeElement([1, 2, 3, 4], 1), [2, 3, 4]);
+        $this->assertEquals(ArrayUtils::removeElement([1, 2, 3, 4], 8), [1, 2, 3, 4]);
+        $this->assertEquals(ArrayUtils::removeElement(["hello", "guys"], "guys"), ["hello"]);
+        $this->assertEquals(ArrayUtils::removeElement(["hello", 1, ["test"]], 1), ["hello", ["test"]]);
+        $this->assertEquals(ArrayUtils::removeElement(["hello", 1, ["test"]], ["test"]), ["hello", 1]);
+        $this->assertEquals(ArrayUtils::removeElement(["hello", 1, ["test", "array"], ["test"]], ["test", "array"]), ["hello", 1, ["test"]]);
 	}
 
 
