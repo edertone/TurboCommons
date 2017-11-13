@@ -258,8 +258,13 @@ export class TableObject {
      *
      * @return True if the operation was successful
      */
-    addColumns(number: number, names = [], at = -1){
+    addColumns(number: number, names: string[] = [], at = -1){
 
+        if(!ArrayUtils.isArray(names)){
+
+            throw new Error('TableObject->addColumns names must be an array');
+        }
+        
         if(!NumericUtils.isInteger(number) || number <= 0){
 
             throw new Error('TableObject->addColumns number must be a positive integer');
