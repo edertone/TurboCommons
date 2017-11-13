@@ -29,7 +29,7 @@ class TableObject{
      *
      * @var HashMapObject
      */
-    protected $_columnNames = null;
+    protected $_columnNames;
 
 
     /**
@@ -38,7 +38,7 @@ class TableObject{
      *
      * @var HashMapObject
      */
-    protected $_cells = null;
+    protected $_cells;
 
 
     /**
@@ -154,8 +154,6 @@ class TableObject{
             for ($i = 0; $i < $namesCount; $i++) {
 
                 if(!StringUtils::isString($names[$i])){
-
-                    $this->_columnNames = null;
 
                     throw new UnexpectedValueException('TableObject->setColumnNames List of names must be an array of strings');
                 }

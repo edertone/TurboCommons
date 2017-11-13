@@ -27,6 +27,53 @@ class ArrayUtilsTest extends TestCase {
 
 
     /**
+     * @see TestCase::setUpBeforeClass()
+     *
+     * @return void
+     */
+    public static function setUpBeforeClass(){
+
+        // Nothing necessary here
+    }
+
+
+    /**
+     * @see TestCase::setUp()
+     *
+     * @return void
+     */
+    protected function setUp(){
+
+        $this->exceptionMessage = '';
+    }
+
+
+    /**
+     * @see TestCase::tearDown()
+     *
+     * @return void
+     */
+    protected function tearDown(){
+
+        if($this->exceptionMessage != ''){
+
+            $this->fail($this->exceptionMessage);
+        }
+    }
+
+
+    /**
+     * @see TestCase::tearDownAfterClass()
+     *
+     * @return void
+     */
+    public static function tearDownAfterClass(){
+
+        // Nothing necessary here
+    }
+
+
+    /**
      * testIsArray
      *
      * @return void
@@ -65,32 +112,25 @@ class ArrayUtilsTest extends TestCase {
 	public function testIsEqualTo(){
 
 		// Test non array values must launch exception
-		$exceptionMessage = '';
-
 		try {
 			ArrayUtils::isEqualTo(null, null);
-			$exceptionMessage = 'null did not cause exception';
+			$this->exceptionMessage = 'null did not cause exception';
 		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			ArrayUtils::isEqualTo(1, 1);
-			$exceptionMessage = '1 did not cause exception';
+			$this->exceptionMessage = '1 did not cause exception';
 		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			ArrayUtils::isEqualTo('asfasf1', '345345');
-			$exceptionMessage = 'asfasf1 did not cause exception';
+			$this->exceptionMessage = 'asfasf1 did not cause exception';
 		} catch (Throwable $e) {
 			// We expect an exception to happen
-		}
-
-		if($exceptionMessage != ''){
-
-			$this->fail($exceptionMessage);
 		}
 
 		// Test identic arrays
@@ -160,32 +200,27 @@ class ArrayUtilsTest extends TestCase {
 	public function testRemoveDuplicateElements(){
 
 	    // Test empty values
-	    $exceptionMessage = '';
+	    $this->exceptionMessage = '';
 
 	    try {
 	        ArrayUtils::removeDuplicateElements(null);
-	        $exceptionMessage = 'null did not cause exception';
+	        $this->exceptionMessage = 'null did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        ArrayUtils::removeDuplicateElements('');
-	        $exceptionMessage = '"" did not cause exception';
+	        $this->exceptionMessage = '"" did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        ArrayUtils::removeDuplicateElements(new stdClass());
-	        $exceptionMessage = 'new stdClass() did not cause exception';
+	        $this->exceptionMessage = 'new stdClass() did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
-	    }
-
-	    if($exceptionMessage != ''){
-
-	        $this->fail($exceptionMessage);
 	    }
 
 	    $this->assertEquals([], ArrayUtils::removeDuplicateElements([]));
@@ -222,32 +257,27 @@ class ArrayUtilsTest extends TestCase {
 	public function testHasDuplicateElements(){
 
 	    // Test empty values
-	    $exceptionMessage = '';
+	    $this->exceptionMessage = '';
 
 	    try {
 	        ArrayUtils::hasDuplicateElements(null);
-	        $exceptionMessage = 'null did not cause exception';
+	        $this->exceptionMessage = 'null did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        ArrayUtils::hasDuplicateElements('');
-	        $exceptionMessage = '"" did not cause exception';
+	        $this->exceptionMessage = '"" did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        ArrayUtils::hasDuplicateElements(new stdClass());
-	        $exceptionMessage = 'new stdClass() did not cause exception';
+	        $this->exceptionMessage = 'new stdClass() did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
-	    }
-
-	    if($exceptionMessage != ''){
-
-	        $this->fail($exceptionMessage);
 	    }
 
 	    $this->assertFalse(ArrayUtils::hasDuplicateElements([]));
@@ -297,32 +327,27 @@ class ArrayUtilsTest extends TestCase {
 	public function testGetDuplicateElements(){
 
 	    // Test empty values
-	    $exceptionMessage = '';
+	    $this->exceptionMessage = '';
 
 	    try {
 	        ArrayUtils::getDuplicateElements(null);
-	        $exceptionMessage = 'null did not cause exception';
+	        $this->exceptionMessage = 'null did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        ArrayUtils::getDuplicateElements('');
-	        $exceptionMessage = '"" did not cause exception';
+	        $this->exceptionMessage = '"" did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        ArrayUtils::getDuplicateElements(new stdClass());
-	        $exceptionMessage = 'new stdClass() did not cause exception';
+	        $this->exceptionMessage = 'new stdClass() did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
-	    }
-
-	    if($exceptionMessage != ''){
-
-	        $this->fail($exceptionMessage);
 	    }
 
 	    $this->assertEquals([], ArrayUtils::getDuplicateElements([]));
