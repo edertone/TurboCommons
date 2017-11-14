@@ -631,7 +631,7 @@ export class TableObject {
      *
      * @return A valid column index based on the specified integer or label.
      */
-    _validateColumnIndex(column: any){
+    private _validateColumnIndex(column: any){
 
         let columnIndex = NumericUtils.isInteger(column) ? column : -1;
         let columnNames = this._columnNames.getValues();
@@ -667,7 +667,7 @@ export class TableObject {
      *
      * @return A valid row index based on the specified integer
      */
-    _validateRowIndex(row: number){
+    private _validateRowIndex(row: number){
 
         let rowIndex = NumericUtils.isInteger(row) ? row : -1;
 

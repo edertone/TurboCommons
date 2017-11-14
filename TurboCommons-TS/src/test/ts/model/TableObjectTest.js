@@ -610,4 +610,522 @@ QUnit.test("testAddColumns", function(assert){
     // Already tested
 });
 
+
+/**
+ * testSetColumn
+ */
+QUnit.test("testSetColumn", function(assert){
+
+    // Test empty values
+    var test = new TableObject();
+
+    assert.throws(function() {
+        test.setColumn(0, []);
+    });
+
+    var test = new TableObject(4, 4);
+
+    for (var i = 0; i < window.emptyValuesCount; i++) {
+
+        assert.throws(function() {
+            test.setColumn(window.emptyValues[i]);
+        });
+
+        assert.throws(function() {
+            test.setColumn(0, window.emptyValues[i]);
+        });
+    }
+
+    // Test ok values
+    var test = new TableObject(1, 1);
+
+    test.setColumn(0, ['a']);
+    assert.ok(test.countRows() === 1);
+    assert.ok(test.countColumns() === 1);
+    assert.ok(ArrayUtils.isEqualTo(test.getColumn(0), ['a']));
+
+    var test = new TableObject(4, 4);
+
+    test.setColumn(1, [1, 2, 3, 4]);
+    test.setColumn(3, [1, 2, 3, 4]);
+    assert.ok(test.countRows() === 4);
+    assert.ok(test.countColumns() === 4);
+    assert.ok(ArrayUtils.isEqualTo(test.getColumn(0), [null, null, null, null]));
+    assert.ok(ArrayUtils.isEqualTo(test.getColumn(1), [1, 2, 3, 4]));
+    assert.ok(ArrayUtils.isEqualTo(test.getColumn(2), [null, null, null, null]));
+    assert.ok(ArrayUtils.isEqualTo(test.getColumn(3), [1, 2, 3, 4]));
+
+    test.setColumn(1, ['a', 'b', 'c', 'd']);
+    test.setColumn(2, [5, 6, 7, 8]);
+    assert.ok(ArrayUtils.isEqualTo([null, null, null, null], test.getColumn(0)));
+    assert.ok(ArrayUtils.isEqualTo(['a', 'b', 'c', 'd'], test.getColumn(1)));
+    assert.ok(ArrayUtils.isEqualTo([5, 6, 7, 8], test.getColumn(2)));
+    assert.ok(ArrayUtils.isEqualTo([1, 2, 3, 4], test.getColumn(3)));
+
+    // Test wrong values
+    assert.throws(function() {
+        test.setColumn(-1, ['a', 'b', 'c', 'd']);
+    });
+
+    assert.throws(function() {
+        test.setColumn(4, ['a', 'b', 'c', 'd']);
+    });
+
+    assert.throws(function() {
+        test.setColumn(5, ['a', 'b', 'c', 'd']);
+    });
+
+    assert.throws(function() {
+        test.setColumn('ooo', ['a', 'b', 'c', 'd']);
+    });
+    
+    assert.throws(function() {
+        test.setColumn(0, ['a', 'b', 'c']);
+    });
+
+    assert.throws(function() {
+        test.setColumn(0, ['a', 'b', 'c', 'd', 'e']);
+    });
+
+    // Test exceptions
+    // already tested
+});
+
+
+/**
+ * testRemoveColumn
+ */
+QUnit.test("testRemoveColumn", function(assert){
+    
+    // Test empty values
+    var test = new TableObject();
+
+    assert.throws(function() {
+        test.removeColumn(0);
+    });
+
+    var test = new TableObject(4, 4);
+
+    for (var i = 0; i < window.emptyValuesCount; i++) {
+
+        assert.throws(function() {
+            test.removeColumn(window.emptyValues[i]);
+        });
+    }
+
+    // Test ok values
+    var test = new TableObject(1, 1);
+    test.setColumn(0, [1]);
+    test.removeColumn(0);
+    assert.ok(test.countRows() === 0);
+    assert.ok(test.countColumns() === 0);
+    assert.ok(test.countCells() === 0);
+
+    var test = new TableObject(50, 50);
+
+    for (var i = test.countColumns() - 1; i >= 0; i--) {
+
+        test.removeColumn(i);
+
+        assert.ok(test.countRows() === (i == 0 ? 0 : 50));
+        assert.ok(test.countColumns() === i);
+        assert.ok(test.countCells() === 50 * i);
+    }
+
+    var test = new TableObject(4, 4);
+    test.setColumnNames(['c1', 'c2', 'c3', 'c4']);
+    test.removeColumn('c2');
+    assert.ok(test.countRows() === 4);
+    assert.ok(test.countColumns() === 3);
+    assert.ok(test.countCells() === 12);
+    test.removeColumn('c4');
+    assert.ok(test.countRows() === 4);
+    assert.ok(test.countColumns() === 2);
+    assert.ok(test.countCells() === 8);
+    test.removeColumn('c3');
+    assert.ok(test.countRows() === 4);
+    assert.ok(test.countColumns() === 1);
+    assert.ok(test.countCells() === 4);
+
+    var test = new TableObject(3, 3);
+    test.setColumnNames(['c1', 'c2', 'c3']);
+    test.setColumn(0, ['1', '2', '3']);
+    test.setColumn(1, [4, 5, 6]);
+    test.setColumn(2, ['7', 8, '9']);
+    test.removeColumn(1);
+    assert.ok(ArrayUtils.isEqualTo(test.getColumn(0), ['1', '2', '3']));
+    assert.ok(ArrayUtils.isEqualTo(test.getColumn(1), ['7', 8, '9']));
+    assert.ok(test.countRows() === 3);
+    assert.ok(test.countColumns() === 2);
+    assert.ok(test.countCells() === 6);
+    test.removeColumn(1);
+    assert.ok(ArrayUtils.isEqualTo(test.getColumn(0), ['1', '2', '3']));
+    assert.ok(test.countRows() === 3);
+    assert.ok(test.countColumns() === 1);
+    assert.ok(test.countCells() === 3);
+    test.removeColumn(0);
+    assert.ok(test.countRows() === 0);
+    assert.ok(test.countColumns() === 0);
+    assert.ok(test.countCells() === 0);
+
+    // Test wrong values
+    var test = new TableObject(50, 50);
+
+    assert.throws(function() {
+        test.removeColumn(-1);
+    });
+
+    assert.throws(function() {
+        test.removeColumn(50);
+    });
+
+    assert.throws(function() {
+        test.removeColumn('col');
+    });
+
+    // Test exceptions
+    // Already tested
+});
+
+
+/**
+ * testGetCell
+ */
+QUnit.test("testGetCell", function(assert){
+
+    // Test empty values
+    var test = new TableObject();
+
+    assert.throws(function() {
+        test.getCell(0, 0);
+    });
+
+    var test = new TableObject(4, 4);
+
+    for (var i = 0; i < window.emptyValuesCount; i++) {
+
+        assert.throws(function() {
+            test.getCell(window.emptyValues[i], 0);
+        });
+
+        assert.throws(function() {
+            test.getCell(0, window.emptyValues[i]);
+        });
+    }
+
+    // Test ok values
+    test = new TableObject(3, 3);
+    test.setColumnNames(['c1', 'c2', 'c3']);
+    test.setColumn(0, ['1', '2', '3']);
+    test.setColumn(1, [4, 5, 6]);
+    test.setColumn(2, ['7', 8, '9']);
+    assert.ok(test.getCell(0, 0) === '1');
+    assert.ok(test.getCell(0, 'c1') === '1');
+    assert.ok(test.getCell(2, 0) === '3');
+    assert.ok(test.getCell(2, 'c1') === '3');
+    assert.ok(test.getCell(1, 1) === 5);
+    assert.ok(test.getCell(1, 'c2') === 5);
+    assert.ok(test.getCell(0, 2) === '7');
+    assert.ok(test.getCell(0, 'c3') === '7');
+    assert.ok(test.getCell(2, 2) === '9');
+    assert.ok(test.getCell(2, 'c3') === '9');
+
+    test.removeColumn('c2');
+    assert.ok(test.getCell(0, 0) === '1');
+    assert.ok(test.getCell(0, 'c1') === '1');
+    assert.ok(test.getCell(2, 0) === '3');
+    assert.ok(test.getCell(2, 'c1') === '3');
+    assert.ok(test.getCell(1, 1) === 8);
+    assert.ok(test.getCell(1, 'c3') === 8);
+    assert.ok(test.getCell(0, 1) === '7');
+    assert.ok(test.getCell(0, 'c3') === '7');
+
+    test.removeRow(0);
+    assert.ok(test.getCell(0, 0) === '2');
+    assert.ok(test.getCell(0, 'c1') === '2');
+    assert.ok(test.getCell(1, 1) === '9');
+    assert.ok(test.getCell(1, 'c3') === '9');
+    assert.ok(test.countRows() === 2);
+    assert.ok(test.countColumns() === 2);
+    assert.ok(test.countCells() === 4);
+
+    test.removeRow(0);
+    assert.ok(test.getCell(0, 0) === '3');
+    assert.ok(test.getCell(0, 'c1') === '3');
+    assert.ok(test.getCell(0, 1) === '9');
+    assert.ok(test.getCell(0, 'c3') === '9');
+    assert.ok(test.countRows() === 1);
+    assert.ok(test.countColumns() === 2);
+    assert.ok(test.countCells() === 2);
+
+    // Test wrong values
+    assert.throws(function() {
+        test.getCell(0, -1);
+    });
+
+    assert.throws(function() {
+        test.getCell(-1, 0);
+    });
+
+    assert.throws(function() {
+        test.getCell(0, 3);
+    });
+
+    assert.throws(function() {
+        test.getCell(3, 0);
+    });
+
+    // Test exceptions
+    // Already tested
+});
+
+
+/**
+ * testSetCell
+ */
+QUnit.test("testSetCell", function(assert){
+    
+    // Test empty values
+    var test = new TableObject();
+
+    assert.throws(function() {
+        test.setCell(0, 0, null);
+    });
+
+    var test = new TableObject(4, 4);
+
+    for (var i = 0; i < window.emptyValuesCount; i++) {
+
+        assert.throws(function() {
+            test.setCell(window.emptyValues[i], 0, null);
+        });
+
+        assert.throws(function() {
+            test.setCell(0, window.emptyValues[i], null);
+        });
+
+        assert.ok(test.setCell(0, 0, window.emptyValues[i]) === window.emptyValues[i]);
+        assert.ok(test.getCell(0, 0) === window.emptyValues[i]);
+    }
+
+    // Test ok values
+    var test = new TableObject(10, 10);
+    assert.ok(test.setCell(0, 0, 'value') === 'value');
+    assert.ok(test.getCell(0, 0) === 'value');
+    assert.ok(test.setCell(5, 5, 'value5') === 'value5');
+    assert.ok(test.getCell(5, 5) === 'value5');
+    assert.ok(ArrayUtils.isEqualTo([null, null, null, null, null, 'value5', null, null, null, null], test.getColumn(5)));
+
+    assert.ok(test.setCell(0, 9, '1') === '1');
+    assert.ok(test.setCell(1, 9, '2') === '2');
+    assert.ok(test.setCell(2, 9, '3') === '3');
+    assert.ok(test.setCell(3, 9, '4') === '4');
+    assert.ok(test.setCell(4, 9, '5') === '5');
+    assert.ok(ArrayUtils.isEqualTo(['1', '2', '3', '4', '5', null, null, null, null, null], test.getColumn(9)));
+
+    test.setColumnName(7, 'col7');
+    assert.ok(test.setCell(3, 'col7', '3 value') === '3 value');
+    assert.ok(test.setCell(8, 'col7', '8 value') === '8 value');
+    assert.ok(test.getCell(3, 7) === '3 value');
+    assert.ok(test.getCell(3, 'col7') === '3 value');
+    assert.ok(test.getCell(8, 7) === '8 value');
+    assert.ok(test.getCell(8, 'col7') === '8 value');
+    assert.ok(ArrayUtils.isEqualTo([null, null, null, '3 value', null, null, null, null, '8 value', null], test.getColumn(7)));
+    assert.ok(ArrayUtils.isEqualTo([null, null, null, '3 value', null, null, null, null, '8 value', null], test.getColumn('col7')));
+
+    // Test wrong values
+    assert.throws(function() {
+        test.setCell(-1, 0, 'v');
+    });
+
+    assert.throws(function() {
+        test.setCell(11, 0, 'v');
+    });
+
+    assert.throws(function() {
+        test.setCell(0, -1, 'v');
+    });
+
+    assert.throws(function() {
+        test.setCell(0, 11, 'v');
+    });
+
+    assert.throws(function() {
+        test.setCell(0, 'no', 'v');
+    });
+
+    assert.throws(function() {
+        test.setCell('no', 0, 'v');
+    });
+
+    // Test exceptions
+    // Already tested
+});
+
+
+/**
+ * testGetRow
+ */
+QUnit.test("testGetRow", function(assert){
+    
+    // Test empty values
+    var test = new TableObject();
+
+    assert.throws(function() {
+        test.getRow(0);
+    });
+
+    for (var i = 0; i < window.emptyValuesCount; i++) {
+
+        assert.throws(function() {
+            test.getRow(window.emptyValues[i]);
+        });
+    }
+
+    // Test ok values
+    var test = new TableObject(1, 1);
+    assert.ok(ArrayUtils.isEqualTo(test.getRow(0), [null]));
+
+    var test = new TableObject(5, 5);
+    test.setCell(1, 0, 1);
+    test.setCell(1, 1, 2);
+    test.setCell(1, 2, 3);
+    assert.ok(ArrayUtils.isEqualTo(test.getRow(0), [null, null, null, null, null]));
+    assert.ok(ArrayUtils.isEqualTo(test.getRow(1), [1, 2, 3, null, null]));
+
+    var test = new TableObject(5, 5);
+    assert.ok(ArrayUtils.isEqualTo(test.getRow(0), [null, null, null, null, null]));
+    test.setRow(2, [1, 2, 3, 4, 5]);
+    assert.ok(ArrayUtils.isEqualTo(test.getRow(0), [null, null, null, null, null]));
+    assert.ok(ArrayUtils.isEqualTo(test.getRow(2), [1, 2, 3, 4, 5]));
+    test.setRow(4, [1, 2, 3, 4, 5]);
+    assert.ok(ArrayUtils.isEqualTo(test.getRow(3), [null, null, null, null, null]));
+    assert.ok(ArrayUtils.isEqualTo(test.getRow(4), [1, 2, 3, 4, 5]));
+
+    // Test wrong values
+    assert.throws(function() {
+        test.getRow(-1);
+    });
+
+    assert.throws(function() {
+        test.getRow(11);
+    });
+
+    assert.throws(function() {
+        test.getRow('string');
+    });
+
+    // Test exceptions
+    // Already tested
+});
+
+
+/**
+ * testAddRows
+ */
+QUnit.test("testAddRows", function(assert){
+    
+    // Test empty values
+    var test = new TableObject();
+
+    assert.throws(function() {
+        test.addRows(0);
+    });
+
+    for (var i = 0; i < window.emptyValuesCount; i++) {
+
+        assert.throws(function() {
+            test.addRows(window.emptyValues[i]);
+        });
+
+        if(ArrayUtils.isArray(window.emptyValues[i])){
+
+            assert.throws(function() {
+                test.addRows(1, window.emptyValues[i]);
+            });
+        }
+    }
+
+    // Test ok values
+    var test = new TableObject();
+    assert.ok(test.addRows(1));
+    assert.ok(test.countRows() === 1);
+    assert.ok(ArrayUtils.isEqualTo(test.getRow(0), []));
+
+    var test = new TableObject(4, 4);
+    assert.ok(test.addRows(2));
+    assert.ok(test.countRows() === 6);
+    assert.ok(ArrayUtils.isEqualTo(test.getRow(3), [null, null, null, null]));
+
+    assert.ok(test.addRows(1));
+    assert.ok(test.countRows() === 7);
+
+    assert.ok(test.addRows(1, 2));
+    assert.ok(test.countRows() === 8);
+
+    assert.ok(test.addRows(1, 0));
+    assert.ok(test.countRows() === 9);
+
+    var test = new TableObject(1, 3);
+    test.setRow(0, [1, 2, 3]);
+    assert.ok(1 ===test.countRows());
+
+    assert.ok(test.addRows(1, 0));
+    assert.ok(2 === test.countRows());
+    assert.ok(ArrayUtils.isEqualTo([null, null, null], test.getRow(0)));
+    assert.ok(ArrayUtils.isEqualTo([1, 2, 3], test.getRow(1)));
+    assert.ok(test.addRows(1, 0));
+    assert.ok(ArrayUtils.isEqualTo([null, null, null], test.getRow(0)));
+    assert.ok(ArrayUtils.isEqualTo([null, null, null], test.getRow(1)));
+    assert.ok(ArrayUtils.isEqualTo([1, 2, 3], test.getRow(2)));
+    assert.ok(3 === test.countRows());
+
+    assert.ok(test.addRows(1, 2));
+    assert.ok(ArrayUtils.isEqualTo([null, null, null], test.getRow(0)));
+    assert.ok(ArrayUtils.isEqualTo([null, null, null], test.getRow(1)));
+    assert.ok(ArrayUtils.isEqualTo([null, null, null], test.getRow(2)));
+    assert.ok(ArrayUtils.isEqualTo([1, 2, 3], test.getRow(3)));
+    assert.ok(test.countRows() === 4);
+
+    var test = new TableObject();
+    test.addRows(3);
+    test.addColumns(3);
+    test.setRow(0, [1, 2, 3]);
+    test.setRow(1, [4, 5, 6]);
+    test.setRow(2, [7, 8, 9]);
+    assert.ok(test.countRows() === 3);
+    assert.ok(test.countColumns() === 3);
+    assert.ok(ArrayUtils.isEqualTo([1, 2, 3], test.getRow(0)));
+    assert.ok(ArrayUtils.isEqualTo([4, 5, 6], test.getRow(1)));
+    assert.ok(ArrayUtils.isEqualTo([7, 8, 9], test.getRow(2)));
+    test.addRows(1, 2);
+    test.setRow(2, ['x', 'y', 'z']);
+    assert.ok(ArrayUtils.isEqualTo([1, 2, 3], test.getRow(0)));
+    assert.ok(ArrayUtils.isEqualTo([4, 5, 6], test.getRow(1)));
+    assert.ok(ArrayUtils.isEqualTo(['x', 'y', 'z'], test.getRow(2)));
+    assert.ok(ArrayUtils.isEqualTo([7, 8, 9], test.getRow(3)));
+    assert.ok(test.countRows() === 4);
+    assert.ok(test.countColumns() === 3);
+
+    // Test wrong values
+    var test = new TableObject(3, 3);
+
+    window.wrongValues = [0, -1, 1.1, [1, 2, 3, 4]];
+    window.wrongValuesCount = window.wrongValues.length;
+
+    for (var i = 0; i < window.wrongValuesCount; i++) {
+
+        assert.throws(function() {
+            test.addRows(window.wrongValues[i]);
+        });
+    }
+
+    assert.throws(function() {
+        test.addRows(1, 4);
+    });
+
+    // Test exceptions
+    // Already tested
+});
+
 // TODO - add missing tests
