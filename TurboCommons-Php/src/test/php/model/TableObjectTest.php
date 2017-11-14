@@ -1247,7 +1247,6 @@ class TableObjectTest extends TestCase {
 	    $test = new TableObject();
 
 	    try {
-	        new TableObject();
 	        $test->getRow(0);
 	        $this->exceptionMessage = '0 did not cause exception';
 	    } catch (Throwable $e) {
@@ -1257,7 +1256,6 @@ class TableObjectTest extends TestCase {
 	    for ($i = 0; $i < $this->emptyValuesCount; $i++) {
 
 	        try {
-	            new TableObject();
 	            $test->getRow($this->emptyValues[$i]);
 	            $this->exceptionMessage = $i.' empty value did not cause exception';
 	        } catch (Throwable $e) {
@@ -1287,7 +1285,6 @@ class TableObjectTest extends TestCase {
 
 	    // Test wrong values
 	    try {
-	        new TableObject();
 	        $test->getRow(-1);
 	        $this->exceptionMessage = '-1 value did not cause exception';
 	    } catch (Throwable $e) {
@@ -1295,7 +1292,6 @@ class TableObjectTest extends TestCase {
 	    }
 
 	    try {
-	        new TableObject(9, 9);
 	        $test->getRow(11);
 	        $this->exceptionMessage = '11 value did not cause exception';
 	    } catch (Throwable $e) {
@@ -1303,7 +1299,6 @@ class TableObjectTest extends TestCase {
 	    }
 
 	    try {
-	        new TableObject();
 	        $test->getRow('string');
 	        $this->exceptionMessage = 'string value did not cause exception';
 	    } catch (Throwable $e) {
