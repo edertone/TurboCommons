@@ -94,8 +94,6 @@ class TableObjectTest extends TestCase {
 	    $this->assertTrue($test->countRows() === 0);
 	    $this->assertTrue($test->countColumns() === 0);
 
-	    $this->exceptionMessage = '';
-
 	    for ($i = 0; $i < $this->emptyValuesCount; $i++) {
 
 	        for ($j = 0; $j < $this->emptyValuesCount; $j++) {
