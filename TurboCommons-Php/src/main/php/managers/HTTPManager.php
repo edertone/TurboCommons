@@ -109,7 +109,7 @@ class HTTPManager extends BaseStrictClass {
      *
      * @return boolean True if the specified domain is free can be registered, false if the domain is already registered by somebody
      */
-    public static function isDomainFreeToRegister($domain){
+    public function isDomainFreeToRegister($domain){
 
         $domain = strtolower($domain);
 

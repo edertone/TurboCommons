@@ -25,7 +25,7 @@ class FilesManager extends BaseStrictClass{
 
 
     /** Defines if some of the class methods will accept internet urls in addition to regular OS filesystem paths as parameters */
-    // TODO - Accept urls will disappear from files manager. It will be only used with local file system.
+    // TODO - Accept urls must disappear from files manager. It will be only used with local file system.
     public $acceptUrls = false;
 
 
