@@ -13,30 +13,73 @@ import { ValidationManager } from "../managers/ValidationManager";
 
     
 /**
- * The most common string processing and modification utilities.
- * 
- * <pre><code> 
- * This is a static class, so no instance needs to be created.
- * Usage example:
- * 
- * var ns = org_turbocommons_utils;
- * 
- * var result1 = ns.StringUtils.isEmpty('   ');
- * var result2 = ns.StringUtils.countWords('hello');
- * ...
- * </code></pre>
- * 
- * @class
- */   
+ * The most common string processing and modification utilities
+ */  
 export class StringUtils {
+    
+    
+    /** Defines the sentence case format (Only the first character of the sentence is capitalised, except for proper nouns and other words which are required by a more specific rule to be capitalised). Generally equivalent to the baseline universal standard of formal English orthography */
+    readonly FORMAT_SENTENCE_CASE = 'FORMAT_SENTENCE_CASE';
+
+
+    /** Defines the start case format (The first character in all words capitalised and all the rest of the word lower case) */
+    readonly FORMAT_START_CASE = 'FORMAT_START_CASE';
+
+
+    /** Defines the all upper case format (All letters on a string written with Capital letters only) */
+    readonly FORMAT_ALL_UPPER_CASE = 'FORMAT_ALL_UPPER_CASE';
+
+
+    /** Defines the all lower case format (All letters on a string written with lower case letters only) */
+    readonly FORMAT_ALL_LOWER_CASE = 'FORMAT_ALL_LOWER_CASE';
+
+
+    /** Defines the CamelCase format (the practice of writing compound words or phrases such that each word or abbreviation begins with a capital letter) */
+    readonly FORMAT_CAMEL_CASE = 'FORMAT_CAMEL_CASE';
+
+
+    /**
+     * Defines the UpperCamelCase format variation that writes first letter as upper case
+     *
+     * @see StringUtils.FORMAT_CAMEL_CASE
+     */
+    readonly FORMAT_UPPER_CAMEL_CASE = 'FORMAT_UPPER_CAMEL_CASE';
+
+
+    /**
+     * Defines the lowerCamelCase format variation that writes first letter as lower case
+     *
+     * @see StringUtils.FORMAT_CAMEL_CASE
+     */
+    readonly FORMAT_LOWER_CAMEL_CASE = 'FORMAT_LOWER_CAMEL_CASE';
+
+
+    /** Defines the snake_case format (the practice of writing compound words or phrases in which the elements are separated with one underscore character (_) and no spaces) */
+    readonly FORMAT_SNAKE_CASE = 'FORMAT_SNAKE_CASE';
+
+
+    /**
+     * Defines the FORMAT_UPPER_SNAKE_CASE format variation that writes all letters as upper case
+     *
+     * @see StringUtils.FORMAT_SNAKE_CASE
+     */
+    readonly FORMAT_UPPER_SNAKE_CASE = 'FORMAT_UPPER_SNAKE_CASE';
+
+
+    /**
+     * Defines the lower_snake_case format variation that writes all letters as lower case
+     *
+     * @see StringUtils.FORMAT_SNAKE_CASE
+     */
+    readonly FORMAT_LOWER_SNAKE_CASE = 'FORMAT_LOWER_SNAKE_CASE';
     
     
     /**
      * Tells if the given value is a string or not
      *
-     * @param {any} value A value to check
+     * @param value A value to check
      *
-     * @returns {boolean} true if the given value is a string, false otherwise
+     * @returns true if the given value is a string, false otherwise
      */
     public static isString(value:any):boolean {
         
@@ -45,15 +88,36 @@ export class StringUtils {
     
     
     /**
+     * Tells if the given string is a valid url or not
+     *
+     * @param value The value to check
+     *
+     * @return False in case the validation fails or true if validation succeeds.
+     */
+    public static isUrl(value:any) {
+        
+        var res = false;
+    
+        if(!StringUtils.isEmpty(value) && StringUtils.isString(value)){
+    
+            // This amazingly good solution's been found at http://stackoverflow.com/questions/3809401/what-is-a-good-regular-expression-to-match-a-url
+            var urlRegex = '^(?!mailto:)(?:(?:http|https|ftp)://)(?:\\S+(?::\\S*)?@)?(?:(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))|localhost)(?::\\d{2,5})?(?:(/|\\?|#)[^\\s]*)?$';
+    
+            res = !(value.length < 2083 && (new RegExp(urlRegex, 'i')).test(value)) ? false : true;
+        }
+    
+        return res;
+    }
+    
+    
+    /**
      * Tells if a specified string is empty. The string may contain empty spaces, and new line characters but have some lenght, and therefore be EMPTY.
      * This method checks all these different conditions that can tell us that a string is empty.
      * 
-     * @static
-     * 
-     * @param {string} string String to check
-     * @param {array} emptyChars List of strings that will be also considered as empty characters. For example, if we also want to define 'NULL' and '_' as empty string values, we can set this to ['NULL', '_']
+     * @param string String to check
+     * @param emptyChars List of strings that will be also considered as empty characters. For example, if we also want to define 'NULL' and '_' as empty string values, we can set this to ['NULL', '_']
      *
-     * @returns {boolean} false if the string is not empty, true if the string contains only spaces, newlines or any other characters defined as "empty" values
+     * @returns false if the string is not empty, true if the string contains only spaces, newlines or any other characters defined as "empty" values
      */
     public static isEmpty(string:string, emptyChars:string[] = []) {
     
@@ -133,12 +197,10 @@ export class StringUtils {
     /**
      * Count the number of words that exist on the given string
      *
-     * @static
-     * 
      * @param string The string which words will be counted
      * @param wordSeparator ' ' by default. The character that is considered as the word sepparator
      *
-     * @returns int The number of words (elements divided by the wordSeparator value) that are present on the string
+     * @returns The number of words (elements divided by the wordSeparator value) that are present on the string
      */
     public static countWords(string:string, wordSeparator:string = ' ') {
         
@@ -166,13 +228,11 @@ export class StringUtils {
      * Method that limits the lenght of a string and optionally appends informative characters like ' ...'
      * to inform that the original string was longer.
      * 
-     * @static
-     * 
      * @param string String to limit
      * @param limit Max number of characters
      * @param limiterString If the specified text exceeds the specified limit, the value of this parameter will be added to the end of the result. The value is ' ...' by default.
      *
-     * @returns string The specified string but limited in length if necessary. Final result will never exceed the specified limit, also with the limiterString appended.
+     * @returns The specified string but limited in length if necessary. Final result will never exceed the specified limit, also with the limiterString appended.
      */
     public static limitLen(string:string, limit:number = 100, limiterString:string = ' ...') {
         
@@ -206,11 +266,9 @@ export class StringUtils {
      * Extracts the domain name from a given url (excluding subdomain). 
      * For example: http://subdomain.google.com/test/ will result in 'google.com'
      * 
-     * @static
+     * @param url A string containing an URL
      * 
-     * @param {string} url A string containing an URL
-     * 
-     * @returns {string} The domain from the given string (excluding the subdomain if exists)
+     * @returns The domain from the given string (excluding the subdomain if exists)
      */
     public static getDomainFromUrl(url:string) {
         
@@ -231,17 +289,13 @@ export class StringUtils {
      * Extracts the hostname (domain + subdomain) from a given url.
      * For example: http://subdomain.google.com/test/ will result in 'subdomain.google.com'
      * 
-     * @static
+     * @param url A string containing an URL
      * 
-     * @param {string} url A string containing an URL
-     * 
-     * @returns {string} The domain and subdomain from the given string (subdomain.domain.com)
+     * @returns The domain and subdomain from the given string (subdomain.domain.com)
      */
     public static getHostNameFromUrl(url:string) {
         
-        var validationManager = new ValidationManager();
-
-        if(!validationManager.isFilledIn(url) || !validationManager.isUrl(url)){
+        if(StringUtils.isEmpty(url) || !StringUtils.isUrl(url)){
 
             return '';
         }
@@ -266,13 +320,11 @@ export class StringUtils {
      * Extracts all the lines from the given string and outputs an array with each line as an element.
      * It does not matter which line separator's been used (\n, \r, Windows, linux...). All source lines will be correctly extracted.
      * 
-     * @static
-     * 
-     * @param {string} string Text containing one or more lines that will be converted to an array with each line on a different element.
-     * @param {array} filters One or more regular expressions that will be used to filter unwanted lines. Lines that match any of the
+     * @param string Text containing one or more lines that will be converted to an array with each line on a different element.
+     * @param filters One or more regular expressions that will be used to filter unwanted lines. Lines that match any of the
      *  filters will be excluded from the result. By default, all empty lines are ignored (those containing only newline, blank, tabulators, etc..).
      *
-     * @returns {array} A list with all the string lines sepparated as different array elements.
+     * @returns A list with all the string lines sepparated as different array elements.
      */
     public static getLines(string:string, filters:RegExp[] = [/\s+/g]) {
     
@@ -284,7 +336,7 @@ export class StringUtils {
             return res;
         }
 
-        var tmp:string[] = string.split(/\r?\n/);
+        var tmp:string[] = string.split(/\r?\n|\n|\r/);
 
         for(var i = 0; i < tmp.length; i++){
 
@@ -315,11 +367,9 @@ export class StringUtils {
      * Given a filesystem path which contains some file, this method extracts the filename plus its extension.
      * Example: "//folder/folder2/folder3/file.txt" -> results in "file.txt"
      * 
-     * @static
-     * 
-     * @param {string} path An OS system path containing some file
+     * @param path An OS system path containing some file
      *
-     * @returns {string} The extracted filename and extension, like: finemane.txt
+     * @returns The extracted filename and extension, like: finemane.txt
      */
     public static getFileNameWithExtension(path:string){
     
@@ -345,11 +395,9 @@ export class StringUtils {
      * Given a filesystem path which contains some file, this method extracts the filename WITHOUT its extension.
      * Example: "//folder/folder2/folder3/file.txt" -> results in "file"
      *
-     * @static
-     * 
-     * @param {string} path An OS system path containing some file
+     * @param path An OS system path containing some file
      *
-     * @returns {string} The extracted filename WITHOUT extension, like: finemane
+     * @returns The extracted filename WITHOUT extension, like: finemane
      */
     public static getFileNameWithoutExtension(path:string) {
     
@@ -373,11 +421,9 @@ export class StringUtils {
      * Given a filesystem path which contains some file, this method extracts only the file extension
      * Example: "//folder/folder2/folder3/file.txt" -> results in "txt"
      * 
-     * @static
-     * 
-     * @param {string} path An OS system path containing some file
+     * @param path An OS system path containing some file
      *
-     * @returns {string} The file extension WITHOUT the dot character. For example: jpg, png, js, exe ...
+     * @returns The file extension WITHOUT the dot character. For example: jpg, png, js, exe ...
      */
     public static getFileExtension(path:string) {
     
@@ -395,13 +441,11 @@ export class StringUtils {
      * Given an internet URL, this method extracts only the scheme part.
      * Example: "http://google.com" -> results in "http"
      * 
-     * @static
-     * 
      * @see StringUtils.formatUrl, ValidationManager.isUrl
      * 
-     * @param {string} url A valid internet url
+     * @param url A valid internet url
      *
-     * @returns {string} ('ftp', 'http', ...) if the url is valid or '' if the url is invalid
+     * @returns ('ftp', 'http', ...) if the url is valid or '' if the url is invalid
      */
     public static getSchemeFromUrl(url:string) {
     
@@ -410,14 +454,12 @@ export class StringUtils {
             return '';
         }
 
-        var validationManager = new ValidationManager();
-
-        if(!validationManager.isString(url)){
+        if(!StringUtils.isString(url)){
 
             throw new Error("StringUtils.getSchemeFromUrl: Specified value must be a string");
         }
 
-        if(!validationManager.isUrl(url)){
+        if(!StringUtils.isUrl(url)){
 
             return '';
         }
@@ -443,11 +485,9 @@ export class StringUtils {
      * 
      * NOTE: This method will not check if the path is a real path on the current file system; it will only fix formatting problems
      * 
-     * @static
-     * 
      * @param path The path that must be formatted
      *
-     * @returns string The correctly formatted path without any trailing directory separator
+     * @returns The correctly formatted path without any trailing directory separator
      */
     public static formatPath(path:string):string {
     
@@ -494,26 +534,23 @@ export class StringUtils {
      * 
      * @see https://en.wikipedia.org/wiki/Uniform_Resource_Locator#Syntax
      * 
-     * @static
-     *
-     * @returns {string} The formated url string or the original string if it was not a valid url
+     * @returns The formated url string or the original string if it was not a valid url
      */
     public static formatUrl(url:string) {
         
         var urlSeparator:string = '/';
-        var validationManager = new ValidationManager();
-
+        
         if(url == null || url == undefined || url == ''){
 
             return '';
         }
 
-        if(!validationManager.isString(url)){
+        if(!StringUtils.isString(url)){
 
             throw new Error("StringUtils.formatUrl: Specified value must be a string");
         }
 
-        if(!validationManager.isFilledIn(url)){
+        if(StringUtils.isEmpty(url)){
 
             return url;
         }
@@ -539,7 +576,7 @@ export class StringUtils {
 
         if(scheme === ''){
 
-            if(validationManager.isUrl('http://' + url)){
+            if(StringUtils.isUrl('http://' + url)){
 
                 return 'http://' + url;
             }
@@ -557,6 +594,12 @@ export class StringUtils {
     
     public static generateRandomPassword() {
     
+        // TODO: translate from php
+    }
+    
+    
+    public static removeNewLineCharacters() {
+        
         // TODO: translate from php
     }
     
@@ -854,5 +897,41 @@ export class StringUtils {
 
             return diacriticsMap[a] || a;
         });
+    }
+    
+    
+    public static removeWordsShorterThan() {
+        
+        // TODO: translate from php
+    }
+    
+    
+    public static removeWordsLongerThan() {
+        
+        // TODO: translate from php
+    }
+    
+    
+    public static removeUrls() {
+        
+        // TODO: translate from php
+    }
+    
+    
+    public static removeEmails() {
+        
+        // TODO: translate from php
+    }
+    
+    
+    public static removeHtmlCode() {
+        
+        // TODO: translate from php
+    }
+    
+    
+    public static removeMultipleSpaces() {
+        
+        // TODO: translate from php
     }
 }

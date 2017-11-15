@@ -49,6 +49,76 @@ QUnit.test("isString", function(assert) {
 
 
 /**
+ * isUrl
+ */
+QUnit.test("isUrl", function(assert) {
+
+    // Wrong url cases
+    assert.ok(!StringUtils.isUrl(''));
+    assert.ok(!StringUtils.isUrl(null));
+    assert.ok(!StringUtils.isUrl(undefined));
+    assert.ok(!StringUtils.isUrl([]));
+    assert.ok(!StringUtils.isUrl('    '));
+    assert.ok(!StringUtils.isUrl('123f56ccaca'));
+    assert.ok(!StringUtils.isUrl('8/%$144///(!(/"'));
+    assert.ok(!StringUtils.isUrl('http'));
+    assert.ok(!StringUtils.isUrl('x.y'));
+    assert.ok(!StringUtils.isUrl('http://x.y'));
+    assert.ok(!StringUtils.isUrl('google.com-'));
+    assert.ok(!StringUtils.isUrl("\n   \t\n"));
+    assert.ok(!StringUtils.isUrl('http:\\google.com'));
+    assert.ok(!StringUtils.isUrl('_http://google.com'));
+    assert.ok(!StringUtils.isUrl('http://www.example..com'));
+    assert.ok(!StringUtils.isUrl('http://.com'));
+    assert.ok(!StringUtils.isUrl('http://www.example.'));
+    assert.ok(!StringUtils.isUrl('http:/www.example.com'));
+    assert.ok(!StringUtils.isUrl('http://'));
+    assert.ok(!StringUtils.isUrl('http://.'));
+    assert.ok(!StringUtils.isUrl('http://??/'));
+    assert.ok(!StringUtils.isUrl('http://foo.bar?q=Spaces should be encoded'));
+    assert.ok(!StringUtils.isUrl('rdar://1234'));
+    assert.ok(!StringUtils.isUrl('http://foo.bar/foo(bar)baz quux'));
+    assert.ok(!StringUtils.isUrl('http://10.1.1.255'));
+    assert.ok(!StringUtils.isUrl('http://.www.foo.bar./'));
+    assert.ok(!StringUtils.isUrl('http://.www.foo.bar/'));
+    assert.ok(!StringUtils.isUrl('ftp://user:password@host:port/path'));
+    assert.ok(!StringUtils.isUrl('/nfs/an/disks/jj/home/dir/file.txt'));
+    assert.ok(!StringUtils.isUrl('C:\\Program Files (x86)'));
+
+    // good url cases
+    assert.ok(StringUtils.isUrl('http://x.ye'));
+    assert.ok(StringUtils.isUrl('http://google.com'));
+    assert.ok(StringUtils.isUrl('ftp://mydomain.com'));
+    assert.ok(StringUtils.isUrl('http://www.example.com:8800'));
+    assert.ok(StringUtils.isUrl('http://www.example.com/a/b/c/d/e/f/g/h/i.html'));
+    assert.ok(StringUtils.isUrl('http://www.test.com/do.html#A'));
+    assert.ok(StringUtils.isUrl('https://subdomain.test.com/'));
+    assert.ok(StringUtils.isUrl('https://test.com'));
+    assert.ok(StringUtils.isUrl('http://foo.com/blah_blah/'));
+    assert.ok(StringUtils.isUrl('https://www.example.com/foo/?bar=baz&inga=42&quux'));
+    assert.ok(StringUtils.isUrl('http://userid@example.com:8080'));
+    assert.ok(StringUtils.isUrl('http://➡.ws/䨹'));
+    assert.ok(StringUtils.isUrl('http://⌘.ws/'));
+    assert.ok(StringUtils.isUrl('http://foo.bar/?q=Test%20URL-encoded%20stuff'));
+    assert.ok(StringUtils.isUrl('http://-.~_!$&\'()*+,;=:%40:80%2f::::::@example.com'));
+    assert.ok(StringUtils.isUrl('http://223.255.255.254'));
+    assert.ok(StringUtils.isUrl('ftp://user:password@host.com:8080/path'));
+    assert.ok(StringUtils.isUrl('http://www.test.com?pageid=123&testid=1524'));
+    
+    // Test non string values throw exceptions
+    assert.throws(function() {
+
+        StringUtils.isUrl([12341]);
+    });
+
+    assert.throws(function() {
+
+        StringUtils.isUrl(12341);
+    });
+});
+
+
+/**
  * isEmpty
  */
 QUnit.test("isEmpty", function(assert) {
@@ -80,40 +150,36 @@ QUnit.test("isEmpty", function(assert) {
 /**
  * isCamelCase
  */
-QUnit.test("isCamelCase", function(assert) {
+QUnit.todo("isCamelCase", function(assert) {
 
     // TODO: copy tests from PHP
-    assert.ok(true);
 });
 
 
 /**
  * isSnakeCase
  */
-QUnit.test("isSnakeCase", function(assert) {
+QUnit.todo("isSnakeCase", function(assert) {
 
     // TODO: copy tests from PHP
-    assert.ok(true);
 });
 
 
 /**
  * countStringOccurences
  */
-QUnit.test("countStringOccurences", function(assert) {
+QUnit.todo("countStringOccurences", function(assert) {
 
     // TODO: copy tests from PHP
-    assert.ok(true);
 });
 
 
 /**
  * countCapitalLetters
  */
-QUnit.test("countCapitalLetters", function(assert) {
+QUnit.todo("countCapitalLetters", function(assert) {
 
     // TODO: copy tests from PHP
-    assert.ok(true);
 });
 
 
@@ -235,24 +301,28 @@ QUnit.test("getLines", function(assert) {
     assert.ok(ArrayUtils.isEqualTo(StringUtils.getLines('          '), []));
     assert.ok(ArrayUtils.isEqualTo(StringUtils.getLines('single line'), ['single line']));
     assert.ok(ArrayUtils.isEqualTo(StringUtils.getLines("line1\nline2\nline3"), ['line1', 'line2', 'line3']));
+    assert.ok(ArrayUtils.isEqualTo(StringUtils.getLines("line1\rline2\rline3"), ['line1', 'line2', 'line3']));
+    assert.ok(ArrayUtils.isEqualTo(StringUtils.getLines("line1\r\nline2\r\nline3"), ['line1', 'line2', 'line3']));
     assert.ok(ArrayUtils.isEqualTo(StringUtils.getLines("line1\n        \nline2"), ['line1', 'line2']));
     assert.ok(ArrayUtils.isEqualTo(StringUtils.getLines("line1\n\n\n\t\r       \nline2"), ['line1', 'line2']));
     assert.ok(ArrayUtils.isEqualTo(StringUtils.getLines("line1\r\n   \r\nline2"), ['line1', 'line2']));
     assert.ok(ArrayUtils.isEqualTo(StringUtils.getLines("line1\n 1  \nline2"), ['line1', ' 1  ', 'line2']));
+    assert.ok(ArrayUtils.isEqualTo(StringUtils.getLines("line1\r\n 1  \n\r\r\nline2"), ['line1', ' 1  ', 'line2']));
 
     assert.ok(ArrayUtils.isEqualTo(StringUtils.getLines('          ', []), ['          ']));
+    assert.ok(ArrayUtils.isEqualTo(StringUtils.getLines("line1\r   \rline2", []), ['line1', '   ', 'line2']));
     assert.ok(ArrayUtils.isEqualTo(StringUtils.getLines("line1\n   \nline2", []), ['line1', '   ', 'line2']));
     assert.ok(ArrayUtils.isEqualTo(StringUtils.getLines("line1\r\n   \r\nline2", []), ['line1', '   ', 'line2']));
+    assert.ok(ArrayUtils.isEqualTo(StringUtils.getLines("line1\n\n\n\t\r       \nline2", []), ['line1', "\t", '       ', 'line2']));
 });
 
 
 /**
  * getKeyWords
  */
-QUnit.test("getKeyWords", function(assert) {
+QUnit.todo("getKeyWords", function(assert) {
 
     // TODO: copy tests from PHP
-    assert.ok(true);
 });
 
 
@@ -344,10 +414,9 @@ QUnit.test("getSchemeFromUrl", function(assert) {
 /**
  * formatCase
  */
-QUnit.test("formatCase", function(assert) {
+QUnit.todo("formatCase", function(assert) {
 
     // TODO: copy tests from PHP
-    assert.ok(true);
 });
 
 
@@ -420,20 +489,27 @@ QUnit.test("formatUrl", function(assert) {
 /**
  * formatForFullTextSearch
  */
-QUnit.test("formatForFullTextSearch", function(assert) {
+QUnit.todo("formatForFullTextSearch", function(assert) {
 
     // TODO: copy tests from PHP
-    assert.ok(true);
 });
 
 
 /**
  * generateRandomPassword
  */
-QUnit.test("generateRandomPassword", function(assert) {
+QUnit.todo("generateRandomPassword", function(assert) {
 
     // TODO: copy tests from PHP
-    assert.ok(true);
+});
+
+
+/**
+ * testRemoveNewLineCharacters
+ */
+QUnit.todo("testRemoveNewLineCharacters", function(assert) {
+
+    // TODO: copy tests from PHP
 });
 
 
@@ -456,65 +532,58 @@ QUnit.test("removeAccents", function(assert) {
     assert.ok(StringUtils.removeAccents('óíéàùú hello') === 'oieauu hello');
     assert.ok(StringUtils.removeAccents("óóó èèè\núùúùioler    \r\noughúíééanh hello") === "ooo eee\nuuuuioler    \r\noughuieeanh hello");
     assert.ok(StringUtils.removeAccents('öïüíúóèà go!!.;') === 'oiuiuoea go!!.;');
-
 });
 
 
 /**
  * removeWordsShorterThan
  */
-QUnit.test("removeWordsShorterThan", function(assert) {
+QUnit.todo("removeWordsShorterThan", function(assert) {
 
     // TODO: copy tests from PHP
-    assert.ok(true);
 });
 
 
 /**
  * removeWordsLongerThan
  */
-QUnit.test("removeWordsLongerThan", function(assert) {
+QUnit.todo("removeWordsLongerThan", function(assert) {
 
     // TODO: copy tests from PHP
-    assert.ok(true);
 });
 
 
 /**
  * removeUrls
  */
-QUnit.test("removeUrls", function(assert) {
+QUnit.todo("removeUrls", function(assert) {
 
     // TODO: copy tests from PHP
-    assert.ok(true);
 });
 
 
 /**
  * removeEmails
  */
-QUnit.test("removeEmails", function(assert) {
+QUnit.todo("removeEmails", function(assert) {
 
     // TODO: copy tests from PHP
-    assert.ok(true);
 });
 
 
 /**
  * removeHtmlCode
  */
-QUnit.test("removeHtmlCode", function(assert) {
+QUnit.todo("removeHtmlCode", function(assert) {
 
     // TODO: copy tests from PHP
-    assert.ok(true);
 });
 
 
 /**
  * removeMultipleSpaces
  */
-QUnit.test("removeMultipleSpaces", function(assert) {
+QUnit.todo("removeMultipleSpaces", function(assert) {
 
     // TODO: copy tests from PHP
-    assert.ok(true);
 });
