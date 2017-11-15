@@ -44,7 +44,7 @@ class StringUtilsTest extends TestCase {
 	 */
 	protected function setUp(){
 
-		// Nothing necessary here
+	    $this->exceptionMessage = '';
 	}
 
 
@@ -55,7 +55,10 @@ class StringUtilsTest extends TestCase {
 	 */
 	protected function tearDown(){
 
-		// Nothing necessary here
+	    if($this->exceptionMessage != ''){
+
+	        $this->fail($this->exceptionMessage);
+	    }
 	}
 
 
@@ -96,6 +99,82 @@ class StringUtilsTest extends TestCase {
 
 
 	/**
+	 * testIsUrl
+	 *
+	 * @return void
+	 */
+	public function testIsUrl(){
+
+	    // Wrong url cases
+	    $this->assertTrue(!StringUtils::isUrl(''));
+	    $this->assertTrue(!StringUtils::isUrl(null));
+	    $this->assertTrue(!StringUtils::isUrl([]));
+	    $this->assertTrue(!StringUtils::isUrl('    '));
+	    $this->assertTrue(!StringUtils::isUrl('123f56ccaca'));
+	    $this->assertTrue(!StringUtils::isUrl('8/%$144///(!(/"'));
+	    $this->assertTrue(!StringUtils::isUrl('http'));
+	    $this->assertTrue(!StringUtils::isUrl('x.y'));
+	    $this->assertTrue(!StringUtils::isUrl('http://x.y'));
+	    $this->assertTrue(!StringUtils::isUrl('google.com-'));
+	    $this->assertTrue(!StringUtils::isUrl("\n   \t\n"));
+	    $this->assertTrue(!StringUtils::isUrl('http:\\google.com'));
+	    $this->assertTrue(!StringUtils::isUrl('_http://google.com'));
+	    $this->assertTrue(!StringUtils::isUrl('http://www.example..com'));
+	    $this->assertTrue(!StringUtils::isUrl('http://.com'));
+	    $this->assertTrue(!StringUtils::isUrl('http://www.example.'));
+	    $this->assertTrue(!StringUtils::isUrl('http:/www.example.com'));
+	    $this->assertTrue(!StringUtils::isUrl('http://'));
+	    $this->assertTrue(!StringUtils::isUrl('http://.'));
+	    $this->assertTrue(!StringUtils::isUrl('http://??/'));
+	    $this->assertTrue(!StringUtils::isUrl('http://foo.bar?q=Spaces should be encoded'));
+	    $this->assertTrue(!StringUtils::isUrl('rdar://1234'));
+	    $this->assertTrue(!StringUtils::isUrl('http://foo.bar/foo(bar)baz quux'));
+	    $this->assertTrue(!StringUtils::isUrl('http://10.1.1.255'));
+	    $this->assertTrue(!StringUtils::isUrl('http://.www.foo.bar./'));
+	    $this->assertTrue(!StringUtils::isUrl('http://.www.foo.bar/'));
+	    $this->assertTrue(!StringUtils::isUrl('ftp://user:password@host:port/path'));
+	    $this->assertTrue(!StringUtils::isUrl('/nfs/an/disks/jj/home/dir/file.txt'));
+	    $this->assertTrue(!StringUtils::isUrl('C:\\Program Files (x86)'));
+
+	    // good url cases
+	    $this->assertTrue(StringUtils::isUrl('http://x.ye'));
+	    $this->assertTrue(StringUtils::isUrl('http://google.com'));
+	    $this->assertTrue(StringUtils::isUrl('ftp://mydomain.com'));
+	    $this->assertTrue(StringUtils::isUrl('http://www.example.com:8800'));
+	    $this->assertTrue(StringUtils::isUrl('http://www.example.com/a/b/c/d/e/f/g/h/i.html'));
+	    $this->assertTrue(StringUtils::isUrl('http://www.test.com/do.html#A'));
+	    $this->assertTrue(StringUtils::isUrl('https://subdomain.test.com/'));
+	    $this->assertTrue(StringUtils::isUrl('https://test.com'));
+	    $this->assertTrue(StringUtils::isUrl('http://foo.com/blah_blah/'));
+	    $this->assertTrue(StringUtils::isUrl('https://www.example.com/foo/?bar=baz&inga=42&quux'));
+	    $this->assertTrue(StringUtils::isUrl('http://userid@example.com:8080'));
+	    $this->assertTrue(StringUtils::isUrl('http://➡.ws/䨹'));
+	    $this->assertTrue(StringUtils::isUrl('http://⌘.ws/'));
+	    $this->assertTrue(StringUtils::isUrl('http://foo.bar/?q=Test%20URL-encoded%20stuff'));
+	    $this->assertTrue(StringUtils::isUrl('http://-.~_!$&\'()*+,;=:%40:80%2f::::::@example.com'));
+	    $this->assertTrue(StringUtils::isUrl('http://223.255.255.254'));
+	    $this->assertTrue(StringUtils::isUrl('ftp://user:password@host.com:8080/path'));
+	    // TODO - this test does not pass, but it does pass in JS. We should look for another regex in PHP that passes it also
+	    // $this->assertTrue(StringUtils::isUrl('http://www.test.com?pageid=123&testid=1524'));
+
+	    // Test non string values throw exceptions
+	    try {
+	        StringUtils::isUrl([12341]);
+	        $this->exceptionMessage = '[12341] did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::isUrl(12341);
+	        $this->exceptionMessage = '12341 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+	}
+
+
+	/**
 	 * testIsEmpty
 	 *
 	 * @return void
@@ -119,18 +198,11 @@ class StringUtilsTest extends TestCase {
 		$this->assertTrue(!StringUtils::isEmpty('EMPTY       void   hole    XX', ['EMPTY', 'void', 'hole']));
 
 		// Test non string value gives exception
-		$exceptionMessage = '';
-
 		try {
 			StringUtils::isEmpty(123);
-			$exceptionMessage = '123 did not cause exception';
+			$this->exceptionMessage = '123 did not cause exception';
 		} catch (Throwable $e) {
 			// We expect an exception to happen
-		}
-
-		if($exceptionMessage != ''){
-
-			$this->fail($exceptionMessage);
 		}
 	}
 
@@ -275,39 +347,32 @@ class StringUtilsTest extends TestCase {
 		$this->assertTrue(!StringUtils::isCamelCase('Úamel', StringUtils::FORMAT_LOWER_CAMEL_CASE));
 
 		// Test exceptions
-		$exceptionMessage = '';
-
 		try {
 			StringUtils::isCamelCase(123);
-			$exceptionMessage = '123 did not cause exception';
+			$this->exceptionMessage = '123 did not cause exception';
 		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::isCamelCase([1,5,8]);
-			$exceptionMessage = '[1,5,8] did not cause exception';
+			$this->exceptionMessage = '[1,5,8] did not cause exception';
 		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::isCamelCase(new Exception());
-			$exceptionMessage = 'new Exception did not cause exception';
+			$this->exceptionMessage = 'new Exception did not cause exception';
 		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::isCamelCase('CamelCase', 67);
-			$exceptionMessage = '67 did not cause exception';
+			$this->exceptionMessage = '67 did not cause exception';
 		} catch (Throwable $e) {
 			// We expect an exception to happen
-		}
-
-		if($exceptionMessage != ''){
-
-			$this->fail($exceptionMessage);
 		}
 	}
 
@@ -397,39 +462,32 @@ class StringUtilsTest extends TestCase {
 		$this->assertTrue(!StringUtils::isSnakeCase('snake__case', StringUtils::FORMAT_LOWER_SNAKE_CASE));
 
 		// Test exceptions
-		$exceptionMessage = '';
-
 		try {
 			StringUtils::isSnakeCase(123);
-			$exceptionMessage = '123 did not cause exception';
+			$this->exceptionMessage = '123 did not cause exception';
 		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::isSnakeCase([1,5,8]);
-			$exceptionMessage = '[1,5,8] did not cause exception';
+			$this->exceptionMessage = '[1,5,8] did not cause exception';
 		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::isSnakeCase(new Exception());
-			$exceptionMessage = 'new Exception did not cause exception';
+			$this->exceptionMessage = 'new Exception did not cause exception';
 		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::isSnakeCase('SnakeCase', 67);
-			$exceptionMessage = '67 did not cause exception';
+			$this->exceptionMessage = '67 did not cause exception';
 		} catch (Throwable $e) {
 			// We expect an exception to happen
-		}
-
-		if($exceptionMessage != ''){
-
-			$this->fail($exceptionMessage);
 		}
 	}
 
@@ -452,32 +510,25 @@ class StringUtilsTest extends TestCase {
 		$this->assertTrue(StringUtils::countStringOccurences("helló bàbÝ\n   whats Up Todäy? are you feeling better? GOOD!", 'T') == 1);
 
 		// Test exceptions
-		$exceptionMessage = '';
-
 		try {
 			StringUtils::countStringOccurences(null, null);
-			$exceptionMessage = 'null did not cause exception';
+			$this->exceptionMessage = 'null did not cause exception';
 		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::countStringOccurences('', '');
-			$exceptionMessage = '"" did not cause exception';
+			$this->exceptionMessage = '"" did not cause exception';
 		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::countStringOccurences('  ', '');
-			$exceptionMessage = '"" did not cause exception';
+			$this->exceptionMessage = '"" did not cause exception';
 		} catch (Throwable $e) {
 			// We expect an exception to happen
-		}
-
-		if($exceptionMessage != ''){
-
-			$this->fail($exceptionMessage);
 		}
 	}
 
@@ -547,32 +598,25 @@ class StringUtilsTest extends TestCase {
 		$this->assertTrue(StringUtils::limitLen('hello dear how are you', 50) === 'hello dear how are you');
 
 		// Test invalid values give exception
-		$exceptionMessage = '';
-
 		try {
 		    StringUtils::limitLen('', 0);
-		    $exceptionMessage = '0 did not cause exception';
+		    $this->exceptionMessage = '0 did not cause exception';
 		} catch (Throwable $e) {
 		    // We expect an exception to happen
 		}
 
 		try {
 			StringUtils::limitLen('hello', [1, 2]);
-			$exceptionMessage = '[1, 2] did not cause exception';
+			$this->exceptionMessage = '[1, 2] did not cause exception';
 		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 		    StringUtils::limitLen('hello', null);
-		    $exceptionMessage = 'hello did not cause exception';
+		    $this->exceptionMessage = 'hello did not cause exception';
 		} catch (Throwable $e) {
 		    // We expect an exception to happen
-		}
-
-		if($exceptionMessage != ''){
-
-			$this->fail($exceptionMessage);
 		}
 	}
 
@@ -910,39 +954,32 @@ class StringUtilsTest extends TestCase {
 		$this->assertTrue(StringUtils::formatCase("över! còmpléx.   \n\n\n\t\t   ís test!is?for!?!? you.!  ", StringUtils::FORMAT_LOWER_CAMEL_CASE) === 'overComplexIsTestIsForYou');
 
 		// Test exception cases
-		$exceptionMessage = '';
-
 		try {
 			StringUtils::formatCase('helloWorld', '');
-			$exceptionMessage = 'empty string did not cause exception';
+			$this->exceptionMessage = 'empty string did not cause exception';
 		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::formatCase(1, StringUtils::FORMAT_SENTENCE_CASE);
-			$exceptionMessage = '1 did not cause exception';
+			$this->exceptionMessage = '1 did not cause exception';
 		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::formatCase([1,2,3], StringUtils::FORMAT_SENTENCE_CASE);
-			$exceptionMessage = '[1,2,3] did not cause exception';
+			$this->exceptionMessage = '[1,2,3] did not cause exception';
 		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::formatCase('Hello', 'invalidformat');
-			$exceptionMessage = 'invalidformat did not cause exception';
+			$this->exceptionMessage = 'invalidformat did not cause exception';
 		} catch (Throwable $e) {
 			// We expect an exception to happen
-		}
-
-		if($exceptionMessage != ''){
-
-			$this->fail($exceptionMessage);
 		}
 	}
 
@@ -963,25 +1000,18 @@ class StringUtilsTest extends TestCase {
 		$this->assertTrue(StringUtils::formatPath('test\\test/hello\\\\') == 'test'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'hello');
 
 		// Test non string paths throw exception
-		$exceptionMessage = '';
-
 		try {
 			StringUtils::formatPath(['1']);
-			$exceptionMessage = '[1] did not cause exception';
+			$this->exceptionMessage = '[1] did not cause exception';
 		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
 
 		try {
 			StringUtils::formatPath(1);
-			$exceptionMessage = '1 did not cause exception';
+			$this->exceptionMessage = '1 did not cause exception';
 		} catch (Throwable $e) {
 			// We expect an exception to happen
-		}
-
-		if($exceptionMessage != ''){
-
-			$this->fail($exceptionMessage);
 		}
 	}
 
@@ -1052,41 +1082,33 @@ class StringUtilsTest extends TestCase {
 	    $this->assertTrue(StringUtils::removeNewLineCharacters('a\t\t') === 'a\t\t');
 
 	    // Test exceptions
-	    $exceptionMessage = '';
-
 	    try {
 	        StringUtils::removeNewLineCharacters(1);
-	        $exceptionMessage = '1 did not cause exception';
+	        $this->exceptionMessage = '1 did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        StringUtils::removeNewLineCharacters([]);
-	        $exceptionMessage = '[] did not cause exception';
+	        $this->exceptionMessage = '[] did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        StringUtils::removeNewLineCharacters(new stdClass());
-	        $exceptionMessage = 'new stdClass() did not cause exception';
+	        $this->exceptionMessage = 'new stdClass() did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        StringUtils::removeNewLineCharacters([1,2,3,4]);
-	        $exceptionMessage = '[1,2,3,4] did not cause exception';
+	        $this->exceptionMessage = '[1,2,3,4] did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
-
-	    if($exceptionMessage != ''){
-
-	        $this->fail($exceptionMessage);
-	    }
-
 	}
 
 

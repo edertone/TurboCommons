@@ -90,6 +90,39 @@ class StringUtils {
 
 
     /**
+     * Tells if the given string is a valid url or not
+     *
+     * @param mixed $value The value to check
+     *
+     * @return boolean False in case the validation fails or true if validation succeeds.
+     */
+    public static function isUrl($value){
+
+        $res = false;
+
+        if(!self::isEmpty($value) && is_string($value)){
+
+            // This amazingly good solution's been found at https://jkwl.io/php/regex/2015/05/18/url-validation-php-regex.html
+            $urlRegex = '#^(?:(?:https?|ftp):\\/\\/)?(?:\\S+(?::\\S*)?@)?(?:(?!(?:10|127)(?:\\.\\d{1,3}){3})(?!(?:169\\.254|192\\.168)(?:\\.\\d{1,3}){2})(?!172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|' .
+                // host name
+            "(?:(?:[a-z\\x{00a1}-\\x{ffff}0-9]-*)*[a-z\\x{00a1}-\\x{ffff}0-9]+)" .
+            // domain name
+            "(?:\\.(?:[a-z\\x{00a1}-\\x{ffff}0-9]-*)*[a-z\\x{00a1}-\\x{ffff}0-9]+)*" .
+            // TLD identifier
+            '(?:\\.(?:[a-z\\x{00a1}-\\x{ffff}]{2,})))' .
+            // port number
+            '(?::\\d{2,5})?' .
+            // resource path
+            '(?:\\/\\S*)?$#ui';
+
+            $res = (strlen($value) < 2083 && preg_match($urlRegex, $value));
+        }
+
+        return $res;
+    }
+
+
+    /**
      * Tells if a specified string is empty. The string may contain empty spaces, and new line characters but have some lenght, and therefore be EMPTY.
      * This method checks all these different conditions that can tell us that a string is empty.
      *

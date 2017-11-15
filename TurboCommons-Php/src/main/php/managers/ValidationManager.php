@@ -125,27 +125,7 @@ class ValidationManager extends BaseStrictClass{
 	 */
 	public function isUrl($value, string $errorMessage = 'value is not an URL', bool $isWarning = false){
 
-	    $res = false;
-
-		if(!StringUtils::isEmpty($value) && is_string($value)){
-
-			// This amazingly good solution's been found at https://jkwl.io/php/regex/2015/05/18/url-validation-php-regex.html
-			$urlRegex = '#^(?:(?:https?|ftp):\\/\\/)?(?:\\S+(?::\\S*)?@)?(?:(?!(?:10|127)(?:\\.\\d{1,3}){3})(?!(?:169\\.254|192\\.168)(?:\\.\\d{1,3}){2})(?!172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|' .
-			        // host name
-			        "(?:(?:[a-z\\x{00a1}-\\x{ffff}0-9]-*)*[a-z\\x{00a1}-\\x{ffff}0-9]+)" .
-			        // domain name
-			        "(?:\\.(?:[a-z\\x{00a1}-\\x{ffff}0-9]-*)*[a-z\\x{00a1}-\\x{ffff}0-9]+)*" .
-			        // TLD identifier
-			        '(?:\\.(?:[a-z\\x{00a1}-\\x{ffff}]{2,})))' .
-			        // port number
-			        '(?::\\d{2,5})?' .
-			        // resource path
-			        '(?:\\/\\S*)?$#ui';
-
-			$res = (strlen($value) < 2083 && preg_match($urlRegex, $value));
-		}
-
-		return $this->_updateValidationStatus($res, $errorMessage, $isWarning);
+	    return $this->_updateValidationStatus(StringUtils::isUrl($value), $errorMessage, $isWarning);
 	}
 
 

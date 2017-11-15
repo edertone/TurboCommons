@@ -11,7 +11,6 @@
 
 namespace org\turbocommons\src\main\php\managers;
 
-use org\turbocommons\src\main\php\utils\HTTPUtils;
 use DirectoryIterator;
 use Exception;
 use UnexpectedValueException;
@@ -26,6 +25,7 @@ class FilesManager extends BaseStrictClass{
 
 
     /** Defines if some of the class methods will accept internet urls in addition to regular OS filesystem paths as parameters */
+    // TODO - Accept urls will disappear from files manager. It will be only used with local file system.
     public $acceptUrls = false;
 
 
@@ -46,7 +46,7 @@ class FilesManager extends BaseStrictClass{
             return true;
         }
 
-        if($this->acceptUrls && HTTPUtils::urlExists($path)){
+        if($this->acceptUrls && (new HTTPManager())->urlExists($path)){
 
             if(!ini_get('allow_url_fopen')){
 
@@ -82,7 +82,7 @@ class FilesManager extends BaseStrictClass{
 
         if($this->acceptUrls){
 
-            if(HTTPUtils::urlExists($path)){
+            if((new HTTPManager())->urlExists($path)){
 
                 return true;
             }
@@ -602,7 +602,7 @@ class FilesManager extends BaseStrictClass{
 
             $fileFound = false;
 
-            if($this->acceptUrls && HTTPUtils::urlExists($path)){
+            if($this->acceptUrls && (new HTTPManager())->urlExists($path)){
 
                 if(!ini_get('allow_url_fopen')){
 
