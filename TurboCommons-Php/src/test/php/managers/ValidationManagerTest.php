@@ -431,6 +431,7 @@ class ValidationManagerTest extends TestCase {
 	public function testIsDate(){
 
 		// TODO - copy from js
+	    $this->markTestIncomplete('This test is incomplete.');
 	}
 
 
@@ -442,6 +443,7 @@ class ValidationManagerTest extends TestCase {
 	public function testIsMail(){
 
 		// TODO - copy from js
+	    $this->markTestIncomplete('This test is incomplete.');
 	}
 
 

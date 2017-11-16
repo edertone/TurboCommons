@@ -56,7 +56,7 @@ class ArrayUtils {
 		for($i = 0, $l = $array1Count; $i < $l; $i++){
 
 			// Check if we have nested arrays
-			if($validationManager->isArray($array1[$i]) && $validationManager->isArray($array2[$i])){
+		    if(self::isArray($array1[$i]) && self::isArray($array2[$i])){
 
 				if(!self::isEqualTo($array1[$i], $array2[$i])){
 
@@ -65,7 +65,7 @@ class ArrayUtils {
 
 			}else{
 
-				if($validationManager->isObject($array1[$i]) && $validationManager->isObject($array2[$i])){
+			    if(ObjectUtils::isObject($array1[$i]) && ObjectUtils::isObject($array2[$i])){
 
 					if(!ObjectUtils::isEqualTo($array1[$i], $array2[$i])){
 
