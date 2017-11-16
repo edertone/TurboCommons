@@ -123,8 +123,6 @@ class DateTimeObjectTest extends TestCase {
             $this->assertSame(DateTimeObject::getCurrentHour(), $dateTime->getHour());
             $this->assertSame(DateTimeObject::getCurrentMinute(), $dateTime->getMinute());
             $this->assertGreaterThanOrEqual($dateTime->getSecond(), DateTimeObject::getCurrentSecond());
-            $this->assertGreaterThanOrEqual($dateTime->getMiliSecond(), DateTimeObject::getCurrentMiliSecond());
-            $this->assertGreaterThanOrEqual($dateTime->getMicroSecond(), DateTimeObject::getCurrentMicroSecond());
             $this->assertSame(DateTimeObject::getCurrentTimeZoneOffset(), $dateTime->getTimeZoneOffset());
             $this->assertContains('Europe', $dateTime->getTimeZoneName());
         }
