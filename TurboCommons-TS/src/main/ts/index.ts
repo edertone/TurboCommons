@@ -9,6 +9,7 @@
 
 
 // Managers package
+export { BrowserManager } from './managers/BrowserManager';
 export { ValidationManager} from './managers/ValidationManager';
 
 // Model package
