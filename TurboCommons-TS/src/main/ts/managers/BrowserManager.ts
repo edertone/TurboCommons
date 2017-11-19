@@ -379,15 +379,15 @@ export class BrowserManager{
         const destinationValueY = ArrayUtils.isArray(destination) ? (<[number, number]>destination)[1] : (<HTMLScriptElement>destination).offsetTop;
         
         // Calculate the real value where scrollbars must move
-        let destinationX = 0;
-        let destinationY = 0;
+        let destinationX = startX;
+        let destinationY = startY;
             
-        if(destinationValueX > windowWidth){
+        if(documentWidth > windowWidth){
             
             destinationX = Math.round(documentWidth - destinationValueX < windowWidth ? documentWidth - windowWidth : destinationValueX);
         }
         
-        if(destinationValueY > windowHeight){
+        if(documentHeight > windowHeight){
             
             destinationY = Math.round(documentHeight - destinationValueY < windowHeight ? documentHeight - windowHeight : destinationValueY);
         }
