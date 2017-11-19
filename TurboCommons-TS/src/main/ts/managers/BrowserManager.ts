@@ -345,36 +345,57 @@ export class BrowserManager{
     
 
     /**
-     * Moves the browser scroll to the specified Y axis position or DOM element.
+     * Moves the browser scroll to the specified X,Y axis position or DOM element.
      * 
      * @example browserManager.scrollTo(document.querySelector('#myId'), 800);
+     * @example browserManager.scrollTo([100,200], 1000);
      * 
      * @see https://pawelgrzybek.com/page-scroll-in-vanilla-javascript/
      * 
-     * @param destination The location where the scroll must be moved to. It can be an HTML element instance or a numeric position.
+     * @param destination The location where the scroll must be moved to. It can be an HTML element instance or an array of two numbers with the [x,y] destination coordinates
      * @param duration The animation duration in miliseconds. Set it to 0 to perform a direct scroll change.
      * @param callback A method that will be executed right after the scroll finishes
      * 
      * @returns void
       */
-    scrollTo(destination: HTMLElement|number, duration = 600, callback: Function|null = null){
+    scrollTo(destination: HTMLElement|[number, number], duration = 600, callback: Function|null = null){
 
         // Define an easeOutCubic function for the scroll movement
         const easingFunction = (t:number) => {return (--t)*t*t+1};
         
-        const start = window.pageYOffset;
-        const startTime = 'now' in window.performance ? performance.now() : new Date().getTime();
+        // Get the current scrollbar positions and system miliseconds
+        const startX = window.pageXOffset;
+        const startY = window.pageYOffset;
+        const startTime = ('now' in window.performance) ? performance.now() : (new Date()).getTime();
 
+        // Obtain the viewport and document dimensions
+        const documentWidth = this.getDocumentWidth();
         const documentHeight = this.getDocumentHeight();
+        const windowWidth = this.getWindowWidth();
         const windowHeight = this.getWindowHeight();
         
-        const destinationOffset = typeof destination === 'number' ? destination : (<HTMLScriptElement>destination).offsetTop;
+        // Find the requested destination coordinates depending on the type of the parameter
+        const destinationValueX = ArrayUtils.isArray(destination) ? (<[number, number]>destination)[0] : (<HTMLScriptElement>destination).offsetLeft;
+        const destinationValueY = ArrayUtils.isArray(destination) ? (<[number, number]>destination)[1] : (<HTMLScriptElement>destination).offsetTop;
         
-        const destinationOffsetToScroll = Math.round(documentHeight - destinationOffset < windowHeight ? documentHeight - windowHeight : destinationOffset);
+        // Calculate the real value where scrollbars must move
+        let destinationX = 0;
+        let destinationY = 0;
+            
+        if(destinationValueX > windowWidth){
+            
+            destinationX = Math.round(documentWidth - destinationValueX < windowWidth ? documentWidth - windowWidth : destinationValueX);
+        }
+        
+        if(destinationValueY > windowHeight){
+            
+            destinationY = Math.round(documentHeight - destinationValueY < windowHeight ? documentHeight - windowHeight : destinationValueY);
+        }
 
+        // If requestAnimationFrame is not available, we will simply perform the scroll without any animation
         if ('requestAnimationFrame' in window === false) {
             
-            window.scroll(0, destinationOffsetToScroll);
+            window.scroll(destinationX, destinationY);
           
             if (callback) {
             
@@ -384,14 +405,18 @@ export class BrowserManager{
             return;
         }
 
-        function scroll() {
+        // Define a method that will perform the scroll animation
+        function animate() {
 
-            const now = 'now' in window.performance ? performance.now() : new Date().getTime();
+            const now = ('now' in window.performance) ? performance.now() : (new Date()).getTime();
             const time = Math.min(1, ((now - startTime) / duration));
 
-            window.scroll(0, Math.ceil(easingFunction(time) * (destinationOffsetToScroll - start) + start));
+            const x = Math.ceil(easingFunction(time) * (destinationX - startX) + startX);
+            const y = Math.ceil(easingFunction(time) * (destinationY - startY) + startY);
+            
+            window.scroll(x, y);
 
-            if (Math.ceil(window.pageYOffset) === destinationOffsetToScroll) {
+            if (Math.ceil(window.pageXOffset) === destinationX && Math.ceil(window.pageYOffset) === destinationY) {
             
                 if (callback !== null) {
               
@@ -401,9 +426,9 @@ export class BrowserManager{
                 return;
             }
 
-            requestAnimationFrame(scroll);
+            requestAnimationFrame(animate);
         }
 
-        scroll();
+        animate();
     }
 }
