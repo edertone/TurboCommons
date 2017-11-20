@@ -13,15 +13,26 @@
 QUnit.module("BrowserManagerTest", {
     beforeEach : function() {
 
+        window.StringUtils = org_turbocommons.StringUtils;
         window.NumericUtils = org_turbocommons.NumericUtils;
         window.sut = new org_turbocommons.BrowserManager();
     },
 
     afterEach : function() {
 
+        delete window.StringUtils;
         delete window.NumericUtils;
         delete window.sut;
     }
+});
+
+
+/**
+ * getCurrentUrl
+ */
+QUnit.test("getCurrentUrl", function(assert){
+    
+    assert.ok(StringUtils.isUrl(sut.getCurrentUrl()));
 });
 
 

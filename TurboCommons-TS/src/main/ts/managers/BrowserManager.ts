@@ -13,8 +13,24 @@ import { NumericUtils } from '../utils/NumericUtils';
 import { ArrayUtils } from '../utils/ArrayUtils';
 
 
+/**
+ * An abstraction of the browser entity an all its related operations and properties
+ * Browser entity is normally available only on client side or front end view applications.
+ * (It makes no sense to have a BrowserManager object on a server side application)
+ */ 
 export class BrowserManager{
 
+    
+    /**
+     * Get the current page full url, including 'http://', domain and any uri get parameters
+     *
+     * @return A well formed url
+     */
+    getCurrentUrl(){
+        
+        return window.location.href;
+    }
+    
     
     /**
      * Tells if the current html document is fully loaded or not.
