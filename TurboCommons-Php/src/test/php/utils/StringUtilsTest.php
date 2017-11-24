@@ -1049,8 +1049,43 @@ class StringUtilsTest extends TestCase {
 	 */
 	public function testGenerateRandomPassword(){
 
-		// TODO!!
+	    // Test empty values
+	    try {
+	        StringUtils::generateRandomPassword(null, null, null);
+	        $this->exceptionMessage = '-1 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
+	    // Test ok values
+	    $this->assertTrue(StringUtils::generateRandomPassword(0, true, true) === '');
+	    $this->assertTrue(StringUtils::generateRandomPassword(0, false, false) === '');
+
+	    for ($i = 1; $i < 50; $i++) {
+
+	        $this->assertTrue(strlen(StringUtils::generateRandomPassword($i, true, true)) === $i);
+	        $this->assertTrue(strlen(StringUtils::generateRandomPassword($i, false, false)) === $i);
+	        $this->assertTrue(strlen(StringUtils::generateRandomPassword($i, true, false)) === $i);
+	        $this->assertTrue(strlen(StringUtils::generateRandomPassword($i, false, true)) === $i);
+	    }
+
+	    // Test wrong values
+	    // not necessary
+
+	    // Test exceptions
+	    try {
+	        StringUtils::generateRandomPassword(-1);
+	        $this->exceptionMessage = '-1 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::generateRandomPassword('some string');
+	        $this->exceptionMessage = 'some string did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 	}
 
 

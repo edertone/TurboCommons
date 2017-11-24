@@ -819,39 +819,50 @@ class StringUtils {
 
 
     /**
-     * Method to generate a random string with the specified lenght
+     * Generates a random string with the specified lenght and options
      *
      * @param int $lenght Specify the lengh of the password
-     * @param boolean $useuppercase Specify if it's an upper case or not
+     * @param boolean $useUpperCase Specify if upper case letters will be also included in the generated string
+     * @param boolean $useNumbers Specify if numeric digits will be also included in the generated string
      *
-     * @return string
+     * @return string A randomly generated string that can be used as a password
      */
-    public static function generateRandomPassword(int $lenght = 5, bool $useuppercase = true){
+    public static function generateRandomPassword(int $lenght = 5, bool $useUpperCase = true, bool $useNumbers = true){
+
+        if($lenght < 0 || !NumericUtils::isInteger($lenght)){
+
+            throw new InvalidArgumentException('StringUtils->generateRandomPassword: length must be a positive number');
+        }
 
         // Set the characters to use in the random password
         $chars = 'abcdefghijkmnopqrstuvwxyz023456789';
 
-        // With the upper case option, also upper case letters will be used
-        if($useuppercase){
+        if($useUpperCase){
 
             $chars = 'ABCDEFGHIJKMNOPQRSTUVWXYZ'.$chars;
         }
 
-        // Get the lenght for the chars string to use in random generation process
-        $charslen = strlen($chars) - 1;
+        if($useNumbers){
 
-        // Initialize the used vars: (srand defines the random seed)
-        srand((double)microtime()*1000000);
-        $pass = '' ;
+            $chars = '0123456789'.$chars;
+        }
+
+        // Get the lenght for the chars string to use in random generation process
+        $charsLen = strlen($chars) - 1;
+
+        $result = '' ;
 
         // loop throught all the password defined lenght
         for($i=0; $i<$lenght; $i++){
-            $num = rand() % $charslen; // get an integer between 0 and charslen.
-            $pass = $pass.substr($chars, $num, 1); // append the random character to the password.
+
+            // get an integer between 0 and charslen.
+            $num = mt_rand(0, $charsLen);
+
+            // append the random character to the password.
+            $result = $result.substr($chars, $num, 1);
         }
 
-        return $pass;
-
+        return $result;
     }
 
 
