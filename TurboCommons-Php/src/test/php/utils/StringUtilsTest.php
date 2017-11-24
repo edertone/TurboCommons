@@ -106,35 +106,37 @@ class StringUtilsTest extends TestCase {
 	public function testIsUrl(){
 
 	    // Wrong url cases
-	    $this->assertTrue(!StringUtils::isUrl(''));
-	    $this->assertTrue(!StringUtils::isUrl(null));
-	    $this->assertTrue(!StringUtils::isUrl([]));
-	    $this->assertTrue(!StringUtils::isUrl('    '));
-	    $this->assertTrue(!StringUtils::isUrl('123f56ccaca'));
-	    $this->assertTrue(!StringUtils::isUrl('8/%$144///(!(/"'));
-	    $this->assertTrue(!StringUtils::isUrl('http'));
-	    $this->assertTrue(!StringUtils::isUrl('x.y'));
-	    $this->assertTrue(!StringUtils::isUrl('http://x.y'));
-	    $this->assertTrue(!StringUtils::isUrl('google.com-'));
-	    $this->assertTrue(!StringUtils::isUrl("\n   \t\n"));
-	    $this->assertTrue(!StringUtils::isUrl('http:\\google.com'));
-	    $this->assertTrue(!StringUtils::isUrl('_http://google.com'));
-	    $this->assertTrue(!StringUtils::isUrl('http://www.example..com'));
-	    $this->assertTrue(!StringUtils::isUrl('http://.com'));
-	    $this->assertTrue(!StringUtils::isUrl('http://www.example.'));
-	    $this->assertTrue(!StringUtils::isUrl('http:/www.example.com'));
-	    $this->assertTrue(!StringUtils::isUrl('http://'));
-	    $this->assertTrue(!StringUtils::isUrl('http://.'));
-	    $this->assertTrue(!StringUtils::isUrl('http://??/'));
-	    $this->assertTrue(!StringUtils::isUrl('http://foo.bar?q=Spaces should be encoded'));
-	    $this->assertTrue(!StringUtils::isUrl('rdar://1234'));
-	    $this->assertTrue(!StringUtils::isUrl('http://foo.bar/foo(bar)baz quux'));
-	    $this->assertTrue(!StringUtils::isUrl('http://10.1.1.255'));
-	    $this->assertTrue(!StringUtils::isUrl('http://.www.foo.bar./'));
-	    $this->assertTrue(!StringUtils::isUrl('http://.www.foo.bar/'));
-	    $this->assertTrue(!StringUtils::isUrl('ftp://user:password@host:port/path'));
-	    $this->assertTrue(!StringUtils::isUrl('/nfs/an/disks/jj/home/dir/file.txt'));
-	    $this->assertTrue(!StringUtils::isUrl('C:\\Program Files (x86)'));
+	    $this->assertFalse(StringUtils::isUrl(''));
+	    $this->assertFalse(StringUtils::isUrl(null));
+	    $this->assertFalse(StringUtils::isUrl([]));
+	    $this->assertFalse(StringUtils::isUrl('    '));
+	    $this->assertFalse(StringUtils::isUrl('123f56ccaca'));
+	    $this->assertFalse(StringUtils::isUrl('8/%$144///(!(/"'));
+	    $this->assertFalse(StringUtils::isUrl('http'));
+	    $this->assertFalse(StringUtils::isUrl('x.y'));
+	    $this->assertFalse(StringUtils::isUrl('http://x.y'));
+	    $this->assertFalse(StringUtils::isUrl('google.com-'));
+	    $this->assertFalse(StringUtils::isUrl("\n   \t\n"));
+	    $this->assertFalse(StringUtils::isUrl('./test/file.js'));
+	    $this->assertFalse(StringUtils::isUrl('http:\\google.com'));
+	    $this->assertFalse(StringUtils::isUrl('_http://google.com'));
+	    $this->assertFalse(StringUtils::isUrl('http://www.example..com'));
+	    $this->assertFalse(StringUtils::isUrl('http://.com'));
+	    $this->assertFalse(StringUtils::isUrl('http://www.example.'));
+	    $this->assertFalse(StringUtils::isUrl('http:/www.example.com'));
+	    $this->assertFalse(StringUtils::isUrl('http://'));
+	    $this->assertFalse(StringUtils::isUrl('http://.'));
+	    $this->assertFalse(StringUtils::isUrl('http://??/'));
+	    $this->assertFalse(StringUtils::isUrl('http://foo.bar?q=Spaces should be encoded'));
+	    $this->assertFalse(StringUtils::isUrl('rdar://1234'));
+	    $this->assertFalse(StringUtils::isUrl('http://foo.bar/foo(bar)baz quux'));
+	    $this->assertFalse(StringUtils::isUrl('http://10.1.1.255'));
+	    $this->assertFalse(StringUtils::isUrl('http://.www.foo.bar./'));
+	    $this->assertFalse(StringUtils::isUrl('http://.www.foo.bar/'));
+	    $this->assertFalse(StringUtils::isUrl('ftp://user:password@host:port/path'));
+	    $this->assertFalse(StringUtils::isUrl('/nfs/an/disks/jj/home/dir/file.txt'));
+	    $this->assertFalse(StringUtils::isUrl('C:\\Program Files (x86)'));
+	    $this->assertFalse(StringUtils::isUrl('http://www.google.com\\test.html'));
 
 	    // good url cases
 	    $this->assertTrue(StringUtils::isUrl('http://x.ye'));
@@ -154,6 +156,10 @@ class StringUtilsTest extends TestCase {
 	    $this->assertTrue(StringUtils::isUrl('http://-.~_!$&\'()*+,;=:%40:80%2f::::::@example.com'));
 	    $this->assertTrue(StringUtils::isUrl('http://223.255.255.254'));
 	    $this->assertTrue(StringUtils::isUrl('ftp://user:password@host.com:8080/path'));
+	    $this->assertTrue(StringUtils::isUrl('http://www.google.com/test.html?a=1'));
+	    $this->assertTrue(StringUtils::isUrl('http://www.google.com/test.html?a=1&b=2'));
+	    $this->assertTrue(StringUtils::isUrl('http://www.google.com/test.html?a=1&b=2?c=3'));
+	    $this->assertTrue(StringUtils::isUrl('http://www.google.com/test.html?a=1&b=2?????'));
 	    // TODO - this test does not pass, but it does pass in JS. We should look for another regex in PHP that passes it also
 	    // $this->assertTrue(StringUtils::isUrl('http://www.test.com?pageid=123&testid=1524'));
 
