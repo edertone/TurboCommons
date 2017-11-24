@@ -54,36 +54,37 @@ QUnit.test("isString", function(assert) {
 QUnit.test("isUrl", function(assert) {
 
     // Wrong url cases
-    assert.ok(!StringUtils.isUrl(''));
-    assert.ok(!StringUtils.isUrl(null));
-    assert.ok(!StringUtils.isUrl(undefined));
-    assert.ok(!StringUtils.isUrl([]));
-    assert.ok(!StringUtils.isUrl('    '));
-    assert.ok(!StringUtils.isUrl('123f56ccaca'));
-    assert.ok(!StringUtils.isUrl('8/%$144///(!(/"'));
-    assert.ok(!StringUtils.isUrl('http'));
-    assert.ok(!StringUtils.isUrl('x.y'));
-    assert.ok(!StringUtils.isUrl('http://x.y'));
-    assert.ok(!StringUtils.isUrl('google.com-'));
-    assert.ok(!StringUtils.isUrl("\n   \t\n"));
-    assert.ok(!StringUtils.isUrl('http:\\google.com'));
-    assert.ok(!StringUtils.isUrl('_http://google.com'));
-    assert.ok(!StringUtils.isUrl('http://www.example..com'));
-    assert.ok(!StringUtils.isUrl('http://.com'));
-    assert.ok(!StringUtils.isUrl('http://www.example.'));
-    assert.ok(!StringUtils.isUrl('http:/www.example.com'));
-    assert.ok(!StringUtils.isUrl('http://'));
-    assert.ok(!StringUtils.isUrl('http://.'));
-    assert.ok(!StringUtils.isUrl('http://??/'));
-    assert.ok(!StringUtils.isUrl('http://foo.bar?q=Spaces should be encoded'));
-    assert.ok(!StringUtils.isUrl('rdar://1234'));
-    assert.ok(!StringUtils.isUrl('http://foo.bar/foo(bar)baz quux'));
-    assert.ok(!StringUtils.isUrl('http://10.1.1.255'));
-    assert.ok(!StringUtils.isUrl('http://.www.foo.bar./'));
-    assert.ok(!StringUtils.isUrl('http://.www.foo.bar/'));
-    assert.ok(!StringUtils.isUrl('ftp://user:password@host:port/path'));
-    assert.ok(!StringUtils.isUrl('/nfs/an/disks/jj/home/dir/file.txt'));
-    assert.ok(!StringUtils.isUrl('C:\\Program Files (x86)'));
+    assert.notOk(StringUtils.isUrl(''));
+    assert.notOk(StringUtils.isUrl(null));
+    assert.notOk(StringUtils.isUrl([]));
+    assert.notOk(StringUtils.isUrl('    '));
+    assert.notOk(StringUtils.isUrl('123f56ccaca'));
+    assert.notOk(StringUtils.isUrl('8/%$144///(!(/"'));
+    assert.notOk(StringUtils.isUrl('http'));
+    assert.notOk(StringUtils.isUrl('x.y'));
+    assert.notOk(StringUtils.isUrl('http://x.y'));
+    assert.notOk(StringUtils.isUrl('google.com-'));
+    assert.notOk(StringUtils.isUrl("\n   \t\n"));
+    assert.notOk(StringUtils.isUrl('./test/file.js'));
+    assert.notOk(StringUtils.isUrl('http:\\google.com'));
+    assert.notOk(StringUtils.isUrl('_http://google.com'));
+    assert.notOk(StringUtils.isUrl('http://www.example..com'));
+    assert.notOk(StringUtils.isUrl('http://.com'));
+    assert.notOk(StringUtils.isUrl('http://www.example.'));
+    assert.notOk(StringUtils.isUrl('http:/www.example.com'));
+    assert.notOk(StringUtils.isUrl('http://'));
+    assert.notOk(StringUtils.isUrl('http://.'));
+    assert.notOk(StringUtils.isUrl('http://??/'));
+    assert.notOk(StringUtils.isUrl('http://foo.bar?q=Spaces should be encoded'));
+    assert.notOk(StringUtils.isUrl('rdar://1234'));
+    assert.notOk(StringUtils.isUrl('http://foo.bar/foo(bar)baz quux'));
+    assert.notOk(StringUtils.isUrl('http://10.1.1.255'));
+    assert.notOk(StringUtils.isUrl('http://.www.foo.bar./'));
+    assert.notOk(StringUtils.isUrl('http://.www.foo.bar/'));
+    assert.notOk(StringUtils.isUrl('ftp://user:password@host:port/path'));
+    assert.notOk(StringUtils.isUrl('/nfs/an/disks/jj/home/dir/file.txt'));
+    assert.notOk(StringUtils.isUrl('C:\\Program Files (x86)'));
+    assert.notOk(StringUtils.isUrl('http://www.google.com\\test.html'));
 
     // good url cases
     assert.ok(StringUtils.isUrl('http://x.ye'));
@@ -103,6 +104,10 @@ QUnit.test("isUrl", function(assert) {
     assert.ok(StringUtils.isUrl('http://-.~_!$&\'()*+,;=:%40:80%2f::::::@example.com'));
     assert.ok(StringUtils.isUrl('http://223.255.255.254'));
     assert.ok(StringUtils.isUrl('ftp://user:password@host.com:8080/path'));
+    assert.ok(StringUtils.isUrl('http://www.google.com/test.html?a=1'));
+    assert.ok(StringUtils.isUrl('http://www.google.com/test.html?a=1&b=2'));
+    assert.ok(StringUtils.isUrl('http://www.google.com/test.html?a=1&b=2?c=3'));
+    assert.ok(StringUtils.isUrl('http://www.google.com/test.html?a=1&b=2?????'));
     assert.ok(StringUtils.isUrl('http://www.test.com?pageid=123&testid=1524'));
     
     // Test non string values throw exceptions
