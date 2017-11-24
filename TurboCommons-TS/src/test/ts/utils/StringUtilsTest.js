@@ -498,9 +498,37 @@ QUnit.todo("formatForFullTextSearch", function(assert) {
 /**
  * generateRandomPassword
  */
-QUnit.todo("generateRandomPassword", function(assert) {
+QUnit.test("generateRandomPassword", function(assert) {
 
-    // TODO: copy tests from PHP
+    // Test empty values
+    assert.throws(function() {
+
+        StringUtils.generateRandomPassword(null, null, null);
+    });
+
+    // Test ok values
+    assert.ok(StringUtils.generateRandomPassword(0, true, true) === '');
+    assert.ok(StringUtils.generateRandomPassword(0, false, false) === '');
+
+    for (var i = 1; i < 50; i++) {
+
+        assert.ok(StringUtils.generateRandomPassword(i, true, true).length === i);
+        assert.ok(StringUtils.generateRandomPassword(i, false, false).length === i);
+        assert.ok(StringUtils.generateRandomPassword(i, true, false).length === i);
+        assert.ok(StringUtils.generateRandomPassword(i, false, true).length === i);
+    }
+
+    // Test wrong values
+    // not necessary
+
+    // Test exceptions
+    assert.throws(function() {
+        StringUtils.generateRandomPassword(-1);
+    });
+
+    assert.throws(function() {
+        StringUtils.generateRandomPassword('some string');
+    });
 });
 
 

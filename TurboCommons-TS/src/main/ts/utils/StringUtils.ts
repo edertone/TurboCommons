@@ -300,6 +300,8 @@ export class StringUtils {
             return '';
         }
 
+        // TODO - This should be improved by avoiding the use of an anchor element,
+        // cause it will only work on browsers and Explorer / Edge generate wrong results
         var tmp:HTMLAnchorElement = document.createElement('a');
 
         tmp.href = url;
@@ -592,9 +594,51 @@ export class StringUtils {
     }
     
     
-    public static generateRandomPassword() {
+    /**
+     * Generates a random string with the specified lenght and options
+     *
+     * @param lenght Specify the lengh of the password
+     * @param useUpperCase Specify if upper case letters will be also included in the generated string
+     * @param useNumbers Specify if numeric digits will be also included in the generated string
+     *
+     * @return A randomly generated string that can be used as a password
+     */
+    public static generateRandomPassword(lenght = 5, useUpperCase = true, useNumbers = true) {
     
-        // TODO: translate from php
+        if(lenght < 0 || !NumericUtils.isInteger(lenght)){
+
+            throw new Error('StringUtils->generateRandomPassword: length must be a positive number');
+        }
+        
+        // Set the characters to use in the random password
+        let chars = 'abcdefghijkmnopqrstuvwxyz023456789';
+
+        if(useUpperCase){
+
+            chars = 'ABCDEFGHIJKMNOPQRSTUVWXYZ' + chars;
+        }
+        
+        if(useNumbers){
+
+            chars = '0123456789' + chars;
+        }
+
+        // Get the lenght for the chars string to use in random generation process
+        let charsLen = chars.length - 1;
+
+        let result = '' ;
+
+        // loop throught all the password defined lenght
+        for(let i=0; i<lenght; i++){
+        
+            // get an integer between 0 and charslen.
+            let num = Math.floor(Math.random() * charsLen);
+        
+            // append the random character to the password.
+            result = result + chars.substr(num, 1);
+        }
+
+        return result;
     }
     
     
