@@ -91,46 +91,4 @@ export class ObjectUtils {
 
 		return true;
 	}
-	
-	
-	/**
-     * Check if two provided objects and all their child objects have the same keys.
-     * Note that key values are not taken into consideration. We wonly compare the objects structure.
-     * All Child objects will be recursively checked to verify that their keys are also the same.
-     * 
-     * @param object1 First object to compare
-     * @param object2 Second object to compare
-     *
-     * @returns true if objects share the same structure
-     */
-    public static isSameStructureAs(object1:any, object2:any):boolean{
-        
-        // Both provided values must be objects or an exception will be launched
-        if(!ObjectUtils.isObject(object1) || !ObjectUtils.isObject(object2)){
-
-            throw new Error("ObjectUtils.isSameStructureAs: parameters must be objects");
-        }
-
-        var keys1:string[] = ObjectUtils.getKeys(object1);
-        var keys2:string[] = ObjectUtils.getKeys(object2);
-
-        if(!ArrayUtils.isEqualTo(keys1, keys2)){
-
-            return false;
-        }
-
-        // Loop all the keys and find other objects
-        for(var i:number = 0; i < keys1.length; i++){
-
-            if(ObjectUtils.isObject(object1[keys1[i]])){
-                
-                if(!ObjectUtils.isSameStructureAs(object1[keys1[i]], object2[keys2[i]])){
-                
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
 }
