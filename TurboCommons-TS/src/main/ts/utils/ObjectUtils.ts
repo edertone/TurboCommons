@@ -94,13 +94,14 @@ export class ObjectUtils {
 	
 	
 	/**
-     * Check if two provided objects have the same properties (values are not taken into consideration)
-     * Child objects will be also recursively checked
+     * Check if two provided objects and all their child objects have the same keys.
+     * Note that key values are not taken into consideration. We wonly compare the objects structure.
+     * All Child objects will be recursively checked to verify that their keys are also the same.
      * 
      * @param object1 First object to compare
      * @param object2 Second object to compare
      *
-     * @returns true if objects share the same properties and also their child elements properties.
+     * @returns true if objects share the same structure
      */
     public static isSameStructureAs(object1:any, object2:any):boolean{
         
