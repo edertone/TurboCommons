@@ -206,3 +206,143 @@ QUnit.test("isEqualTo", function(assert) {
         ObjectUtils.isEqualTo("hello", "hello");
     });
 });
+
+
+/**
+ * isSameStructureAs
+ */
+QUnit.test("isSameStructureAs", function(assert) {
+
+    // Test identic values
+    assert.ok(ObjectUtils.isSameStructureAs({}, {}));
+    assert.ok(ObjectUtils.isSameStructureAs({
+        hello : 'home'
+    }, {
+        hello : 'home'
+    }));
+    assert.ok(ObjectUtils.isSameStructureAs({
+        1 : 1
+    }, {
+        1 : 1
+    }));
+    assert.ok(ObjectUtils.isSameStructureAs({
+        hello : 'home',
+        number : 1
+    }, {
+        hello : 'home',
+        number : 1
+    }));
+    assert.ok(ObjectUtils.isSameStructureAs({
+        hello : 'home',
+        number : 1,
+        array : [1, 2, 3]
+    }, {
+        hello : 'home',
+        number : 1,
+        array : [1, 2, 3]
+    }));
+    assert.ok(ObjectUtils.isSameStructureAs({
+        hello : 'home',
+        array : {
+            hello : 'home',
+            number : 1
+        }
+    }, {
+        hello : 'home',
+        array : {
+            hello : 'home',
+            number : 1
+        }
+    }));
+
+    // Test different values but same properties
+    assert.ok(ObjectUtils.isSameStructureAs({
+            1 : 1
+        }, {
+            1 : 2
+        }));
+    assert.ok(ObjectUtils.isSameStructureAs({
+            1 : 1,
+            a : 1
+        }, {
+            1 : 2,
+            a : 4
+        }));
+    assert.ok(ObjectUtils.isSameStructureAs({
+            hello : 'guys'
+        }, {
+            hello : 2
+        }));
+    assert.ok(ObjectUtils.isSameStructureAs({
+            hello : 'home',
+            number : 1,
+            array : [1, 3]
+        }, {
+            hello : 'hello',
+            number : 1,
+            array : [1, 2, 3]
+        }));
+    assert.ok(ObjectUtils.isSameStructureAs({
+        hello : 'home',
+        array : {
+            hello : 'home',
+            number : 1
+        }
+    }, {
+        hello : 'home',
+        array : {
+            hello : 'h',
+            number : 1
+        }
+    }));
+    
+    // Test different values but same properties
+    assert.ok(!ObjectUtils.isSameStructureAs({}, {
+            1 : 1
+        }));
+    assert.ok(!ObjectUtils.isSameStructureAs({
+            1 : 1
+        }, {
+            a : 2
+        }));
+    assert.ok(!ObjectUtils.isSameStructureAs({
+            hello : 'guys'
+        }, {
+            1 : 2
+        }));
+    assert.ok(!ObjectUtils.isSameStructureAs({
+            hello : 'guys'
+        }, {
+            hell : 'guys'
+        }));
+    assert.ok(!ObjectUtils.isSameStructureAs({
+            hello : 'home',
+            number : 1,
+            array : [1, 3]
+        }, {
+            hello : 'home',
+            number : 1,
+            arra : [1, 2, 3]
+        }));
+
+    // Test exceptions with non objects
+    assert.throws(function() {
+
+        ObjectUtils.isSameStructureAs(undefined, undefined);
+    });
+
+    assert.throws(function() {
+
+        ObjectUtils.isSameStructureAs(null, null);
+    });
+
+    assert.throws(function() {
+
+        ObjectUtils.isSameStructureAs([], []);
+    });
+
+    assert.throws(function() {
+
+        ObjectUtils.isSameStructureAs("hello", "hello");
+    });
+});

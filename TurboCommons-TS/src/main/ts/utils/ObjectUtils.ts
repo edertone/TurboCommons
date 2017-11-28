@@ -23,9 +23,9 @@ export class ObjectUtils {
     /**
      * Tells if the given value is an object or not
      *
-     * @param {any} value A value to check
+     * @param value A value to check
      *
-     * @returns {boolean} true if the given value is an object, false otherwise
+     * @returns true if the given value is an object, false otherwise
      */
     public static isObject(value:any):boolean{
     
@@ -36,11 +36,9 @@ export class ObjectUtils {
 	/**
 	 * Get the list of literals for a given object. Note that only 1rst depth keys are providen
 	 * 
-	 * @static
-	 * 
-	 * @param {object} object A valid object
+	 * @param object A valid object
 	 *
-	 * @returns {array} List of strings with the first level object key names in the same order as defined on the object instance
+	 * @returns List of strings with the first level object key names in the same order as defined on the object instance
 	 */
 	public static getKeys(object:any):string[]{
 
@@ -48,27 +46,20 @@ export class ObjectUtils {
 		
 		if(!ObjectUtils.isObject(object)){
 
-			throw new Error("ObjectUtils.getKeys: Provided parameter must be an object");
+			throw new Error("ObjectUtils.getKeys: parameter must be an object");
 		}
 
-		for(var key in object){
-
-			res.push(key);
-		}
-
-		return res;
+		return Object.keys(object);
 	}
 
 
 	/**
 	 * Check if two provided objects are identical
 	 * 
-	 * @static
-	 * 
-	 * @param {object} object1 First object to compare
-	 * @param {object} object2 Second object to compare
+	 * @param object1 First object to compare
+	 * @param object2 Second object to compare
 	 *
-	 * @returns {boolean} true if objects are exactly the same, false if not
+	 * @returns true if objects are exactly the same, false if not
 	 */
 	public static isEqualTo(object1:any, object2:any):boolean{
 
@@ -77,7 +68,7 @@ export class ObjectUtils {
 		// Both provided values must be objects or an exception will be launched
 		if(!ObjectUtils.isObject(object1) || !ObjectUtils.isObject(object2)){
 
-			throw new Error("ObjectUtils.isEqualTo: Provided parameters must be objects");
+			throw new Error("ObjectUtils.isEqualTo: parameters must be objects");
 		}
 
 		var keys1:string[] = ObjectUtils.getKeys(object1);
@@ -100,4 +91,45 @@ export class ObjectUtils {
 
 		return true;
 	}
+	
+	
+	/**
+     * Check if two provided objects have the same properties (values are not taken into consideration)
+     * Child objects will be also recursively checked
+     * 
+     * @param object1 First object to compare
+     * @param object2 Second object to compare
+     *
+     * @returns true if objects share the same properties and also their child elements properties.
+     */
+    public static isSameStructureAs(object1:any, object2:any):boolean{
+        
+        // Both provided values must be objects or an exception will be launched
+        if(!ObjectUtils.isObject(object1) || !ObjectUtils.isObject(object2)){
+
+            throw new Error("ObjectUtils.isSameStructureAs: parameters must be objects");
+        }
+
+        var keys1:string[] = ObjectUtils.getKeys(object1);
+        var keys2:string[] = ObjectUtils.getKeys(object2);
+
+        if(!ArrayUtils.isEqualTo(keys1, keys2)){
+
+            return false;
+        }
+
+        // Loop all the keys and find other objects
+        for(var i:number = 0; i < keys1.length; i++){
+
+            if(ObjectUtils.isObject(object1[keys1[i]])){
+                
+                if(!ObjectUtils.isSameStructureAs(object1[keys1[i]], object2[keys2[i]])){
+                
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
 }
