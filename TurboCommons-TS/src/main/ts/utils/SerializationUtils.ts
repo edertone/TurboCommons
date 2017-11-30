@@ -28,7 +28,7 @@ export class SerializationUtils {
      * the same properties as the hashmap keys. Class property values will be set to the same value of the hash map key 
      *
      * @param hashMap An object that contains data which is organized as a hash map. For example: An associative array or an object with key / value pairs
-     * @param classInstance A class instance that will be filled with all the values that are found on the hashmap (This parameter is modified by this method).
+     * @param classInstance A class instance that will be filled with all the values that are found on the hashmap (the instance is modified by this method and all values erased).
      * @param strictMode If set to true, all keys that are found on the hashmap instance must exist on the class instance, otherwise an exception will be thrown
      *
      * @return The provided class instance with all its properties filled with the corresponding hashmap values
@@ -66,9 +66,12 @@ export class SerializationUtils {
     
     /**
      * Copy data from a json string to a class instance. All class properties will be filled with their values on the json string
-     *
+     * For more information on how the conversion is performed, see this class objectToClass method
+     * 
+     * @see SerializationUtils.objectToClass
+     * 
      * @param string A string containing valid json data
-     * @param classInstance A class instance that will be filled with all the json data (This parameter is modified by this method).
+     * @param classInstance A class instance that will be filled with all the json data (the instance is modified by this method and all values erased).
      * @param strictMode If set to true, all keys that are found on the json data must exist on the class instance, otherwise an exception will be thrown
      *
      * @return The provided class instance with all its properties filled with the corresponding json values
@@ -99,22 +102,22 @@ export class SerializationUtils {
         let className = (classInstance.constructor as any).name;
 
         // On strict mode, verify that both objects share the same keys
-        if(strictMode){
+        if(strictMode && className !== 'Object'){
 
             let classProperties = ObjectUtils.getKeys(classInstance);
             
             if(!ArrayUtils.isEqualTo(keys, classProperties)){
                 
-                throw new Error("SerializationUtils.objectToClass: keys do not match " + className + " properties");
+                throw new Error("SerializationUtils.objectToClass: [" + keys.join(',') + "] keys not match " + className + " props: [" + classProperties.join(',') + "]");
             }
         }
         
         for(let key of keys){
             
-            // Key must exist on provided class instance
-            if(!classInstance.hasOwnProperty(key)){
+            // Key should exist on provided class instance
+            if(!classInstance.hasOwnProperty(key) && className !== 'Object'){
                 
-                throw new Error("SerializationUtils.objectToClass: property " + key + " not found in " + className);
+                continue;
             }
             
             let value = (object as any)[key];
@@ -126,14 +129,14 @@ export class SerializationUtils {
                     throw new Error('SerializationUtils.objectToClass: ' + key + ' must be array in both object and ' + className + ' class');
                 }
                                        
-                if(strictMode){
-                    
-                    if(classInstance[key].length !== 1){
+                if(strictMode && classInstance[key].length !== 1){
                         
-                        throw new Error('SerializationUtils.objectToClass: ' + key + ' must contain 1 default element in ' + className + ' class');
-                    }
-                    
-                    let elementClassName = classInstance[key][0].constructor.name;
+                    throw new Error('SerializationUtils.objectToClass: ' + key + ' must contain 1 default element in ' + className + ' class');
+                }
+                
+                let elementClassName = (classInstance[key].length == 1) ? classInstance[key][0].constructor.name : '';
+                   
+                if(elementClassName !== ''){
                     
                     classInstance[key] = [];
                     
@@ -145,8 +148,7 @@ export class SerializationUtils {
                 }else{
                  
                     classInstance[key] = value;
-                }
-              
+                }              
                 
             }else{
                 
