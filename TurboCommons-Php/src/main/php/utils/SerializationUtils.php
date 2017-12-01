@@ -11,10 +11,7 @@
 
 namespace org\turbocommons\src\main\php\utils;
 
-use UnexpectedValueException;
 use org\turbocommons\src\main\php\model\JavaPropertiesObject;
-use org\turbocommons\src\main\php\model\XMLObject;
-use org\turbocommons\src\main\php\model\HashMapObject;
 
 
 /**
@@ -23,7 +20,69 @@ use org\turbocommons\src\main\php\model\HashMapObject;
  */
 class SerializationUtils{
 
-    // TODO - translate from TS
+
+    // TODO
+    public static function hashMapObjectToClass(){
+
+        // TODO - review from TS
+    }
+
+
+    /**
+     * Convert a JavaPropertiesObject instance to a string that is valid so it can be saved to a .properties file.
+     *
+     * @param JavaPropertiesObject $javaProperties An instance of a JavaPropertiesObject
+     *
+     * @return string An ISO-8859-1 string containing valid properties data, ready to be stored as a .properties java format file.
+     */
+    public static function javaPropertiesObjectToString(JavaPropertiesObject $javaProperties){
+
+        return $javaProperties->toString();
+    }
+
+
+    // TODO
+    public static function jsonToClass(){
+
+        // TODO - review from TS
+    }
+
+
+    // TODO
+    public static function objectToClass(){
+
+        // TODO - review from TS
+    }
+
+
+    /**
+     * Convert a string containing the contents of a Java properties file to a JavaPropertiesObject instance
+     * For example: tag1=value1 will be converted to ['tag1' => 'value1'].<br><br>
+     * Note that the input string must be encoded with ISO-8859-1 and strictly follow the Java
+     * properties file format (Otherwise results may not be correct).
+     *
+     * @param string $string String containing the contents of a .properties Java file
+     *
+     * @return JavaPropertiesObject The properties format parsed as an object
+     */
+    public static function stringToJavaPropertiesObject($string){
+
+        return new JavaPropertiesObject($string);
+    }
+
+
+    // TODO
+    public static function stringToXmlObject(){
+
+        // TODO - review from TS
+    }
+
+
+    // TODO
+    public static function xmlObjectToString(){
+
+        // TODO - review from TS
+    }
 }
 
 ?>

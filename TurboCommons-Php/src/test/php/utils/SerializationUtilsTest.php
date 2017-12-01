@@ -11,12 +11,7 @@
 
 namespace org\turbocommons\src\test\php\utils;
 
-use Exception;
-use org\turbocommons\src\main\php\managers\FilesManager;
-use org\turbocommons\src\main\php\managers\ValidationManager;
-use org\turbocommons\src\main\php\utils\SerializationUtils;
 use PHPUnit\Framework\TestCase;
-use org\turbocommons\src\main\php\utils\XmlUtils;
 
 
 /**
@@ -26,7 +21,223 @@ use org\turbocommons\src\main\php\utils\XmlUtils;
  */
 class SerializationUtilsTest extends TestCase {
 
-    // TODO - translate from TS
+    /**
+     * @see TestCase::setUpBeforeClass()
+     *
+     * @return void
+     */
+    public static function setUpBeforeClass(){
+
+        // Nothing necessary here
+    }
+
+
+    /**
+     * @see TestCase::setUp()
+     *
+     * @return void
+     */
+    protected function setUp(){
+
+        // TODO - translate from TS
+
+        $this->exceptionMessage = '';
+    }
+
+
+    /**
+     * @see TestCase::tearDown()
+     *
+     * @return void
+     */
+    protected function tearDown(){
+
+        // TODO - translate from TS
+
+        if($this->exceptionMessage != ''){
+
+            $this->fail($this->exceptionMessage);
+        }
+    }
+
+
+    /**
+     * @see TestCase::tearDownAfterClass()
+     *
+     * @return void
+     */
+    public static function tearDownAfterClass(){
+
+        // Nothing necessary here
+    }
+
+
+    /**
+     * testHashMapObjectToClass
+     *
+     * @return void
+     */
+    public function testHashMapObjectToClass(){
+
+        // Test empty values
+        // TODO
+
+        // Test ok values
+        // TODO
+
+        // Test wrong values
+        // TODO
+
+        // Test exceptions
+        // TODO
+
+        // TODO
+        $this->markTestIncomplete('This test has not been implemented yet.');
+    }
+
+
+    /**
+     * testJavaPropertiesObjectToString
+     *
+     * @return void
+     */
+    public function testJavaPropertiesObjectToString(){
+
+        // Test empty values
+        // TODO
+
+        // Test ok values
+        // TODO
+
+        // Test wrong values
+        // TODO
+
+        // Test exceptions
+        // TODO
+
+        // TODO
+        $this->markTestIncomplete('This test has not been implemented yet.');
+    }
+
+
+    /**
+     * testJsonToClass
+     *
+     * @return void
+     */
+    public function testJsonToClass(){
+
+        // Test empty values
+        // TODO
+
+        // Test ok values
+        // TODO
+
+        // Test wrong values
+        // TODO
+
+        // Test exceptions
+        // TODO
+
+        // TODO
+        $this->markTestIncomplete('This test has not been implemented yet.');
+    }
+
+
+    /**
+     * testObjectToClass
+     *
+     * @return void
+     */
+    public function testObjectToClass(){
+
+        // Test empty values
+        // TODO
+
+        // Test ok values
+        // TODO
+
+        // Test wrong values
+        // TODO
+
+        // Test exceptions
+        // TODO
+
+        // TODO
+        $this->markTestIncomplete('This test has not been implemented yet.');
+    }
+
+
+    /**
+     * testStringToJavaPropertiesObject
+     *
+     * @return void
+     */
+    public function testStringToJavaPropertiesObject(){
+
+        // Test empty values
+        // TODO
+
+        // Test ok values
+        // TODO
+
+        // Test wrong values
+        // TODO
+
+        // Test exceptions
+        // TODO
+
+        // TODO
+        $this->markTestIncomplete('This test has not been implemented yet.');
+    }
+
+
+    /**
+     * testStringToXmlObject
+     *
+     * @return void
+     */
+    public function testStringToXmlObject(){
+
+        // Test empty values
+        // TODO
+
+        // Test ok values
+        // TODO
+
+        // Test wrong values
+        // TODO
+
+        // Test exceptions
+        // TODO
+
+        // TODO
+        $this->markTestIncomplete('This test has not been implemented yet.');
+    }
+
+
+    /**
+     * testXmlObjectToString
+     *
+     * @return void
+     */
+    public function testXmlObjectToString(){
+
+        // Test empty values
+        // TODO
+
+        // Test ok values
+        // TODO
+
+        // Test wrong values
+        // TODO
+
+        // Test exceptions
+        // TODO
+
+        // TODO
+        $this->markTestIncomplete('This test has not been implemented yet.');
+    }
 }
 
 ?>
