@@ -100,28 +100,34 @@ export class SerializationUtils {
         
         let keys = ObjectUtils.getKeys(object);
         let className = (classInstance.constructor as any).name;
-
-        // On strict mode, verify that both objects share the same keys
-        if(strictMode && className !== 'Object'){
-
-            let classProperties = ObjectUtils.getKeys(classInstance);
+        let classInstanceKeys = ObjectUtils.getKeys(classInstance);
+        
+        // If class is simply an empty generic object, direct copy is performed and returned
+        if(className === 'Object' && classInstanceKeys.length == 0){
             
-            if(!ArrayUtils.isEqualTo(keys, classProperties)){
+            return classInstance = object;
+        }
+        
+        // On strict mode, verify that both objects have the same keys
+        if(strictMode){
+
+            if(!ArrayUtils.isEqualTo(keys, classInstanceKeys)){
                 
-                throw new Error("SerializationUtils.objectToClass: [" + keys.join(',') + "] keys not match " + className + " props: [" + classProperties.join(',') + "]");
+                throw new Error("SerializationUtils.objectToClass (strict mode): [" + keys.join(',') + "] keys not match " + className + " props: [" + classInstanceKeys.join(',') + "]");
             }
         }
         
         for(let key of keys){
             
-            // Key should exist on provided class instance
-            if(!classInstance.hasOwnProperty(key) && className !== 'Object'){
+            // If key does not exist on class instance, we will not assign it
+            if(!classInstance.hasOwnProperty(key)){
                 
                 continue;
             }
             
             let value = (object as any)[key];
             
+            // If any of the two key values is an array, we will threat the property type as array
             if(ArrayUtils.isArray(value) || ArrayUtils.isArray(classInstance[key])){
 
                 if(ArrayUtils.isArray(value) !== ArrayUtils.isArray(classInstance[key])) {
@@ -131,7 +137,7 @@ export class SerializationUtils {
                                        
                 if(strictMode && classInstance[key].length !== 1){
                         
-                    throw new Error('SerializationUtils.objectToClass: ' + key + ' must contain 1 default element in ' + className + ' class');
+                    throw new Error('SerializationUtils.objectToClass (strict mode): ' + className + '.' + key + ' must contain 1 default element');
                 }
                 
                 let elementClassName = (classInstance[key].length == 1) ? classInstance[key][0].constructor.name : '';
@@ -152,11 +158,12 @@ export class SerializationUtils {
                 
             }else{
                 
+                // If any of the two key values is an object, we will threat the property type as object
                 if(ObjectUtils.isObject(value) || ObjectUtils.isObject(classInstance[key])){
                     
                     if(ObjectUtils.isObject(value) !== ObjectUtils.isObject(classInstance[key])){
                                                 
-                        throw new Error('SerializationUtils.objectToClass: ' + key + ' must be Object in both object and ' + className + ' class');
+                        throw new Error('SerializationUtils.objectToClass: <' + key + '> must be Object in both object and ' + className + ' class');
                     }
                         
                     classInstance[key] = SerializationUtils.objectToClass(value, classInstance[key], strictMode);

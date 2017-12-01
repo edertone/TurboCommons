@@ -11,8 +11,11 @@
 
 QUnit.module("SerializationUtilsTest", {
     
-    before : function(){
+    beforeEach : function(){
 
+        window.emptyValues = [null, '', [], {}, '     ', "\n\n\n", 0];
+        window.emptyValuesCount = window.emptyValues.length;     
+        
         window.ObjectUtils = org_turbocommons.ObjectUtils;
         window.SerializationUtils = org_turbocommons.SerializationUtils;  
         
@@ -57,21 +60,11 @@ QUnit.module("SerializationUtilsTest", {
             return MultipleComlexProps;
         }());     
     },
-    
-    beforeEach : function(){
-
-        window.emptyValues = [null, '', [], {}, '     ', "\n\n\n", 0];
-        window.emptyValuesCount = window.emptyValues.length;     
-    },
 
     afterEach : function(){
 
         delete window.emptyValues;
         delete window.emptyValuesCount;
-    },
-    
-    after : function(){
-
         delete window.ObjectUtils;
         delete window.SerializationUtils;
         delete window.SingleProp;
@@ -124,10 +117,17 @@ QUnit.test("jsonToClass", function(assert){
         assert.throws(function() {
             SerializationUtils.jsonToClass('{}', {}, emptyValues[i]);
         });
-    }
-
+    }    
+    
     // Test ok values with identical json and class either with strict set as true and false
     for(var boolValue of [true, false]){
+
+        // Special case: Empty generic object provided as class instance will be totally overriden by json data
+        assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
+                    '{"someKey":[{"someClass":{"foo":"value"}}]}',
+                    new Object(),
+                    boolValue),
+                {someKey:[{someClass:{foo:"value"}}]}));
         
         assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
                     '{"foo":"value"}',
@@ -148,9 +148,9 @@ QUnit.test("jsonToClass", function(assert){
                 {someClass:{foo:'value'}}));
         
         assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
-                '{"arr":[{"someClass":{"foo":"value"}}]}',
-                new SingleArrayProp(), 
-                boolValue),
+                    '{"arr":[{"someClass":{"foo":"value"}}]}',
+                    new SingleArrayProp(), 
+                    boolValue),
                 {arr:[{someClass:{foo:"value"}}]}));
     }
     

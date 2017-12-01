@@ -1,0 +1,38 @@
+/**
+ * This file contains a list of typescript classes that are used by the Serialization Utils 
+ * tests but converted to js. We can use the typescript playground online tool to easily convert this code
+ * to js.
+ */ 
+
+class SingleProp {
+
+    foo = '';
+}
+
+class SingleObjProp {
+
+    obj = new Object();
+}
+
+class SingleClassProp {
+
+    someClass = new SingleProp();
+}
+
+class SingleArrayProp {
+
+    arr = [new SingleClassProp()];
+}
+
+class MultipleComlexProps {
+
+	number = 0;
+
+	string = '';
+	
+	obj = new Object();
+	
+	someClass = new SingleArrayProp();
+
+	arr = [new SingleArrayProp(), 0, new Object()];
+}
