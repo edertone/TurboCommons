@@ -34,5 +34,5 @@ class MultipleComlexProps {
 	
 	someClass = new SingleArrayProp();
 
-	arr = [new SingleArrayProp(), 0, new Object()];
+	arr = [new SingleArrayProp()];
 }

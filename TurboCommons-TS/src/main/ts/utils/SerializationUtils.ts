@@ -50,17 +50,10 @@ export class SerializationUtils {
     }
         
 
-    /**
-     * Convert a JavaPropertiesObject instance to a string that is valid so it can be saved to a .properties file.
-     *
-     * @param javaProperties An instance of a JavaPropertiesObject
-     * 
-     * @return string An ISO-8859-1 string containing valid properties data, ready to be stored as a .properties java format file.
-     */
-    public static javaPropertiesObjectToString(javaProperties:any){
+    // TODO - review from PHP
+    public static javaPropertiesObjectToString(){
 
-        // TODO - implement this and translate it to PHP
-//        return $javaProperties->toString();
+        // TODO - implement this translating from PHP
     }
     
     
@@ -109,18 +102,20 @@ export class SerializationUtils {
         }
         
         // On strict mode, verify that both objects have the same keys
-        if(strictMode){
-
-            if(!ArrayUtils.isEqualTo(keys, classInstanceKeys)){
+        if(strictMode && keys.length !== classInstanceKeys.length){
                 
-                throw new Error("SerializationUtils.objectToClass (strict mode): [" + keys.join(',') + "] keys not match " + className + " props: [" + classInstanceKeys.join(',') + "]");
-            }
+            throw new Error("SerializationUtils.objectToClass (strict mode): [" + keys.join(',') + "] keys not match " + className + " props: [" + classInstanceKeys.join(',') + "]");
         }
         
         for(let key of keys){
             
             // If key does not exist on class instance, we will not assign it
             if(!classInstance.hasOwnProperty(key)){
+                
+                if(strictMode){
+                    
+                    throw new Error("SerializationUtils.objectToClass (strict mode): <" + key + "> not found in " + className);
+                }
                 
                 continue;
             }
@@ -137,7 +132,7 @@ export class SerializationUtils {
                                        
                 if(strictMode && classInstance[key].length !== 1){
                         
-                    throw new Error('SerializationUtils.objectToClass (strict mode): ' + className + '.' + key + ' must contain 1 default element');
+                    throw new Error('SerializationUtils.objectToClass (strict mode): ' + className + '.' + key + ' must contain only 1 default element');
                 }
                 
                 let elementClassName = (classInstance[key].length == 1) ? classInstance[key][0].constructor.name : '';
@@ -179,20 +174,10 @@ export class SerializationUtils {
     }
     
     
-    /**
-     * Convert a string containing the contents of a Java properties file to a JavaPropertiesObject instance.
-     * 
-     * Note that the input string must be encoded with ISO-8859-1 and strictly follow the Java
-     * properties file format (Otherwise results may not be correct).
-     *
-     * @param string The contents of a .properties Java file
-     *
-     * @return The properties format parsed as a JavaPropertiesObject instance
-     */
+    // TODO - review from PHP
     public static stringToJavaPropertiesObject(string: string){
 
-     // TODO - implement this and translate it to PHP
-//        return new JavaPropertiesObject($string);
+        // TODO - review from PHP
     }
     
     
