@@ -155,6 +155,30 @@ QUnit.test("isEqualTo", function(assert) {
             number : 1
         }
     }));
+    
+    // Test same values but with different key order
+    assert.ok(ObjectUtils.isEqualTo({
+        number : 1,
+        hello : 'home',
+        array : [1, 2, 3]
+    }, {
+        hello : 'home',
+        number : 1,
+        array : [1, 2, 3]
+    }));
+    assert.ok(ObjectUtils.isEqualTo({
+        hello : 'home',
+        array : {
+            hello : 'home',
+            number : 1
+        }
+    }, {
+        array : {
+            number : 1,
+            hello : 'home'
+        },
+        hello : 'home'
+    }));
 
     // Test different values	
     assert.ok(!ObjectUtils.isEqualTo({}, {

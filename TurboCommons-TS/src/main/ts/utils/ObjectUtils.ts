@@ -54,7 +54,10 @@ export class ObjectUtils {
 
 
 	/**
-	 * Check if two provided objects are identical
+	 * Check if two provided objects are identical.
+	 * Note that properties order does not alter the comparison. So if two objects 
+	 * have the same properties with exactly the same values, but they appear in a different
+	 * order on both objects, this method will consider them as equal.
 	 * 
 	 * @param object1 First object to compare
 	 * @param object2 Second object to compare
@@ -71,8 +74,8 @@ export class ObjectUtils {
 			throw new Error("ObjectUtils.isEqualTo: parameters must be objects");
 		}
 
-		var keys1:string[] = ObjectUtils.getKeys(object1);
-		var keys2:string[] = ObjectUtils.getKeys(object2);
+		var keys1:string[] = ObjectUtils.getKeys(object1).sort();
+		var keys2:string[] = ObjectUtils.getKeys(object2).sort();
 
 		// Compare keys can save a lot of time 
 		if(!ArrayUtils.isEqualTo(keys1, keys2)){
