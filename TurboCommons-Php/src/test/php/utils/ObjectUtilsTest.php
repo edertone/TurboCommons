@@ -171,6 +171,30 @@ class ObjectUtilsTest extends TestCase {
 				])
 		])));
 
+		// Test same values but with different key order
+		$this->assertTrue(ObjectUtils::isEqualTo(((object) [
+		    'number' => 1,
+		    'hello' => 'home',
+		    'array' => [1, 2, 3]
+		]), ((object) [
+		    'hello' => 'home',
+		    'number' => 1,
+		    'array' => [1, 2, 3]
+		])));
+		$this->assertTrue(ObjectUtils::isEqualTo(((object) [
+		    'hello' => 'home',
+		    'array' => ((object) [
+		        'hello' => 'home',
+		        'number' => 1
+		    ])
+		]), ((object) [
+		    'array' => ((object) [
+		        'number' => 1,
+		        'hello' => 'home'
+		    ]),
+		    'hello' => 'home'
+		])));
+
 		// Test different values
 		$this->assertTrue(!ObjectUtils::isEqualTo(new stdClass(), ((object) [
 				'1' => 1

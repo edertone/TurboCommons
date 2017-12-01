@@ -61,7 +61,10 @@ class ObjectUtils {
 
 
 	/**
-	 * Check if two provided objects are identical
+	 * Check if two provided objects are identical.
+	 * Note that properties order does not alter the comparison. So if two objects
+	 * have the same properties with exactly the same values, but they appear in a different
+	 * order on both objects, this method will consider them as equal.
 	 *
 	 * @param object $object1 First object to compare
 	 * @param object $object2 Second object to compare
@@ -80,6 +83,9 @@ class ObjectUtils {
 
 		$keys1 = self::getKeys($object1);
 		$keys2 = self::getKeys($object2);
+
+		sort($keys1);
+		sort($keys2);
 
 		// Compare keys can save a lot of time
 		if(!ArrayUtils::isEqualTo($keys1, $keys2)){
