@@ -26,7 +26,7 @@ use org\turbocommons\src\main\php\utils\StringUtils;
  * - Supports diferent folder structures for the resourcebundles organization.<br>
  * - Uses a lazy method to load only the requested bundles and tries to minimize path requests.
  */
-class LocalesManager extends BaseSingletonClass{
+class LocalizationManager extends BaseSingletonClass{
 
 
     /**
@@ -49,7 +49,7 @@ class LocalesManager extends BaseSingletonClass{
      * A list of languages that will be used by this class to translate the given keys, sorted by preference. When a key and bundle are requested for translation,
      * the class will check on the first language of this list for a translated text. If missing, the next one will be used, and so.<br><br>
      * For example: Setting this property to ['en_US', 'es_ES', 'fr_FR'] and calling
-     * LocalesManager::getInstance()->get('HELLO', 'Greetings') will try to locate the en_US value for the
+     * LocalizationManager::getInstance()->get('HELLO', 'Greetings') will try to locate the en_US value for the
      * HELLO tag on the Greetings bundle. If the tag is not found for the specified locale and bundle, the same
      * search will be performed for the es_ES locale, and so, till a value is found or no more locales are defined.
      *
@@ -65,7 +65,7 @@ class LocalesManager extends BaseSingletonClass{
      * We can define a single format for all of the specified paths, or we can specify the first n. If there are more
      * defined paths than formats, the last format will be used for all the subsequent paths on the $paths array.
      *
-     * Possible values: LocalesManager::FORMAT_JAVA_PROPERTIES, LocalesManager::FORMAT_ANDROID_XML
+     * Possible values: LocalizationManager::FORMAT_JAVA_PROPERTIES, LocalizationManager::FORMAT_ANDROID_XML
      *
      * TODO: Add support for more internationalization formats
      *
@@ -137,23 +137,23 @@ class LocalesManager extends BaseSingletonClass{
         // Locales must be an array
         if(!is_array($localesArray)){
 
-            throw new UnexpectedValueException('LocalesManager->get: locales property must be an array');
+            throw new UnexpectedValueException('LocalizationManager->get: locales property must be an array');
         }
 
         // Paths verifications
         if(!is_array($this->paths)){
 
-            throw new UnexpectedValueException('LocalesManager->get: paths property must be an array');
+            throw new UnexpectedValueException('LocalizationManager->get: paths property must be an array');
         }
 
         if(!is_array($this->pathStructure)){
 
-            throw new UnexpectedValueException('LocalesManager->get: pathStructure property must be an array');
+            throw new UnexpectedValueException('LocalizationManager->get: pathStructure property must be an array');
         }
 
         if(count($this->pathStructure) > count($this->paths)){
 
-            throw new UnexpectedValueException('LocalesManager->get: pathStructure cannot have more elements than paths');
+            throw new UnexpectedValueException('LocalizationManager->get: pathStructure cannot have more elements than paths');
         }
 
         // Check if we need to load the last used bundle
@@ -164,7 +164,7 @@ class LocalesManager extends BaseSingletonClass{
 
         if($bundle == ''){
 
-            throw new UnexpectedValueException('LocalesManager->get: No resource bundle specified');
+            throw new UnexpectedValueException('LocalizationManager->get: No resource bundle specified');
         }
 
         // Store the specified bundle name as the last that's been used till now
@@ -191,7 +191,7 @@ class LocalesManager extends BaseSingletonClass{
             }
         }
 
-        throw new UnexpectedValueException('LocalesManager->get: Specified key <'.$key.'> was not found on locales list: ['.implode(', ', $localesArray).']');
+        throw new UnexpectedValueException('LocalizationManager->get: Specified key <'.$key.'> was not found on locales list: ['.implode(', ', $localesArray).']');
     }
 
 
@@ -230,7 +230,7 @@ class LocalesManager extends BaseSingletonClass{
             }
         }
 
-        throw new UnexpectedValueException('LocalesManager->_loadBundle: Could not load bundle <'.$bundle.'> and locale <'.$locale.'>');
+        throw new UnexpectedValueException('LocalizationManager->_loadBundle: Could not load bundle <'.$bundle.'> and locale <'.$locale.'>');
     }
 }
 

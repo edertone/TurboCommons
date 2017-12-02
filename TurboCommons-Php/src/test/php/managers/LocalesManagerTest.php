@@ -13,15 +13,15 @@ namespace org\turbocommons\src\test\php\managers;
 
 use PHPUnit\Framework\TestCase;
 use Throwable;
-use org\turbocommons\src\main\php\managers\LocalesManager;
+use org\turbocommons\src\main\php\managers\LocalizationManager;
 
 
 /**
- * LocalesManager tests
+ * LocalizationManager tests
  *
  * @return void
  */
-class LocalesManagerTest extends TestCase {
+class LocalizationManagerTest extends TestCase {
 
 
     /**
@@ -32,7 +32,7 @@ class LocalesManagerTest extends TestCase {
      */
     public function testLocalesAsFolders(){
 
-        $localesManager = LocalesManager::getInstance();
+        $localesManager = LocalizationManager::getInstance();
 
         // Test EN_US
         $localesManager->locales = ['en_US', 'es_ES'];

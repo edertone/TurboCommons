@@ -20,7 +20,7 @@ use org\turbocommons\src\main\php\model\ErrorData;
  * A singleton class that is used to encapsulate all the global error management.
  * It will give total control over the code exceptions, the way they are handled and notified.
  */
-class ErrorManager extends BaseSingletonClass{
+class GlobalErrorManager extends BaseSingletonClass{
 
 
 	/**
