@@ -10,6 +10,7 @@
 
 // Managers package
 export { BrowserManager } from './managers/BrowserManager';
+export { HTTPManager } from './managers/HTTPManager';
 export { ValidationManager} from './managers/ValidationManager';
 
 // Model package
@@ -24,4 +25,5 @@ export { ArrayUtils } from './utils/ArrayUtils';
 export { ConversionUtils } from './utils/ConversionUtils';
 export { NumericUtils } from './utils/NumericUtils';
 export { ObjectUtils } from './utils/ObjectUtils';
+export { SerializationUtils } from './utils/SerializationUtils';
 export { StringUtils } from './utils/StringUtils';

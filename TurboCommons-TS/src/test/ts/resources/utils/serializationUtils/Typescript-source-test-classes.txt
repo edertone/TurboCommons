@@ -2,37 +2,50 @@
  * This file contains a list of typescript classes that are used by the Serialization Utils 
  * tests but converted to js. We can use the typescript playground online tool to easily convert this code
  * to js.
- */ 
+ */
+ 
 
-class SingleProp {
+namespace org_turboCommons_test_serializationUtils {
 
-    foo = '';
-}
+	export class SingleProp {
 
-class SingleObjProp {
-
-    obj = new Object();
-}
-
-class SingleClassProp {
-
-    someClass = new SingleProp();
-}
-
-class SingleArrayProp {
-
-    arr = [new SingleClassProp()];
-}
-
-class MultipleComlexProps {
-
-	number = 0;
-
-	string = '';
+		oneProp = "hello";
+	}
 	
-	obj = new Object();
-	
-	someClass = new SingleArrayProp();
+	export class NonTypedProps {
 
-	arr = [new SingleArrayProp()];
+		nullProp = null;
+
+		undefinedProp = undefined;
+	}
+	
+	export class BasicTypeProps {
+	
+		boolean = false;
+	
+		number = 0;
+	
+		string = '';
+		
+		obj = {a: 1};
+		
+		someClass = new NonTypedProps();
+	
+		arr = [];
+	}
+	
+	export class TypedArrayProps {
+
+		boolArray = [false];
+		
+		numberArray = [0];
+		
+		stringArray = [""];
+		
+		objectArray = [{}];
+
+		classArray = [new NonTypedProps()];
+		
+		arrayArray = [[]];
+	}
 }

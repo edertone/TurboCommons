@@ -9,6 +9,64 @@
  * CopyRight : -> Copyright 2015 Edertone Advanded Solutions (08211 Castellar del Vallès, Barcelona). http://www.edertone.com
  */
 
+
+
+// *******************************************************************************************
+// Following classes are defined to be used on several tests.
+// They have been created by using the typescript playground online tool
+// that automatically generates the javascript code from a typescript given 
+// one. Original typescript source that generates these classes is found at:
+// test/ts/resources/utils/serializationUtils/Typescript-source-test-classes.txt
+
+// TODO - all these classes shoud be included in a sepparated file and added to index.html as resources
+
+var org_turboCommons_test_serializationUtils;
+(function (org_turboCommons_test_serializationUtils) {
+    var SingleProp = /** @class */ (function () {
+        function SingleProp() {
+            this.oneProp = "hello";
+        }
+        return SingleProp;
+    }());
+    org_turboCommons_test_serializationUtils.SingleProp = SingleProp;
+    var NonTypedProps = /** @class */ (function () {
+        function NonTypedProps() {
+            this.nullProp = null;
+            this.undefinedProp = undefined;
+        }
+        return NonTypedProps;
+    }());
+    org_turboCommons_test_serializationUtils.NonTypedProps = NonTypedProps;
+    var BasicTypeProps = /** @class */ (function () {
+        function BasicTypeProps() {
+            this.boolean = false;
+            this.number = 0;
+            this.string = '';
+            this.obj = { a: 1 };
+            this.someClass = new NonTypedProps();
+            this.arr = [];
+        }
+        return BasicTypeProps;
+    }());
+    org_turboCommons_test_serializationUtils.BasicTypeProps = BasicTypeProps;
+    var TypedArrayProps = /** @class */ (function () {
+        function TypedArrayProps() {
+            this.boolArray = [false];
+            this.numberArray = [0];
+            this.stringArray = [""];
+            this.objectArray = [{}];
+            this.classArray = [new NonTypedProps()];
+            this.arrayArray = [[]];
+        }
+        return TypedArrayProps;
+    }());
+    org_turboCommons_test_serializationUtils.TypedArrayProps = TypedArrayProps;
+})(org_turboCommons_test_serializationUtils || (org_turboCommons_test_serializationUtils = {}));
+
+//*******************************************************************************************
+
+
+
 QUnit.module("SerializationUtilsTest", {
     
     beforeEach : function(){
@@ -17,61 +75,26 @@ QUnit.module("SerializationUtilsTest", {
         window.emptyValuesCount = window.emptyValues.length;     
         
         window.ObjectUtils = org_turbocommons.ObjectUtils;
-        window.SerializationUtils = org_turbocommons.SerializationUtils;  
+        window.SerializationUtils = org_turbocommons.SerializationUtils; 
         
-        // Following classes are defined to be used on several tests.
-        // They have been created by using the typescript playground online tool
-        // that automatically generates the javascript code from a typescript given 
-        // one. Original typescript source that generates these classes is found at:
-        // test/ts/resources/utils/serializationUtils/Typescript-source-test-classes.txt
-        
-        window.SingleProp = /** @class */ (function () {
-            function SingleProp() {
-                this.foo = '';
-            }
-            return SingleProp;
-        }());
-        window.SingleObjProp = /** @class */ (function () {
-            function SingleObjProp() {
-                this.obj = new Object();
-            }
-            return SingleObjProp;
-        }());
-        window.SingleClassProp = /** @class */ (function () {
-            function SingleClassProp() {
-                this.someClass = new SingleProp();
-            }
-            return SingleClassProp;
-        }());
-        window.SingleArrayProp = /** @class */ (function () {
-            function SingleArrayProp() {
-                this.arr = [new SingleClassProp()];
-            }
-            return SingleArrayProp;
-        }());
-        window.MultipleComlexProps = /** @class */ (function () {
-            function MultipleComlexProps() {
-                this.number = 0;
-                this.string = '';
-                this.obj = new Object();
-                this.someClass = new SingleArrayProp();
-                this.arr = [new SingleArrayProp()];
-            }
-            return MultipleComlexProps;
-        }());     
+        window.SingleProp = org_turboCommons_test_serializationUtils.SingleProp;
+        window.NonTypedProps = org_turboCommons_test_serializationUtils.NonTypedProps;
+        window.BasicTypeProps = org_turboCommons_test_serializationUtils.BasicTypeProps;
+        window.TypedArrayProps = org_turboCommons_test_serializationUtils.TypedArrayProps;
     },
 
     afterEach : function(){
 
         delete window.emptyValues;
         delete window.emptyValuesCount;
+        
         delete window.ObjectUtils;
         delete window.SerializationUtils;
+        
         delete window.SingleProp;
-        delete window.SingleObjProp;
-        delete window.SingleClassProp;
-        delete window.SingleArrayProp;
-        delete window.MultipleComlexProps;
+        delete window.NonTypedProps;
+        delete window.BasicTypeProps;
+        delete window.TypedArrayProps;
     }
 });
 
@@ -119,7 +142,7 @@ QUnit.todo("javaPropertiesObjectToString", function(assert){
  */
 QUnit.test("jsonToClass", function(assert){
 
-    // Test empty values
+    // Test empty values on method parameters
     assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass('{}', {}, false), {}));
     assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass('{}', {}, true), {}));
     
@@ -141,145 +164,142 @@ QUnit.test("jsonToClass", function(assert){
         });
     }
     
-    for(var boolValue of [true, false]){
-        
-        // Test special case: If we provide an empty object as the classInstance or classInstance property
-        // default type, no strict checking will happen. Object will be directly opdated with the source JSON data
+    for(var strictValue of [true, false]){
+    
+        // Test that non typed properties accept being defined with any value
         assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
-                '{"obj":{"foo1": 1, "foo2": 2}}',
-                new SingleObjProp(),
-                boolValue),
-            {obj: {foo1: 1, foo2: 2}}));
+                '{"undefinedProp": false}',
+                new NonTypedProps(),
+                false),
+                {nullProp: null, undefinedProp: false}));
         
         assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
-                '{"someKey":[{"someClass":{"foo":"value", "foo2": 1, "foo3": []}}]}',
-                new Object(),
-                boolValue),
-            {someKey:[{someClass:{foo:"value", foo2: 1, foo3: []}}]}));
+                '{"nullProp": 2, "undefinedProp": "hello"}',
+                new NonTypedProps(),
+                strictValue),
+                {nullProp: 2, undefinedProp: "hello"}));
         
-        
-        // Test identical JSON and classInstance with strict true and false
         assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
-                    '{"foo":"value"}',
+                '{"nullProp": [1, 2, 3], "undefinedProp": {"a": 1, "b": 2}}',
+                new NonTypedProps(),
+                strictValue),
+                {"nullProp": [1, 2, 3], "undefinedProp": {a: 1, b: 2}}));
+          
+        // Test that typed properties accept only values of their own type
+        assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
+                '{"boolean": true, "number": 1230.1, "string": "hello", "obj": {"b": 2}, ' +
+                '"someClass": {"nullProp": 1, "undefinedProp": 2}, "arr": [1,2,3,4]}',
+                new BasicTypeProps(),
+                strictValue),
+                {boolean: true, number: 1230.1, string: "hello", obj: {"b": 2},
+                    someClass: {nullProp: 1, undefinedProp: 2}, arr: [1,2,3,4]}));
+        
+        assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
+                '{"boolean": false, "number": 25, "string": "h", "obj": {}, ' +
+                '"someClass": {"noProp": 1}, "arr": ["a"]}',
+                new BasicTypeProps(),
+                false),
+                {boolean: false, number: 25, string: "h", obj: {},
+                    someClass: {nullProp: null, undefinedProp: undefined}, arr: ["a"]}));
+        
+        assert.throws(function() {
+            SerializationUtils.jsonToClass(
+                    '{"boolean": 1, "number": 1230.1, "string": "hello", "obj": {"b": 2}, ' +
+                    '"someClass": {"nullProp": 1, "undefinedProp": 2}, "arr": [1,2,3,4]}',
+                    new BasicTypeProps(),
+                    strictValue);
+        }, /expected to be boolean/);
+        
+        assert.throws(function() {
+            SerializationUtils.jsonToClass(
+                    '{"boolean": false, "number": true, "string": "hello", "obj": {"b": 2}, ' +
+                    '"someClass": {"nullProp": 1, "undefinedProp": 2}, "arr": [1,2,3,4]}',
+                    new BasicTypeProps(),
+                    strictValue);
+        }, /expected to be number/);
+        
+        assert.throws(function() {
+            SerializationUtils.jsonToClass(
+                    '{"boolean": false, "number": -10, "string": 1, "obj": {"b": 2}, ' +
+                    '"someClass": {"nullProp": 1, "undefinedProp": 2}, "arr": [1,2,3,4]}',
+                    new BasicTypeProps(),
+                    strictValue);
+        }, /expected to be string/);
+        
+        assert.throws(function() {
+            SerializationUtils.jsonToClass(
+                    '{"boolean": false, "number": -10, "string": "", "obj": true, ' +
+                    '"someClass": {"nullProp": 1, "undefinedProp": 2}, "arr": [1,2,3,4]}',
+                    new BasicTypeProps(),
+                    strictValue);
+        }, /expected to be Object/);
+        
+        assert.throws(function() {
+            SerializationUtils.jsonToClass(
+                    '{"boolean": false, "number": -10, "string": "", "obj": {}, ' +
+                    '"someClass": 1, "arr": [1,2,3,4]}',
+                    new BasicTypeProps(),
+                    strictValue);
+        }, /expected to be NonTypedProps/);
+        
+        assert.throws(function() {
+            SerializationUtils.jsonToClass(
+                    '{"boolean": false, "number": -10, "string": "", "obj": {}, ' +
+                    '"someClass": {"prop": true}, "arr": [1,2,3,4]}',
+                    new BasicTypeProps(),
+                    true);
+        }, /keys not match NonTypedProps/);
+        
+        assert.throws(function() {
+            SerializationUtils.jsonToClass(
+                    '{"boolean": false, "number": -10, "string": "", "obj": {}, ' +
+                    '"someClass": {"nullProp": true, "undefinedProp": "a"}, "arr": "er"}',
+                    new BasicTypeProps(),
+                    strictValue);
+        }, /expected to be array/);
+        
+        // Test class and JSON with different keys and properties
+        assert.throws(function() {
+            SerializationUtils.jsonToClass(
+                    '{"foo1":"value", "oneProp":"value"}',
                     new SingleProp(),
-                    boolValue), 
-                {foo:'value'}));
+                    true);
+        }, /keys not match/);
+        
+        assert.throws(function() {
+            SerializationUtils.jsonToClass(
+                    '{"boolean":true, "string":"hello"}',
+                    new BasicTypeProps(),
+                    true);
+        }, /keys not match/);
         
         assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
-                    '{"obj":{"foo":"value", "foo2":"value2"}}',
-                    new SingleObjProp(), 
-                    boolValue),
-                {obj:{foo:"value", foo2:"value2"}}));
-        
-        assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
-                    '{"someClass":{"foo":"value"}}',
-                    new SingleClassProp(), 
-                    boolValue),
-                {someClass:{foo:'value'}}));
-        
-        assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
-                    '{"arr":[{"someClass":{"foo":"value"}}]}',
-                    new SingleArrayProp(), 
-                    boolValue),
-                {arr:[{someClass:{foo:"value"}}]}));
-        
-        // Test complex class with many properties
-        assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
-                    '{"number": 9882, "string": "hello", "obj": {"foo": "bar"},' +
-                    '"someClass": {"arr":[{"someClass":{"foo":"value"}}]},' +
-                    '"arr": [{"arr":[{"someClass":{"foo":"value"}}]}]}',
-                    new MultipleComlexProps(), 
-                    boolValue),
-                {number: 9882, string: "hello", obj: {foo: "bar"},
-                someClass: {arr:[{someClass:{foo:"value"}}]},
-                arr: [{arr:[{someClass:{foo:"value"}}]}]}));
-        
-        // Test same properties and keys but with different order
-        assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
-                '{"string": "hello", "number": 9882,' +
-                '"someClass": {"arr":[{"someClass":{"foo":"value"}}]},' +
-                '"arr": [{"arr":[{"someClass":{"foo":"value"}}]}],' +
-                '"obj": {"foo": "bar"}}',
-                new MultipleComlexProps(), 
-                boolValue),
-            {obj: {foo: "bar"}, number: 9882, string: "hello",
-            arr: [{arr:[{someClass:{foo:"value"}}]}],
-            someClass: {arr:[{someClass:{foo:"value"}}]}}));
-    }
-    
-    
-    // Test class and JSON with different keys and properties with strict true and false
-    assert.throws(function() {
-        SerializationUtils.jsonToClass(
                 '{"foo1":"value", "foo2":"value"}',
                 new SingleProp(),
-                true);
-    });
-    
-    assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
-            '{"foo1":"value", "foo2":"value"}',
-            new SingleProp(),
-            false), 
-        {foo:''}));
-    
-    assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
-            '{"foo1":"value"}',
-            new SingleProp(),
-            false), 
-        {foo:''}));
-    
-    assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
-            '{"foo":"value", "nonexistant":"value"}',
-            new SingleProp(),
-            false), 
-        {foo:'value'}));
-    
-    assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
-            '{"arr1":[{"obj":{"foo":"value"}}]}',
-            new SingleArrayProp(), 
-            false),
-            {arr:[{someClass:{foo:''}}]}));
-   
-    assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
-            '{"arr":[{"obj1":{"foo":"value"}}]}',
-            new SingleArrayProp(), 
-            false),
-            {arr:[{someClass:{foo:''}}]}));
-         
-    assert.throws(function() {
-        SerializationUtils.jsonToClass(
-                '{"arr":[{"obj1":{"foo":"value"}}]}',
-                new SingleArrayProp(), 
-                true);
-    });
-    
-    
-    // Test errors related to different types on class and JSON with strict mode
-    // TODO
-    
-    // Test wrong values with strict mode true and keys or properties that do not exist on the other part
-    assert.throws(function() {
-        SerializationUtils.jsonToClass(
+                false), 
+            {oneProp:'hello'}));
+        
+        assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
                 '{"foo1":"value"}',
                 new SingleProp(),
-                true);
-    });
-    
-    assert.throws(function() {
-        SerializationUtils.jsonToClass(
-                '{"foo": 1, "obj":{"foo2": 2}}',
-                new SingleObjProp(),
-                true);
-    });
-    
-    assert.throws(function() {
-        SerializationUtils.jsonToClass(
-                '{"foo":"value", "nonexistant":"value"}',
+                false), 
+            {oneProp:'hello'}));
+        
+        assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
+                '{"oneProp":"value", "nonexistant":"value"}',
                 new SingleProp(),
-                true);
-    });
+                false), 
+            {oneProp:'value'}));
+        
+        assert.throws(function() {
+            SerializationUtils.jsonToClass(
+                    '{"foo1":"value"}',
+                    new SingleProp(),
+                    true);
+        }, /<foo1> not found/);
+    }
 
-    // Test wrong parameters exceptions
+    // Test exceptions caused by wrong type parameters
     assert.throws(function() {
         SerializationUtils.jsonToClass('hello', {}, true);
     });
