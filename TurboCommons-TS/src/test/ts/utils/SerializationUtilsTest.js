@@ -297,6 +297,9 @@ QUnit.test("jsonToClass", function(assert){
                     new SingleProp(),
                     true);
         }, /<foo1> not found/);
+        
+        // Test properties with typed and non typed array values
+        // TODO
     }
 
     // Test exceptions caused by wrong type parameters

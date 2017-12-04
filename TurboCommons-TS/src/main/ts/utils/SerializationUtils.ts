@@ -120,7 +120,7 @@ export class SerializationUtils {
             // If property has an explicit null or undefined default value, any type is allowed
             if(classInstance[key] !== null && classInstance[key] !== undefined){
                 
-                let typeErrorMessage = 'SerializationUtils.objectToClass: <' + key + '> was ' + (typeof value) + ' but expected to be ';
+                let typeErrorMessage = 'SerializationUtils.objectToClass: <' + classInstanceName + '.' + key + '> was ' + (typeof value) + ' but expected to be ';
                 
                 if (ArrayUtils.isArray(classInstance[key])){
                     
