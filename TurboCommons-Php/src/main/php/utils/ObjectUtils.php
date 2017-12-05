@@ -109,6 +109,13 @@ class ObjectUtils {
 
 		return true;
 	}
+
+
+	// TODO - translate from TS
+	public static function clone($object){
+
+	    // TODO - translate from TS
+	}
 }
 
 ?>

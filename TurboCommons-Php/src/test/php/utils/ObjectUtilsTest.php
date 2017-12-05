@@ -253,6 +253,27 @@ class ObjectUtilsTest extends TestCase {
 			$this->fail($exceptionMessage);
 		}
 	}
+
+
+	/**
+	 * testClone
+	 *
+	 * @return void
+	 */
+	public function testClone(){
+
+	    // Test empty values
+	    // TODO - translate from ts
+
+	    // Test ok values
+	    // TODO - translate from ts
+
+	    // Test wrong values
+	    // TODO - translate from ts
+
+	    // Test exceptions
+	    // TODO - translate from ts
+	}
 }
 
 ?>
