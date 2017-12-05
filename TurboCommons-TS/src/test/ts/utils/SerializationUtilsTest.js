@@ -42,7 +42,7 @@ var org_turboCommons_test_serializationUtils;
             this.boolean = false;
             this.number = 0;
             this.string = '';
-            this.obj = { a: 1 };
+            this.obj = {};
             this.someClass = new NonTypedProps();
             this.arr = [];
         }
@@ -51,11 +51,12 @@ var org_turboCommons_test_serializationUtils;
     org_turboCommons_test_serializationUtils.BasicTypeProps = BasicTypeProps;
     var TypedArrayProps = /** @class */ (function () {
         function TypedArrayProps() {
+            this.nonTypedArray = [];
             this.boolArray = [false];
             this.numberArray = [0];
             this.stringArray = [""];
             this.objectArray = [{}];
-            this.classArray = [new NonTypedProps()];
+            this.classArray = [new SingleProp()];
             this.arrayArray = [[]];
         }
         return TypedArrayProps;
@@ -165,6 +166,15 @@ QUnit.test("jsonToClass", function(assert){
     }
     
     for(var strictValue of [true, false]){
+        
+        // Test that null values on source json keys are assigned to destination properties
+        assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
+                '{"boolean": null, "number": null, "string": null, "obj": null, ' +
+                '"someClass": null, "arr": null}',
+                new BasicTypeProps(),
+                strictValue),
+                {boolean: false, number: 0, string: "", obj: {},
+                    someClass: {nullProp: null, undefinedProp: undefined}, arr: []}));
     
         // Test that non typed properties accept being defined with any value
         assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
@@ -194,11 +204,15 @@ QUnit.test("jsonToClass", function(assert){
                 {boolean: true, number: 1230.1, string: "hello", obj: {"b": 2},
                     someClass: {nullProp: 1, undefinedProp: 2}, arr: [1,2,3,4]}));
         
-        assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
+        var value = SerializationUtils.jsonToClass(
                 '{"boolean": false, "number": 25, "string": "h", "obj": {}, ' +
                 '"someClass": {"noProp": 1}, "arr": ["a"]}',
                 new BasicTypeProps(),
-                false),
+                false);
+        
+        assert.strictEqual(value.someClass.constructor.name, 'NonTypedProps');
+                
+        assert.ok(ObjectUtils.isEqualTo(value,
                 {boolean: false, number: 25, string: "h", obj: {},
                     someClass: {nullProp: null, undefinedProp: undefined}, arr: ["a"]}));
         
@@ -299,7 +313,25 @@ QUnit.test("jsonToClass", function(assert){
         }, /<foo1> not found/);
         
         // Test properties with typed and non typed array values
-        // TODO
+        var value = SerializationUtils.jsonToClass(
+                '{"nonTypedArray": [1,"a", null], "boolArray": [true,false], ' +
+                '"numberArray": [1,3,5], "stringArray": ["hello","home"], ' +
+                '"objectArray": [{"b": 2}], "classArray": [{"oneProp": "a"}, {"oneProp": "b"}], ' +
+                '"arrayArray": [[1,2,3], ["a","b","c"]]}',
+                new TypedArrayProps(),
+                strictValue);
+                
+        assert.ok(ObjectUtils.isEqualTo(value,
+                {nonTypedArray: [1,"a", null], boolArray: [true,false], 
+                    numberArray: [1,3,5], stringArray: ["hello","home"],
+                    objectArray: [{"b": 2}], classArray: [{oneProp: "a"}, {oneProp: "b"}],
+                    arrayArray: [[1,2,3], ["a","b","c"]]}));
+        
+        assert.strictEqual(value.classArray[0].constructor.name, 'SingleProp');
+        
+        // TODO - wrong typed arrays
+         // TODO
+         // TODO
     }
 
     // Test exceptions caused by wrong type parameters

@@ -88,7 +88,7 @@ export class SerializationUtils {
 
         if(typeof strictMode !== 'boolean'){
             
-            throw new Error("SerializationUtils.objectToClass: strictMode must be boolean");
+            throw new Error("strictMode must be boolean");
         }
         
         let objectKeys = ObjectUtils.getKeys(object);
@@ -98,7 +98,7 @@ export class SerializationUtils {
         // On strict mode, verify that both objects have the same keys
         if(strictMode && objectKeys.length !== classInstanceKeys.length){
                 
-            throw new Error("SerializationUtils.objectToClass (strict mode): [" + objectKeys.join(',') + "] keys not match " + classInstanceName + " props: [" + classInstanceKeys.join(',') + "]");
+            throw new Error("(strict mode): [" + objectKeys.join(',') + "] keys not match " + classInstanceName + " props: [" + classInstanceKeys.join(',') + "]");
         }
         
         // Loop all the received object keys and store each value on the respective class property
@@ -109,7 +109,7 @@ export class SerializationUtils {
                 
                 if(strictMode){
                     
-                    throw new Error("SerializationUtils.objectToClass (strict mode): <" + key + "> not found in " + classInstanceName);
+                    throw new Error("(strict mode): <" + key + "> not found in " + classInstanceName);
                 }
                 
                 continue;
@@ -117,10 +117,16 @@ export class SerializationUtils {
             
             let value = (object as any)[key];
             
-            // If property has an explicit null or undefined default value, any type is allowed
+            // A null key value will leave the property value untouched
+            if(value === null){
+                
+                continue;
+            }
+            
+            // If property has an explicit null or undefined default value, any type is allowed.
             if(classInstance[key] !== null && classInstance[key] !== undefined){
                 
-                let typeErrorMessage = 'SerializationUtils.objectToClass: <' + classInstanceName + '.' + key + '> was ' + (typeof value) + ' but expected to be ';
+                let typeErrorMessage = '<' + classInstanceName + '.' + key + '> was ' + (typeof value) + ' but expected to be ';
                 
                 if (ArrayUtils.isArray(classInstance[key])){
                     
@@ -133,16 +139,30 @@ export class SerializationUtils {
                         
                         if(classInstance[key].length !== 1){
                         
-                            throw new Error('SerializationUtils.objectToClass: to define a typed list, ' + classInstanceName + '.' + key + ' must contain only 1 default typed element');
+                            throw new Error('To define a typed list, ' + classInstanceName + '.' + key + ' must contain only 1 default typed element');
                         }
                         
-                        let elementClassName = classInstance[key][0].constructor.name;
-                        
+                        let defaultElement = classInstance[key][0];
+                        let isDefaultElementAClass = (ObjectUtils.isObject(defaultElement) && defaultElement.constructor.name !== 'Object');
+                                                  
                         classInstance[key] = [];
                         
                         for(let o of value){
                             
-                            classInstance[key].push(SerializationUtils.objectToClass(o, new (window as any)[elementClassName](), strictMode));     
+                            if(isDefaultElementAClass){
+                                
+                                o = SerializationUtils.objectToClass(o, ObjectUtils.clone(defaultElement), strictMode);
+                                
+                            }else{
+                                
+                                // Type of array elements must match the default value
+                                if(typeof o !== typeof defaultElement){
+                                    
+                                    throw new Error('<' + classInstanceName + '.' + key + '> is defined as array of ' + (typeof defaultElement) + ' but received array of ' + typeof o);
+                                }                            
+                            }
+
+                            classInstance[key].push(o);
                         }
                         
                         continue;
@@ -194,7 +214,7 @@ export class SerializationUtils {
 
         if(StringUtils.isEmpty(string)){
 
-            throw new Error('SerializationUtils->stringToXmlObject Empty string is not a valid xml value');
+            throw new Error('Empty string is not a valid xml value');
         }
         
      // TODO - implement this and translate it to PHP
