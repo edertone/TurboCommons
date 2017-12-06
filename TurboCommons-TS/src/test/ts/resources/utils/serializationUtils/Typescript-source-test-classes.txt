@@ -27,7 +27,7 @@ namespace org_turboCommons_test_serializationUtils {
 	
 		string = '';
 		
-		obj = {a: 1};
+		obj = {};
 		
 		someClass = new NonTypedProps();
 	
@@ -35,6 +35,8 @@ namespace org_turboCommons_test_serializationUtils {
 	}
 	
 	export class TypedArrayProps {
+	
+		nonTypedArray = [];
 
 		boolArray = [false];
 		
@@ -44,7 +46,7 @@ namespace org_turboCommons_test_serializationUtils {
 		
 		objectArray = [{}];
 
-		classArray = [new NonTypedProps()];
+		classArray = [new SingleProp()];
 		
 		arrayArray = [[]];
 	}

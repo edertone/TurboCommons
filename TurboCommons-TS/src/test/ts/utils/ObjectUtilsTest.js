@@ -230,3 +230,71 @@ QUnit.test("isEqualTo", function(assert) {
         ObjectUtils.isEqualTo("hello", "hello");
     });
 });
+
+
+/**
+ * clone
+ */
+QUnit.test("clone", function(assert) {
+    
+    // Test empty values
+    assert.strictEqual(ObjectUtils.clone(null), null);
+    assert.strictEqual(ObjectUtils.clone(undefined), undefined);
+    assert.strictEqual(ObjectUtils.clone(0), 0);
+    assert.strictEqual(ObjectUtils.clone(''), '');
+    assert.ok(ArrayUtils.isEqualTo(ObjectUtils.clone([]), []));
+    assert.ok(ObjectUtils.isEqualTo(ObjectUtils.clone({}), {}));
+    assert.strictEqual(ObjectUtils.clone('    '), '    ');
+
+    // Test ok values. Verify modified clones do not affect original one
+    var value = -145;    
+    var clonedValue = ObjectUtils.clone(value);    
+    assert.strictEqual(clonedValue, value);
+    clonedValue = clonedValue + 100;
+    assert.strictEqual(clonedValue, -45);
+    assert.strictEqual(value, -145);
+    
+    var value = 'hello';    
+    var clonedValue = ObjectUtils.clone(value);    
+    assert.strictEqual(clonedValue, value);
+    clonedValue = clonedValue + 'test';
+    assert.strictEqual(value, 'hello');
+    
+    var value = [1,2,3,4,5];    
+    var clonedValue = ObjectUtils.clone(value);
+    assert.ok(ArrayUtils.isEqualTo(clonedValue, value));
+    clonedValue.push(6);
+    assert.ok(ArrayUtils.isEqualTo(value, [1,2,3,4,5]));
+    
+    var value = [1,2,3,{a:1, b:2, c:{d:1}},5];
+    var clonedValue = ObjectUtils.clone(value);
+    assert.ok(ArrayUtils.isEqualTo(clonedValue, value));
+    clonedValue[3].a = 5;
+    clonedValue[3].c.d = 6;
+    assert.ok(ArrayUtils.isEqualTo(clonedValue, [1,2,3,{a:5, b:2, c:{d:6}},5]));
+    assert.ok(ArrayUtils.isEqualTo(value, [1,2,3,{a:1, b:2, c:{d:1}},5]));
+    
+    var value = {a:1, b:2, c:[3,4,5,{d:6,e:{f:7}}]};
+    var clonedValue = ObjectUtils.clone(value);
+    assert.ok(ObjectUtils.isEqualTo(clonedValue, value));
+    clonedValue.a = 5;
+    clonedValue.c[0] = 9;
+    clonedValue.c[3].e = null;
+    assert.ok(ObjectUtils.isEqualTo(clonedValue, {a:5, b:2, c:[9,4,5,{d:6,e:null}]}));
+    assert.ok(ObjectUtils.isEqualTo(value, {a:1, b:2, c:[3,4,5,{d:6,e:{f:7}}]}));
+    
+    // Test an object containing references to other objects
+    var reference = {ref:1};
+    var value = {a:1, b:reference};
+    var clonedValue = ObjectUtils.clone(value);
+    assert.ok(ObjectUtils.isEqualTo(clonedValue, value));
+    reference.ref = 2;
+    assert.ok(ObjectUtils.isEqualTo(clonedValue, {a:1, b:{ref:1}}));
+    assert.ok(ObjectUtils.isEqualTo(value, {a:1, b:{ref:2}}));
+    
+    // Test wrong values
+    // not necessary
+
+    // Test exceptions
+    // no exceptions are thrown by this method
+});

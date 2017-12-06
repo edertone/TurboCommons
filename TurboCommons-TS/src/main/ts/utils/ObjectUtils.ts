@@ -94,4 +94,34 @@ export class ObjectUtils {
 
 		return true;
 	}
+	
+	
+	/**
+	 * Perform a deep copy of the given object.
+	 * 
+	 * @see https://stackoverflow.com/questions/4459928/how-to-deep-clone-in-javascript
+	 * 
+	 * @param object Any language instance like nubmers, strings, arrays, objects, etc.. that we want to duplicate.
+	 * 
+	 * @returns An exact independent copy of the received object, without any shared reference.
+	 */
+	public static clone(object:any) {
+	    
+	    if(object == null || typeof(object) != 'object') {
+	    
+	        return object;
+	    }
+
+	    let result = new object.constructor();
+
+	    for(var key in object) {
+	        
+	        if (object.hasOwnProperty(key)) {
+	          
+	            result[key] = ObjectUtils.clone(object[key]);
+	        }
+	    }
+
+	    return result;
+	  }	    
 }
