@@ -22,6 +22,20 @@ class SerializationUtils{
 
 
     // TODO
+    public static function classToJson(){
+
+        // TODO - review from TS
+    }
+
+
+    // TODO
+    public static function classToObject(){
+
+        // TODO - review from TS
+    }
+
+
+    // TODO
     public static function hashMapObjectToClass(){
 
         // TODO - review from TS

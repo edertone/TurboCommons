@@ -73,6 +73,54 @@ class SerializationUtilsTest extends TestCase {
 
 
     /**
+     * testClassToJson
+     *
+     * @return void
+     */
+    public function testClassToJson(){
+
+        // Test empty values
+        // TODO - review from ts
+
+        // Test ok values
+        // TODO - review from ts
+
+        // Test wrong values
+        // TODO - review from ts
+
+        // Test exceptions
+        // TODO - review from ts
+
+        // TODO
+        $this->markTestIncomplete('This test has not been implemented yet.');
+    }
+
+
+    /**
+     * testClassToObject
+     *
+     * @return void
+     */
+    public function testClassToObject(){
+
+        // Test empty values
+        // TODO - review from ts
+
+        // Test ok values
+        // TODO - review from ts
+
+        // Test wrong values
+        // TODO - review from ts
+
+        // Test exceptions
+        // TODO - review from ts
+
+        // TODO
+        $this->markTestIncomplete('This test has not been implemented yet.');
+    }
+
+
+    /**
      * testHashMapObjectToClass
      *
      * @return void
