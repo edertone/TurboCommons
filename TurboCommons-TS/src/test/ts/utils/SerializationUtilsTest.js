@@ -101,6 +101,44 @@ QUnit.module("SerializationUtilsTest", {
 
 
 /**
+ * classToJson
+ */
+QUnit.todo("classToJson", function(assert){
+    
+    // Test empty values
+    // TODO
+
+    // Test ok values
+    // TODO
+
+    // Test wrong values
+    // TODO
+
+    // Test exceptions
+    // TODO
+});
+
+
+/**
+ * classToObject
+ */
+QUnit.todo("classToObject", function(assert){
+ 
+    // Test empty values
+    // TODO
+
+    // Test ok values
+    // TODO
+
+    // Test wrong values
+    // TODO
+
+    // Test exceptions
+    // TODO
+});
+
+
+/**
  * hashMapObjectToClass
  */
 QUnit.todo("hashMapObjectToClass", function(assert){

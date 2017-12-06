@@ -24,6 +24,26 @@ export class SerializationUtils {
     
     
     /**
+     * Generate a valid JSON string from a given class instance
+     * 
+     * @param classInstance A class instance
+     * 
+     * @returns A valid JSON string containing all the data on the provided class
+     */
+    public static classToJson(classInstance:any){
+
+        return JSON.stringify(classInstance);
+    }
+    
+    
+    // TODO
+    public static classToObject(){
+
+        // TODO
+    }
+    
+    
+    /**
      * Copy data from a HashMapObject instance to an arbitrary class instance which contains
      * the same properties as the hashmap keys. Class property values will be set to the same value of the hash map key 
      *
