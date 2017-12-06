@@ -262,7 +262,7 @@ QUnit.test("jsonToClass", function(assert){
                     '"someClass": {"prop": true}, "arr": [1,2,3,4]}',
                     new BasicTypeProps(),
                     true);
-        }, /keys not match NonTypedProps/);
+        }, /keys do not match NonTypedProps/);
         
         assert.throws(function() {
             SerializationUtils.jsonToClass(
@@ -278,14 +278,14 @@ QUnit.test("jsonToClass", function(assert){
                     '{"foo1":"value", "oneProp":"value"}',
                     new SingleProp(),
                     true);
-        }, /keys not match/);
+        }, /keys do not match/);
         
         assert.throws(function() {
             SerializationUtils.jsonToClass(
                     '{"boolean":true, "string":"hello"}',
                     new BasicTypeProps(),
                     true);
-        }, /keys not match/);
+        }, /keys do not match/);
         
         assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
                 '{"foo1":"value", "foo2":"value"}',
@@ -329,9 +329,40 @@ QUnit.test("jsonToClass", function(assert){
         
         assert.strictEqual(value.classArray[0].constructor.name, 'SingleProp');
         
-        // TODO - wrong typed arrays
-         // TODO
-         // TODO
+        assert.throws(function() {
+            SerializationUtils.jsonToClass(
+                    '{"boolArray": [true,false,0]}',
+                    new TypedArrayProps(),
+                    false);
+        }, /but received number/);
+        
+        assert.throws(function() {
+            SerializationUtils.jsonToClass(
+                    '{"numberArray": [1,2,"hello"]}',
+                    new TypedArrayProps(),
+                    false);
+        }, /but received string/);
+        
+        assert.throws(function() {
+            SerializationUtils.jsonToClass(
+                    '{"stringArray": [1,"string",5]}',
+                    new TypedArrayProps(),
+                    false);
+        }, /but received number/);
+        
+        assert.throws(function() {
+            SerializationUtils.jsonToClass(
+                    '{"objectArray": [{"a":1},"string"]}',
+                    new TypedArrayProps(),
+                    false);
+        }, /but received string/);
+        
+        assert.throws(function() {
+            SerializationUtils.jsonToClass(
+                    '{"arrayArray": ["string"]}',
+                    new TypedArrayProps(),
+                    false);
+        }, /but received string/);
     }
 
     // Test exceptions caused by wrong type parameters
