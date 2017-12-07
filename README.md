@@ -1,23 +1,23 @@
 ### General purpose cross-language development library
 Devs around the world do the same things every day with different languages. They perform string modifications, validations, data conversions, file operations and more.
 
-Â¿Why must they learn new ways of doing the same thing every time they move to a new language?
+¿Why must they learn new ways of doing the same thing every time they move to a new language?
 
-Reading a file, validating an email address, counting the words in a string... we do it more or less the same way on all languages. So why not create a global library that does it exactly the same way on all languages? A library that has the same class and function names, the same variables, the same namespaces and delivers exactly the same behaviour?
+Reading a file, validating an email address, counting the words on a string, parsing a csv ... Why not create a cross language global library that does it exactly the same way on all languages? A library that has the same class and function names, the same variables and delivers exactly the same behaviour?
 
 ### Introducing Turbo Commons!
-TurboCommons tries to standarize all those common operations so they are performed the same way across all possible languages. There's a set of well known common problems, with a set of well known common solutions that are the same for all the programming languages in the world. Our goal is that any developer who knows this library can start doing the same things with JS, Java or C# without having to learn something new. In brief, make our coding lifes easier!
+TurboCommons tries to standarize all those common operations so they are performed the same way across all possible languages. There's a set of well known common problems, with a set of well known common solutions that are the same for all the programming languages in the world. Our goal is that any developer who knows this library can start doing the same things with Php, typescript, javascript, Java, C# ... without having to learn something new. In brief, make our coding lifes easier!
 
 ### What does it do?
 This library tries to cover the following development areas:
-- Data manipulation: Strings, Arrays, HashMaps, Objects, XML, CSV, ...
+- Data manipulation: Strings, Arrays, Objects, HashMaps, XML, CSV, ...
 - Full standard ISO 8601 date/time values and timezone manipulation
-- Conversion and serialization / de-serialization of complex data structures
+- Universal conversion and serialization / de-serialization of complex data structures
 - Pictures manipulation and transformation
 - Localization management (text translations) 
 - Global exception management
-- Complex cross language validation: Mails, Urls, postal codes, ...
-- Sending emails, operations with ftp and http, ...
+- Validation: Mails, Urls, postal codes, ...
+- Remote operations: Sending emails, http requests, ftp operations ...
 
 ### How we do it?
 If we want to create a library that does this magic, we must be really strict. There are some rules that must be followed to make sure our goal is reached:
@@ -30,14 +30,21 @@ If we want to create a library that does this magic, we must be really strict. T
 
 - Any function that is defined on the library must give exactly the same result for a given set of parameters, no matter in which language is coded. This is really important, and to make sure this is as true as possible, we code the same exact unit tests for all the classes and methods on all the translated languages.
 
-- All methods on the library must be translated from one language to another, and try to keep the same structure when possible.
+- All methods on the library must be translated from one language to another, have the same name, and try to keep the same structure when possible.
 
-- As said before, but to make it clear: Any class or method that is coded in any language for this library must give the exact same results on the same exact unit tests.
+- As said before, but to make it clear: Any utility, class or method that is part of this library must give the same results on the same exact unit tests for all the implemented languages.
 
 ### How many languages does it support	 
-Currently, TurboCommons is written in php and javascript (and an early pre-alpha java version too), but we want to port it to as many languages as possible.
 
-So! if you want to translate the library to your language of choice, please contact us and help us build the most standard cross language development library in the world! We're starting so we need your help to port this library to as many languages as possible, and more important, we need to code the SAME unit tests across all the implemented languages.
+Following list contains the supported languages:
+
+- Php
+- Typescript
+- Javascript 3
+- Javascript 5
+- Javascript 6
+
+We want to increase this list So! if you want to translate the library to your language of choice, please contact us and help us build the most standard cross language development library in the world! We're starting so we need your help to port this library to as many languages as possible, and more important, we need to code the SAME unit tests across all the implemented languages.
 
 ### Does it really work?
 We are 100% active users of the library, and we can tell you it really helps! Nowadays, everybody works with more than one language on an average development project. This library helps a lot with keeping a consistent project code base.
@@ -50,15 +57,25 @@ Learn once, code forever
 - Javascript: http://turbocommons.org/resources/shared/html/doc-js
 - Php: http://turbocommons.org/resources/shared/html/doc-php/namespaces/org.html
 
+(More coming soon)
+
+### Install
+
+- Php: Currently only available via .Phar download
+- Typescript: npm install turbocommons-ts
+- Javascript 3: npm install turbocommons-es3
+- Javascript 5: npm install turbocommons-es5
+- Javascript 6: npm install turbocommons-es6
+
 ### Download
-Latest version can be downloaded at:
+
+Latest compiled version can be downloaded at:
 
 - Javascript: http://turbocommons.org/resources/shared/zip/TurboCommons-JS5.zip
-
 - Php: http://turbocommons.org/resources/shared/zip/TurboCommons-Php.zip
 
 ### Dependencies
-The main goal for this library is to have zero dependencies, but sometimes this is not totally possible. So currently, the javascript version requires jquery 1.8.3 for some of the features. Php version is totally dependency free now.
+The main goal for this library is to have zero dependencies. We are building an true standalone general purpose library.
 
 ### Coming soon
 The official site http://turbocommons.org is under development. Here you'll find examples, tutorials, and tons of documentation for all the library classes and methods. Stay tuned!
