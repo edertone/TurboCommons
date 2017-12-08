@@ -34,6 +34,9 @@ We want to increase this list. So! if you want to translate the library to your 
 - Php:
 ```
 Currently only available via .Phar download. (Composer package coming soon)
+require 'TurboCommons-Php/TurboCommons-Php-X.X.XX.phar';
+use org\turbocommons\src\main\php\utils\StringUtils;
+$n = StringUtils::countWords("word1 word2 word3");
 ```
 - Typescript:
 ```
@@ -48,14 +51,14 @@ npm install turbocommons-es3
 var StringUtils = org_turbocommons.StringUtils;
 var n = StringUtils.countWords("word1 word2 word3");
 ```
-- Javascript 5: npm install turbocommons-es5
+- Javascript 5:
 ```
 npm install turbocommons-es5
 <script src="turbocommons-es5/TurboCommons-ES5-X.X.X.js"></script>
 var StringUtils = org_turbocommons.StringUtils;
 var n = StringUtils.countWords("word1 word2 word3");
 ```
-- Javascript 6: npm install turbocommons-es6
+- Javascript 6:
 ```
 npm install turbocommons-es6
 <script src="turbocommons-es6/TurboCommons-ES6-X.X.X.js"></script>
