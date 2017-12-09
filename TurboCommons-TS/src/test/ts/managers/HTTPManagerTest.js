@@ -16,6 +16,8 @@ QUnit.module("HTTPManagerTest", {
         window.emptyValues = [null, '', [], {}, '     ', "\n\n\n", 0];
         window.emptyValuesCount = window.emptyValues.length;
 
+        window.ObjectUtils = org_turbocommons.ObjectUtils;
+        window.HashMapObject = org_turbocommons.HashMapObject;
         window.HTTPManager = org_turbocommons.HTTPManager;
         window.browserManager = new org_turbocommons.BrowserManager();
         window.sut = new org_turbocommons.HTTPManager();
@@ -27,6 +29,9 @@ QUnit.module("HTTPManagerTest", {
 
         delete window.emptyValues;
         delete window.emptyValuesCount;
+        
+        delete window.ObjectUtils;
+        delete window.HashMapObject;
         delete window.HTTPManager;
         delete window.browserManager;
         delete window.sut;
@@ -125,25 +130,6 @@ QUnit.test("isInternetAvailable", function(assert){
 
 
 /**
- * isDomainFreeToRegister
- */
-QUnit.todo("isDomainFreeToRegister", function(assert){
-
-    // Test empty values
-    // TODO
-
-    // Test ok values
-    // TODO
-
-    // Test wrong values
-    // TODO
-
-    // Test exceptions
-    // TODO
-});
-
-
-/**
  * urlExists
  */
 QUnit.test("urlExists", function(assert){
@@ -156,37 +142,43 @@ QUnit.test("urlExists", function(assert){
         });
         
         assert.throws(function() {
-            sut.isInternetAvailable(emptyValues[i], emptyValues[i]);
+            sut.urlExists('https://www.google.com', emptyValues[i]);
         });
         
         assert.throws(function() {
-            sut.isInternetAvailable(emptyValues[i], emptyValues[i], emptyValues[i]);
+            sut.urlExists('https://www.google.com', function(){}, emptyValues[i]);
         });
     }
 
     // Test ok values
-//    sut.urlExists('https://www.google.com', function(){
-//        
-//        assert.ok(true);
-//        
-//    }, function(){
-//        
-//        assert.ok(false);
-//    });
-    // TODO
+    var done = assert.async(2);
+    
+    sut.urlExists(browserManager.getCurrentUrl(), function(){
+        
+        assert.ok(true);
+        done();
+        
+    }, function(){
+        
+        assert.ok(false);
+        done();
+    });
 
     // Test wrong values
-//    sut.urlExists('https://www.thisurldoesnotexistsdfasdfwermv.asd', function(){
-//        
-//        assert.ok(false);
-//        
-//    }, function(){
-//        
-//        assert.ok(true);
-//    });
+    sut.urlExists('https://www.google.com', function(){
+        
+        assert.ok(false);
+        done();
+        
+    }, function(){
+        
+        // Google triggers the noCallback due to CORS restrictions 
+        assert.ok(true);
+        done();
+    });
 
     // Test exceptions
-    // TODO
+    // Already tested by empty values
 });
 
 
@@ -206,6 +198,74 @@ QUnit.todo("getUrlHeaders", function(assert){
 
     // Test exceptions
     // TODO
+});
+
+
+/**
+ * generateUrlQueryString
+ */
+QUnit.test("generateUrlQueryString", function(assert){
+
+    // Test empty values
+    for (var i = 0; i < emptyValuesCount; i++) {
+        
+        if(ObjectUtils.isObject(emptyValues[i])){
+            
+            assert.strictEqual(sut.generateUrlQueryString(emptyValues[i]), '');
+            
+        }else{
+            
+            assert.throws(function() {
+                sut.generateUrlQueryString(emptyValues[i]);
+            });
+        }
+    }
+
+    // Test ok values with objects
+    assert.strictEqual(sut.generateUrlQueryString({a:1}), 'a=1');
+    assert.strictEqual(sut.generateUrlQueryString({a:1,b:2}), 'a=1&b=2');
+    assert.strictEqual(sut.generateUrlQueryString({a:1,b:2,c:3}), 'a=1&b=2&c=3');
+    assert.strictEqual(sut.generateUrlQueryString({a:"h&b",b:"-_.*="}), 'a=h%26b&b=-_.*%3D');
+    assert.strictEqual(sut.generateUrlQueryString({"/&%$·#&=":"1"}), '%2F%26%25%24%C2%B7%23%26%3D=1');
+    assert.strictEqual(sut.generateUrlQueryString({"%":"%"}), '%25=%25');
+    
+    // Test ok values with HashMapObjects
+    var hashMapObject = new HashMapObject();
+    hashMapObject.set('/&%$·#&=', 1);
+    assert.strictEqual(sut.generateUrlQueryString(hashMapObject), '%2F%26%25%24%C2%B7%23%26%3D=1');
+    
+    hashMapObject.set('b', 2);
+    assert.strictEqual(sut.generateUrlQueryString(hashMapObject), '%2F%26%25%24%C2%B7%23%26%3D=1&b=2');
+    
+    hashMapObject.set('c', 3);
+    assert.strictEqual(sut.generateUrlQueryString(hashMapObject), '%2F%26%25%24%C2%B7%23%26%3D=1&b=2&c=3');
+    
+    hashMapObject.set('d', 'he/&%$·#&=llo');
+    assert.strictEqual(sut.generateUrlQueryString(hashMapObject), '%2F%26%25%24%C2%B7%23%26%3D=1&b=2&c=3&d=he%2F%26%25%24%C2%B7%23%26%3Dllo');
+    
+    // Test wrong values
+    // Tested with exceptions
+
+    // Test exceptions
+    assert.throws(function() {
+        sut.generateUrlQueryString("hello");
+    });
+    
+    assert.throws(function() {
+        sut.generateUrlQueryString([1,2,3,4]);
+    });
+    
+    assert.throws(function() {
+        sut.generateUrlQueryString(new Error());
+    });
+    
+    assert.throws(function() {
+        sut.generateUrlQueryString(10);
+    });
+    
+    assert.throws(function() {
+        sut.generateUrlQueryString(true);
+    });
 });
 
 

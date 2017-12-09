@@ -9,6 +9,8 @@
 
 
 import { StringUtils } from '../utils/StringUtils';
+import { ObjectUtils } from '../utils/ObjectUtils';
+import { HashMapObject } from '../model/HashMapObject';
 
    
 /**
@@ -20,7 +22,7 @@ export class HTTPManager{
     /** 
      * Defines if the http comunications made by this class will be synchronous (code execution will be stopped while 
      * waiting for the response) or asynchronous (execution flow will continue and response will be processed once received)
-     * Synchronous requests are normally NOT a good idea 
+     * Note: Synchronous requests are normally NOT, NOT a good idea 
      */
     asynchronous = true;
     
@@ -126,27 +128,26 @@ export class HTTPManager{
             recursiveUrlTest(this.internetCheckLocations.slice(0));
         }       
     }
-
-    
-    isDomainFreeToRegister(){
-        
-        // TODO - translate from php
-    }
     
     
     /**
      * Test if the specified url exists by trying to connect to it.
      * Note that crossdomain security rules may prevent this method from working correctly if you try
-     * to check the existence of an url that does not allow CORS
+     * to check the existence of an url that does not allow CORS outside your application domain.
      * 
      * @param url An full valid internet address to check
      * @param yesCallback A method that will be executed if the url exists
-     * @param noCallback A method that will be executed if the url does not exist
+     * @param noCallback A method that will be executed if the url does not exist (or is not accessible).
      *
      * @return void
      */
     urlExists(url:string, yesCallback: () => any, noCallback: () => any){
     
+        if(typeof yesCallback  !== 'function' || typeof noCallback !== 'function'){
+            
+            throw new Error("HTTPManager.urlExists: params must be functions");
+        }
+
         if(!StringUtils.isUrl(url)){
 
             noCallback();
@@ -214,13 +215,65 @@ export class HTTPManager{
     
     
     /**
+     * This method generates a GET url query from a set of key/value pairs
+     * 
+     * A query string is the part of an url that contains the GET parameters. It is placed after
+     * the ? symbol and contains a list of parameters and values that are sent to the url.
+     * 
+     * @param object An object or a HashMapObject containing key/value pairs that will be used to construct the query string
+     * 
+     *@see https://en.wikipedia.org/wiki/Query_string
+     *@see HashMapObject
+     *
+     *@returns A valid query string that can be used with any url: http://www.url.com?query_string
+     */
+    generateUrlQueryString(object:any){
+        
+        let result = '';
+        let keys:string[] = [];
+        let values:string[] = [];
+        
+        if(ObjectUtils.isObject(object)){
+        
+            if(object.constructor.name === 'HashMapObject'){
+                
+                keys = (object as HashMapObject).getKeys();
+                values = (object as HashMapObject).getValues();
+            
+            }else if(object.constructor.name === 'Object'){
+                
+                keys = Object.getOwnPropertyNames(object);
+
+                for(var i = 0; i < keys.length; i++){
+
+                    values.push(object[keys[i]]);
+                }
+            
+            }else{
+                
+                throw new Error('object must be a HashMapObject or an Object');
+            }
+            
+            for (var i = 0; i < keys.length; i++) {
+                
+                result += '&' + encodeURIComponent(keys[i]) + '=' + encodeURIComponent(values[i]);
+            }
+
+            return result.substring(1, result.length);        
+        }
+
+        throw new Error('object must be a HashMapObject or an Object');
+    }
+    
+    
+    /**
      * Perform an HTTP get request to the specified location
      * 
      * @param url TODO
      * @param successCallback TODO
      * @param errorCallback TODO
      */
-    get(url:any, successCallback: (e: string) => any, errorCallback: (e: string) => any){
+    get(url:any, params:any, successCallback: (e: string) => any, errorCallback: (e: string) => any){
               
         var request = new XMLHttpRequest();
         
