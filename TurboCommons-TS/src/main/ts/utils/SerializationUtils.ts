@@ -53,7 +53,7 @@ export class SerializationUtils {
      *
      * @return The provided class instance with all its properties filled with the corresponding hashmap values
      */
-    public static hashMapObjectToClass(hashMap:HashMapObject, classInstance:any, strictMode = true){
+    public static hashMapObjectToClass<T>(hashMap:HashMapObject, classInstance:T, strictMode = true): T{
 
         // TODO - implement this and translate it to PHP
 //        let keys = hashMap.getKeys(); 
@@ -66,7 +66,7 @@ export class SerializationUtils {
 //            }
 //        }
 //
-//        return $classInstance;
+        return classInstance;
     }
         
 
@@ -89,7 +89,7 @@ export class SerializationUtils {
      *
      * @return The provided class instance with all its properties filled with the corresponding json values
      */
-    public static jsonToClass(string:string, classInstance:any, strictMode = true){
+    public static jsonToClass<T>(string:string, classInstance:T, strictMode = true): T{
 
         return SerializationUtils.objectToClass(JSON.parse(string), classInstance, strictMode);
     }
@@ -103,7 +103,7 @@ export class SerializationUtils {
      * the value type. If the same key on the object has a different type value, an exception will happen.
      * Null values on the source object keys will leave the same destination class properties untouched.
      * 
-     * Typed arrays can be forced by setting a class property an array with a single default item. That item type
+     * Typed arrays can be forced by setting a class property as an array with a single default item. That item type
      * will be used as the reference for all the array values on the object property.
      * 
      * @param object An object containing the source data to serialize
@@ -112,7 +112,7 @@ export class SerializationUtils {
      *
      * @return The provided class instance with all its properties filled with the corresponding object values
      */
-    public static objectToClass(object:Object, classInstance:any, strictMode = true){
+    public static objectToClass<T>(object:Object, classInstance:T, strictMode = true): T{
 
         if(typeof strictMode !== 'boolean'){
             
