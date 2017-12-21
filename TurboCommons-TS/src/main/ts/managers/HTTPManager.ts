@@ -264,23 +264,33 @@ export class HTTPManager{
 
         throw new Error('object must be a HashMapObject or an Object');
     }
-    
+        
     
     /**
      * Perform an HTTP get request to the specified location
      * 
-     * @param url TODO
-     * @param successCallback TODO
-     * @param errorCallback TODO
+     * @param url The url to call
+     * @param successCallback A method that will be executed once request is successful. Request result will be passed as a string
+     * @param errorCallback A method that will be executed once request fails. The error description will be passed as a string
+     * @param params TODO - Implement this feature
+     * 
+     * @returns void
      */
-    get(url:any, params:any, successCallback: (e: string) => any, errorCallback: (e: string) => any){
-              
+    get(url:string, successCallback: ((s: string) => any), errorCallback: ((s: string) => any), params:any = null){
+        
+        if(!StringUtils.isString(url) || StringUtils.isEmpty(url)){
+            
+            throw new Error('url must be a non empty string');
+        }
+        
         var request = new XMLHttpRequest();
         
         if(this.timeout > 0){
             
             request.timeout = this.timeout;
         }  
+        
+        // TODO - we must implement the params parameter
         
         request.open('GET', url, this.asynchronous);
         
@@ -291,7 +301,7 @@ export class HTTPManager{
                 successCallback(request.responseText);
             
             } else {
-              
+            
                 errorCallback(request.statusText);
             }
         };

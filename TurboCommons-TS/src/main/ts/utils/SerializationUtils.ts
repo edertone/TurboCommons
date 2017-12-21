@@ -112,7 +112,7 @@ export class SerializationUtils {
      *
      * @return The provided class instance with all its properties filled with the corresponding object values
      */
-    public static objectToClass<T>(object:Object, classInstance:T, strictMode = true): T{
+    public static objectToClass<T>(object:Object, classInstance:any, strictMode = true): any{
 
         if(typeof strictMode !== 'boolean'){
             

@@ -16,6 +16,7 @@ QUnit.module("HTTPManagerTest", {
         window.emptyValues = [null, '', [], {}, '     ', "\n\n\n", 0];
         window.emptyValuesCount = window.emptyValues.length;
 
+        window.StringUtils = org_turbocommons.StringUtils;
         window.ObjectUtils = org_turbocommons.ObjectUtils;
         window.HashMapObject = org_turbocommons.HashMapObject;
         window.HTTPManager = org_turbocommons.HTTPManager;
@@ -30,6 +31,7 @@ QUnit.module("HTTPManagerTest", {
         delete window.emptyValues;
         delete window.emptyValuesCount;
         
+        delete window.StringUtils;
         delete window.ObjectUtils;
         delete window.HashMapObject;
         delete window.HTTPManager;
@@ -272,21 +274,47 @@ QUnit.test("generateUrlQueryString", function(assert){
 /**
  * get
  */
-QUnit.todo("get", function(assert){
-
+QUnit.test("get", function(assert){
+    
     // Test empty values
-    // TODO
-
+    for (var i = 0; i < emptyValuesCount; i++) {
+        
+        assert.throws(function() {
+            sut.get(emptyValues[i]);
+        }, /must be a non empty string/);
+    } 
+    
     // Test ok values
-    // TODO
+    var done = assert.async(2);
+    
+    sut.get(browserManager.getCurrentUrl(), function(result){
+            
+        assert.ok(!StringUtils.isEmpty(result));
+        done();
+        
+    }, function(){
+        
+        assert.ok(false);
+        done();
+    });
+    
+    sut.get('https://www.iuyyt7ct6u8289gduf823439ryhhgfxhjwer234.casdfase43', function(result){
+        
+        assert.ok(false);
+        done();
+        
+    }, function(){
+        
+        assert.ok(true);
+        done();
+    });
 
     // Test wrong values
-    // TODO
+    // This test is considered innecessary and skiped
 
     // Test exceptions
-    // TODO
+    // This test is considered innecessary and skiped
 });
-
 
 
 /**
