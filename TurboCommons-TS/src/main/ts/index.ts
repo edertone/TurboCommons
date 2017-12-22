@@ -11,6 +11,7 @@
 // Managers package
 export { BrowserManager } from './managers/BrowserManager';
 export { HTTPManager } from './managers/HTTPManager';
+export { LocalizationManager} from './managers/LocalizationManager';
 export { ValidationManager} from './managers/ValidationManager';
 
 // Model package

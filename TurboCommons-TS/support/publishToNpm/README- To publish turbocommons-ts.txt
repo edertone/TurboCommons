@@ -9,3 +9,4 @@ To publish the library to npm:
 5 - Update the version number on the package.json file
 6 - Update the project name on the package.json file (turbocommons-ts, turbocommons-es3, turbocommons-es5, ...)
 7 - Open a command line inside the created desktop folder and run : npm publish
+8 - Commit the new build number to git
