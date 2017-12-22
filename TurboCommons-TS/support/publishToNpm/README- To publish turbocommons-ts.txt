@@ -3,10 +3,22 @@ To publish the library to npm:
 
 
 1 - Generate a release build
+
 2 - Create a folder on your desktop and add all files from dist/NNN/
+
 3 - Copy the package.json file from this folder to the created desktop folder
+
 4 - Add the readme.md file if exists
+
 5 - Update the version number on the package.json file
+
 6 - Update the project name on the package.json file (turbocommons-ts, turbocommons-es3, turbocommons-es5, ...)
+
 7 - Open a command line inside the created desktop folder and run : npm publish
+
 8 - Commit the new build number to git
+
+9 - Generate online html docs:
+	- Open a cmd at the root of the project
+	- Install typedoc if necessary
+	- typedoc --module commonjs --mode modules --out target/docs/ src/main/ts

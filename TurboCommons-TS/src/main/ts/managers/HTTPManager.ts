@@ -195,17 +195,17 @@ export class HTTPManager{
         
         request.open('GET', url, this.asynchronous);
         
-        request.onload = function() {
+        request.onload = () => {
             
             successCallback(request.getAllResponseHeaders().split("\n"));
         };
 
-        request.onerror = function() {
+        request.onerror = () => {
         
             errorCallback(request.statusText);          
         };
         
-        request.ontimeout = function() {
+        request.ontimeout = () => {
             
             errorCallback(this.timeout + HTTPManager.ERROR_TIMEOUT);          
         };
@@ -294,7 +294,7 @@ export class HTTPManager{
         
         request.open('GET', url, this.asynchronous);
         
-        request.onload = function() {
+        request.onload = () => {
         
             if (request.status >= 200 && request.status < 400) {
             
@@ -306,13 +306,13 @@ export class HTTPManager{
             }
         };
 
-        request.onerror = function() {
+        request.onerror = () => {
           
             // There was a connection error of some sort
             errorCallback(request.statusText);
         };
         
-        request.ontimeout = function() {
+        request.ontimeout = () => {
             
             errorCallback(this.timeout + HTTPManager.ERROR_TIMEOUT);          
         };
