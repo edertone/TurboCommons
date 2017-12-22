@@ -77,7 +77,7 @@ If you don't want to use a package manager like npm or composer, latest compiled
 The main goal for this library is to have zero dependencies. We are building a true standalone general purpose library.
 
 ### Documentation
-- Typescript / Javascript: http://turbocommons.org/resources/shared/html/doc-ts
+- Typescript / Javascript: http://turbocommons.org/resources/shared/html/doc-ts/globals.html
 - Php: http://turbocommons.org/resources/shared/html/doc-php/namespaces/org.html
 
 ### Official website
