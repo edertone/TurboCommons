@@ -12,13 +12,20 @@ To publish the library to npm:
 
 5 - Update the version number on the package.json file
 
-6 - Update the project name on the package.json file (turbocommons-ts, turbocommons-es3, turbocommons-es5, ...)
+6 - Update the project name on the package.json file:
+	turbocommons-ts
+	turbocommons-es3
+	turbocommons-es5
+	turbocommons-es6
 
-7 - Open a command line inside the created desktop folder and run : npm publish
+7 - Open a command line inside the created desktop folder and run:
+	npm publish
 
-8 - Commit the new build number to git
+8 - Commit the new build number to the git repository
 
 9 - Generate online html docs:
 	- Open a cmd at the root of the project
 	- Install typedoc if necessary
-	- typedoc --module commonjs --mode modules --out target/docs/ src/main/ts
+	- typedoc --name turbocommons --module commonjs --mode modules --out target/docs/ src/main/ts
+	
+10 - Upload the new version to turbocommons website for direct download
