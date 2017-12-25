@@ -139,20 +139,23 @@ QUnit.test("urlExists", function(assert){
     // Test empty values
     for (var i = 0; i < emptyValuesCount; i++) {
         
-        assert.throws(function() {
-            sut.urlExists(emptyValues[i]);
-        });
-        
+        if(!StringUtils.isString(emptyValues[i])){
+            
+            assert.throws(function() {
+                sut.urlExists(emptyValues[i], function(){}, function(){});
+            }, /url must be a string/);            
+        }
+
         assert.throws(function() {
             sut.urlExists('https://www.google.com', emptyValues[i]);
-        });
+        }, /params must be functions/);
         
         assert.throws(function() {
             sut.urlExists('https://www.google.com', function(){}, emptyValues[i]);
-        });
+        }, /params must be functions/);
     }
 
-    // Test ok values
+    // Test ok values    
     var done = assert.async(2);
     
     sut.urlExists(browserManager.getCurrentUrl(), function(){
@@ -187,19 +190,53 @@ QUnit.test("urlExists", function(assert){
 /**
  * getUrlHeaders
  */
-QUnit.todo("getUrlHeaders", function(assert){
-
+QUnit.test("getUrlHeaders", function(assert){
+    
     // Test empty values
-    // TODO
+    for (var i = 0; i < emptyValuesCount; i++) {
+        
+        assert.throws(function() {
+            sut.getUrlHeaders(emptyValues[i], function(){}, function(){});
+        });
+        
+        assert.throws(function() {
+            sut.getUrlHeaders('https://www.google.com', emptyValues[i]);
+        }, /params must be functions/);
+        
+        assert.throws(function() {
+            sut.getUrlHeaders('https://www.google.com', function(){}, emptyValues[i]);
+        }, /params must be functions/);
+    }
 
     // Test ok values
-    // TODO
+    var done = assert.async(2);
+    
+    sut.getUrlHeaders(browserManager.getCurrentUrl(), function(data){
+        
+        assert.ok(data.length > 0);
+        done();
+        
+    }, function(){
+        
+        assert.ok(false);
+        done();
+    });
 
     // Test wrong values
-    // TODO
+    sut.getUrlHeaders('https://www.google.com', function(){
+        
+        assert.ok(false);
+        done();
+        
+    }, function(){
+        
+        // Google triggers the noCallback due to CORS restrictions 
+        assert.ok(true);
+        done();
+    });
 
     // Test exceptions
-    // TODO
+    // Already tested by empty values
 });
 
 

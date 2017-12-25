@@ -113,6 +113,7 @@ export class LocalizationManager {
             throw new Error('invalid pathIndex');
         }
     
+        let errorHappened = false;
         let callsCount = 0;
         
         let http = new HTTPManager();
@@ -144,7 +145,7 @@ export class LocalizationManager {
                         break;
                 }
 
-                if (callsCount >= this.locales.length) {
+                if (!errorHappened && callsCount >= this.locales.length) {
 
                     this._lastBundle = bundle;
 
@@ -155,13 +156,15 @@ export class LocalizationManager {
                 }
                 
             }, (err) => {
-                
-                callsCount++;
 
-                if (errorCallback !== null) {
+                callsCount++;
+                
+                if (!errorHappened && errorCallback !== null) {
 
                     errorCallback();
-                }                
+                }  
+                
+                errorHappened = true;
             });
         }
     }

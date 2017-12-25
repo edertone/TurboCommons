@@ -203,7 +203,9 @@ QUnit.test("jsonToClass", function(assert){
         });
     }
     
-    for(var strictValue of [true, false]){
+    for(var i = 0; i < 2; i++){
+         
+        var strictValue = ((i === 0) ? false : true);
         
         // Test that null values on source json keys are assigned to destination properties
         assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(

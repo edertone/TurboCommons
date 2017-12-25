@@ -143,14 +143,21 @@ export class HTTPManager{
      */
     urlExists(url:string, yesCallback: () => any, noCallback: () => any){
     
+        if(!StringUtils.isString(url)){
+
+            throw new Error("url must be a string");
+        }
+        
         if(typeof yesCallback  !== 'function' || typeof noCallback !== 'function'){
             
-            throw new Error("HTTPManager.urlExists: params must be functions");
+            throw new Error("params must be functions");
         }
 
         if(!StringUtils.isUrl(url)){
 
             noCallback();
+            
+            return;
         }
 
         this.getUrlHeaders(url, (result) =>{
@@ -185,7 +192,22 @@ export class HTTPManager{
      * @return void
      */
     getUrlHeaders(url:string, successCallback: (e:string[]) => any, errorCallback: (e:string) => any){
-     
+    
+        if(!StringUtils.isString(url)){
+
+            throw new Error("url must be a string");
+        }
+        
+        if(typeof successCallback  !== 'function' || typeof errorCallback !== 'function'){
+            
+            throw new Error("params must be functions");
+        }
+
+        if(!StringUtils.isUrl(url)){
+
+            throw new Error("invalid url");
+        }
+        
         let request = new XMLHttpRequest();
         
         if(this.timeout > 0){

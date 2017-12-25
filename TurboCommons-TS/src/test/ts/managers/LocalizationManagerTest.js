@@ -127,7 +127,7 @@ QUnit.test("test-json", function(assert){
     sut.locales = ['en_US', 'es_ES'];
     sut.paths = ['./resources/managers/localizationManager/test-json/$locale/$bundle.json'];
 
-    var done = assert.async();
+    var done = assert.async(2);
 
     sut.loadBundle('Locales', function(){
 
@@ -167,6 +167,11 @@ QUnit.test("test-json", function(assert){
         assert.strictEqual(sut.get('NOT_TO_BE_FOUND'), '');
         
         done();
+        
+    }, function(){
+        
+        assert.ok(false);
+        done();
     });
 
     // Test wrong values
@@ -176,10 +181,12 @@ QUnit.test("test-json", function(assert){
     sut.loadBundle('nonexistant', function(){
         
         assert.ok(false);
+        done();
         
     }, function(){
         
-        assert.ok(true);        
+        assert.ok(true); 
+        done();
     }, 0);
     
     assert.throws(function() {
