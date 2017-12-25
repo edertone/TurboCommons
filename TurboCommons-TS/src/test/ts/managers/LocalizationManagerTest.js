@@ -64,19 +64,47 @@ QUnit.test("loadBundle", function(assert){
 /**
  * get
  */
-QUnit.todo("get", function(assert){
+QUnit.test("get", function(assert){
 
-    // Test empty values
-    // TODO
+    // Test non initialized
+    assert.throws(function() {
+        sut.get("KEY");
+    }, /Bundle <> does not exist/);
+    
+    assert.throws(function() {
+        sut.get("KEY", "Locales");
+    }, /Bundle <Locales> does not exist/);
 
     // Test ok values
-    // TODO
+    sut.locales = ['en_US'];
+    sut.paths = ['./resources/managers/localizationManager/test-json/$locale/$bundle.json'];
+
+    var done = assert.async();
+
+    sut.loadBundle('Locales', function(){
+
+        // Test empty values
+        for (var i = 0; i < emptyValuesCount; i++) {
+            
+            assert.throws(function() {
+                sut.get(emptyValues[i]);
+            }, /not found/);
+        } 
+
+        assert.strictEqual(sut.get('PASSWORD'), 'Password');
+        done();
+        
+    }, function(){
+        
+        assert.ok(false);
+        done();
+    });
 
     // Test wrong values
-    // TODO
+    // Already tested
 
     // Test exceptions
-    // TODO
+    // Already tested
 });
 
 
