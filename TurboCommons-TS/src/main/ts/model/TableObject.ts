@@ -56,7 +56,7 @@ export class TableObject {
      *
      * @return The constructed TableObject
      */
-    constructor(rows = 0, columns: any = 0){
+    constructor(rows = 0, columns: number|string[] = 0){
 
         if(NumericUtils.isInteger(rows) && rows >= 0){
 
@@ -69,15 +69,15 @@ export class TableObject {
 
         if(NumericUtils.isInteger(columns) && columns >= 0){
 
-            this._columnsCount = columns;
+            this._columnsCount = Number(columns);
 
         }else{
 
             if(ArrayUtils.isArray(columns)){
 
-                this._columnsCount = columns.length;
+                this._columnsCount = (columns as string[]).length;
 
-                this.setColumnNames(columns);
+                this.setColumnNames(columns as string[]);
 
             }else{
 
@@ -104,7 +104,7 @@ export class TableObject {
      *
      * @return True if the column name was correctly assigned
      */
-    setColumnName(column: any, name: string){
+    setColumnName(column: number|string, name: string){
 
         let columnIndex = this._validateColumnIndex(column);
 
@@ -234,7 +234,7 @@ export class TableObject {
      *
      * @return All the table elements that belong to the required column
      */
-    getColumn(column: number){
+    getColumn(column: string|number){
 
         let result = [];
 
@@ -328,7 +328,7 @@ export class TableObject {
      *
      * @return void
      */
-    setColumn(column: any, data: any[]){
+    setColumn(column: number|string, data: any[]){
 
         let dataCount = data.length;
 
@@ -358,7 +358,7 @@ export class TableObject {
      *
      * @return void
      */
-    removeColumn(column: number){
+    removeColumn(column: number|string){
 
         let columnIndex = this._validateColumnIndex(column);
 
@@ -415,7 +415,7 @@ export class TableObject {
      *
      * @return The value for the cell that is located at the specified row and column
      */
-    getCell(row: number, column: any){
+    getCell(row: number, column: number|string){
 
         let rowIndex = this._validateRowIndex(row);
         let columnIndex = this._validateColumnIndex(column);
@@ -442,7 +442,7 @@ export class TableObject {
      *
      * @return The assigned value after beign stored into the table cell
      */
-    setCell(row: number, column: any, value: any){
+    setCell(row: number, column: number|string, value: any){
 
         let rowIndex = this._validateRowIndex(row);
         let columnIndex = this._validateColumnIndex(column);
@@ -631,9 +631,9 @@ export class TableObject {
      *
      * @return A valid column index based on the specified integer or label.
      */
-    private _validateColumnIndex(column: any){
+    private _validateColumnIndex(column: number|string){
 
-        let columnIndex = NumericUtils.isInteger(column) ? column : -1;
+        let columnIndex = NumericUtils.isInteger(column) ? Number(column) : -1;
         let columnNames = this._columnNames.getValues();
         let columnNamesKeys = this._columnNames.getKeys();
         let columnNamesCount = columnNames.length;
