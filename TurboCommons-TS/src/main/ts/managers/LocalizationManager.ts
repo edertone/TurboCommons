@@ -103,6 +103,16 @@ export class LocalizationManager {
      */
     loadBundle(bundle: string, successCallback: Function|null = null, errorCallback: Function|null = null, pathIndex = 0) {
 
+        if(!StringUtils.isString(bundle) || StringUtils.isEmpty(bundle)){
+            
+            throw new Error('bundle must be a non empty string');
+        }
+        
+        if(pathIndex >= this.paths.length){
+            
+            throw new Error('invalid pathIndex');
+        }
+    
         let callsCount = 0;
         
         let http = new HTTPManager();

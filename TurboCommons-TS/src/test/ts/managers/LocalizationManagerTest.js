@@ -32,12 +32,96 @@ QUnit.module("LocalizationManagerTest", {
 
 
 /**
- * test-json
+ * loadBundle
  */
-QUnit.test("test-json", function(assert){
+QUnit.test("loadBundle", function(assert){
+
+    // Test empty values
+    for (var i = 0; i < emptyValuesCount; i++) {
+        
+        assert.throws(function() {
+            sut.loadBundle(emptyValues[i]);
+        }, /bundle must be a non empty string/);
+    } 
+
+    // Test ok values
+    // Tested on other tests
+
+    // Test wrong values
+    // Tested on other tests
+
+    // Test exceptions
+    assert.throws(function() {
+        sut.loadBundle([1,2,3,4]);
+    }, /must be a non empty string/);
+    
+    assert.throws(function() {
+        sut.loadBundle(150);
+    }, /bundle must be a non empty string/);
+});
+
+
+/**
+ * get
+ */
+QUnit.todo("get", function(assert){
 
     // Test empty values
     // TODO
+
+    // Test ok values
+    // TODO
+
+    // Test wrong values
+    // TODO
+
+    // Test exceptions
+    // TODO
+});
+
+
+/**
+ * getAllUpperCase
+ */
+QUnit.todo("getAllUpperCase", function(assert){
+
+    // Test empty values
+    // TODO
+
+    // Test ok values
+    // TODO
+
+    // Test wrong values
+    // TODO
+
+    // Test exceptions
+    // TODO
+});
+
+
+/**
+ * getAllLowerCase
+ */
+QUnit.todo("getAllLowerCase", function(assert){
+
+    // Test empty values
+    // TODO
+
+    // Test ok values
+    // TODO
+
+    // Test wrong values
+    // TODO
+
+    // Test exceptions
+    // TODO
+});
+
+
+/**
+ * test-json
+ */
+QUnit.test("test-json", function(assert){
 
     // Test ok values
     sut.locales = ['en_US', 'es_ES'];
@@ -79,11 +163,14 @@ QUnit.test("test-json", function(assert){
         sut.missingKeyFormat = '--$key--';        
         assert.strictEqual(sut.get('NOT_TO_BE_FOUND'), '--NOT_TO_BE_FOUND--');
         
+        sut.missingKeyFormat = '';        
+        assert.strictEqual(sut.get('NOT_TO_BE_FOUND'), '');
+        
         done();
     });
 
     // Test wrong values
-    // TODO
+    // Already tested
 
     // Test exceptions
     sut.loadBundle('nonexistant', function(){
@@ -94,14 +181,21 @@ QUnit.test("test-json", function(assert){
         
         assert.ok(true);        
     }, 0);
-    // TODO
+    
+    assert.throws(function() {
+        sut.loadBundle('Locales', null, null, 2);
+    }, /invalid pathIndex/);
+    
+    assert.throws(function() {
+        sut.loadBundle('Locales', null, null, 10);
+    }, /invalid pathIndex/);
 });
 
 
 /**
- * todo
+ * test-properties
  */
-QUnit.todo("todo", function(assert){
+QUnit.todo("test-properties", function(assert){
 
     // Test empty values
     // TODO
