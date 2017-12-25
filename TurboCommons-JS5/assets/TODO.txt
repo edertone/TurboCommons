@@ -1,1 +1,0 @@
-- Turbocommons JS is deprecated. Now all the code will be moved to Typescript, and all javascript versions will be auto generated.
