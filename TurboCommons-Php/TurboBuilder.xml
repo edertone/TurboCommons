@@ -24,7 +24,7 @@
 
 		<CopyrightHeaders enabled="true">
 		
-			<Header path="support/copyrightHeaders/TurboCommons-Generic.txt" 
+			<Header path="support/copyrightHeaders/TurboCommons-Php.txt" 
 					appliesTo="src"
 					includes="**/*.php"
 					excludes="" />
