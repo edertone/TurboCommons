@@ -24,6 +24,7 @@ export { XMLObject } from './model/XMLObject';
 // Utils package
 export { ArrayUtils } from './utils/ArrayUtils';
 export { ConversionUtils } from './utils/ConversionUtils';
+export { EncodingUtils } from './utils/EncodingUtils';
 export { NumericUtils } from './utils/NumericUtils';
 export { ObjectUtils } from './utils/ObjectUtils';
 export { SerializationUtils } from './utils/SerializationUtils';

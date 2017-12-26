@@ -658,6 +658,7 @@
 					concat.setDestfile(new java.io.File(localServerPath + '/' + projectBaseName + '-unitTests/ts-' + targets[i] + '/index.js'));
 					concat.addFileset(fs);
 					concat.setAppend(false);
+					concat.setEncoding("UTF-8");
 					concat.perform();
 			
 					// Copy source maps if exist to the local server so browsers can read them
@@ -690,6 +691,7 @@
 					concat.setDestfile(new java.io.File(localServerPath + '/' + projectBaseName + '-unitTests/ts-' + targets[i] + '/index.js'));
 					concat.addFileset(fs);
 					concat.setAppend(true);
+					concat.setEncoding("UTF-8");
 					concat.perform();
 			
 					// Launch the tests on all the enabled browsers
