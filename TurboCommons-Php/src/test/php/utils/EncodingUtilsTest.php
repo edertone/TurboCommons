@@ -43,7 +43,7 @@ class EncodingUtilsTest extends TestCase {
 	 */
 	protected function setUp(){
 
-		// Nothing necessary here
+	    $this->exceptionMessage = '';
 	}
 
 
@@ -54,7 +54,10 @@ class EncodingUtilsTest extends TestCase {
 	 */
 	protected function tearDown(){
 
-		// Nothing necessary here
+	    if($this->exceptionMessage != ''){
+
+	        $this->fail($this->exceptionMessage);
+	    }
 	}
 
 
@@ -77,60 +80,53 @@ class EncodingUtilsTest extends TestCase {
 	public function testUnicodeEscapedCharsToUtf8(){
 
 	    // Test empty values
-	    $this->assertTrue(EncodingUtils::unicodeEscapedCharsToUtf8('') === '');
-	    $this->assertTrue(EncodingUtils::unicodeEscapedCharsToUtf8('   ') === '   ');
-	    $this->assertTrue(EncodingUtils::unicodeEscapedCharsToUtf8("\n\r\n") === "\n\r\n");
-	    $this->assertTrue(EncodingUtils::unicodeEscapedCharsToUtf8("\n    \r\n   \r") === "\n    \r\n   \r");
-
-	    $exceptionMessage = '';
+	    $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8(''), '');
+	    $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8('   '), '   ');
+	    $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8("\n\r\n"), "\n\r\n");
+	    $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8("\n    \r\n   \r"), "\n    \r\n   \r");
 
 	    try {
             EncodingUtils::unicodeEscapedCharsToUtf8(null);
-            $exceptionMessage = 'null did not cause exception';
+            $this->exceptionMessage = 'null did not cause exception';
         } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
             EncodingUtils::unicodeEscapedCharsToUtf8(0);
-            $exceptionMessage = '0 did not cause exception';
+            $this->exceptionMessage = '0 did not cause exception';
         } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
             EncodingUtils::unicodeEscapedCharsToUtf8([]);
-            $exceptionMessage = '[] did not cause exception';
+            $this->exceptionMessage = '[] did not cause exception';
         } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
             EncodingUtils::unicodeEscapedCharsToUtf8(new stdClass());
-            $exceptionMessage = 'new stdClass() did not cause exception';
+            $this->exceptionMessage = 'new stdClass() did not cause exception';
         } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
-        if($exceptionMessage != ''){
-
-            $this->fail($exceptionMessage);
-        }
-
-	    // Test ok values
-        $this->assertTrue(EncodingUtils::unicodeEscapedCharsToUtf8('1') === '1');
-        $this->assertTrue(EncodingUtils::unicodeEscapedCharsToUtf8('.,_/}') === '.,_/}');
-        $this->assertTrue(EncodingUtils::unicodeEscapedCharsToUtf8('hello') === 'hello');
-        $this->assertTrue(EncodingUtils::unicodeEscapedCharsToUtf8('hello world') === 'hello world');
-        $this->assertTrue(EncodingUtils::unicodeEscapedCharsToUtf8('hello\\ world\\') === 'hello\\ world\\');
-        $this->assertTrue(EncodingUtils::unicodeEscapedCharsToUtf8('Eclipse Integration Commons 3.8.0 GA\\n\\') === 'Eclipse Integration Commons 3.8.0 GA\\n\\');
-        $this->assertTrue(EncodingUtils::unicodeEscapedCharsToUtf8('Eclipse Inte\\u0024gration Commons 3.8.0 GA\\n\\') === 'Eclipse Inte$gration Commons 3.8.0 GA\\n\\');
-        $this->assertTrue(EncodingUtils::unicodeEscapedCharsToUtf8('Bj\\u00F6rk') === 'Björk');
-        $this->assertTrue(EncodingUtils::unicodeEscapedCharsToUtf8('Dodd\\u2013Frank') === 'Dodd–Frank');
-        $this->assertTrue(EncodingUtils::unicodeEscapedCharsToUtf8('\\u0070\\u0075\\u0062\\u006c\\u0069\\u0063\\u007b\\u007d') === 'public{}');
-        $this->assertTrue(EncodingUtils::unicodeEscapedCharsToUtf8('\\u79c1\\u306e\\u5bb6\\u3078\\u306e\\u6b53\\u8fce') === '私の家への歓迎');
-        $this->assertTrue(EncodingUtils::unicodeEscapedCharsToUtf8("\r\n\\u79c1\\u306e\\u5bb6\\u3078\\u306e\\u6b53\\u8fce") === "\r\n私の家への歓迎");
-        $this->assertTrue(EncodingUtils::unicodeEscapedCharsToUtf8("\r\n\\u79c1\\u306e\\u5bb6\\u3078\\u306e\\u6b53\r\n\\u8fce\\") === "\r\n私の家への歓\r\n迎\\");
+        // Test ok values
+        $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8('1'), '1');
+        $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8('.,_/}'), '.,_/}');
+        $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8('hello'), 'hello');
+        $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8('hello world'), 'hello world');
+        $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8('hello\\ world\\'), 'hello\\ world\\');
+        $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8('Eclipse Integration Commons 3.8.0 GA\\n\\'), 'Eclipse Integration Commons 3.8.0 GA\\n\\');
+        $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8('Eclipse Inte\\u0024gration Commons 3.8.0 GA\\n\\'), 'Eclipse Inte$gration Commons 3.8.0 GA\\n\\');
+        $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8('Bj\\u00F6rk'), 'Björk');
+        $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8('Dodd\\u2013Frank'), 'Dodd–Frank');
+        $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8('\\u0070\\u0075\\u0062\\u006c\\u0069\\u0063\\u007b\\u007d'), 'public{}');
+        $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8('\\u79c1\\u306e\\u5bb6\\u3078\\u306e\\u6b53\\u8fce'), '私の家への歓迎');
+        $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8("\r\n\\u79c1\\u306e\\u5bb6\\u3078\\u306e\\u6b53\\u8fce"), "\r\n私の家への歓迎");
+        $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8("\r\n\\u79c1\\u306e\\u5bb6\\u3078\\u306e\\u6b53\r\n\\u8fce\\"), "\r\n私の家への歓\r\n迎\\");
 
 	    // Test wrong values
 	    // Not necessary
@@ -148,60 +144,53 @@ class EncodingUtilsTest extends TestCase {
 	public function testUtf8ToUnicodeEscapedChars(){
 
 	    // Test empty values
-	    $this->assertTrue(EncodingUtils::utf8ToUnicodeEscapedChars('') === '');
-	    $this->assertTrue(EncodingUtils::utf8ToUnicodeEscapedChars('   ') === '   ');
-	    $this->assertTrue(EncodingUtils::utf8ToUnicodeEscapedChars("\n\r\n") === "\n\r\n");
-	    $this->assertTrue(EncodingUtils::utf8ToUnicodeEscapedChars("\n    \r\n   \r") === "\n    \r\n   \r");
-
-	    $exceptionMessage = '';
+	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars(''), '');
+	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars('   '), '   ');
+	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars("\n\r\n"), "\n\r\n");
+	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars("\n    \r\n   \r"), "\n    \r\n   \r");
 
 	    try {
 	        EncodingUtils::utf8ToUnicodeEscapedChars(null);
-	        $exceptionMessage = 'null did not cause exception';
+	        $this->exceptionMessage = 'null did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        EncodingUtils::utf8ToUnicodeEscapedChars(0);
-	        $exceptionMessage = '0 did not cause exception';
+	        $this->exceptionMessage = '0 did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        EncodingUtils::utf8ToUnicodeEscapedChars([]);
-	        $exceptionMessage = '[] did not cause exception';
+	        $this->exceptionMessage = '[] did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        EncodingUtils::utf8ToUnicodeEscapedChars(new stdClass());
-	        $exceptionMessage = 'new stdClass() did not cause exception';
+	        $this->exceptionMessage = 'new stdClass() did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
-	    if($exceptionMessage != ''){
-
-	        $this->fail($exceptionMessage);
-	    }
-
 	    // Test ok values
-	    $this->assertTrue(EncodingUtils::utf8ToUnicodeEscapedChars('1') === '1');
-	    $this->assertTrue(EncodingUtils::utf8ToUnicodeEscapedChars('.,_/}') === '.,_/}');
-	    $this->assertTrue(EncodingUtils::utf8ToUnicodeEscapedChars('hello') === 'hello');
-	    $this->assertTrue(EncodingUtils::utf8ToUnicodeEscapedChars('hello world') === 'hello world');
-	    $this->assertTrue(EncodingUtils::utf8ToUnicodeEscapedChars('hello\\ world\\') === 'hello\\ world\\');
-	    $this->assertTrue(EncodingUtils::utf8ToUnicodeEscapedChars('Eclipse Integration Commons 3.8.0 GA\\n\\') === 'Eclipse Integration Commons 3.8.0 GA\\n\\');
-	    $this->assertTrue(EncodingUtils::utf8ToUnicodeEscapedChars('Eclipse Inteögration Commons 3.8.0 GA\\n\\') === 'Eclipse Inte\\u00f6gration Commons 3.8.0 GA\\n\\');
-	    $this->assertTrue(EncodingUtils::utf8ToUnicodeEscapedChars('Björk') === 'Bj\\u00f6rk');
-	    $this->assertTrue(EncodingUtils::utf8ToUnicodeEscapedChars('Dodd–Frank') === 'Dodd\\u2013Frank');
-	    $this->assertTrue(EncodingUtils::utf8ToUnicodeEscapedChars('public{}') === 'public{}');
-	    $this->assertTrue(EncodingUtils::utf8ToUnicodeEscapedChars('私の家への歓迎') === '\\u79c1\\u306e\\u5bb6\\u3078\\u306e\\u6b53\\u8fce');
-	    $this->assertTrue(EncodingUtils::utf8ToUnicodeEscapedChars("\r\n私の家への歓迎") === "\\r\\n\\u79c1\\u306e\\u5bb6\\u3078\\u306e\\u6b53\\u8fce");
-	    $this->assertTrue(EncodingUtils::utf8ToUnicodeEscapedChars("\r\n私の家への歓\r\n迎\\") === "\\r\\n\\u79c1\\u306e\\u5bb6\\u3078\\u306e\\u6b53\\r\\n\\u8fce\\");
+	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars('1'), '1');
+	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars('.,_/}'), '.,_/}');
+	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars('hello'), 'hello');
+	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars('hello world'), 'hello world');
+	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars('hello\\ world\\'), 'hello\\ world\\');
+	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars('Eclipse Integration Commons 3.8.0 GA\\n\\'), 'Eclipse Integration Commons 3.8.0 GA\\n\\');
+	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars('Eclipse Inteögration Commons 3.8.0 GA\\n\\'), 'Eclipse Inte\\u00f6gration Commons 3.8.0 GA\\n\\');
+	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars('Björk'), 'Bj\\u00f6rk');
+	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars('Dodd–Frank'), 'Dodd\\u2013Frank');
+	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars('public{}'), 'public{}');
+	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars('私の家への歓迎'), '\\u79c1\\u306e\\u5bb6\\u3078\\u306e\\u6b53\\u8fce');
+	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars("\r\n私の家への歓迎"), "\\r\\n\\u79c1\\u306e\\u5bb6\\u3078\\u306e\\u6b53\\u8fce");
+	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars("\r\n私の家への歓\r\n迎\\"), "\\r\\n\\u79c1\\u306e\\u5bb6\\u3078\\u306e\\u6b53\\r\\n\\u8fce\\");
 
 	    // Test wrong values
 	    // Not necessary

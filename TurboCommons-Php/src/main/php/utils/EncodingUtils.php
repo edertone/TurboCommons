@@ -37,7 +37,7 @@ class EncodingUtils{
             }, $string);
         }
 
-        throw new InvalidArgumentException('EncodingUtils->unicodeEscapedCharsToUtf8: Specified value must be a string');
+        throw new InvalidArgumentException('Specified value must be a string');
 	}
 
 
@@ -52,7 +52,7 @@ class EncodingUtils{
 
 	    if(!is_string($string)){
 
-	        throw new InvalidArgumentException('EncodingUtils->utf8ToUnicodeEscapedChars: Specified value must be a string');
+	        throw new InvalidArgumentException('Specified value must be a string');
 	    }
 
 	    if(StringUtils::isEmpty($string)){

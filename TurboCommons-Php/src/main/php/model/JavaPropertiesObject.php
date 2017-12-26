@@ -41,7 +41,7 @@ class JavaPropertiesObject extends HashMapObject {
 
         if(!StringUtils::isString($string)){
 
-            throw new UnexpectedValueException('JavaPropertiesObject->__construct value must be a string');
+            throw new UnexpectedValueException('value must be a string');
         }
 
         if($string === ''){
@@ -50,9 +50,9 @@ class JavaPropertiesObject extends HashMapObject {
         }
 
         // Validate received string
-        if(strlen($string) < 2 || substr($string, 0, 1) == '=' || (strpos($string, '=') === false && strpos($string, ':') === false)){
+        if(strlen($string) < 2 || substr($string, 0, 1) === '=' || (strpos($string, '=') === false && strpos($string, ':') === false)){
 
-            throw new UnexpectedValueException('JavaPropertiesObject->__construct invalid properties format');
+            throw new UnexpectedValueException('invalid properties format');
         }
 
         $key = '';
@@ -182,7 +182,7 @@ class JavaPropertiesObject extends HashMapObject {
 
         if($objectToCompare == null){
 
-            throw new UnexpectedValueException('JavaPropertiesObject->isEqualTo properties does not contain valid java properties data');
+            throw new UnexpectedValueException('properties does not contain valid java properties data');
         }
 
         $thisKeys = $this->getKeys();
