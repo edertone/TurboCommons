@@ -124,6 +124,7 @@ class EncodingUtilsTest extends TestCase {
         $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8('Bj\\u00F6rk'), 'Björk');
         $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8('Dodd\\u2013Frank'), 'Dodd–Frank');
         $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8('\\u0070\\u0075\\u0062\\u006c\\u0069\\u0063\\u007b\\u007d'), 'public{}');
+        $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8('abc\\u79c1d\\u306e\\u5bb6\\u3078\\u306e\\u6b53\\u8fceef'), 'abc私dの家への歓迎ef');
         $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8('\\u79c1\\u306e\\u5bb6\\u3078\\u306e\\u6b53\\u8fce'), '私の家への歓迎');
         $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8("\r\n\\u79c1\\u306e\\u5bb6\\u3078\\u306e\\u6b53\\u8fce"), "\r\n私の家への歓迎");
         $this->assertSame(EncodingUtils::unicodeEscapedCharsToUtf8("\r\n\\u79c1\\u306e\\u5bb6\\u3078\\u306e\\u6b53\r\n\\u8fce\\"), "\r\n私の家への歓\r\n迎\\");
@@ -188,6 +189,7 @@ class EncodingUtilsTest extends TestCase {
 	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars('Björk'), 'Bj\\u00f6rk');
 	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars('Dodd–Frank'), 'Dodd\\u2013Frank');
 	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars('public{}'), 'public{}');
+	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars('abc私dの家への歓迎ef'), 'abc\\u79c1d\\u306e\\u5bb6\\u3078\\u306e\\u6b53\\u8fceef');
 	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars('私の家への歓迎'), '\\u79c1\\u306e\\u5bb6\\u3078\\u306e\\u6b53\\u8fce');
 	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars("\r\n私の家への歓迎"), "\\r\\n\\u79c1\\u306e\\u5bb6\\u3078\\u306e\\u6b53\\u8fce");
 	    $this->assertSame(EncodingUtils::utf8ToUnicodeEscapedChars("\r\n私の家への歓\r\n迎\\"), "\\r\\n\\u79c1\\u306e\\u5bb6\\u3078\\u306e\\u6b53\\r\\n\\u8fce\\");
