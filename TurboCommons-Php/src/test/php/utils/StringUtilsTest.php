@@ -499,6 +499,39 @@ class StringUtilsTest extends TestCase {
 
 
 	/**
+	 * testTrim
+	 *
+	 * @return void
+	 */
+	public function testTrim(){
+
+	    // TODO - translate from TS
+	}
+
+
+	/**
+	 * testTrimLeft
+	 *
+	 * @return void
+	 */
+	public function testTrimLeft(){
+
+	    // TODO - translate from TS
+	}
+
+
+	/**
+	 * testTrimRight
+	 *
+	 * @return void
+	 */
+	public function testTrimRight(){
+
+	    // TODO - translate from TS
+	}
+
+
+	/**
 	 * testCountStringOccurences
 	 *
 	 * @return void
@@ -1231,17 +1264,6 @@ class StringUtilsTest extends TestCase {
 	 * @return void
 	 */
 	public function testRemoveUrls(){
-
-	    // TODO!!
-	}
-
-
-	/**
-	 * testRemoveEmails
-	 *
-	 * @return void
-	 */
-	public function testRemoveEmails(){
 
 	    // TODO!!
 	}

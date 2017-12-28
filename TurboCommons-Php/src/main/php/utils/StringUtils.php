@@ -289,6 +289,33 @@ class StringUtils {
 
 
     /**
+     * TODO translate from TS
+     */
+    public static function trim(){
+
+        // TODO translate from TS
+    }
+
+
+    /**
+     * TODO translate from TS
+     */
+    public static function trimLeft(){
+
+        // TODO translate from TS
+    }
+
+
+    /**
+     * TODO translate from TS
+     */
+    public static function trimRight(){
+
+        // TODO translate from TS
+    }
+
+
+    /**
      * Count the number of times a string is found inside another string
      *
      * @param string $string The string where we want to search
@@ -1087,21 +1114,6 @@ class StringUtils {
     public static function removeUrls($string, string $replacement = 'xxxx') {
 
         return preg_replace('/[a-zA-Z]*[:\/\/]*[A-Za-z0-9\-_]+\.+[A-Za-z0-9\.\/%&=\?\-_]+/i', $replacement, $string);
-    }
-
-
-
-    /**
-     * Remove all emails from The string to process
-     *
-     * @param string $string The string to process
-     * @param string $replacement The replacement string that will be shown when some email is removed
-     *
-     * @return string The string without any text that represents an email inside it.
-     */
-    public static function removeEmails($string, string $replacement = 'xxxx'){
-
-        return preg_replace('/[^@\s]*@[^@\s]*\.[^@\s]*/', $replacement, $string);
     }
 
 
