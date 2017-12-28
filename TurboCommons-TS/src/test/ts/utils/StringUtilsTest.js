@@ -171,6 +171,195 @@ QUnit.todo("isSnakeCase", function(assert) {
 
 
 /**
+ * trim
+ */
+QUnit.test("trim", function(assert){
+
+    // Test empty values
+    assert.throws(function() {
+        StringUtils.trim(undefined);
+    }, /value is not a string/);
+    
+    assert.throws(function() {
+        StringUtils.trim(null);
+    }, /value is not a string/);
+    
+    assert.throws(function() {
+        StringUtils.trim(0);
+    }, /value is not a string/);
+    
+    assert.throws(function() {
+        StringUtils.trim([]);
+    }, /value is not a string/);
+    
+    assert.strictEqual(StringUtils.trim(""), "");
+
+    // Test ok values
+    assert.strictEqual(StringUtils.trim("   "), "");
+    assert.strictEqual(StringUtils.trim("\n\n\r\r"), "");
+    assert.strictEqual(StringUtils.trim("  \n\n\r\r"), "");
+    assert.strictEqual(StringUtils.trim("\n\n\r\r   "), "");
+    assert.strictEqual(StringUtils.trim("   \n\n\r\r   "), "");
+    assert.strictEqual(StringUtils.trim("hello"), "hello");
+    assert.strictEqual(StringUtils.trim("hello\n"), "hello");
+    assert.strictEqual(StringUtils.trim("hello\r\n"), "hello");
+    assert.strictEqual(StringUtils.trim("\nhello\r\n"), "hello");
+    assert.strictEqual(StringUtils.trim("   hello"), "hello");
+    assert.strictEqual(StringUtils.trim("hello   "), "hello");
+    assert.strictEqual(StringUtils.trim("  hello  "), "hello");
+    
+    assert.strictEqual(StringUtils.trim("helloxax", "xa"), "hello");
+    assert.strictEqual(StringUtils.trim("XXXhello", "xlX"), "hello");
+    assert.strictEqual(StringUtils.trim("XXXhelloxxx", "xX"), "hello");
+    assert.strictEqual(StringUtils.trim("1|2", "123"), "|");
+    assert.strictEqual(StringUtils.trim("1|2", ""), "1|2");
+    assert.strictEqual(StringUtils.trim("1|2\n", "1"), "|2\n");
+
+    // Test wrong values
+    // Not necessary
+
+    // Test exceptions
+    assert.throws(function() {
+        StringUtils.trim([1, 2, 3, 4]);
+    }, /value is not a string/);
+    
+    assert.throws(function() {
+        StringUtils.trim(new Error());
+    }, /value is not a string/);
+    
+    assert.throws(function() {
+        StringUtils.trim(123466);
+    }, /value is not a string/);
+});
+
+
+/**
+ * trimLeft
+ */
+QUnit.test("trimLeft", function(assert){
+
+    // Test empty values
+    assert.throws(function() {
+        StringUtils.trimLeft(undefined);
+    }, /value is not a string/);
+    
+    assert.throws(function() {
+        StringUtils.trimLeft(null);
+    }, /value is not a string/);
+    
+    assert.throws(function() {
+        StringUtils.trimLeft(0);
+    }, /value is not a string/);
+    
+    assert.throws(function() {
+        StringUtils.trimLeft([]);
+    }, /value is not a string/);
+    
+    assert.strictEqual(StringUtils.trimLeft(""), "");
+
+    // Test ok values
+    assert.strictEqual(StringUtils.trimLeft("   "), "");
+    assert.strictEqual(StringUtils.trimLeft("\n\n\r\r"), "");
+    assert.strictEqual(StringUtils.trimLeft("  \n\n\r\r"), "");
+    assert.strictEqual(StringUtils.trimLeft("\n\n\r\r   "), "");
+    assert.strictEqual(StringUtils.trimLeft("   \n\n\r\r   "), "");
+    assert.strictEqual(StringUtils.trimLeft("hello"), "hello");
+    assert.strictEqual(StringUtils.trimLeft("hello\n"), "hello\n");
+    assert.strictEqual(StringUtils.trimLeft("hello\r\n"), "hello\r\n");
+    assert.strictEqual(StringUtils.trimLeft("\nhello\r\n"), "hello\r\n");
+    assert.strictEqual(StringUtils.trimLeft("   hello"), "hello");
+    assert.strictEqual(StringUtils.trimLeft("hello   "), "hello   ");
+    assert.strictEqual(StringUtils.trimLeft("  hello  "), "hello  ");
+    
+    assert.strictEqual(StringUtils.trimLeft("helloxax", "xa"), "helloxax");
+    assert.strictEqual(StringUtils.trimLeft("XXXhello", "xlX"), "hello");
+    assert.strictEqual(StringUtils.trimLeft("XXXhelloxxx", "xX"), "helloxxx");
+    assert.strictEqual(StringUtils.trimLeft("1|2", "123"), "|2");
+    assert.strictEqual(StringUtils.trimLeft("1|2", ""), "1|2");
+    assert.strictEqual(StringUtils.trimLeft("1|2\n", "1"), "|2\n");
+
+    // Test wrong values
+    // Not necessary
+
+    // Test exceptions
+    assert.throws(function() {
+        StringUtils.trimLeft([1, 2, 3, 4]);
+    }, /value is not a string/);
+    
+    assert.throws(function() {
+        StringUtils.trimLeft(new Error());
+    }, /value is not a string/);
+    
+    assert.throws(function() {
+        StringUtils.trimLeft(123466);
+    }, /value is not a string/);
+});
+
+
+/**
+ * trimRight
+ */
+QUnit.test("trimRight", function(assert){
+
+    // Test empty values
+    assert.throws(function() {
+        StringUtils.trimRight(undefined);
+    }, /value is not a string/);
+    
+    assert.throws(function() {
+        StringUtils.trimRight(null);
+    }, /value is not a string/);
+    
+    assert.throws(function() {
+        StringUtils.trimRight(0);
+    }, /value is not a string/);
+    
+    assert.throws(function() {
+        StringUtils.trimRight([]);
+    }, /value is not a string/);
+    
+    assert.strictEqual(StringUtils.trimRight(""), "");
+
+    // Test ok values
+    assert.strictEqual(StringUtils.trimRight("   "), "");
+    assert.strictEqual(StringUtils.trimRight("\n\n\r\r"), "");
+    assert.strictEqual(StringUtils.trimRight("  \n\n\r\r"), "");
+    assert.strictEqual(StringUtils.trimRight("\n\n\r\r   "), "");
+    assert.strictEqual(StringUtils.trimRight("   \n\n\r\r   "), "");
+    assert.strictEqual(StringUtils.trimRight("hello"), "hello");
+    assert.strictEqual(StringUtils.trimRight("hello\n"), "hello");
+    assert.strictEqual(StringUtils.trimRight("hello\r\n"), "hello");
+    assert.strictEqual(StringUtils.trimRight("\nhello\r\n"), "\nhello");
+    assert.strictEqual(StringUtils.trimRight("   hello"), "   hello");
+    assert.strictEqual(StringUtils.trimRight("hello   "), "hello");
+    assert.strictEqual(StringUtils.trimRight("  hello  "), "  hello");
+    
+    assert.strictEqual(StringUtils.trimRight("helloxax", "xa"), "hello");
+    assert.strictEqual(StringUtils.trimRight("XXXhello", "xlX"), "XXXhello");
+    assert.strictEqual(StringUtils.trimRight("XXXhelloxxx", "xX"), "XXXhello");
+    assert.strictEqual(StringUtils.trimRight("1|2", "123"), "1|");
+    assert.strictEqual(StringUtils.trimRight("1|2", ""), "1|2");
+    assert.strictEqual(StringUtils.trimRight("1|2\n", "1"), "1|2\n");
+
+    // Test wrong values
+    // Not necessary
+
+    // Test exceptions
+    assert.throws(function() {
+        StringUtils.trimRight([1, 2, 3, 4]);
+    }, /value is not a string/);
+    
+    assert.throws(function() {
+        StringUtils.trimRight(new Error());
+    }, /value is not a string/);
+    
+    assert.throws(function() {
+        StringUtils.trimRight(123466);
+    }, /value is not a string/);
+});
+
+
+/**
  * countStringOccurences
  */
 QUnit.todo("countStringOccurences", function(assert) {
@@ -590,15 +779,6 @@ QUnit.todo("removeWordsLongerThan", function(assert) {
  * removeUrls
  */
 QUnit.todo("removeUrls", function(assert) {
-
-    // TODO: copy tests from PHP
-});
-
-
-/**
- * removeEmails
- */
-QUnit.todo("removeEmails", function(assert) {
 
     // TODO: copy tests from PHP
 });

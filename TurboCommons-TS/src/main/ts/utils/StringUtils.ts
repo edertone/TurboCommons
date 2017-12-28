@@ -180,6 +180,75 @@ export class StringUtils {
         
         // TODO - translate from php
     }
+
+    
+    /**
+     * Remove whitespaces (or any custom set of characters) from both sides of a string
+     * 
+     * @param string A string to process
+     * 
+     * @param characters A set of characters that will be trimmed from both string sides. By default,
+     * empty space and new line characters are defined : " \n\r"
+     * 
+     * @example: StringUtils.trim("abcXXabc", "abc") outputs "XX"
+     * 
+     * @returns The trimmed string
+     */
+    public static trim(string: string, characters = " \n\r") {
+        
+        if(!StringUtils.isString(string)){
+            
+            throw new Error('value is not a string');
+        }
+        
+        return StringUtils.trimLeft(StringUtils.trimRight(string, characters), characters);
+    }
+    
+    
+    /**
+     * Remove whitespaces (or any custom set of characters) from a string left side
+     * 
+     * @param string A string to process
+     * 
+     * @param characters A set of characters that will be trimmed from string left side. By default,
+     * empty space and new line characters are defined : " \n\r"
+     * 
+     * @example: StringUtils.trimLeft("abcXXabc", "abc") outputs "XXabc"
+     *  
+     * @returns The trimmed string
+     */
+    public static trimLeft(string: string, characters = " \n\r") {
+    
+        if(!StringUtils.isString(string)){
+            
+            throw new Error('value is not a string');
+        }
+
+        return string.replace(new RegExp("^[" + characters + "]+"), "");
+    }
+    
+    
+    /**
+     * Remove whitespaces (or any custom set of characters) from a string right side
+     * 
+     * @param string A string to process
+     * 
+     * @param characters A set of characters that will be trimmed from string right side. By default,
+     * empty space and new line characters are defined : " \n\r"
+     *
+     * @example: StringUtils.trimRight("abcXXabc", "abc") outputs "abcXX"
+     * 
+     * @returns The trimmed string
+     */
+    public static trimRight(string: string, characters = " \n\r") {
+        
+        if(!StringUtils.isString(string)){
+            
+            throw new Error('value is not a string');
+        }
+
+        return string.replace(new RegExp("[" + characters + "]+$"), "");
+    }
     
     
     public static countStringOccurences() {
@@ -957,12 +1026,6 @@ export class StringUtils {
     
     
     public static removeUrls() {
-        
-        // TODO: translate from php
-    }
-    
-    
-    public static removeEmails() {
         
         // TODO: translate from php
     }
