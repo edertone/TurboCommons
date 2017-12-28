@@ -44,6 +44,8 @@ class JavaPropertiesObjectTest extends TestCase {
      */
     protected function setUp(){
 
+        $this->exceptionMessage = '';
+
         $this->wrongValues = [null, [], 'key', '=', '=key', '=key=', '=key=value', [1, 2], 1234, new stdclass()];
         $this->wrongValuesCount = count($this->wrongValues);
 
@@ -62,7 +64,10 @@ class JavaPropertiesObjectTest extends TestCase {
      */
     protected function tearDown(){
 
-        // Nothing necessary here
+        if($this->exceptionMessage != ''){
+
+            $this->fail($this->exceptionMessage);
+        }
     }
 
 
@@ -85,8 +90,6 @@ class JavaPropertiesObjectTest extends TestCase {
     public function testConstruct(){
 
         // Test empty values
-        $exceptionMessage = '';
-
         $test = new JavaPropertiesObject();
         $this->assertTrue($test->length() === 0);
 
@@ -95,14 +98,14 @@ class JavaPropertiesObjectTest extends TestCase {
 
         try {
             new JavaPropertiesObject('       ');
-            $exceptionMessage = '"        " value did not cause exception';
+            $this->exceptionMessage = '"        " value did not cause exception';
         } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
             new JavaPropertiesObject("\n\n\n");
-            $exceptionMessage = '"\n\n\n" value did not cause exception';
+            $this->exceptionMessage = '"\n\n\n" value did not cause exception';
         } catch (Throwable $e) {
             // We expect an exception to happen
         }
@@ -261,15 +264,10 @@ class JavaPropertiesObjectTest extends TestCase {
 
             try {
                 new JavaPropertiesObject($this->wrongValues[$i]);
-                $exceptionMessage = 'wrong value did not cause exception';
+                $this->exceptionMessage = 'wrong value did not cause exception';
             } catch (Throwable $e) {
                 // We expect an exception to happen
             }
-        }
-
-        if($exceptionMessage != ''){
-
-            $this->fail($exceptionMessage);
         }
     }
 
@@ -325,8 +323,6 @@ class JavaPropertiesObjectTest extends TestCase {
     public function testIsEqualTo(){
 
         // Test empty values
-        $exceptionMessage = '';
-
         $properties = new JavaPropertiesObject();
 
         $this->assertTrue($properties->isEqualTo(''));
@@ -334,28 +330,28 @@ class JavaPropertiesObjectTest extends TestCase {
 
         try {
             $properties->isEqualTo(null);
-            $exceptionMessage = 'null value did not cause exception';
+            $this->exceptionMessage = 'null value did not cause exception';
         } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
             $properties->isEqualTo([]);
-            $exceptionMessage = '[] value did not cause exception';
+            $this->exceptionMessage = '[] value did not cause exception';
         } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
             $properties->isEqualTo(new stdClass());
-            $exceptionMessage = 'new stdClass() value did not cause exception';
+            $this->exceptionMessage = 'new stdClass() value did not cause exception';
         } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
             $properties->isEqualTo(0);
-            $exceptionMessage = '0 value did not cause exception';
+            $this->exceptionMessage = '0 value did not cause exception';
         } catch (Throwable $e) {
             // We expect an exception to happen
         }
@@ -382,7 +378,7 @@ class JavaPropertiesObjectTest extends TestCase {
 
             try {
                 $properties->isEqualTo($this->wrongValues[$i]);
-                $exceptionMessage = $this->wrongValues[$i].' wrong value did not cause exception';
+                $this->exceptionMessage = $this->wrongValues[$i].' wrong value did not cause exception';
             } catch (Throwable $e) {
                 // We expect an exception to happen
             }
@@ -396,11 +392,6 @@ class JavaPropertiesObjectTest extends TestCase {
 
         $properties = new JavaPropertiesObject('key1=v1');
         $this->assertFalse($properties->isEqualTo("key1=v1\nkey2=v2"));
-
-        if($exceptionMessage != ''){
-
-            $this->fail($exceptionMessage);
-        }
 
         // Test exceptions
         // Already tested at wrong values
