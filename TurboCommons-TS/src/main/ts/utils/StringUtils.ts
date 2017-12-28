@@ -196,11 +196,6 @@ export class StringUtils {
      */
     public static trim(string: string, characters = " \n\r") {
         
-        if(!StringUtils.isString(string)){
-            
-            throw new Error('value is not a string');
-        }
-        
         return StringUtils.trimLeft(StringUtils.trimRight(string, characters), characters);
     }
     
