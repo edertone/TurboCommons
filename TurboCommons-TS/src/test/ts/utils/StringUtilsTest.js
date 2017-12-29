@@ -14,12 +14,18 @@ QUnit.module("StringUtilsTest", {
 
         window.StringUtils = org_turbocommons.StringUtils;
         window.ArrayUtils = org_turbocommons.ArrayUtils;
+        
+        window.emptyValues = [undefined, null, '', [], {}, '     ', "\n\n\n", 0];
+        window.emptyValuesCount = window.emptyValues.length;
     },
 
     afterEach : function() {
 
         delete window.StringUtils;
         delete window.ArrayUtils;
+        
+        delete window.emptyValues;
+        delete window.emptyValuesCount;
     }
 });
 
@@ -167,6 +173,82 @@ QUnit.todo("isCamelCase", function(assert) {
 QUnit.todo("isSnakeCase", function(assert) {
 
     // TODO: copy tests from PHP
+});
+
+
+/**
+ * replace
+ */
+QUnit.test("replace", function(assert) {
+
+    // Test empty values
+    for(var i = 0; i < emptyValuesCount; i++){
+        
+        if(StringUtils.isString(emptyValues[i])){
+            
+            assert.strictEqual(StringUtils.replace(emptyValues[i], "a", "b"), emptyValues[i]);
+            assert.strictEqual(StringUtils.replace("string", emptyValues[i], "b"), "string");
+            assert.strictEqual(StringUtils.replace("string", "a", emptyValues[i]), "string");
+            
+            assert.throws(function() {
+                StringUtils.replace("string", "a", "b", emptyValues[i]);
+            }, /count must be an integer/);
+            
+        }else{
+            
+            assert.throws(function() {
+                StringUtils.replace(emptyValues[i], "a", "b");
+            }, /string is not valid/);
+            
+            if(ArrayUtils.isArray(emptyValues[i])){
+                
+                assert.strictEqual(StringUtils.replace("string", emptyValues[i], "b"), "string");
+                assert.strictEqual(StringUtils.replace("string", "a", emptyValues[i]), "string");
+                
+            }else{
+                
+                assert.throws(function() {
+                    StringUtils.replace("string", emptyValues[i], "b");
+                }, /search is not a string or array/);
+                
+                assert.throws(function() {
+                    StringUtils.replace("string", "a", emptyValues[i]);
+                }, /replacement is not a string or array/);
+            }            
+        }
+    }
+
+    // Test ok values
+    assert.strictEqual(StringUtils.replace("x", "", "xyz"), "x");
+    assert.strictEqual(StringUtils.replace("x", "x", "xyz"), "xyz");
+    assert.strictEqual(StringUtils.replace("x", "x", "$"), "$");
+    assert.strictEqual(StringUtils.replace("x", "x", "$$"), "$$");
+    assert.strictEqual(StringUtils.replace("string", "str", ""), "ing");
+    assert.strictEqual(StringUtils.replace("string", "s", "b"), "btring");
+    assert.strictEqual(StringUtils.replace("string", "st", "ab"), "abring");
+    assert.strictEqual(StringUtils.replace("string", "string", ""), "");
+    assert.strictEqual(StringUtils.replace("abababAb", "a", "X"), "XbXbXbAb");
+    assert.strictEqual(StringUtils.replace("abababAb", "aba", "r"), "rbabAb");
+    assert.strictEqual(StringUtils.replace("+$-/\\_", "$", "Q"), "+Q-/\\_");
+    
+    assert.strictEqual(StringUtils.replace("string", ["s"], "b"), "btring");
+    assert.strictEqual(StringUtils.replace("string", ["s", "i", "g"], "b"), "btrbnb");
+    assert.strictEqual(StringUtils.replace("string", ["s", "i"], ["b", " "]), "btr ng");
+    assert.strictEqual(StringUtils.replace("Hello???", ["H", "E", "?"], ["h", "X", "!"]), "hello!!!");
+    // TODO
+
+    // Test wrong values
+    // TODO
+
+    // Test exceptions
+    assert.throws(function() {
+        StringUtils.replace("string", ["a"], ["b", "c"]);
+    }, /search and replacement arrays must have the same length/);
+    
+    assert.throws(function() {
+        StringUtils.replace("string", ["a", "b", "c"], ["b", "c"]);
+    }, /search and replacement arrays must have the same length/);
+    // TODO
 });
 
 

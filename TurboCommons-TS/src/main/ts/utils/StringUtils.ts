@@ -9,6 +9,7 @@
  
 
 import { NumericUtils } from './NumericUtils';
+import { ArrayUtils } from './ArrayUtils';
 import { ValidationManager } from "../managers/ValidationManager";
 
     
@@ -179,6 +180,60 @@ export class StringUtils {
     public static isSnakeCase() {
         
         // TODO - translate from php
+    }
+    
+    
+    
+    public static replace(string: string, search: string|string[], replacement: string|string[], count: number = -1) {
+        
+        if(!StringUtils.isString(string)){
+            
+            throw new Error("string is not valid");
+        }
+        
+        if(!StringUtils.isString(search) && !ArrayUtils.isArray(search)){
+            
+            throw new Error("search is not a string or array");
+        }
+        
+        if(!StringUtils.isString(replacement) && !ArrayUtils.isArray(replacement)){
+            
+            throw new Error("replacement is not a string or array");
+        }
+        
+        if(!NumericUtils.isInteger(count)){
+            
+            throw new Error("count must be an integer");
+        }
+        
+        let result = string;
+        let searchArray = StringUtils.isString(search) ? [String(search)] : search;
+        let replacementArray = StringUtils.isString(replacement) ? [String(replacement)] : replacement;
+        
+        if(replacementArray.length > 1 && searchArray.length !== replacementArray.length){
+            
+            throw new Error("search and replacement arrays must have the same length");
+        }
+        
+        for (var i = 0; i < searchArray.length; i++) {
+            
+            if(searchArray[i] !== ''){
+                
+                // Escape the target string to avoid errors with special characters
+                let t = searchArray[i].replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+                
+                let r = (replacementArray.length === 1) ? replacementArray[0] : replacementArray[i];
+                
+                if(r === undefined || r === null){
+                    
+                    r = '';
+                }
+                
+                result = result.replace(new RegExp(t, 'g'), r.replace(/\$/g, "$$$$"));
+            }
+        }
+        
+        return result;
     }
 
     
