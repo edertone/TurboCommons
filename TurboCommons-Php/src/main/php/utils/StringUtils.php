@@ -289,6 +289,16 @@ class StringUtils {
 
 
     /**
+     * TODO docs
+     * TODO Verify that this version works exactly the same as the TS one, and implement the same unit tests
+     */
+    public static function replace($string, $search, $replacement, $count = -1){
+
+        return str_replace($search, $replacement, $string, $count);
+    }
+
+
+    /**
      * TODO translate from TS
      */
     public static function trim(){

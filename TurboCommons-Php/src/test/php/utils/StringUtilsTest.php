@@ -499,6 +499,17 @@ class StringUtilsTest extends TestCase {
 
 
 	/**
+	 * testReplace
+	 *
+	 * @return void
+	 */
+	public function testReplace(){
+
+	    // TODO - translate from TS
+	}
+
+
+	/**
 	 * testTrim
 	 *
 	 * @return void
