@@ -133,7 +133,7 @@ class JavaPropertiesObjectTest extends TestCase {
 
         $test = new JavaPropertiesObject('path=c:\\\\docs\\\\doc1');
         $this->assertTrue($test->length() === 1);
-        $this->assertTrue($test->get('path') === 'c:\docs\doc1');
+        $this->assertTrue($test->get('path') === 'c:\\docs\\doc1');
 
         foreach ($this->propertiesFiles as $file) {
 
