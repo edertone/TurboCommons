@@ -192,7 +192,7 @@ QUnit.test("replace", function(assert) {
             
             assert.throws(function() {
                 StringUtils.replace("string", "a", "b", emptyValues[i]);
-            }, /count must be an integer/);
+            }, /count must be a positive integer/);
             
         }else{
             
@@ -229,21 +229,35 @@ QUnit.test("replace", function(assert) {
     assert.strictEqual(StringUtils.replace("string", "string", ""), "");
     assert.strictEqual(StringUtils.replace("abababAb", "a", "X"), "XbXbXbAb");
     assert.strictEqual(StringUtils.replace("abababAb", "aba", "r"), "rbabAb");
+    assert.strictEqual(StringUtils.replace("8888888888888", "8", ""), "");
     assert.strictEqual(StringUtils.replace("+$-/\\_", "$", "Q"), "+Q-/\\_");
     
     assert.strictEqual(StringUtils.replace("string", ["s"], "b"), "btring");
     assert.strictEqual(StringUtils.replace("string", ["s", "i", "g"], "b"), "btrbnb");
     assert.strictEqual(StringUtils.replace("string", ["s", "i"], ["b", " "]), "btr ng");
     assert.strictEqual(StringUtils.replace("Hello???", ["H", "E", "?"], ["h", "X", "!"]), "hello!!!");
-    // TODO - add lot more tests
-
+    
     // Test ok values with limited count
-    // TODO
+    assert.strictEqual(StringUtils.replace("x", "", "xyz", 1), "x");
+    assert.strictEqual(StringUtils.replace("x", "x", "xyz", 1), "xyz");
+    assert.strictEqual(StringUtils.replace("xxx", "x", "xyz", 1), "xyzxx");
+    assert.strictEqual(StringUtils.replace("abababAb", "a", "X", 2), "XbXbabAb");
+    assert.strictEqual(StringUtils.replace("abababAb", "aba", "r", 3), "rbabAb");
+    assert.strictEqual(StringUtils.replace("abababAbabaabaaba", "aba", "r", 3), "rbabAbrraba");
+    assert.strictEqual(StringUtils.replace("+$-/$\\_", "$", "Q", 1), "+Q-/$\\_");
+    assert.strictEqual(StringUtils.replace("8888888888888", "8", "", 5), "88888888");
+    
+    assert.strictEqual(StringUtils.replace("123123123", ["1", "2"], "A", 2), "A23A23123");
+    assert.strictEqual(StringUtils.replace("123123123", ["1", "2"], ["A", "B"], 4), "AB3A23A23");
     
     // Test wrong values
-    // TODO
+    // not necessary
 
     // Test exceptions
+    assert.throws(function() {
+        StringUtils.replace("string", "a", "b", 0);
+    }, /count must be a positive integer/);
+    
     assert.throws(function() {
         StringUtils.replace("string", ["a"], ["b", "c"]);
     }, /search and replacement arrays must have the same length/);
@@ -251,7 +265,6 @@ QUnit.test("replace", function(assert) {
     assert.throws(function() {
         StringUtils.replace("string", ["a", "b", "c"], ["b", "c"]);
     }, /search and replacement arrays must have the same length/);
-    // TODO add more
 });
 
 

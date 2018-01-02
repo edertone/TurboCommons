@@ -210,12 +210,13 @@ export class StringUtils {
             throw new Error("replacement is not a string or array");
         }
         
-        if(!NumericUtils.isInteger(count)){
+        if(!NumericUtils.isInteger(count) || count === 0){
             
-            throw new Error("count must be an integer");
+            throw new Error("count must be a positive integer");
         }
         
         let result = string;
+        let replaceCount = 0;
         let searchArray = StringUtils.isString(search) ? [String(search)] : search;
         let replacementArray = StringUtils.isString(replacement) ? [String(replacement)] : replacement;
         
@@ -240,6 +241,13 @@ export class StringUtils {
                 for (let j = 0; j < occurences; j++) {
                 
                     result = result.replace(searchArray[i], r.replace(/\$/g, "$$$$"));
+                    
+                    replaceCount ++;
+                    
+                    if(count > 0 && replaceCount >= count){
+                        
+                        return result;
+                    }
                 }
             }
         }
