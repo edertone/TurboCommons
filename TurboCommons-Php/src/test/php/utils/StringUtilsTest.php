@@ -549,15 +549,15 @@ class StringUtilsTest extends TestCase {
 	 */
 	public function testCountStringOccurences(){
 
-		$this->assertTrue(StringUtils::countStringOccurences('       ', ' ') == 7);
-		$this->assertTrue(StringUtils::countStringOccurences('hello', 'o') == 1);
-		$this->assertTrue(StringUtils::countStringOccurences('hello baby', 'b') == 2);
-		$this->assertTrue(StringUtils::countStringOccurences('hello baby', 'B') == 0);
-		$this->assertTrue(StringUtils::countStringOccurences("tRy\nto\r\n\t\ngo\r\nUP", 'o') == 2);
-		$this->assertTrue(StringUtils::countStringOccurences("     \n      \r\n", 'a') == 0);
-		$this->assertTrue(StringUtils::countStringOccurences(" AEÉÜ    \n   1   \r\nÍË", 'É') == 1);
-		$this->assertTrue(StringUtils::countStringOccurences("heLLo Baby\nhellÓ àgaiN and go\n\n\r\nUp!", 'a') == 3);
-		$this->assertTrue(StringUtils::countStringOccurences("helló bàbÝ\n   whats Up Todäy? are you feeling better? GOOD!", 'T') == 1);
+		$this->assertSame(StringUtils::countStringOccurences('       ', ' '), 7);
+		$this->assertSame(StringUtils::countStringOccurences('hello', 'o'), 1);
+		$this->assertSame(StringUtils::countStringOccurences('hello baby', 'b'), 2);
+		$this->assertSame(StringUtils::countStringOccurences('hello baby', 'B'), 0);
+		$this->assertSame(StringUtils::countStringOccurences("tRy\nto\r\n\t\ngo\r\nUP", 'o'), 2);
+		$this->assertSame(StringUtils::countStringOccurences("     \n      \r\n", 'a'), 0);
+		$this->assertSame(StringUtils::countStringOccurences(" AEÉÜ    \n   1   \r\nÍË", 'É'), 1);
+		$this->assertSame(StringUtils::countStringOccurences("heLLo Baby\nhellÓ àgaiN and go\n\n\r\nUp!", 'a'), 3);
+		$this->assertSame(StringUtils::countStringOccurences("helló bàbÝ\n   whats Up Todäy? are you feeling better? GOOD!", 'T'), 1);
 
 		// Test exceptions
 		try {
