@@ -143,15 +143,7 @@ export class StringUtils {
         }
 
         // Replace all extra empty characters
-        for(var i = 0; i < emptyChars.length; i++){
-
-            if((aux = StringUtils.replace(aux, emptyChars[i], '')) == ''){
-
-                return true;
-            }
-        }
-
-        return false;
+        return StringUtils.replace(aux, emptyChars, '') === '';
     }
     
     
