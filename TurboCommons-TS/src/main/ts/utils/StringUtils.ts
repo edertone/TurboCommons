@@ -122,8 +122,6 @@ export class StringUtils {
      */
     public static isEmpty(string:string, emptyChars:string[] = []) {
     
-        var aux = '';
-
         // Empty or null value is considered empty
         if(string == null || string == ""){
 
@@ -133,27 +131,13 @@ export class StringUtils {
         // Throw exception if non string value was received
         if(!StringUtils.isString(string)){
 
-            throw new Error("StringUtils.isEmpty: value is not a string");
+            throw new Error("value is not a string");
         }
 
-        // Replace all empty spaces
-        if((aux = string.replace(/ /g, '')) == ''){
+        let aux = '';
 
-            return true;
-        }
-
-        // Replace all new line characters
-        if((aux = aux.replace(/\n/g, '')) == ''){
-
-            return true;
-        }
-
-        if((aux = aux.replace(/\r/g, '')) == ''){
-
-            return true;
-        }
-
-        if((aux = aux.replace(/\t/g, '')) == ''){
+        // Replace all empty spaces and new line characters
+        if((aux = StringUtils.replace(string, [' ', "\n", "\r", "\t"], '')) == ''){
 
             return true;
         }
@@ -161,7 +145,7 @@ export class StringUtils {
         // Replace all extra empty characters
         for(var i = 0; i < emptyChars.length; i++){
 
-            if((aux = aux.replace(new RegExp(emptyChars[i], 'g'), '')) == ''){
+            if((aux = StringUtils.replace(aux, emptyChars[i], '')) == ''){
 
                 return true;
             }
@@ -394,7 +378,7 @@ export class StringUtils {
         
         if(limit <= 0 || !NumericUtils.isNumeric(limit)){
 
-            throw new Error('StringUtils.limitLen: limit must be a positive numeric value');
+            throw new Error('limit must be a positive numeric value');
         }
 
         if(!StringUtils.isString(string)){
@@ -614,7 +598,7 @@ export class StringUtils {
 
         if(!StringUtils.isString(url)){
 
-            throw new Error("StringUtils.getSchemeFromUrl: Specified value must be a string");
+            throw new Error("Specified value must be a string");
         }
 
         if(!StringUtils.isUrl(url)){
@@ -658,7 +642,7 @@ export class StringUtils {
 
         if(!StringUtils.isString(path)){
 
-            throw new Error("StringUtils.formatPath: Specified path must be a string");
+            throw new Error("Specified path must be a string");
         }
 
         // Replace all slashes on the path with the os default
@@ -705,7 +689,7 @@ export class StringUtils {
 
         if(!StringUtils.isString(url)){
 
-            throw new Error("StringUtils.formatUrl: Specified value must be a string");
+            throw new Error("Specified value must be a string");
         }
 
         if(StringUtils.isEmpty(url)){
@@ -763,7 +747,7 @@ export class StringUtils {
     
         if(lenght < 0 || !NumericUtils.isInteger(lenght)){
 
-            throw new Error('StringUtils->generateRandomPassword: length must be a positive number');
+            throw new Error('length must be a positive number');
         }
         
         // Set the characters to use in the random password
