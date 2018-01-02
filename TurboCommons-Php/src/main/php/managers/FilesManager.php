@@ -50,7 +50,7 @@ class FilesManager extends BaseStrictClass{
 
             if(!ini_get('allow_url_fopen')){
 
-                throw new UnexpectedValueException('FilesManager->isFile: allow_url_fopen flag must be set to TRUE on php.ini');
+                throw new UnexpectedValueException('allow_url_fopen flag must be set to TRUE on php.ini');
             }
 
             if(strlen(file_get_contents($path, null, null, null, 10)) != 0){

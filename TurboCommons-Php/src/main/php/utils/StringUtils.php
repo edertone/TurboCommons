@@ -142,7 +142,7 @@ class StringUtils {
         // Throw exception if non string value was received
         if(!is_string($string)){
 
-            throw new InvalidArgumentException('StringUtils->isEmpty: value is not a string');
+            throw new InvalidArgumentException('value is not a string');
         }
 
         $aux = '';
@@ -192,7 +192,7 @@ class StringUtils {
         // Throw exception if non string value was received
         if(!is_string($string)){
 
-            throw new InvalidArgumentException('StringUtils->isCamelCase: value is not a string');
+            throw new InvalidArgumentException('value is not a string');
         }
 
         // Single letter is accepted as default camel case
@@ -223,7 +223,7 @@ class StringUtils {
                 break;
 
             default:
-                throw new InvalidArgumentException('StringUtils->isCamelCase: Unknown type specified');
+                throw new InvalidArgumentException('Unknown type specified');
         }
 
         // Perform a last alphanumeric validation before returning the result
@@ -255,7 +255,7 @@ class StringUtils {
         // Throw exception if non string value was received
         if(!is_string($string)){
 
-            throw new InvalidArgumentException('StringUtils->isSnakeCase: value is not a string');
+            throw new InvalidArgumentException('value is not a string');
         }
 
         // Check that there are only letters, numbers and underscores
@@ -281,7 +281,7 @@ class StringUtils {
                 break;
 
             default:
-                throw new InvalidArgumentException('StringUtils->isSnakeCase: Unknown type specified');
+                throw new InvalidArgumentException('Unknown type specified');
         }
 
         return $isSnakeCase;
@@ -334,6 +334,16 @@ class StringUtils {
      * @return int The number of times that $findMe appears on $string
      */
     public static function countStringOccurences($string, string $findMe){
+
+        if(!is_string($string) || !is_string($findMe)){
+
+            throw new InvalidArgumentException('value is not a string');
+        }
+
+        if($findMe === ''){
+
+            throw new InvalidArgumentException('cannot count occurences for an empty string');
+        }
 
         return substr_count($string, $findMe);
     }
@@ -400,7 +410,7 @@ class StringUtils {
 
         if($limit <= 0 || !NumericUtils::isNumeric($limit)){
 
-            throw new InvalidArgumentException('StringUtils->limitLen: limit must be a positive numeric value');
+            throw new InvalidArgumentException('limit must be a positive numeric value');
         }
 
         if(!self::isString($string)){
@@ -429,7 +439,7 @@ class StringUtils {
      */
     public static function getDomainFromUrl($string){
 
-        // TODO translate from JS
+        // TODO translate from TS
     }
 
 
@@ -438,7 +448,7 @@ class StringUtils {
      */
     public static function getHostNameFromUrl($string){
 
-        // TODO translate from JS
+        // TODO translate from TS
     }
 
 
@@ -617,11 +627,11 @@ class StringUtils {
 
 
     /**
-     * TODO - translate from js
+     * TODO - translate from Ts
      */
     public static function getSchemeFromUrl(){
 
-        // TODO - translate from js
+        // TODO - translate from Ts
     }
 
 
@@ -662,7 +672,7 @@ class StringUtils {
         // Non string values will throw an exception
         if(!is_string($string)){
 
-            throw new InvalidArgumentException('StringUtils->formatCase: value is not a string');
+            throw new InvalidArgumentException('value is not a string');
         }
 
         // Generate the sentence case output
@@ -764,7 +774,7 @@ class StringUtils {
             return $string;
         }
 
-        throw new InvalidArgumentException('StringUtils->formatCase: Unknown format specified');
+        throw new InvalidArgumentException('Unknown format specified');
     }
 
 
@@ -792,7 +802,7 @@ class StringUtils {
 
         if(!is_string($path)){
 
-            throw new InvalidArgumentException('StringUtils->formatPath: Specified path must be a string');
+            throw new InvalidArgumentException('Specified path must be a string');
         }
 
         // Replace all slashes on the path with the os default
@@ -816,11 +826,11 @@ class StringUtils {
 
 
     /**
-     * TODO - copy from js
+     * TODO - copy from Ts
      */
     public static function formatUrl(){
 
-        // TODO - copy from js
+        // TODO - copy from Ts
     }
 
 
@@ -868,7 +878,7 @@ class StringUtils {
 
         if($lenght < 0 || !NumericUtils::isInteger($lenght)){
 
-            throw new InvalidArgumentException('StringUtils->generateRandomPassword: length must be a positive number');
+            throw new InvalidArgumentException('length must be a positive number');
         }
 
         // Set the characters to use in the random password
@@ -919,7 +929,7 @@ class StringUtils {
 
         if(!self::isString($string)){
 
-            throw new InvalidArgumentException('StringUtils->removeNewLineCharacters: Specified value must be a string');
+            throw new InvalidArgumentException('Specified value must be a string');
         }
 
         return str_replace(array("\n","\r"), '', $string);
@@ -1156,7 +1166,6 @@ class StringUtils {
         // Remove more than one spaces on the string
         return preg_replace('/ +/', ' ', $res);
     }
-
 }
 
 ?>
