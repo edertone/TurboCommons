@@ -154,17 +154,7 @@ class StringUtils {
         }
 
         // Replace all extra empty characters
-        $emptyCharsCount = count($emptyChars);
-
-        for($i = 0; $i < $emptyCharsCount; $i++){
-
-            if(($aux = str_replace($emptyChars[$i], '', $aux)) == ''){
-
-                return true;
-            }
-        }
-
-        return false;
+        return str_replace($emptyChars, '', $aux) === '';
     }
 
 
