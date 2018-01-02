@@ -235,8 +235,11 @@ QUnit.test("replace", function(assert) {
     assert.strictEqual(StringUtils.replace("string", ["s", "i", "g"], "b"), "btrbnb");
     assert.strictEqual(StringUtils.replace("string", ["s", "i"], ["b", " "]), "btr ng");
     assert.strictEqual(StringUtils.replace("Hello???", ["H", "E", "?"], ["h", "X", "!"]), "hello!!!");
-    // TODO
+    // TODO - add lot more tests
 
+    // Test ok values with limited count
+    // TODO
+    
     // Test wrong values
     // TODO
 
@@ -248,7 +251,7 @@ QUnit.test("replace", function(assert) {
     assert.throws(function() {
         StringUtils.replace("string", ["a", "b", "c"], ["b", "c"]);
     }, /search and replacement arrays must have the same length/);
-    // TODO
+    // TODO add more
 });
 
 
@@ -444,9 +447,30 @@ QUnit.test("trimRight", function(assert){
 /**
  * countStringOccurences
  */
-QUnit.todo("countStringOccurences", function(assert) {
+QUnit.test("countStringOccurences", function(assert) {
 
-    // TODO: copy tests from PHP
+    assert.strictEqual(StringUtils.countStringOccurences('       ', ' '), 7);
+    assert.strictEqual(StringUtils.countStringOccurences('hello', 'o'), 1);
+    assert.strictEqual(StringUtils.countStringOccurences('hello baby', 'b'), 2);
+    assert.strictEqual(StringUtils.countStringOccurences('hello baby', 'B'), 0);
+    assert.strictEqual(StringUtils.countStringOccurences("tRy\nto\r\n\t\ngo\r\nUP", 'o'), 2);
+    assert.strictEqual(StringUtils.countStringOccurences("     \n      \r\n", 'a'), 0);
+    assert.strictEqual(StringUtils.countStringOccurences(" AEÉÜ    \n   1   \r\nÍË", 'É'), 1);
+    assert.strictEqual(StringUtils.countStringOccurences("heLLo Baby\nhellÓ àgaiN and go\n\n\r\nUp!", 'a'), 3);
+    assert.strictEqual(StringUtils.countStringOccurences("helló bàbÝ\n   whats Up Todäy? are you feeling better? GOOD!", 'T'), 1);
+
+    // Test exceptions
+    assert.throws(function() {
+        StringUtils.countStringOccurences(null, null);
+    }, /value is not a string/);
+
+    assert.throws(function() {
+        StringUtils.countStringOccurences('', '');
+    }, /cannot count occurences for an empty string/);
+
+    assert.throws(function() {
+        StringUtils.countStringOccurences('  ', '');
+    }, /cannot count occurences for an empty string/);
 });
 
 

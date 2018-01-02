@@ -183,7 +183,16 @@ export class StringUtils {
     }
     
     
-    
+    /**
+     * Replace all occurrences of the search string with the replacement string
+     *  
+     * @param string The string or array being searched and replaced on, otherwise known as the haystack.
+     * @param search The value being searched for, otherwise known as the needle. An array may be used to designate multiple needles. 
+     * @param replacement The value being searched for, otherwise known as the needle. An array may be used to designate multiple needles. 
+     * @param count [optional] If passed and > 0, this will define the maximum number of replacements to perform
+     * 
+     * @returns The string with all the replaced values
+     */
     public static replace(string: string, search: string|string[], replacement: string|string[], count: number = -1) {
         
         if(!StringUtils.isString(string)){
@@ -215,12 +224,9 @@ export class StringUtils {
             throw new Error("search and replacement arrays must have the same length");
         }
         
-        for (var i = 0; i < searchArray.length; i++) {
+        for (let i = 0; i < searchArray.length; i++) {
             
             if(searchArray[i] !== ''){
-                
-                // Escape the target string to avoid errors with special characters
-                let t = searchArray[i].replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
                 
                 let r = (replacementArray.length === 1) ? replacementArray[0] : replacementArray[i];
                 
@@ -229,7 +235,12 @@ export class StringUtils {
                     r = '';
                 }
                 
-                result = result.replace(new RegExp(t, 'g'), r.replace(/\$/g, "$$$$"));
+                let occurences = StringUtils.countStringOccurences(result, searchArray[i]);
+                
+                for (let j = 0; j < occurences; j++) {
+                
+                    result = result.replace(searchArray[i], r.replace(/\$/g, "$$$$"));
+                }
             }
         }
         
@@ -301,9 +312,27 @@ export class StringUtils {
     }
     
     
-    public static countStringOccurences() {
+    /**
+     * Count the number of times a string is found inside another string
+     *
+     * @param string The string where we want to search
+     * @param findMe The string that we want to look for
+     *
+     * @returns The number of times that findMe appears on string
+     */
+    public static countStringOccurences(string: string, findMe: string) {
         
-        // TODO - translate from php
+        if(!StringUtils.isString(string) || !StringUtils.isString(findMe)){
+            
+            throw new Error('value is not a string');
+        }
+        
+        if(findMe === ''){
+            
+            throw new Error('cannot count occurences for an empty string');
+        }
+
+        return string.split(findMe).length - 1;
     }
     
     
