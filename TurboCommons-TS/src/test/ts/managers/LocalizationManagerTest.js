@@ -12,6 +12,8 @@
 
 QUnit.module("LocalizationManagerTest", {
     beforeEach : function(){
+        
+        window.basePath = './resources/managers/localizationManager';
 
         window.emptyValues = [null, '', [], {}, '     ', "\n\n\n", 0];
         window.emptyValuesCount = window.emptyValues.length;
@@ -22,6 +24,8 @@ QUnit.module("LocalizationManagerTest", {
 
     afterEach : function(){
 
+        delete window.basePath;
+        
         delete window.emptyValues;
         delete window.emptyValuesCount;
 
@@ -48,9 +52,33 @@ QUnit.test("loadBundle", function(assert){
     // Tested on other tests
 
     // Test wrong values
-    // Tested on other tests
+    assert.throws(function() {
+        sut.loadBundle("Locales");
+    }, /no locales defined/);
+    
+    sut.locales = ['en_US'];
+    
+    assert.throws(function() {
+        sut.loadBundle("Locales");
+    }, /no paths defined/);
+    
+    // We load a non existing bundle and expect the errorCallback to be fired
+    sut.paths = [window.basePath + '/test-json/$locale/$bundle.json'];
 
-    // Test exceptions
+    var done = assert.async();
+    
+    sut.loadBundle('DoesNotExist', function(){
+
+        assert.ok(false);
+        done();
+        
+    }, function(){
+        
+        assert.ok(true);
+        done();
+    });
+
+    // Test exceptions    
     assert.throws(function() {
         sut.loadBundle([1,2,3,4]);
     }, /must be a non empty string/);
@@ -74,10 +102,26 @@ QUnit.test("get", function(assert){
     assert.throws(function() {
         sut.get("KEY", "Locales");
     }, /Bundle <Locales> does not exist/);
+    
+    sut.missingKeyFormat = '$exception';
+    
+    assert.throws(function() {
+        sut.get("KEY", "NonExistant");
+    }, /Bundle <NonExistant> does not exist/);
 
+    sut.missingKeyFormat = '';
+    assert.strictEqual(sut.get("KEY"), '');
+    
+    sut.missingKeyFormat = '--$key--';
+    assert.strictEqual(sut.get("KEY"), '--KEY--');
+    
+    sut.missingKeyFormat = '<$key>';
+    assert.strictEqual(sut.get("NON_EXISTANT", 'NonExistant'), '<NON_EXISTANT>');
+            
     // Test ok values
+    sut.missingKeyFormat = '$exception';
     sut.locales = ['en_US'];
-    sut.paths = ['./resources/managers/localizationManager/test-json/$locale/$bundle.json'];
+    sut.paths = [window.basePath + '/test-json/$locale/$bundle.json'];
 
     var done = assert.async();
 
@@ -153,7 +197,7 @@ QUnit.test("test-json", function(assert){
 
     // Test ok values
     sut.locales = ['en_US', 'es_ES'];
-    sut.paths = ['./resources/managers/localizationManager/test-json/$locale/$bundle.json'];
+    sut.paths = [window.basePath + '/test-json/$locale/$bundle.json'];
 
     var done = assert.async(2);
 
@@ -167,7 +211,7 @@ QUnit.test("test-json", function(assert){
 
         // Verify defined attributes are still the same
         assert.ok(ArrayUtils.isEqualTo(sut.locales, ['en_US', 'es_ES']));
-        assert.ok(ArrayUtils.isEqualTo(sut.paths, ['./resources/managers/localizationManager/test-json/$locale/$bundle.json']));
+        assert.ok(ArrayUtils.isEqualTo(sut.paths, [window.basePath + '/test-json/$locale/$bundle.json']));
 
         // Test ES_ES
         sut.locales = ['es_ES', 'en_US'];
@@ -181,7 +225,7 @@ QUnit.test("test-json", function(assert){
 
         // Verify defined attributes are still the same
         assert.ok(ArrayUtils.isEqualTo(sut.locales, ['es_ES', 'en_US']));
-        assert.ok(ArrayUtils.isEqualTo(sut.paths, ['./resources/managers/localizationManager/test-json/$locale/$bundle.json']));
+        assert.ok(ArrayUtils.isEqualTo(sut.paths, [window.basePath + '/test-json/$locale/$bundle.json']));
 
         // Test tag that is missing everywhere
         assert.throws(function() {

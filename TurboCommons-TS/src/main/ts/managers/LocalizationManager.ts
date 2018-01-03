@@ -11,6 +11,7 @@
 import { StringUtils } from '../utils/StringUtils';
 import { ObjectUtils } from '../utils/ObjectUtils';
 import { ArrayUtils } from '../utils/ArrayUtils';
+import { JavaPropertiesObject } from '../model/JavaPropertiesObject';
 import { HTTPManager } from './HTTPManager';
 
 
@@ -32,7 +33,7 @@ export class LocalizationManager {
      * HELLO tag on the Greetings bundle. If the tag is not found for the specified locale and bundle, the same
      * search will be performed for the es_ES locale, and so, till a value is found or no more locales are defined.
      */
-    public locales: string[] = [];
+    locales: string[] = [];
 
 
     /**
@@ -57,26 +58,26 @@ export class LocalizationManager {
      *
      * Example: ['../locales/$locale/$bundle.json', 'src/resources/shared/locales/$bundle_$locale.properties']
      */
-    public paths: string[] = ['$locale/$bundle.json'];
+    paths: string[] = [];
 
 
     /**
-     * Specifies the string that will be outputed when a requested key is not found on a bundle.
+     * Defines the behaviour for get(), getStartCase(), etc... methods when a key is not found on
+     * a bundle or the bundle does not exist 
      *
-     * If this value is empty, all missing keys will return an empty value on get, getAllUpperCase, .. methods
-     * If this value contains a string, all missing keys will return it on get, getAllUpperCase, .. methods
-     *
-     * Wildcards can be used:
-     * - $key will be replaced with the key name
-     * - $exception will throw an exception
+     * If this value is empty, all missing keys will return an empty value
+     * If this value contains a string, all missing keys will return that string
+     * If this value contains a string with some of the following wildcards:
+     *    - $key will be replaced with the key name. For example: get("NAME") will output [NAME] if the key is not found and missingKeyFormat = '[$key]'
+     *    - $exception (This is the default value) will throw an exception with the problem cause description.
      */
-    public missingKeyFormat = '$exception';
+    missingKeyFormat = '$exception';
 
     
     /**
      * Enable this flag to load all specified paths as urls instead of file system paths
      */
-    public pathsAreUrls = true;
+    pathsAreUrls = true;
     
 
     /**
@@ -106,6 +107,16 @@ export class LocalizationManager {
         if(!StringUtils.isString(bundle) || StringUtils.isEmpty(bundle)){
             
             throw new Error('bundle must be a non empty string');
+        }
+        
+        if(this.locales.length <= 0){
+            
+            throw new Error('no locales defined');
+        }
+        
+        if(this.paths.length <= 0){
+            
+            throw new Error('no paths defined');
         }
         
         if(pathIndex >= this.paths.length){
@@ -190,7 +201,14 @@ export class LocalizationManager {
 
         if (Object.keys(this._loadedData).indexOf(bundle) === -1) {
 
-            throw new Error('Bundle <' + bundle + '> does not exist');
+            if(this.missingKeyFormat.indexOf('$exception') >= 0){
+            
+                throw new Error('Bundle <' + bundle + '> does not exist');
+            
+            }else{
+            
+                return this.missingKeyFormat.replace('$key', key);
+            }
         }
 
         // Store the specified bundle name as the last that's been used till now
@@ -211,11 +229,34 @@ export class LocalizationManager {
         if (this.missingKeyFormat.indexOf('$exception') >= 0) {
 
             throw new Error('key <' + key + '> not found');
-
-        }else {
-
-            return this.missingKeyFormat.replace('$key', key);
         }
+
+        return this.missingKeyFormat.replace('$key', key);
+    }
+    
+    
+    /**
+     * Get the translation for the given key and bundle as a string with all words first character capitalized 
+     * and all the rest of the word with lower case
+     *
+     * @see LocalizationManager.get
+     * @see StringUtils.formatCase
+     *
+     * @returns The localized Start case text
+     */
+    getStartCase(key: string, bundle = '') {
+
+        // TODO - replace all this code with:
+        // return StringUtils.formatCase(this.get(key, bundle), StringUtils.FORMAT_START_CASE);
+        // Once the StringUtils.formatCase is implemented!
+        const result = this.get(key, bundle).split(' ');
+
+        for (let i = 0; i < result.length; i++) {
+
+            result[i] = result[i].charAt(0).toUpperCase() + result[i].slice(1).toLowerCase();
+        }
+
+        return result.join(' ');
     }
 
 
@@ -223,6 +264,7 @@ export class LocalizationManager {
      * Get the translation for the given key and bundle as an all upper case string
      *
      * @see LocalizationManager.get
+     * @see StringUtils.formatCase
      *
      * @returns The localized upper case text
      */
@@ -236,6 +278,7 @@ export class LocalizationManager {
      * Get the translation for the given key and bundle as an all lower case string
      *
      * @see LocalizationManager.get
+     * @see StringUtils.formatCase
      *
      * @returns The localized lower case text
      */
@@ -251,11 +294,8 @@ export class LocalizationManager {
     }
 
 
-    protected parseProperties(data: string): Object {
+    protected parseProperties(data: string): JavaPropertiesObject {
 
-        // TODO
-        
-        return data;
+        return new JavaPropertiesObject(data);
     }
-
 }
