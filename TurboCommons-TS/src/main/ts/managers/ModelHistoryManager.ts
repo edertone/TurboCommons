@@ -109,6 +109,10 @@ export class ModelHistoryManager<T> {
     redo() {
 
         // TODO
+        // It seems that Proxy feature of ES6 allows us to detect object chages
+        // so we will be able to disable the redo after current state is modified.
+        // http://blog.revathskumar.com/2016/02/es6-observe-change-in-object-using-proxy.html
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy
     }
 
 

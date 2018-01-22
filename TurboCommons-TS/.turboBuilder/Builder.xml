@@ -1082,6 +1082,7 @@
 			<arg line="--js" />
 			<srcfile />
 			<arg line="--warning_level QUIET" />
+			<arg line="--language_out=ES5" />
 			<arg line="--js_output_file" />
 			<targetfile />
 

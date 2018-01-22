@@ -6,15 +6,14 @@ To publish the library to npm:
 
 2 - Create a folder on your desktop and add all files from dist/NNN/
 
-3 - Copy the package.json file from this folder to the created desktop folder
+3 - Copy the package.json file from this folder to each of the dist/NNN/ created folders
 
-4 - Add the readme.md file if exists
+4 - Add the readme.md file if exists to each of the dist/NNN/ folders
 
 5 - Update the version number on the package.json file
 
 6 - Update the project name on the package.json file:
 	turbocommons-ts
-	turbocommons-es3
 	turbocommons-es5
 	turbocommons-es6
 

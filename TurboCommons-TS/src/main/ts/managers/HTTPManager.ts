@@ -257,7 +257,7 @@ export class HTTPManager{
         
         if(ObjectUtils.isObject(object)){
         
-            if(object.constructor.name === 'HashMapObject'){
+            if(object instanceof HashMapObject){
                 
                 keys = (object as HashMapObject).getKeys();
                 values = (object as HashMapObject).getValues();
