@@ -68,15 +68,15 @@ var org_turboCommons_test_serializationUtils;
 
 
 
-QUnit.module("SerializationUtilsTest", {
+QUnit.module("SerializationManagerTest", {
     
     beforeEach : function(){
 
         window.emptyValues = [null, '', [], {}, '     ', "\n\n\n", 0];
         window.emptyValuesCount = window.emptyValues.length;     
         
+        window.sut = new org_turbocommons.SerializationManager(); 
         window.ObjectUtils = org_turbocommons.ObjectUtils;
-        window.SerializationUtils = org_turbocommons.SerializationUtils; 
         
         window.SingleProp = org_turboCommons_test_serializationUtils.SingleProp;
         window.NonTypedProps = org_turboCommons_test_serializationUtils.NonTypedProps;
@@ -89,8 +89,8 @@ QUnit.module("SerializationUtilsTest", {
         delete window.emptyValues;
         delete window.emptyValuesCount;
         
+        delete window.sut;
         delete window.ObjectUtils;
-        delete window.SerializationUtils;
         
         delete window.SingleProp;
         delete window.NonTypedProps;
@@ -182,184 +182,174 @@ QUnit.todo("javaPropertiesObjectToString", function(assert){
 QUnit.test("jsonToClass", function(assert){
 
     // Test empty values on method parameters
-    assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass('{}', {}, false), {}));
-    assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass('{}', {}, true), {}));
+    assert.ok(ObjectUtils.isEqualTo(sut.jsonToClass('{}', {}), {}));
     
     for (var i = 0; i < emptyValuesCount; i++) {
         
         assert.throws(function() {
-            SerializationUtils.jsonToClass(emptyValues[i], {}, true);
+            sut.jsonToClass(emptyValues[i], {});
         });
         
         if(!ObjectUtils.isObject(emptyValues[i])){
             
             assert.throws(function() {
-                SerializationUtils.jsonToClass('{}', emptyValues[i], true);
+                sut.jsonToClass('{}', emptyValues[i]);
             });
         }
-        
-        assert.throws(function() {
-            SerializationUtils.jsonToClass('{}', {}, emptyValues[i]);
-        });
     }
     
     for(var i = 0; i < 2; i++){
          
-        var strictValue = ((i === 0) ? false : true);
+        sut.strictMode = ((i === 0) ? false : true);
         
         // Test that null values on source json keys are assigned to destination properties
-        assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
+        assert.ok(ObjectUtils.isEqualTo(sut.jsonToClass(
                 '{"boolean": null, "number": null, "string": null, "obj": null, ' +
                 '"someClass": null, "arr": null}',
-                new BasicTypeProps(),
-                strictValue),
+                new BasicTypeProps()),
                 {boolean: false, number: 0, string: "", obj: {},
                     someClass: {nullProp: null, undefinedProp: undefined}, arr: []}));
     
         // Test that non typed properties accept being defined with any value
-        assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
-                '{"undefinedProp": false}',
-                new NonTypedProps(),
-                false),
-                {nullProp: null, undefinedProp: false}));
+        if(!sut.strictMode){
+            
+            assert.ok(ObjectUtils.isEqualTo(sut.jsonToClass(
+                    '{"undefinedProp": false}',
+                    new NonTypedProps()),
+                    {nullProp: null, undefinedProp: false}));
+        }
         
-        assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
+        assert.ok(ObjectUtils.isEqualTo(sut.jsonToClass(
                 '{"nullProp": 2, "undefinedProp": "hello"}',
-                new NonTypedProps(),
-                strictValue),
+                new NonTypedProps()),
                 {nullProp: 2, undefinedProp: "hello"}));
         
-        assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
+        assert.ok(ObjectUtils.isEqualTo(sut.jsonToClass(
                 '{"nullProp": [1, 2, 3], "undefinedProp": {"a": 1, "b": 2}}',
-                new NonTypedProps(),
-                strictValue),
+                new NonTypedProps()),
                 {"nullProp": [1, 2, 3], "undefinedProp": {a: 1, b: 2}}));
           
         // Test that typed properties accept only values of their own type
-        assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
+        assert.ok(ObjectUtils.isEqualTo(sut.jsonToClass(
                 '{"boolean": true, "number": 1230.1, "string": "hello", "obj": {"b": 2}, ' +
                 '"someClass": {"nullProp": 1, "undefinedProp": 2}, "arr": [1,2,3,4]}',
-                new BasicTypeProps(),
-                strictValue),
+                new BasicTypeProps()),
                 {boolean: true, number: 1230.1, string: "hello", obj: {"b": 2},
                     someClass: {nullProp: 1, undefinedProp: 2}, arr: [1,2,3,4]}));
         
-        var value = SerializationUtils.jsonToClass(
-                '{"boolean": false, "number": 25, "string": "h", "obj": {}, ' +
-                '"someClass": {"noProp": 1}, "arr": ["a"]}',
-                new BasicTypeProps(),
-                false);
+        if(!sut.strictMode){
         
-        assert.strictEqual(value.someClass.constructor.name, 'NonTypedProps');
-                
-        assert.ok(ObjectUtils.isEqualTo(value,
-                {boolean: false, number: 25, string: "h", obj: {},
-                    someClass: {nullProp: null, undefinedProp: undefined}, arr: ["a"]}));
+            var value = sut.jsonToClass(
+                    '{"boolean": false, "number": 25, "string": "h", "obj": {}, ' +
+                    '"someClass": {"noProp": 1}, "arr": ["a"]}',
+                    new BasicTypeProps());
+            
+            assert.strictEqual(value.someClass.constructor.name, 'NonTypedProps');
+                    
+            assert.ok(ObjectUtils.isEqualTo(value,
+                    {boolean: false, number: 25, string: "h", obj: {},
+                        someClass: {nullProp: null, undefinedProp: undefined}, arr: ["a"]}));
+        }
         
         assert.throws(function() {
-            SerializationUtils.jsonToClass(
+            sut.jsonToClass(
                     '{"boolean": 1, "number": 1230.1, "string": "hello", "obj": {"b": 2}, ' +
                     '"someClass": {"nullProp": 1, "undefinedProp": 2}, "arr": [1,2,3,4]}',
-                    new BasicTypeProps(),
-                    strictValue);
+                    new BasicTypeProps());
         }, /expected to be boolean/);
         
         assert.throws(function() {
-            SerializationUtils.jsonToClass(
+            sut.jsonToClass(
                     '{"boolean": false, "number": true, "string": "hello", "obj": {"b": 2}, ' +
                     '"someClass": {"nullProp": 1, "undefinedProp": 2}, "arr": [1,2,3,4]}',
-                    new BasicTypeProps(),
-                    strictValue);
+                    new BasicTypeProps());
         }, /expected to be number/);
         
         assert.throws(function() {
-            SerializationUtils.jsonToClass(
+            sut.jsonToClass(
                     '{"boolean": false, "number": -10, "string": 1, "obj": {"b": 2}, ' +
                     '"someClass": {"nullProp": 1, "undefinedProp": 2}, "arr": [1,2,3,4]}',
-                    new BasicTypeProps(),
-                    strictValue);
+                    new BasicTypeProps());
         }, /expected to be string/);
         
         assert.throws(function() {
-            SerializationUtils.jsonToClass(
+            sut.jsonToClass(
                     '{"boolean": false, "number": -10, "string": "", "obj": true, ' +
                     '"someClass": {"nullProp": 1, "undefinedProp": 2}, "arr": [1,2,3,4]}',
-                    new BasicTypeProps(),
-                    strictValue);
+                    new BasicTypeProps());
         }, /expected to be Object/);
         
         assert.throws(function() {
-            SerializationUtils.jsonToClass(
+            sut.jsonToClass(
                     '{"boolean": false, "number": -10, "string": "", "obj": {}, ' +
                     '"someClass": 1, "arr": [1,2,3,4]}',
-                    new BasicTypeProps(),
-                    strictValue);
+                    new BasicTypeProps());
         }, /expected to be NonTypedProps/);
         
-        assert.throws(function() {
-            SerializationUtils.jsonToClass(
-                    '{"boolean": false, "number": -10, "string": "", "obj": {}, ' +
-                    '"someClass": {"prop": true}, "arr": [1,2,3,4]}',
-                    new BasicTypeProps(),
-                    true);
-        }, /keys do not match NonTypedProps/);
+        if(sut.strictMode){
+        
+            assert.throws(function() {
+                sut.jsonToClass(
+                        '{"boolean": false, "number": -10, "string": "", "obj": {}, ' +
+                        '"someClass": {"prop": true}, "arr": [1,2,3,4]}',
+                        new BasicTypeProps());
+            }, /keys do not match NonTypedProps/);            
+        }
         
         assert.throws(function() {
-            SerializationUtils.jsonToClass(
+            sut.jsonToClass(
                     '{"boolean": false, "number": -10, "string": "", "obj": {}, ' +
                     '"someClass": {"nullProp": true, "undefinedProp": "a"}, "arr": "er"}',
-                    new BasicTypeProps(),
-                    strictValue);
+                    new BasicTypeProps());
         }, /expected to be array/);
         
         // Test class and JSON with different keys and properties
-        assert.throws(function() {
-            SerializationUtils.jsonToClass(
-                    '{"foo1":"value", "oneProp":"value"}',
-                    new SingleProp(),
-                    true);
-        }, /keys do not match/);
+        if(sut.strictMode){
+            
+            assert.throws(function() {
+                sut.jsonToClass(
+                        '{"foo1":"value", "oneProp":"value"}',
+                        new SingleProp());
+            }, /keys do not match/);
         
-        assert.throws(function() {
-            SerializationUtils.jsonToClass(
-                    '{"boolean":true, "string":"hello"}',
-                    new BasicTypeProps(),
-                    true);
-        }, /keys do not match/);
+            assert.throws(function() {
+                sut.jsonToClass(
+                        '{"boolean":true, "string":"hello"}',
+                        new BasicTypeProps());
+            }, /keys do not match/);
+            
+            assert.throws(function() {
+                sut.jsonToClass(
+                        '{"foo1":"value"}',
+                        new SingleProp());
+            }, /<foo1> not found/);
+        }
         
-        assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
+        if(!sut.strictMode){
+        
+            assert.ok(ObjectUtils.isEqualTo(sut.jsonToClass(
                 '{"foo1":"value", "foo2":"value"}',
-                new SingleProp(),
-                false), 
+                new SingleProp()), 
             {oneProp:'hello'}));
         
-        assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
-                '{"foo1":"value"}',
-                new SingleProp(),
-                false), 
-            {oneProp:'hello'}));
-        
-        assert.ok(ObjectUtils.isEqualTo(SerializationUtils.jsonToClass(
-                '{"oneProp":"value", "nonexistant":"value"}',
-                new SingleProp(),
-                false), 
-            {oneProp:'value'}));
-        
-        assert.throws(function() {
-            SerializationUtils.jsonToClass(
+            assert.ok(ObjectUtils.isEqualTo(sut.jsonToClass(
                     '{"foo1":"value"}',
-                    new SingleProp(),
-                    true);
-        }, /<foo1> not found/);
+                    new SingleProp()), 
+                {oneProp:'hello'}));
+            
+            assert.ok(ObjectUtils.isEqualTo(sut.jsonToClass(
+                    '{"oneProp":"value", "nonexistant":"value"}',
+                    new SingleProp()), 
+                {oneProp:'value'}));
+        }
         
         // Test properties with typed and non typed array values
-        var value = SerializationUtils.jsonToClass(
+        var value = sut.jsonToClass(
                 '{"nonTypedArray": [1,"a", null], "boolArray": [true,false], ' +
                 '"numberArray": [1,3,5], "stringArray": ["hello","home"], ' +
                 '"objectArray": [{"b": 2}], "classArray": [{"oneProp": "a"}, {"oneProp": "b"}], ' +
                 '"arrayArray": [[1,2,3], ["a","b","c"]]}',
-                new TypedArrayProps(),
-                strictValue);
+                new TypedArrayProps());
                 
         assert.ok(ObjectUtils.isEqualTo(value,
                 {nonTypedArray: [1,"a", null], boolArray: [true,false], 
@@ -369,53 +359,50 @@ QUnit.test("jsonToClass", function(assert){
         
         assert.strictEqual(value.classArray[0].constructor.name, 'SingleProp');
         
-        assert.throws(function() {
-            SerializationUtils.jsonToClass(
-                    '{"boolArray": [true,false,0]}',
-                    new TypedArrayProps(),
-                    false);
-        }, /but received number/);
+        if(!sut.strictMode){
+            
+            assert.throws(function() {
+                sut.jsonToClass(
+                        '{"boolArray": [true,false,0]}',
+                        new TypedArrayProps());
+            }, /but received number/);
+            
+            assert.throws(function() {
+                sut.jsonToClass(
+                        '{"numberArray": [1,2,"hello"]}',
+                        new TypedArrayProps());
+            }, /but received string/);
+            
+            assert.throws(function() {
+                sut.jsonToClass(
+                        '{"stringArray": [1,"string",5]}',
+                        new TypedArrayProps());
+            }, /but received number/);
+            
+            assert.throws(function() {
+                sut.jsonToClass(
+                        '{"objectArray": [{"a":1},"string"]}',
+                        new TypedArrayProps());
+            }, /but received string/);
+            
+            assert.throws(function() {
+                sut.jsonToClass(
+                        '{"arrayArray": ["string"]}',
+                        new TypedArrayProps());
+            }, /but received string/);
+        }
         
-        assert.throws(function() {
-            SerializationUtils.jsonToClass(
-                    '{"numberArray": [1,2,"hello"]}',
-                    new TypedArrayProps(),
-                    false);
-        }, /but received string/);
-        
-        assert.throws(function() {
-            SerializationUtils.jsonToClass(
-                    '{"stringArray": [1,"string",5]}',
-                    new TypedArrayProps(),
-                    false);
-        }, /but received number/);
-        
-        assert.throws(function() {
-            SerializationUtils.jsonToClass(
-                    '{"objectArray": [{"a":1},"string"]}',
-                    new TypedArrayProps(),
-                    false);
-        }, /but received string/);
-        
-        assert.throws(function() {
-            SerializationUtils.jsonToClass(
-                    '{"arrayArray": ["string"]}',
-                    new TypedArrayProps(),
-                    false);
-        }, /but received string/);
+        // TODO - Test serialization with classes that contain methods
+        // What should be the behaviour when destination class contains properties but also methods!?!?!?
     }
 
     // Test exceptions caused by wrong type parameters
     assert.throws(function() {
-        SerializationUtils.jsonToClass('hello', {}, true);
+        sut.jsonToClass('hello', {});
     });
     
     assert.throws(function() {
-        SerializationUtils.jsonToClass('{}', [1,2,3], true);
-    });
-    
-    assert.throws(function() {
-        SerializationUtils.jsonToClass('{}', {}, 'hello');
+        sut.jsonToClass('{}', [1,2,3]);
     });
 });
 

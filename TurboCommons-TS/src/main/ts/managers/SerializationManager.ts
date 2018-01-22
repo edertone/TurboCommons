@@ -8,19 +8,28 @@
  */
  
 
-import { NumericUtils } from './NumericUtils';
-import { ValidationManager } from "../managers/ValidationManager";
+import { NumericUtils } from '../utils/NumericUtils';
+import { ValidationManager } from "./ValidationManager";
 import { HashMapObject } from '../model/HashMapObject';
-import { StringUtils } from './StringUtils';
-import { ArrayUtils } from './ArrayUtils';
-import { ObjectUtils } from './ObjectUtils';
+import { StringUtils } from '../utils/StringUtils';
+import { ArrayUtils } from '../utils/ArrayUtils';
+import { ObjectUtils } from '../utils/ObjectUtils';
 
     
 /**
  * Contains methods that allow us to convert data from one complex data structure 
  * format to another complex data structure format
  */  
-export class SerializationUtils {
+export class SerializationManager {
+    
+    
+    /**
+     * When set to true, the structures that are passed as serialization sources must match the structures 
+     * that are passed as serialization targets.
+     * TODO - explicar millor aixo: all keys that are defined on the serialization sources must exist on the serialization targets.
+     * Otherwise an exception will be thrown
+     */
+    strictMode = true;
     
     
     /**
@@ -30,14 +39,14 @@ export class SerializationUtils {
      * 
      * @returns A valid JSON string containing all the data on the provided class
      */
-    public static classToJson(classInstance:any){
+    classToJson(classInstance:any){
 
         return JSON.stringify(classInstance);
     }
     
     
     // TODO
-    public static classToObject(){
+    classToObject(){
 
         // TODO
     }
@@ -49,11 +58,10 @@ export class SerializationUtils {
      *
      * @param hashMap An object that contains data which is organized as a hash map. For example: An associative array or an object with key / value pairs
      * @param classInstance A class instance that will be filled with all the values that are found on the hashmap (the instance is modified by this method and all values erased).
-     * @param strictMode If set to true, all keys that are found on the hashmap instance must exist on the class instance, otherwise an exception will be thrown
      *
      * @return The provided class instance with all its properties filled with the corresponding hashmap values
      */
-    public static hashMapObjectToClass<T>(hashMap:HashMapObject, classInstance:T, strictMode = true): T{
+    hashMapObjectToClass<T>(hashMap:HashMapObject, classInstance:T): T{
 
         // TODO - implement this and translate it to PHP
 //        let keys = hashMap.getKeys(); 
@@ -71,7 +79,7 @@ export class SerializationUtils {
         
 
     // TODO - review from PHP
-    public static javaPropertiesObjectToString(){
+    javaPropertiesObjectToString(){
 
         // TODO - implement this translating from PHP
     }
@@ -85,13 +93,12 @@ export class SerializationUtils {
      * 
      * @param string A string containing valid json data
      * @param classInstance A class instance that will be filled with all the json data (the instance is modified by this method and all values erased).
-     * @param strictMode If set to true, all keys that are found on the json data must exist on the class instance, and viceversa. Otherwise an exception will be thrown
      *
      * @return The provided class instance with all its properties filled with the corresponding json values
      */
-    public static jsonToClass<T>(string:string, classInstance:T, strictMode = true): T{
+    jsonToClass<T>(string:string, classInstance:T): T{
 
-        return SerializationUtils.objectToClass(JSON.parse(string), classInstance, strictMode);
+        return this.objectToClass(JSON.parse(string), classInstance);
     }
     
     
@@ -108,23 +115,17 @@ export class SerializationUtils {
      * 
      * @param object An object containing the source data to serialize
      * @param classInstance An empty class instance that will be filled with all the values from the object
-     * @param strictMode If set to true, all keys that are found on the object data must exist on the class instance, and viceversa. Otherwise an exception will be thrown
      *
      * @return The provided class instance with all its properties filled with the corresponding object values
      */
-    public static objectToClass<T>(object:Object, classInstance:any, strictMode = true): any{
+    objectToClass<T>(object:Object, classInstance:any): any{
 
-        if(typeof strictMode !== 'boolean'){
-            
-            throw new Error("strictMode must be boolean");
-        }
-        
         let objectKeys = ObjectUtils.getKeys(object);
         let classInstanceName = (classInstance.constructor as any).name;
         let classInstanceKeys = ObjectUtils.getKeys(classInstance);
         
         // On strict mode, verify that both objects have the same number of keys
-        if(strictMode && objectKeys.length !== classInstanceKeys.length){
+        if(this.strictMode && objectKeys.length !== classInstanceKeys.length){
                 
             throw new Error("(strict mode): [" + objectKeys.join(',') + "] keys do not match " + classInstanceName + " props: [" + classInstanceKeys.join(',') + "]");
         }
@@ -135,7 +136,7 @@ export class SerializationUtils {
             // Check if key exists on class instance
             if(!classInstance.hasOwnProperty(key)){
                 
-                if(strictMode){
+                if(this.strictMode){
                     
                     throw new Error("(strict mode): <" + key + "> not found in " + classInstanceName);
                 }
@@ -179,7 +180,7 @@ export class SerializationUtils {
                             
                             if(isDefaultElementAClass){
                                 
-                                o = SerializationUtils.objectToClass(o, ObjectUtils.clone(defaultElement), strictMode);
+                                o = this.objectToClass(o, ObjectUtils.clone(defaultElement));
                                 
                             }else{
                                 
@@ -206,7 +207,7 @@ export class SerializationUtils {
                         
                     if(classInstance[key].constructor.name !== 'Object'){
                         
-                        value = SerializationUtils.objectToClass(value, classInstance[key], strictMode);
+                        value = this.objectToClass(value, classInstance[key]);
                     }
                 }
                 
@@ -225,7 +226,7 @@ export class SerializationUtils {
     
     
     // TODO - review from PHP
-    public static stringToJavaPropertiesObject(string: string){
+    stringToJavaPropertiesObject(string: string){
 
         // TODO - review from PHP
     }
@@ -238,7 +239,7 @@ export class SerializationUtils {
      *
      * @return The representation of the given string as an XmlObject instance
      */
-    public static stringToXmlObject(string : string){
+    stringToXmlObject(string : string){
 
         if(StringUtils.isEmpty(string)){
 
@@ -246,7 +247,7 @@ export class SerializationUtils {
         }
         
      // TODO - implement this and translate it to PHP
-//        return new XMLObject($string);
+    //        return new XMLObject($string);
     }
 
 
@@ -257,7 +258,7 @@ export class SerializationUtils {
      *
      * @return The textual valid representation of the given XMLObject
      */
-    public static xmlObjectToString(xml: any){
+    xmlObjectToString(xml: any){
 
         // TODO - force XMLObject type to the method parameter
         return xml.toString();

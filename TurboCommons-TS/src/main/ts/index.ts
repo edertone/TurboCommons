@@ -12,6 +12,8 @@
 export { BrowserManager } from './managers/BrowserManager';
 export { HTTPManager } from './managers/HTTPManager';
 export { LocalizationManager} from './managers/LocalizationManager';
+export { ModelHistoryManager} from './managers/ModelHistoryManager';
+export { SerializationManager } from './managers/SerializationManager';
 export { ValidationManager} from './managers/ValidationManager';
 
 // Model package
@@ -27,5 +29,4 @@ export { ConversionUtils } from './utils/ConversionUtils';
 export { EncodingUtils } from './utils/EncodingUtils';
 export { NumericUtils } from './utils/NumericUtils';
 export { ObjectUtils } from './utils/ObjectUtils';
-export { SerializationUtils } from './utils/SerializationUtils';
 export { StringUtils } from './utils/StringUtils';

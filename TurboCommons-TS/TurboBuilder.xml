@@ -9,8 +9,6 @@
             compilerStrict="true"
             compilerSourceMap="true">
         
-            <CompilerTarget target="ES3" mergedFileName="TurboCommons-ES3" globalVar="org_turbocommons" />
-            
             <CompilerTarget target="ES5" mergedFileName="TurboCommons-ES5" globalVar="org_turbocommons" />
             
             <CompilerTarget target="ES6" mergedFileName="TurboCommons-ES6" globalVar="org_turbocommons" />
@@ -42,7 +40,7 @@
 	<Test>
 	
 		<Ts enabled="true"
-			targets="ES3,ES5,ES6"
+			targets="ES5,ES6"
 			localServerPath="C:\xampp\htdocs\unitTests"
 			localServerUrl="http://localhost/unitTests">
 			
