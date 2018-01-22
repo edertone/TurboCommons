@@ -25,6 +25,8 @@ To publish the library to npm:
 9 - Generate online html docs:
 	- Open a cmd at the root of the project
 	- Install typedoc if necessary
+	- tsconfig.json must be present at the same folder. Coy it to the project root temporarily
 	- typedoc --name turbocommons --module commonjs --mode modules --out target/docs/ src/main/ts
+	- remove temporary tsconfig.json
 	
 10 - Upload the new version to turbocommons website for direct download
