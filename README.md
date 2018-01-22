@@ -23,7 +23,6 @@ This library tries to cover the following development areas:
 
 - Php
 - Typescript
-- Javascript 3
 - Javascript 5
 - Javascript 6
 
@@ -43,13 +42,6 @@ $n = StringUtils::countWords("word1 word2 word3");
 npm install turbocommons-ts
 import { StringUtils } from 'turbocommons-ts';
 let n = StringUtils.countWords("word1 word2 word3");
-```
-- Javascript 3:
-```
-npm install turbocommons-es3
-<script src="turbocommons-es3/TurboCommons-ES3-X.X.X.js"></script>
-var StringUtils = org_turbocommons.StringUtils;
-var n = StringUtils.countWords("word1 word2 word3");
 ```
 - Javascript 5:
 ```
