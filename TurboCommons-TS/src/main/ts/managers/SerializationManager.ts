@@ -25,9 +25,8 @@ export class SerializationManager {
     
     /**
      * When set to true, the structures that are passed as serialization sources must match the structures 
-     * that are passed as serialization targets.
-     * TODO - explicar millor aixo: all keys that are defined on the serialization sources must exist on the serialization targets.
-     * Otherwise an exception will be thrown
+     * that are passed as serialization targets: All keys or properties that are defined on the serialization sources
+     * must exist on the serialization targets, otherwise an exception will be thrown
      */
     strictMode = true;
     
