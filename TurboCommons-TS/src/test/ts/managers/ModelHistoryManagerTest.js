@@ -14,11 +14,21 @@ QUnit.module("ModelHistoryManagerTest", {
     beforeEach : function(){
 
         window.sut = new org_turbocommons.ModelHistoryManager();
+        
+        window.ObjectUtils = org_turbocommons.ObjectUtils;
+        
+        window.emptyValues = [null, '', [], {}, '     ', "\n\n\n", 0];
+        window.emptyValuesCount = window.emptyValues.length;
     },
 
     afterEach : function(){
 
         delete window.sut;
+
+        delete window.ObjectUtils;
+        
+        delete window.emptyValues;
+        delete window.emptyValuesCount;
     }
 });
 
@@ -26,45 +36,164 @@ QUnit.module("ModelHistoryManagerTest", {
 /**
  * constructor
  */
-QUnit.todo("constructor", function(assert){
+QUnit.test("constructor", function(assert){
+
+    // Nothing to test
+    assert.ok(true);
+});
+
+
+/**
+ * setInitialState
+ */
+QUnit.test("setInitialState", function(assert){
 
     // Test empty values
-    // TODO
+    for (var i = 0; i < window.emptyValuesCount; i++) {
+
+        if(ObjectUtils.isObject(window.emptyValues[i]) && 
+                ObjectUtils.isEqualTo(window.emptyValues[i], {})){
+            
+            sut.setInitialState(window.emptyValues[i]);
+            
+            assert.ok(ObjectUtils.isEqualTo(sut.get, {}));
+                
+        }else{
+        
+            assert.throws(function() {
+                sut.setInitialState(window.emptyValues[i]);
+            }, /Invalid instance value/);
+        }
+        
+    }
 
     // Test ok values
-    // TODO
+    sut.setInitialState({a:1, b:2});
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:1, b:2}));
+    
+    sut.get.a = 2;
+    sut.get.b = 3;
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:2, b:3}));
 
+    sut.setInitialState({c:3, d:4});
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {c:3, d:4}));
+    
     // Test wrong values
-    // TODO
+    // Not necessary
 
     // Test exceptions
-    // TODO
+    // Tested by empty values
 });
 
 
 /**
  * get
  */
-QUnit.todo("get", function(assert){
+QUnit.test("get", function(assert){
 
     // Test empty values
-    // TODO
+    // Not necessary
 
     // Test ok values
-    // TODO
-
+    sut.setInitialState({a:1, b:2});
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:1, b:2}));
+    
+    sut.get.a = 3;
+    sut.get.b = 4;
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:3, b:4}));
+    
+    sut.saveSnapshot();
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:3, b:4}));
+    
+    sut.get.a = 5;
+    sut.get.b = 6;
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:5, b:6}));
+    
+    sut.undo();
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:3, b:4}));
+    
+    sut.undo();
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:1, b:2}));
+    
+    sut.undo();
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:1, b:2}));
+    
     // Test wrong values
-    // TODO
+    // Not necessary
 
     // Test exceptions
-    // TODO
+    // Not necessary
 });
 
 
 /**
  * snapshots
  */
-QUnit.todo("snapshots", function(assert){
+QUnit.test("snapshots", function(assert){
+
+    // Test empty values
+    // Not necessary
+
+    // Test ok values
+    sut.setInitialState({a:1, b:2});
+    
+    sut.saveSnapshot();
+    sut.saveSnapshot();
+    sut.saveSnapshot();
+    assert.ok(sut.snapshots.length === 0);
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:1, b:2}));
+    
+    sut.get.a = 3;
+    assert.ok(sut.snapshots.length === 0);
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:3, b:2}));
+    sut.saveSnapshot();
+    assert.ok(sut.snapshots.length === 1);
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:3, b:2}));
+    
+    sut.get.a = 4;
+    assert.ok(sut.snapshots.length === 1);
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:4, b:2}));
+    sut.saveSnapshot();
+    sut.saveSnapshot();
+    sut.saveSnapshot();
+    assert.ok(sut.snapshots.length === 2);
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:4, b:2}));
+    
+    sut.get.b = 5;
+    assert.ok(sut.snapshots.length === 2);
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:4, b:5}));
+    sut.saveSnapshot();
+    assert.ok(sut.snapshots.length === 3);
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:4, b:5}));
+    sut.saveSnapshot();
+    assert.ok(sut.snapshots.length === 3);
+    
+    sut.undo();
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:4, b:2}));
+    assert.ok(sut.snapshots.length === 1);
+    
+    sut.get.b = 6;
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:4, b:6}));
+    sut.saveSnapshot();
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:4, b:6}));
+    assert.ok(sut.snapshots.length === 2);
+    
+    sut.undoAll();
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:1, b:2}));
+    assert.ok(sut.snapshots.length === 0);
+
+    // Test wrong values
+    // Not necessary
+
+    // Test exceptions
+    // Not necessary
+});
+
+
+/**
+ * getSnapshotsByTag
+ */
+QUnit.todo("getSnapshotsByTag", function(assert){
 
     // Test empty values
     // TODO
