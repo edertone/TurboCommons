@@ -101,6 +101,11 @@ export class ModelHistoryManager<T> {
      */
     get get(): T {
 
+        if(!ObjectUtils.isObject(this._currentState)){
+        
+            throw new Error('Undefined initial state');
+        }
+        
         return this._currentState;
     }
 
@@ -191,6 +196,11 @@ export class ModelHistoryManager<T> {
      */
     get isUndoPossible() {
 
+        if(!ObjectUtils.isObject(this._currentState)){
+            
+            return false;
+        }
+        
         if(this._snapshots.length > 0){
             
             return true;

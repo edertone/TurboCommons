@@ -14,7 +14,9 @@ QUnit.module("ModelHistoryManagerTest", {
     beforeEach : function(){
 
         window.sut = new org_turbocommons.ModelHistoryManager();
+        window.ModelHistoryManager = org_turbocommons.ModelHistoryManager;
         
+        window.ArrayUtils = org_turbocommons.ArrayUtils;
         window.ObjectUtils = org_turbocommons.ObjectUtils;
         
         window.emptyValues = [null, '', [], {}, '     ', "\n\n\n", 0];
@@ -24,7 +26,9 @@ QUnit.module("ModelHistoryManagerTest", {
     afterEach : function(){
 
         delete window.sut;
+        delete window.ModelHistoryManager;
 
+        delete window.ArrayUtils;
         delete window.ObjectUtils;
         
         delete window.emptyValues;
@@ -122,7 +126,11 @@ QUnit.test("get", function(assert){
     // Not necessary
 
     // Test exceptions
-    // Not necessary
+    sut = new ModelHistoryManager();
+    
+    assert.throws(function() {
+        sut.get;
+    }, /Undefined initial state/);
 });
 
 
@@ -186,14 +194,16 @@ QUnit.test("snapshots", function(assert){
     // Not necessary
 
     // Test exceptions
-    // Not necessary
+    sut = new ModelHistoryManager();
+    
+    assert.ok(ArrayUtils.isEqualTo(sut.snapshots, []));
 });
 
 
 /**
  * getSnapshotsByTag
  */
-QUnit.todo("getSnapshotsByTag", function(assert){
+QUnit.test("getSnapshotsByTag", function(assert){
 
     // Test empty values
     // TODO
@@ -212,7 +222,7 @@ QUnit.todo("getSnapshotsByTag", function(assert){
 /**
  * saveSnapShot
  */
-QUnit.todo("saveSnapShot", function(assert){
+QUnit.test("saveSnapShot", function(assert){
 
     // Test empty values
     // TODO
@@ -231,7 +241,65 @@ QUnit.todo("saveSnapShot", function(assert){
 /**
  * isUndoPossible
  */
-QUnit.todo("isUndoPossible", function(assert){
+QUnit.test("isUndoPossible", function(assert){
+
+    // Test empty values
+    // Not necessary
+
+    // Test ok values
+    assert.ok(!sut.isUndoPossible);
+    
+    sut.setInitialState({a:1, b:2});
+    
+    sut.saveSnapshot();
+    sut.saveSnapshot();
+    assert.ok(!sut.isUndoPossible);
+
+    sut.get.a = 3;
+    assert.ok(sut.isUndoPossible);
+    sut.saveSnapshot();
+    assert.ok(sut.isUndoPossible);
+
+    sut.get.a = 4;
+    assert.ok(sut.isUndoPossible);
+    sut.saveSnapshot();
+    assert.ok(sut.isUndoPossible);
+    assert.ok(sut.snapshots.length === 2);
+    
+    sut.undoAll();
+    assert.ok(!sut.isUndoPossible);
+    assert.ok(sut.snapshots.length === 0);
+    
+    sut.saveSnapshot();
+    assert.ok(!sut.isUndoPossible);
+    
+    sut.get.b = 3;
+    assert.ok(sut.isUndoPossible);
+    
+    sut.saveSnapshot();
+    assert.ok(sut.isUndoPossible);
+    
+    sut.undo();
+    assert.ok(!sut.isUndoPossible);
+    
+    sut.get.b = 5;
+    assert.ok(sut.isUndoPossible);
+    
+    sut.saveSnapshot();
+    assert.ok(sut.isUndoPossible);
+    
+    // Test wrong values
+    // Not necessary
+
+    // Test exceptions
+    // Not necessary
+});
+
+
+/**
+ * undo
+ */
+QUnit.test("undo", function(assert){
 
     // Test empty values
     // TODO
@@ -248,9 +316,9 @@ QUnit.todo("isUndoPossible", function(assert){
 
 
 /**
- * undo
+ * undoAll
  */
-QUnit.todo("undo", function(assert){
+QUnit.test("undoAll", function(assert){
 
     // Test empty values
     // TODO
@@ -270,25 +338,6 @@ QUnit.todo("undo", function(assert){
  * redo
  */
 QUnit.todo("redo", function(assert){
-
-    // Test empty values
-    // TODO
-
-    // Test ok values
-    // TODO
-
-    // Test wrong values
-    // TODO
-
-    // Test exceptions
-    // TODO
-});
-
-
-/**
- * reset
- */
-QUnit.todo("reset", function(assert){
 
     // Test empty values
     // TODO
