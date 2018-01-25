@@ -18,21 +18,47 @@ import { ObjectUtils } from '../utils/ObjectUtils';
  */
 export class ModelHistoryManager<T> {
 
+    
+    /**
+     * Specifies the maximum amount of snapshots that will be saved.
+     * If we try to save a snapshot and there are more than the ones specified here, the oldest one
+     * will be deleted and the next will be defined as the initial state.
+     * 
+     * Setting it to -1 (default) means infinite snapshots are possible.
+     * 
+     * Basically this property configures the maximun number of possible undos
+     */
+    maxSnapshots = -1;
+    
+    
+    /**
+     * An instance of the provided model class type that represents the state of the model at the very
+     * begining of its history. If we perform all the possible undo operations, the current instance will
+     * end being this one.
+     */
+    private _initialState: T;
+
 
     /**
-     * An instance that will be created with the provided model class type and contains
-     * the current model state.
+     * An instance of the provided model class type that represents the current model state
      */
-    private _instance: T;
+    private _currentState: T;
 
 
     /**
      * A list with all the model instances that are saved as snapshots
      */
-    private _instancesHistory: T[] = [];
+    private _snapshots: T[] = [];
+
 
     /**
-     * Manages the change history for a given model class.
+     * List with all the tags that have been applied to all the saved snapshots.
+     */
+    private _snapshotTags: string[] = [];
+
+
+    /**
+     * This is a fully featured undo / redo manager for any model class
      *
      * When ModelHistoryManager is created, we provide the class type we want to instantiate. ModelHistoryManager
      * takes the responsability of creating the class instance, and internally track any of the changes.
@@ -40,22 +66,24 @@ export class ModelHistoryManager<T> {
      * We will then be able to save snapshots and track the changes on the model class instance,
      * so we can perform undo and redo operations at any time to restore the class state to any of
      * the previously saved snapshots.
+     * 
+     * We can get the instance at the current time by using the 'get' property.
      *
-     * @param typeConstructor The class type that will be used by the ModelHistoryManager. A new fresh instance
-     * is inmediately created by this constructor.
+     * @param modelClassType The class type that will be used by the ModelHistoryManager. A new fresh instance
+     * is inmediately created by this constructor and used as the initial state.
      */
-    constructor(private typeConstructor: new () => T) {
+    constructor(private modelClassType: new () => T) {
 
-        this._instance = new this.typeConstructor();
+        this.reset();
     }
 
 
     /**
-     * The current model class instance
+     * The model class instance as it is now
      */
     get get(): T {
 
-        return this._instance;
+        return this._currentState;
     }
 
 
@@ -64,21 +92,79 @@ export class ModelHistoryManager<T> {
      * moment. Each one of the array elements is a model class instance containing all
      * the information that was available at the moment of taking the snapshot
      * 
-     * WARNING !! - This value must be used only to read data. Avoid direct modification of
-     * the returned array to prevent unwanted behaviours 
+     * WARNING !! - This value must be used only to read data. Any direct modification of
+     * the returned array will result in unwanted behaviours 
      */
     get snapshots() {
 
-        return this._instancesHistory;
+        return this._snapshots;
     }
 
+    
+    /**
+     * Defines the current model instance as the begining of the history management.
+     * This means the current model state will be considered as the starting point, and all undo
+     * operations will end here.
+     * 
+     * Calling this method also cleans all the saved snapshots, so in fact this method is used to
+     * generate a starting point of all the managed history
+     */
+     setInitialState() {
+
+        this._snapshotTags = [];      
+        this._snapshots = [];
+        
+        this._initialState = ObjectUtils.clone(this._currentState);
+    }
+    
+    
+    /**
+     * Obtain a list with all the snapshots that where saved under a specific tag or tags.
+     * 
+     * Only those snapshots that match the given tag or tags will be returned, in the same order as they
+     * were saved.
+     * 
+     * Each one of the array elements is a model class instance containing all
+     * the information that was available at the moment of taking the snapshot
+     * 
+     * WARNING !! - This value must be used only to read data. Any direct modification of
+     * the returned array will result in unwanted behaviours 
+     * 
+     * @param tag  A list of strings with all the tags for which we want to obtain their related snapshots
+     */
+     getSnapshotsByTag(tag:string[]) {
+
+         let result = []; 
+         
+         for (var i = 0; i < this._snapshots.length; i++) {
+    
+            if(tag.indexOf(this._snapshotTags[i]) >= 0){
+                
+                result.push(this._snapshots[i]);
+            }
+         }
+        
+        return result;
+    }
+     
 
     /**
-     * Save a copy of the current model class instance state so it can be later retrieved.
+     * Save a copy of the current model class instance state so it can be retrieved later.
+     * 
+     * @param tag A string we can use as 'label' or 'name' for the saved snapshot. This is useful if
+     * we later want to get a filtered list of snapshots
      */
-    saveSnapShot() {
+    saveSnapshot(tag = '') {
 
-        this._instancesHistory.push(ObjectUtils.clone(this._instance));
+        // If max undo limit is reached, remove first snapshot and set it as the initial state
+        if(this.maxSnapshots > 0 && this._snapshots.length >= this.maxSnapshots){
+            
+            this._snapshotTags.shift();
+            this._initialState = this._snapshots.shift();
+        }
+
+        this._snapshotTags.push(tag);
+        this._snapshots.push(ObjectUtils.clone(this._currentState));
     }
 
 
@@ -87,18 +173,33 @@ export class ModelHistoryManager<T> {
      */
     get isUndoPossible() {
 
-        return this._instancesHistory.length > 0;
+        if(this._snapshots.length > 0){
+            
+            return true;
+        }
+        
+        if(!ObjectUtils.isEqualTo(this._currentState, this._initialState)){
+        
+            return true;
+        }
+        
+        return false;
     }
 
 
     /**
-     * Revert the current model class state to the most recent of the saved snapshots.
+     * Revert the current model class state to the most recent of the saved snapshots or to the initial state
      */
     undo() {
 
-        if (this._instancesHistory.length > 0) {
-
-            this._instance = (this._instancesHistory.pop() as T);
+        if (this._snapshots.length > 0) {
+            
+            this._snapshotTags.pop();        
+            this._currentState = (this._snapshots.pop() as T);
+        
+        }else{
+            
+            this._currentState = ObjectUtils.clone(this._initialState);
         }
     }
 
@@ -117,15 +218,17 @@ export class ModelHistoryManager<T> {
 
 
     /**
-     * Clear all the snapshots, and reset the model class instance to a new fresh instance.
+     * Clear all the snapshots, and reset the model class instance to a new unmodified model class instance.
      *
      * This operation is definitive. After this method is called, all history and the model class
-     * instance current state will be lost forever.
+     * instance current state will be lost forever and the current model state will be reset to a clean instance.
      */
     reset() {
 
-        this._instance = new this.typeConstructor();
+        this._currentState = new this.modelClassType();
+        this._initialState = new this.modelClassType();
 
-        this._instancesHistory = [];
+        this._snapshotTags = [];      
+        this._snapshots = [];
     }
 }
