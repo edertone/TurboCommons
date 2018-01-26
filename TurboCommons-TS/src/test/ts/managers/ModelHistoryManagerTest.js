@@ -13,9 +13,10 @@
 QUnit.module("ModelHistoryManagerTest", {
     beforeEach : function(){
 
-        window.sut = new org_turbocommons.ModelHistoryManager();
+        window.sut = new org_turbocommons.ModelHistoryManager({a:0, b:0});
         window.ModelHistoryManager = org_turbocommons.ModelHistoryManager;
         
+        window.StringUtils = org_turbocommons.StringUtils;
         window.ArrayUtils = org_turbocommons.ArrayUtils;
         window.ObjectUtils = org_turbocommons.ObjectUtils;
         
@@ -28,6 +29,7 @@ QUnit.module("ModelHistoryManagerTest", {
         delete window.sut;
         delete window.ModelHistoryManager;
 
+        delete window.StringUtils;
         delete window.ArrayUtils;
         delete window.ObjectUtils;
         
@@ -53,34 +55,37 @@ QUnit.test("constructor", function(assert){
 QUnit.test("setInitialState", function(assert){
 
     // Test empty values
-    for (var i = 0; i < window.emptyValuesCount; i++) {
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:0, b:0}));
+    sut.setInitialState();
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:0, b:0}));
 
-        if(ObjectUtils.isObject(window.emptyValues[i]) && 
-                ObjectUtils.isEqualTo(window.emptyValues[i], {})){
-            
-            sut.setInitialState(window.emptyValues[i]);
-            
-            assert.ok(ObjectUtils.isEqualTo(sut.get, {}));
-                
-        }else{
-        
-            assert.throws(function() {
-                sut.setInitialState(window.emptyValues[i]);
-            }, /Invalid instance value/);
-        }
-        
-    }
-
-    // Test ok values
-    sut.setInitialState({a:1, b:2});
-    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:1, b:2}));
-    
+    // Test ok values    
     sut.get.a = 2;
     sut.get.b = 3;
     assert.ok(ObjectUtils.isEqualTo(sut.get, {a:2, b:3}));
 
-    sut.setInitialState({c:3, d:4});
-    assert.ok(ObjectUtils.isEqualTo(sut.get, {c:3, d:4}));
+    sut.setInitialState();
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:2, b:3}));
+    
+    sut.get.a = 4;
+    sut.get.b = 5;
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:4, b:5}));
+    
+    assert.ok(sut.undo());
+    assert.notOk(sut.undo());
+    assert.notOk(sut.undo());
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:2, b:3}));
+    
+    sut.get.a = 4;
+    sut.get.b = 5;
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:4, b:5}));
+    
+    sut.get.a = 6;
+    sut.get.b = 7;
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:6, b:7}));
+    
+    assert.ok(sut.undoAll());
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:2, b:3}));
     
     // Test wrong values
     // Not necessary
@@ -99,7 +104,11 @@ QUnit.test("get", function(assert){
     // Not necessary
 
     // Test ok values
-    sut.setInitialState({a:1, b:2});
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:0, b:0}));
+    
+    sut.get.a = 1;
+    sut.get.b = 2;
+    sut.setInitialState();
     assert.ok(ObjectUtils.isEqualTo(sut.get, {a:1, b:2}));
     
     sut.get.a = 3;
@@ -126,11 +135,7 @@ QUnit.test("get", function(assert){
     // Not necessary
 
     // Test exceptions
-    sut = new ModelHistoryManager();
-    
-    assert.throws(function() {
-        sut.get;
-    }, /Undefined initial state/);
+    // Not necessary
 });
 
 
@@ -140,10 +145,15 @@ QUnit.test("get", function(assert){
 QUnit.test("snapshots", function(assert){
 
     // Test empty values
-    // Not necessary
+    assert.ok(ArrayUtils.isEqualTo(sut.snapshots, []));
 
     // Test ok values
-    sut.setInitialState({a:1, b:2});
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:0, b:0}));
+    
+    sut.get.a = 1;
+    sut.get.b = 2;
+    sut.setInitialState();
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:1, b:2}));
     
     sut.saveSnapshot();
     sut.saveSnapshot();
@@ -194,9 +204,7 @@ QUnit.test("snapshots", function(assert){
     // Not necessary
 
     // Test exceptions
-    sut = new ModelHistoryManager();
-    
-    assert.ok(ArrayUtils.isEqualTo(sut.snapshots, []));
+    // Not necessary
 });
 
 
@@ -206,16 +214,96 @@ QUnit.test("snapshots", function(assert){
 QUnit.test("getSnapshotsByTag", function(assert){
 
     // Test empty values
-    // TODO
+    assert.strictEqual(sut.getSnapshotsByTag(['']).length, 0);
+    
+    sut.get.a = 1;
+    sut.get.b = 2;
+    sut.setInitialState();
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:1, b:2}));
+    
+    for (var i = 0; i < window.emptyValuesCount; i++) {
+        
+        assert.throws(function() {
+            sut.getSnapshotsByTag(window.emptyValues[i]);
+        }, /tags must be a non empty string array/);
+    }
+    
+    assert.strictEqual(sut.getSnapshotsByTag(['']).length, 0);
+    
+    sut.get.b = 5;
+    sut.saveSnapshot();
+    assert.strictEqual(sut.getSnapshotsByTag(['']).length, 1);
 
     // Test ok values
-    // TODO
+    sut.undoAll();
+    assert.strictEqual(sut.getSnapshotsByTag(['']).length, 0);
+    assert.strictEqual(sut.getSnapshotsByTag(['nonexistanttag']).length, 0);
+    
+    sut.get.b = 3;
+    sut.saveSnapshot();
+    
+    sut.get.b = 4;
+    sut.saveSnapshot('4-2');
+    
+    sut.get.b = 5;
+    sut.saveSnapshot('5-2');
+    sut.saveSnapshot('4-2');
+    
+    sut.get.b = 4;
+    sut.saveSnapshot('4-2');
+    sut.saveSnapshot('4-2');
+    sut.saveSnapshot('X-2');
+    
+    sut.get.b = 9;
+    assert.strictEqual(sut.snapshots.length, 4);
+    assert.strictEqual(sut.getSnapshotsByTag(['']).length, 1);
+    assert.strictEqual(sut.getSnapshotsByTag(['X-2']).length, 0);
+    assert.strictEqual(sut.getSnapshotsByTag(['4-2']).length, 2);
+    assert.strictEqual(sut.getSnapshotsByTag(['5-2']).length, 1);
+    
+    sut.undo();
+    assert.strictEqual(sut.snapshots.length, 3);
+    assert.strictEqual(sut.getSnapshotsByTag(['']).length, 1);
+    assert.strictEqual(sut.getSnapshotsByTag(['X-2']).length, 0);
+    assert.strictEqual(sut.getSnapshotsByTag(['4-2']).length, 1);
+    assert.strictEqual(sut.getSnapshotsByTag(['5-2']).length, 1);
+    
+    sut.undo();
+    assert.strictEqual(sut.snapshots.length, 2);
+    assert.strictEqual(sut.getSnapshotsByTag(['']).length, 1);
+    assert.strictEqual(sut.getSnapshotsByTag(['X-2']).length, 0);
+    assert.strictEqual(sut.getSnapshotsByTag(['4-2']).length, 1);
+    assert.strictEqual(sut.getSnapshotsByTag(['5-2']).length, 0);
+    
+    sut.undo();
+    assert.strictEqual(sut.snapshots.length, 1);
+    assert.strictEqual(sut.getSnapshotsByTag(['']).length, 1);
+    assert.strictEqual(sut.getSnapshotsByTag(['X-2']).length, 0);
+    assert.strictEqual(sut.getSnapshotsByTag(['4-2']).length, 0);
+    assert.strictEqual(sut.getSnapshotsByTag(['5-2']).length, 0);
+    
+    sut.undo();
+    assert.strictEqual(sut.snapshots.length, 0);
+    assert.strictEqual(sut.getSnapshotsByTag(['']).length, 0);
+    assert.strictEqual(sut.getSnapshotsByTag(['X-2']).length, 0);
+    assert.strictEqual(sut.getSnapshotsByTag(['4-2']).length, 0);
+    assert.strictEqual(sut.getSnapshotsByTag(['5-2']).length, 0);
 
     // Test wrong values
-    // TODO
+    // Not necessary
 
     // Test exceptions
-    // TODO
+    assert.throws(function() {
+        sut.getSnapshotsByTag('hello');
+    }, /tags must be a non empty string array/);
+    
+    assert.throws(function() {
+        sut.getSnapshotsByTag(12345);
+    }, /tags must be a non empty string array/);
+    
+    assert.throws(function() {
+        sut.getSnapshotsByTag(new Error());
+    }, /tags must be a non empty string array/);
 });
 
 
@@ -225,16 +313,65 @@ QUnit.test("getSnapshotsByTag", function(assert){
 QUnit.test("saveSnapShot", function(assert){
 
     // Test empty values
-    // TODO
+    sut.get.a = 1;
+    sut.get.b = 2;
+    sut.setInitialState();
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:1, b:2}));
+    
+    for (var i = 0; i < window.emptyValuesCount; i++) {
+    
+        if(StringUtils.isString(window.emptyValues[i])){
+            
+            assert.notOk(sut.saveSnapshot(window.emptyValues[i]));
+            
+        }else{
+            
+            assert.throws(function() {
+                sut.saveSnapshot(window.emptyValues[i]);
+            }, /tag must be a string/);
+        }
+    }
 
+    sut.get.a = 3;
+    assert.ok(sut.saveSnapshot(''));
+    assert.strictEqual(sut.snapshots.length, 1);
+    
     // Test ok values
-    // TODO
-
+    sut.setInitialState();
+    assert.strictEqual(sut.snapshots.length, 0);
+    assert.notOk(sut.saveSnapshot('snap1'));
+    
+    sut.get.a = 3;
+    sut.get.b = 4;
+    assert.ok(sut.saveSnapshot('snap1'));
+    
+    sut.get.a = 5;
+    sut.get.b = 6;
+    assert.ok(sut.saveSnapshot('snap1'));
+    assert.notOk(sut.saveSnapshot('snap2'));
+    
+    sut.get.a = 7;
+    sut.get.b = 8;
+    assert.ok(sut.saveSnapshot('snap2'));
+    
+    assert.strictEqual(sut.getSnapshotsByTag(['snap1']).length, 2);
+    assert.strictEqual(sut.getSnapshotsByTag(['snap2']).length, 1);
+    
     // Test wrong values
-    // TODO
+    // Not necessary
 
     // Test exceptions
-    // TODO
+    assert.throws(function() {
+        sut.saveSnapshot(['hello']);
+    }, /tag must be a string/);
+    
+    assert.throws(function() {
+        sut.saveSnapshot(123456);
+    }, /tag must be a string/);
+    
+    assert.throws(function() {
+        sut.saveSnapshot(new Error());
+    }, /tag must be a string/);
 });
 
 
@@ -249,7 +386,10 @@ QUnit.test("isUndoPossible", function(assert){
     // Test ok values
     assert.ok(!sut.isUndoPossible);
     
-    sut.setInitialState({a:1, b:2});
+    sut.get.a = 1;
+    sut.get.b = 2;
+    sut.setInitialState();
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:1, b:2}));
     
     sut.saveSnapshot();
     sut.saveSnapshot();
@@ -302,16 +442,50 @@ QUnit.test("isUndoPossible", function(assert){
 QUnit.test("undo", function(assert){
 
     // Test empty values
-    // TODO
-
+    assert.notOk(sut.undo());
+    
     // Test ok values
-    // TODO
+    sut.get.a = 1;
+    sut.get.b = 2;
+    sut.setInitialState();
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:1, b:2}));
+    
+    assert.notOk(sut.undo());
+    assert.notOk(sut.undo());
+    
+    sut.get.b = 3;
+    assert.ok(sut.undo());
+    assert.strictEqual(sut.get.b, 2);
+    
+    sut.get.b = 3;
+    sut.saveSnapshot();
+    
+    sut.get.b = 4;
+    sut.saveSnapshot();
+    
+    sut.get.b = 5;
+    sut.saveSnapshot();
+    
+    sut.get.b = 6;
+    assert.ok(sut.undo());
+    assert.strictEqual(sut.get.b, 5);
+    
+    assert.ok(sut.undo());
+    assert.strictEqual(sut.get.b, 4);
+    
+    assert.ok(sut.undo());
+    assert.strictEqual(sut.get.b, 3);
+    
+    assert.ok(sut.undo());
+    assert.strictEqual(sut.get.b, 2);
+    
+    assert.notOk(sut.undo());
 
     // Test wrong values
-    // TODO
+    // Not necessary
 
     // Test exceptions
-    // TODO
+    // Not necessary
 });
 
 
@@ -321,16 +495,41 @@ QUnit.test("undo", function(assert){
 QUnit.test("undoAll", function(assert){
 
     // Test empty values
-    // TODO
+    assert.notOk(sut.undoAll());
 
     // Test ok values
-    // TODO
+    sut.get.a = 1;
+    sut.get.b = 2;
+    sut.setInitialState();
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:1, b:2}));
+    
+    assert.notOk(sut.undoAll());
+    assert.notOk(sut.undoAll());
+    
+    sut.get.b = 3;
+    assert.ok(sut.undoAll());
+    assert.strictEqual(sut.get.b, 2);
+    
+    sut.get.b = 3;
+    sut.saveSnapshot();
+    
+    sut.get.b = 4;
+    sut.saveSnapshot();
+    
+    sut.get.b = 5;
+    sut.saveSnapshot();
+    
+    sut.get.b = 6;
+    assert.ok(sut.undoAll());
+    assert.strictEqual(sut.get.b, 2);
+    
+    assert.notOk(sut.undoAll());
 
     // Test wrong values
-    // TODO
+    // Not necessary
 
     // Test exceptions
-    // TODO
+    // Not necessary
 });
 
 

@@ -9,6 +9,8 @@
  
 
 import { ObjectUtils } from '../utils/ObjectUtils';
+import { ArrayUtils } from '../utils/ArrayUtils';
+import { StringUtils } from '../utils/StringUtils';
 
 
 /**
@@ -40,56 +42,58 @@ export class ModelHistoryManager<T> {
 
 
     /**
-     * An instance that represents the current model state
+     * An instance that represents the model state at this current moment
      */
     private _currentState: T;
 
 
     /**
-     * A list with all the model instances that are saved as snapshots
+     * A list with all the model instances that have been saved as snapshots
      */
     private _snapshots: T[] = [];
 
 
     /**
-     * List with all the tags that have been applied to all the saved snapshots.
+     * List with all the tags that have been applied to all the saved snapshots
      */
     private _snapshotTags: string[] = [];
 
 
     /**
-     * This is a fully featured undo / redo manager that works with any model class.
+     * This is a fully featured undo / redo manager.
+     * It works with any class but is normally used with those that contain your application model data.
      * 
-     * The first thing we need to do after creating a ModelHistoryManager is to call the setInitialState() method
-     * and pass it a model class instance that will be used as the starting point of the history management.
+     * The first thing we need to do is to create a ModelHistoryManager and pass a model class instance which will be
+     * used as the starting point of the history management. We can redefine the starting point at any time by calling
+     * setInitialState() so if we need to perform some changes to the instance values, we can do it an fix it later as the
+     * initial state.
      *
-     * We will then be able to save snapshots to track the changes on the model class instance,
-     * so we can perform undo and redo operations at any time to restore the class state to any of
-     * the previously saved snapshots.
+     * After defining the initial state, we will be able to save snapshots to track the changes on the instance,
+     * and perform undo / redo operations at any time to restore the state to any of the previously saved snapshots.
      * 
      * We can get the instance at the current time by using the 'get' property.
+     * 
+     * @param instance An instance of the class model type to be used by the history manager as the starting point. 
      */
-    constructor() {
+    constructor(instance: T) {
         
+        this._currentState = instance;
+        
+        this._initialState = ObjectUtils.clone(this._currentState);
     }
     
     
     /**
-     * Defines the specified model instance as the begining of the history management.
-     * This means the current model state will be considered as the starting point, and all undo
-     * operations will end here.
+     * Defines the current model state as the origin of the history management.
+     * This means the current moment is considered as the starting point, and the last possible
+     * undo operation will leave the model state as it was just when this method was called.
      * 
-     * Note that calling this method also cleans any possible saved snapshots
+     * Note that calling this method also cleans any possible saved snapshots or history. We can define it as a
+     * 'reset to the current moment' method.
      */
-     setInitialState(instance: T) {
+     setInitialState() {
 
-         if(!ObjectUtils.isObject(instance)){
-         
-             throw new Error('Invalid instance value');
-         }
-
-         this._currentState = instance;
-         this._initialState = ObjectUtils.clone(instance);
+         this._initialState = ObjectUtils.clone(this._currentState);
         
          this._snapshotTags = [];      
          this._snapshots = [];
@@ -97,15 +101,10 @@ export class ModelHistoryManager<T> {
 
 
     /**
-     * The model class instance as it is now
+     * The model class instance as it is right now
      */
     get get(): T {
 
-        if(!ObjectUtils.isObject(this._currentState)){
-        
-            throw new Error('Undefined initial state');
-        }
-        
         return this._currentState;
     }
 
@@ -136,15 +135,27 @@ export class ModelHistoryManager<T> {
      * WARNING !! - This value must be used only to read data. Any direct modification of
      * the returned array will result in unwanted behaviours 
      * 
-     * @param tag  A list of strings with all the tags for which we want to obtain their related snapshots
+     * @param tags A list of strings with all the tags for which we want to obtain their related snapshots
      */
-    getSnapshotsByTag(tag:string[]) {
+    getSnapshotsByTag(tags:string[]) {
 
+        const errorMessage = 'tags must be a non empty string array. To get the full list of snapshots, use the <snapshots> property';
+
+        if(!ArrayUtils.isArray(tags)){
+            
+            throw new Error(errorMessage);
+        }
+        
+        if(tags.length <= 0){
+            
+            throw new Error(errorMessage);
+        }
+        
         let result = []; 
          
         for (var i = 0; i < this._snapshots.length; i++) {
     
-            if(tag.indexOf(this._snapshotTags[i]) >= 0){
+            if(tags.indexOf(this._snapshotTags[i]) >= 0){
                 
                 result.push(this._snapshots[i]);
             }
@@ -160,10 +171,15 @@ export class ModelHistoryManager<T> {
      * @param tag A string we can use as 'label' or 'name' for the saved snapshot. This is useful if
      * we later want to get a filtered list of snapshots
      * 
-     * @returns true if a snapshot was saved, false if no snapshot saved (moded has not changed)
+     * @returns true if a snapshot was saved, false if no snapshot saved (model has not changed)
      */
     saveSnapshot(tag = '') {
 
+        if(!StringUtils.isString(tag)){
+            
+            throw new Error('tag must be a string');
+        }
+        
         // Check if the snapshot needs to be saved or not
         if(this._snapshots.length > 0 &&
                 ObjectUtils.isEqualTo(this._currentState, this._snapshots[this._snapshots.length - 1])){
@@ -196,17 +212,8 @@ export class ModelHistoryManager<T> {
      */
     get isUndoPossible() {
 
-        if(!ObjectUtils.isObject(this._currentState)){
-            
-            return false;
-        }
-        
-        if(this._snapshots.length > 0){
-            
-            return true;
-        }
-        
-        if(!ObjectUtils.isEqualTo(this._currentState, this._initialState)){
+        if(this._snapshots.length > 0 ||
+                !ObjectUtils.isEqualTo(this._currentState, this._initialState)){
         
             return true;
         }
@@ -220,8 +227,10 @@ export class ModelHistoryManager<T> {
      * if no snapshots are available.
      * 
      * If current state is the same as the initial state, undo will do nothing
+     * 
+     * @returns True if the undo operation resulted in a current state change, false otherwise
      */
-    undo() {
+    undo(): boolean {
 
         if (this._snapshots.length > 0) {
             
@@ -231,11 +240,13 @@ export class ModelHistoryManager<T> {
             // If current state has not changed from previous snapshot, we will call another undo
             if(ObjectUtils.isEqualTo(this._currentState, snapshot)){
                 
-                this.undo();
+                return this.undo();
             
             }else{
                 
                 this._currentState = snapshot;
+                
+                return true;
             }
         
         }else{
@@ -243,8 +254,12 @@ export class ModelHistoryManager<T> {
             if(!ObjectUtils.isEqualTo(this._currentState, this._initialState)){
                 
                 this._currentState = ObjectUtils.clone(this._initialState);
+                
+                return true;
             }
         }
+        
+        return false;
     }
 
 
@@ -253,13 +268,22 @@ export class ModelHistoryManager<T> {
      *
      * This operation is definitive. After this method is called, all history and the current state
      * will be lost forever. No redo will be possible
+     * 
+     * @returns True if the current state changed, false otherwise
      */
     undoAll() {
 
-        this._currentState = ObjectUtils.clone(this._initialState);
+        if(this.isUndoPossible){
+            
+            this._currentState = ObjectUtils.clone(this._initialState);
+            
+            this._snapshotTags = [];      
+            this._snapshots = [];
+            
+            return true;
+        }
         
-        this._snapshotTags = [];      
-        this._snapshots = [];
+        return false;
     }
 
 
