@@ -61,8 +61,9 @@ var n = StringUtils.countWords("word1 word2 word3");
 ### Download
 If you don't want to use a package manager like npm or composer, latest compiled versions can be found at:
 
-- Typescript: Coming soon
-- Javascript: http://turbocommons.org/resources/shared/zip/TurboCommons-JS5.zip
+- Typescript: http://turbocommons.org/resources/shared/zip/TurboCommons-Typescript.zip
+- Javascript 5: http://turbocommons.org/resources/shared/zip/TurboCommons-Javascript-5.zip
+- Javascript 6: http://turbocommons.org/resources/shared/zip/TurboCommons-Javascript-6.zip
 - Php: http://turbocommons.org/resources/shared/zip/TurboCommons-Php.zip
 
 ### Dependencies
