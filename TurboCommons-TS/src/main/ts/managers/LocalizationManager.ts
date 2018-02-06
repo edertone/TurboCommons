@@ -242,21 +242,11 @@ export class LocalizationManager {
      * @see LocalizationManager.get
      * @see StringUtils.formatCase
      *
-     * @returns The localized Start case text
+     * @returns The localized and case formatted text
      */
     getStartCase(key: string, bundle = '') {
 
-        // TODO - replace all this code with:
-        // return StringUtils.formatCase(this.get(key, bundle), StringUtils.FORMAT_START_CASE);
-        // Once the StringUtils.formatCase is implemented!
-        const result = this.get(key, bundle).split(' ');
-
-        for (let i = 0; i < result.length; i++) {
-
-            result[i] = result[i].charAt(0).toUpperCase() + result[i].slice(1).toLowerCase();
-        }
-
-        return result.join(' ');
+        return StringUtils.formatCase(this.get(key, bundle), StringUtils.FORMAT_START_CASE);
     }
 
 
@@ -266,11 +256,11 @@ export class LocalizationManager {
      * @see LocalizationManager.get
      * @see StringUtils.formatCase
      *
-     * @returns The localized upper case text
+     * @returns The localized and case formatted text
      */
     getAllUpperCase(key: string, bundle = '') {
 
-        return this.get(key, bundle).toUpperCase();
+        return StringUtils.formatCase(this.get(key, bundle), StringUtils.FORMAT_ALL_UPPER_CASE);
     }
 
 
@@ -280,20 +270,47 @@ export class LocalizationManager {
      * @see LocalizationManager.get
      * @see StringUtils.formatCase
      *
-     * @returns The localized lower case text
+     * @returns The localized and case formatted text
      */
     getAllLowerCase(key: string, bundle = '') {
 
-        return this.get(key, bundle).toLowerCase();
+        return StringUtils.formatCase(this.get(key, bundle), StringUtils.FORMAT_ALL_LOWER_CASE);
+    }
+    
+    
+    /**
+     * Get the translation for the given key and bundle as a string with the first character as Upper case
+     * and all the rest as lower case
+     *
+     * @see LocalizationManager.get
+     * @see StringUtils.formatCase
+     *
+     * @returns The localized and case formatted text
+     */
+    getFirstUpperRestLower(key: string, bundle = ''){
+        
+        return StringUtils.formatCase(this.get(key, bundle), StringUtils.FORMAT_FIRST_UPPER_REST_LOWER);
     }
 
 
+    /**
+     * Auxiliary method that can be overriden when extending this class to customize the parsing of Json formatted
+     * resource bundles
+     * 
+     * @param data An object resulting the JSON.parse of the resourcebundle read
+     */
     protected parseJson(data: Object): Object {
 
         return data;
     }
 
 
+    /**
+     * Auxiliary method that can be overriden when extending this class to customize the parsing of Java properties
+     * formatted resource bundles
+     * 
+     * @param data A string containing the read resourcebundle
+     */
     protected parseProperties(data: string): JavaPropertiesObject {
 
         return new JavaPropertiesObject(data);
