@@ -19,24 +19,45 @@ import { ValidationManager } from "../managers/ValidationManager";
 export class StringUtils {
     
     
-    /** Defines the sentence case format (Only the first character of the sentence is capitalised, except for proper nouns and other words which are required by a more specific rule to be capitalised). Generally equivalent to the baseline universal standard of formal English orthography */
-    readonly FORMAT_SENTENCE_CASE = 'FORMAT_SENTENCE_CASE';
+    /** 
+     * Defines the sentence case format (Only the first character of the sentence is capitalised,except for
+     * proper nouns and other words which are required by a more specific rule to be capitalised).
+     * Generally equivalent to the baseline universal standard of formal English orthography
+     */
+    static readonly FORMAT_SENTENCE_CASE = 'FORMAT_SENTENCE_CASE';
 
 
-    /** Defines the start case format (The first character in all words capitalised and all the rest of the word lower case) */
-    readonly FORMAT_START_CASE = 'FORMAT_START_CASE';
+    /** 
+     * Defines the start case format (The first character in all words capitalised and all the rest
+     * of the word lower case)
+     */
+    static readonly FORMAT_START_CASE = 'FORMAT_START_CASE';
 
 
-    /** Defines the all upper case format (All letters on a string written with Capital letters only) */
-    readonly FORMAT_ALL_UPPER_CASE = 'FORMAT_ALL_UPPER_CASE';
+    /** 
+     * Defines the all upper case format (All letters on a string written with Capital letters only)
+     */
+    static readonly FORMAT_ALL_UPPER_CASE = 'FORMAT_ALL_UPPER_CASE';
 
 
-    /** Defines the all lower case format (All letters on a string written with lower case letters only) */
-    readonly FORMAT_ALL_LOWER_CASE = 'FORMAT_ALL_LOWER_CASE';
+    /**
+     * Defines the all lower case format (All letters on a string written with lower case letters only)
+     */
+    static readonly FORMAT_ALL_LOWER_CASE = 'FORMAT_ALL_LOWER_CASE';
+
+    
+    /**
+     * Defines the first upper rest lower case format (All letters on a string written
+     * with lower case letters except the first one which is Capitalized)
+     */
+    static readonly FORMAT_FIRST_UPPER_REST_LOWER = 'FORMAT_FIRST_UPPER_REST_LOWER';
 
 
-    /** Defines the CamelCase format (the practice of writing compound words or phrases such that each word or abbreviation begins with a capital letter) */
-    readonly FORMAT_CAMEL_CASE = 'FORMAT_CAMEL_CASE';
+    /** 
+     * Defines the CamelCase format (the practice of writing compound words or phrases such that each
+     * word or abbreviation begins with a capital letter)
+     */
+    static readonly FORMAT_CAMEL_CASE = 'FORMAT_CAMEL_CASE';
 
 
     /**
@@ -44,7 +65,7 @@ export class StringUtils {
      *
      * @see StringUtils.FORMAT_CAMEL_CASE
      */
-    readonly FORMAT_UPPER_CAMEL_CASE = 'FORMAT_UPPER_CAMEL_CASE';
+    static readonly FORMAT_UPPER_CAMEL_CASE = 'FORMAT_UPPER_CAMEL_CASE';
 
 
     /**
@@ -52,11 +73,14 @@ export class StringUtils {
      *
      * @see StringUtils.FORMAT_CAMEL_CASE
      */
-    readonly FORMAT_LOWER_CAMEL_CASE = 'FORMAT_LOWER_CAMEL_CASE';
+    static readonly FORMAT_LOWER_CAMEL_CASE = 'FORMAT_LOWER_CAMEL_CASE';
 
 
-    /** Defines the snake_case format (the practice of writing compound words or phrases in which the elements are separated with one underscore character (_) and no spaces) */
-    readonly FORMAT_SNAKE_CASE = 'FORMAT_SNAKE_CASE';
+    /** 
+     * Defines the snake_case format (the practice of writing compound words or phrases in which
+     * the elements are separated with one underscore character (_) and no spaces)
+     */
+    static readonly FORMAT_SNAKE_CASE = 'FORMAT_SNAKE_CASE';
 
 
     /**
@@ -64,7 +88,7 @@ export class StringUtils {
      *
      * @see StringUtils.FORMAT_SNAKE_CASE
      */
-    readonly FORMAT_UPPER_SNAKE_CASE = 'FORMAT_UPPER_SNAKE_CASE';
+    static readonly FORMAT_UPPER_SNAKE_CASE = 'FORMAT_UPPER_SNAKE_CASE';
 
 
     /**
@@ -72,7 +96,7 @@ export class StringUtils {
      *
      * @see StringUtils.FORMAT_SNAKE_CASE
      */
-    readonly FORMAT_LOWER_SNAKE_CASE = 'FORMAT_LOWER_SNAKE_CASE';
+    static readonly FORMAT_LOWER_SNAKE_CASE = 'FORMAT_LOWER_SNAKE_CASE';
     
     
     /**
@@ -604,9 +628,72 @@ export class StringUtils {
     }
     
     
-    public static formatCase() {
-    
-        // TODO: translate from php
+    /**
+     * Changes the letter case for the given string to the specified format.
+     *
+     * @param string A string that will be processed to match the specified case format.
+     * @param format The format to which the given string will be converted. Possible values are defined as
+     * StringUtils constants that start with <b>FORMAT_</b>, like: StringUtils.FORMAT_ALL_UPPER_CASE
+     *
+     * @see StringUtils.FORMAT_SENTENCE_CASE
+     * @see StringUtils.FORMAT_START_CASE
+     * @see StringUtils.FORMAT_ALL_UPPER_CASE
+     * @see StringUtils.FORMAT_ALL_LOWER_CASE
+     * @see StringUtils.FORMAT_FIRST_UPPER_REST_LOWER
+     * @see StringUtils.FORMAT_CAMEL_CASE
+     * @see StringUtils.FORMAT_UPPER_CAMEL_CASE
+     * @see StringUtils.FORMAT_LOWER_CAMEL_CASE
+     * @see StringUtils.FORMAT_SNAKE_CASE
+     * @see StringUtils.FORMAT_UPPER_SNAKE_CASE
+     * @see StringUtils.FORMAT_LOWER_SNAKE_CASE
+     *
+     * @returns The given string converted to the specified case format.
+     */
+    public static formatCase(string: string, format: string) {
+
+        // Non string values will throw an exception
+        if(!StringUtils.isString(string)){
+
+            throw new Error('value is not a string');
+        }
+
+        // Empty values will return the string itself
+        if(StringUtils.isEmpty(string)){
+
+            return string;
+        }
+        
+        // Generate the sentence case output
+        // TODO - translate from PHP
+     
+        // Generate the title case output
+        // TODO - translate from PHP
+
+        // Generate the all upper case output
+        if(format === StringUtils.FORMAT_ALL_UPPER_CASE){
+
+            return string.toUpperCase();
+        }
+        
+        // Generate the all lower case output
+        if(format === StringUtils.FORMAT_ALL_LOWER_CASE){
+
+            return string.toLowerCase();
+        }
+        
+        // Generate the first upper rest lower case output
+        if(format === StringUtils.FORMAT_FIRST_UPPER_REST_LOWER){
+
+            return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+        }
+        
+        // Generate the snake case format
+        // TODO - translate from PHP
+        
+        // Generate the camel case format
+        // TODO - translate from PHP
+        
+        throw new Error('Unknown format specified');
     }
     
     

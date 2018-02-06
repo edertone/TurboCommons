@@ -727,9 +727,113 @@ QUnit.test("getSchemeFromUrl", function(assert) {
 /**
  * formatCase
  */
-QUnit.todo("formatCase", function(assert) {
+QUnit.test("formatCase", function(assert) {
 
-    // TODO: copy tests from PHP
+    /** Defines the list of string case available formats */
+    var caseFormats = ['',
+            StringUtils.FORMAT_SENTENCE_CASE,
+            StringUtils.FORMAT_START_CASE,
+            StringUtils.FORMAT_ALL_UPPER_CASE,
+            StringUtils.FORMAT_ALL_LOWER_CASE,
+            StringUtils.FORMAT_FIRST_UPPER_REST_LOWER,
+            StringUtils.FORMAT_CAMEL_CASE,
+            StringUtils.FORMAT_UPPER_CAMEL_CASE,
+            StringUtils.FORMAT_LOWER_CAMEL_CASE,
+            StringUtils.FORMAT_SNAKE_CASE,
+            StringUtils.FORMAT_UPPER_SNAKE_CASE,
+            StringUtils.FORMAT_LOWER_SNAKE_CASE
+    ];
+    
+    // test empty cases on all possible formats
+    for (let caseFormat of caseFormats) {
+        
+        assert.throws(function() {
+
+            StringUtils.formatCase(null, caseFormat);
+        }, /value is not a string/);
+        assert.throws(function() {
+
+            StringUtils.formatCase([], caseFormat);
+        }, /value is not a string/);
+        assert.ok(StringUtils.formatCase('', caseFormat) === '');
+        assert.ok(StringUtils.formatCase('       ', caseFormat) === '       ');
+        assert.ok(StringUtils.formatCase("\n\n\n", caseFormat) === "\n\n\n");
+    }
+    
+    // Test FORMAT_SENTENCE_CASE values
+    // TODO - translate from PHP
+    
+    // Test FORMAT_START_CASE values
+    // TODO - translate from PHP
+    
+    // Test FORMAT_ALL_UPPER_CASE values
+    assert.ok(StringUtils.formatCase('h', StringUtils.FORMAT_ALL_UPPER_CASE) === 'H');
+    assert.ok(StringUtils.formatCase('HI', StringUtils.FORMAT_ALL_UPPER_CASE) === 'HI');
+    assert.ok(StringUtils.formatCase('hello', StringUtils.FORMAT_ALL_UPPER_CASE) === 'HELLO');
+    assert.ok(StringUtils.formatCase('helló. únder Ü??', StringUtils.FORMAT_ALL_UPPER_CASE) === 'HELLÓ. ÚNDER Ü??');
+    assert.ok(StringUtils.formatCase('óyeà!!! üst??', StringUtils.FORMAT_ALL_UPPER_CASE) === 'ÓYEÀ!!! ÜST??');
+    assert.ok(StringUtils.formatCase('Hello people', StringUtils.FORMAT_ALL_UPPER_CASE) === 'HELLO PEOPLE');
+    assert.ok(StringUtils.formatCase('Hello pEOPLE', StringUtils.FORMAT_ALL_UPPER_CASE) === 'HELLO PEOPLE');
+    assert.ok(StringUtils.formatCase("över! còmpléx.   \n\n\n\t\t   ís test!is?for!?!? you.!  ", StringUtils.FORMAT_ALL_UPPER_CASE) === "ÖVER! CÒMPLÉX.   \n\n\n\t\t   ÍS TEST!IS?FOR!?!? YOU.!  ");
+
+    // Test FORMAT_ALL_LOWER_CASE values
+    assert.ok(StringUtils.formatCase('h', StringUtils.FORMAT_ALL_LOWER_CASE) === 'h');
+    assert.ok(StringUtils.formatCase('HI', StringUtils.FORMAT_ALL_LOWER_CASE) === 'hi');
+    assert.ok(StringUtils.formatCase('hello', StringUtils.FORMAT_ALL_LOWER_CASE) === 'hello');
+    assert.ok(StringUtils.formatCase('helló. únder Ü??', StringUtils.FORMAT_ALL_LOWER_CASE) === 'helló. únder ü??');
+    assert.ok(StringUtils.formatCase('óyeà!!! üst??', StringUtils.FORMAT_ALL_LOWER_CASE) === 'óyeà!!! üst??');
+    assert.ok(StringUtils.formatCase('Hello people', StringUtils.FORMAT_ALL_LOWER_CASE) === 'hello people');
+    assert.ok(StringUtils.formatCase('Hello pEOPLE', StringUtils.FORMAT_ALL_LOWER_CASE) === 'hello people');
+    assert.ok(StringUtils.formatCase("över! còmpléx.   \n\n\n\t\t   ís test!is?for!?!? you.!  ", StringUtils.FORMAT_ALL_LOWER_CASE) === "över! còmpléx.   \n\n\n\t\t   ís test!is?for!?!? you.!  ");
+
+    // Test FORMAT_FIRST_UPPER_REST_LOWER values
+    assert.ok(StringUtils.formatCase('h', StringUtils.FORMAT_FIRST_UPPER_REST_LOWER) === 'H');
+    assert.ok(StringUtils.formatCase('HI', StringUtils.FORMAT_FIRST_UPPER_REST_LOWER) === 'Hi');
+    assert.ok(StringUtils.formatCase('hello', StringUtils.FORMAT_FIRST_UPPER_REST_LOWER) === 'Hello');
+    assert.ok(StringUtils.formatCase('helló. únder Ü??', StringUtils.FORMAT_FIRST_UPPER_REST_LOWER) === 'Helló. únder ü??');
+    assert.ok(StringUtils.formatCase('óyeà!!! üst??', StringUtils.FORMAT_FIRST_UPPER_REST_LOWER) === 'Óyeà!!! üst??');
+    assert.ok(StringUtils.formatCase('Hello people', StringUtils.FORMAT_FIRST_UPPER_REST_LOWER) === 'Hello people');
+    assert.ok(StringUtils.formatCase('Hello pEOPLE', StringUtils.FORMAT_FIRST_UPPER_REST_LOWER) === 'Hello people');
+    assert.ok(StringUtils.formatCase("över! còmpléx.   \n\n\n\t\t   ís test!is?for!?!? you.!  ", StringUtils.FORMAT_FIRST_UPPER_REST_LOWER) === "Över! còmpléx.   \n\n\n\t\t   ís test!is?for!?!? you.!  ");
+
+    // Test FORMAT_SNAKE_CASE values
+    // TODO - translate from PHP
+    
+    // Test FORMAT_UPPER_SNAKE_CASE values
+    // TODO - translate from PHP
+    
+    // Test FORMAT_LOWER_SNAKE_CASE values
+    // TODO - translate from PHP
+    
+    // Test FORMAT_CAMEL_CASE values
+    // TODO - translate from PHP
+    
+    // Test FORMAT_UPPER_CAMEL_CASE values
+    // TODO - translate from PHP
+    
+    // Test FORMAT_LOWER_CAMEL_CASE values
+    // TODO - translate from PHP
+    
+    // Test exception cases
+    assert.throws(function() {
+
+        StringUtils.formatCase('helloWorld', '');
+    }, /Unknown format specified/);
+
+    assert.throws(function() {
+
+        StringUtils.formatCase(1, StringUtils.FORMAT_SENTENCE_CASE);
+    }, /value is not a string/);
+
+    assert.throws(function() {
+
+        StringUtils.formatCase([1,2,3], StringUtils.FORMAT_SENTENCE_CASE);
+    }, /value is not a string/);
+
+    assert.throws(function() {
+
+        StringUtils.formatCase('Hello', 'invalidformat');
+    }, /Unknown format specified/);
 });
 
 
