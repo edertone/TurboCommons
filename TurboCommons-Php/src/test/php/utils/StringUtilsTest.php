@@ -823,6 +823,7 @@ class StringUtilsTest extends TestCase {
 				StringUtils::FORMAT_START_CASE,
 				StringUtils::FORMAT_ALL_UPPER_CASE,
 				StringUtils::FORMAT_ALL_LOWER_CASE,
+		        StringUtils::FORMAT_FIRST_UPPER_REST_LOWER,
 				StringUtils::FORMAT_CAMEL_CASE,
 				StringUtils::FORMAT_UPPER_CAMEL_CASE,
 				StringUtils::FORMAT_LOWER_CAMEL_CASE,
@@ -834,9 +835,19 @@ class StringUtilsTest extends TestCase {
 		// test empty cases on all possible formats
 		foreach ($caseFormats as $caseFormat) {
 
-			$this->assertTrue(StringUtils::formatCase(null, $caseFormat) === '');
+		    try {
+		        StringUtils::formatCase(null, $caseFormat);
+		        $this->exceptionMessage = 'null did not cause exception';
+		    } catch (Throwable $e) {
+		        // We expect an exception to happen
+		    }
+		    try {
+		        StringUtils::formatCase([], $caseFormat);
+		        $this->exceptionMessage = '[] did not cause exception';
+		    } catch (Throwable $e) {
+		        // We expect an exception to happen
+		    }
 			$this->assertTrue(StringUtils::formatCase('', $caseFormat) === '');
-			$this->assertTrue(StringUtils::formatCase([], $caseFormat) === '');
 			$this->assertTrue(StringUtils::formatCase('       ', $caseFormat) === '       ');
 			$this->assertTrue(StringUtils::formatCase("\n\n\n", $caseFormat) === "\n\n\n");
 		}

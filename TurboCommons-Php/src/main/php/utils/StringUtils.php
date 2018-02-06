@@ -672,22 +672,16 @@ class StringUtils {
      */
     public static function formatCase($string, string $format){
 
-        // null values will return an empty string
-        if($string == null){
+        // Non string values will throw an exception
+        if(!is_string($string)){
 
-            return '';
+            throw new InvalidArgumentException('value is not a string');
         }
 
         // Empty values will return the string itself
         if(self::isEmpty($string)){
 
             return $string;
-        }
-
-        // Non string values will throw an exception
-        if(!is_string($string)){
-
-            throw new InvalidArgumentException('value is not a string');
         }
 
         // Generate the sentence case output
