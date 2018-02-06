@@ -20,23 +20,44 @@ use InvalidArgumentException;
 class StringUtils {
 
 
-    /** Defines the sentence case format (Only the first character of the sentence is capitalised, except for proper nouns and other words which are required by a more specific rule to be capitalised). Generally equivalent to the baseline universal standard of formal English orthography */
+    /**
+     * Defines the sentence case format (Only the first character of the sentence is capitalised,except for
+     * proper nouns and other words which are required by a more specific rule to be capitalised).
+     * Generally equivalent to the baseline universal standard of formal English orthography
+     */
     const FORMAT_SENTENCE_CASE = 'FORMAT_SENTENCE_CASE';
 
 
-    /** Defines the start case format (The first character in all words capitalised and all the rest of the word lower case) */
+    /**
+     * Defines the start case format (The first character in all words capitalised and all the rest
+     * of the word lower case)
+     */
     const FORMAT_START_CASE = 'FORMAT_START_CASE';
 
 
-    /** Defines the all upper case format (All letters on a string written with Capital letters only) */
+    /**
+     * Defines the all upper case format (All letters on a string written with Capital letters only)
+     */
     const FORMAT_ALL_UPPER_CASE = 'FORMAT_ALL_UPPER_CASE';
 
 
-    /** Defines the all lower case format (All letters on a string written with lower case letters only) */
+    /**
+     * Defines the all lower case format (All letters on a string written with lower case letters only)
+     */
     const FORMAT_ALL_LOWER_CASE = 'FORMAT_ALL_LOWER_CASE';
 
 
-    /** Defines the CamelCase format (the practice of writing compound words or phrases such that each word or abbreviation begins with a capital letter) */
+    /**
+     * Defines the first upper rest lower case format (All letters on a string written
+     * with lower case letters except the first one which is Capitalized)
+     */
+    const FORMAT_FIRST_UPPER_REST_LOWER = 'FORMAT_FIRST_UPPER_REST_LOWER';
+
+
+    /**
+     * Defines the CamelCase format (the practice of writing compound words or phrases such that each
+     * word or abbreviation begins with a capital letter)
+     */
     const FORMAT_CAMEL_CASE = 'FORMAT_CAMEL_CASE';
 
 
@@ -56,7 +77,10 @@ class StringUtils {
     const FORMAT_LOWER_CAMEL_CASE = 'FORMAT_LOWER_CAMEL_CASE';
 
 
-    /** Defines the snake_case format (the practice of writing compound words or phrases in which the elements are separated with one underscore character (_) and no spaces) */
+    /**
+     * Defines the snake_case format (the practice of writing compound words or phrases in which
+     * the elements are separated with one underscore character (_) and no spaces)
+     */
     const FORMAT_SNAKE_CASE = 'FORMAT_SNAKE_CASE';
 
 
@@ -636,6 +660,7 @@ class StringUtils {
      * @see StringUtils::FORMAT_START_CASE
      * @see StringUtils::FORMAT_ALL_UPPER_CASE
      * @see StringUtils::FORMAT_ALL_LOWER_CASE
+     * @see StringUtils::FORMAT_FIRST_UPPER_REST_LOWER
      * @see StringUtils::FORMAT_CAMEL_CASE
      * @see StringUtils::FORMAT_UPPER_CAMEL_CASE
      * @see StringUtils::FORMAT_LOWER_CAMEL_CASE
@@ -702,6 +727,12 @@ class StringUtils {
         if($format == self::FORMAT_ALL_LOWER_CASE){
 
             return mb_strtolower($string);
+        }
+
+        // Generate the first upper rest lower case output
+        if($format == self::FORMAT_FIRST_UPPER_REST_LOWER){
+
+            return mb_strtoupper(mb_substr($string, 0, 1)).mb_substr(mb_strtolower($string), 1);
         }
 
         // Generate the snake case format

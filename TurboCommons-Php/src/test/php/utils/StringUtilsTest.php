@@ -886,6 +886,16 @@ class StringUtilsTest extends TestCase {
 		$this->assertTrue(StringUtils::formatCase('Hello pEOPLE', StringUtils::FORMAT_ALL_LOWER_CASE) === 'hello people');
 		$this->assertTrue(StringUtils::formatCase("över! còmpléx.   \n\n\n\t\t   ís test!is?for!?!? you.!  ", StringUtils::FORMAT_ALL_LOWER_CASE) === "över! còmpléx.   \n\n\n\t\t   ís test!is?for!?!? you.!  ");
 
+		// Test FORMAT_FIRST_UPPER_REST_LOWER values
+		$this->assertTrue(StringUtils::formatCase('h', StringUtils::FORMAT_FIRST_UPPER_REST_LOWER) === 'H');
+		$this->assertTrue(StringUtils::formatCase('HI', StringUtils::FORMAT_FIRST_UPPER_REST_LOWER) === 'Hi');
+		$this->assertTrue(StringUtils::formatCase('hello', StringUtils::FORMAT_FIRST_UPPER_REST_LOWER) === 'Hello');
+		$this->assertTrue(StringUtils::formatCase('helló. únder Ü??', StringUtils::FORMAT_FIRST_UPPER_REST_LOWER) === 'Helló. únder ü??');
+		$this->assertTrue(StringUtils::formatCase('óyeà!!! üst??', StringUtils::FORMAT_FIRST_UPPER_REST_LOWER) === 'Óyeà!!! üst??');
+		$this->assertTrue(StringUtils::formatCase('Hello people', StringUtils::FORMAT_FIRST_UPPER_REST_LOWER) === 'Hello people');
+		$this->assertTrue(StringUtils::formatCase('Hello pEOPLE', StringUtils::FORMAT_FIRST_UPPER_REST_LOWER) === 'Hello people');
+		$this->assertTrue(StringUtils::formatCase("över! còmpléx.   \n\n\n\t\t   ís test!is?for!?!? you.!  ", StringUtils::FORMAT_FIRST_UPPER_REST_LOWER) === "Över! còmpléx.   \n\n\n\t\t   ís test!is?for!?!? you.!  ");
+
 		// Test FORMAT_SNAKE_CASE values
 		$this->assertTrue(StringUtils::formatCase('h', StringUtils::FORMAT_SNAKE_CASE) === 'h');
 		$this->assertTrue(StringUtils::formatCase('0', StringUtils::FORMAT_SNAKE_CASE) === '0');
