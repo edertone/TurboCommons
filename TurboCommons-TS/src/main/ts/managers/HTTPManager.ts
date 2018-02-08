@@ -107,7 +107,7 @@ export class HTTPManager{
             
             // We must prevent the browser cache from giving false positives, so we generate
             // an url containing a random GET parameter
-            this.urlExists(String(url + '?r=' + StringUtils.generateRandomPassword(15)), () => {
+            this.urlExists(String(url + '?r=' + StringUtils.generateRandom(15)), () => {
                 
                 return yesCallback();
                 
