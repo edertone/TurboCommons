@@ -883,20 +883,20 @@ class StringUtils {
     /**
      * Generates a random string with the specified lenght and options
      *
-     * @param int $lenght Specify the lengh of the password
+     * @param int $lenght Specify the lengh of the generated string
      * @param boolean $useUpperCase Specify if upper case letters will be also included in the generated string
      * @param boolean $useNumbers Specify if numeric digits will be also included in the generated string
      *
-     * @return string A randomly generated string that can be used as a password
+     * @return string A randomly generated string
      */
-    public static function generateRandomPassword(int $lenght = 5, bool $useUpperCase = true, bool $useNumbers = true){
+    public static function generateRandom(int $lenght = 5, bool $useUpperCase = true, bool $useNumbers = true){
 
         if($lenght < 0 || !NumericUtils::isInteger($lenght)){
 
             throw new InvalidArgumentException('length must be a positive number');
         }
 
-        // Set the characters to use in the random password
+        // Set the characters to use in the random string
         $chars = 'abcdefghijkmnopqrstuvwxyz023456789';
 
         if($useUpperCase){
@@ -914,13 +914,13 @@ class StringUtils {
 
         $result = '' ;
 
-        // loop throught all the password defined lenght
+        // loop throught all the string defined lenght
         for($i=0; $i<$lenght; $i++){
 
             // get an integer between 0 and charslen.
             $num = mt_rand(0, $charsLen);
 
-            // append the random character to the password.
+            // append a random character
             $result = $result.substr($chars, $num, 1);
         }
 

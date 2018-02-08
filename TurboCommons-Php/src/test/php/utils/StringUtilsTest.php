@@ -1114,30 +1114,30 @@ class StringUtilsTest extends TestCase {
 
 
 	/**
-	 * testGenerateRandomPassword
+	 * testGenerateRandom
 	 *
 	 * @return void
 	 */
-	public function testGenerateRandomPassword(){
+	public function testGenerateRandom(){
 
 	    // Test empty values
 	    try {
-	        StringUtils::generateRandomPassword(null, null, null);
+	        StringUtils::generateRandom(null, null, null);
 	        $this->exceptionMessage = '-1 did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    // Test ok values
-	    $this->assertTrue(StringUtils::generateRandomPassword(0, true, true) === '');
-	    $this->assertTrue(StringUtils::generateRandomPassword(0, false, false) === '');
+	    $this->assertTrue(StringUtils::generateRandom(0, true, true) === '');
+	    $this->assertTrue(StringUtils::generateRandom(0, false, false) === '');
 
 	    for ($i = 1; $i < 50; $i++) {
 
-	        $this->assertTrue(strlen(StringUtils::generateRandomPassword($i, true, true)) === $i);
-	        $this->assertTrue(strlen(StringUtils::generateRandomPassword($i, false, false)) === $i);
-	        $this->assertTrue(strlen(StringUtils::generateRandomPassword($i, true, false)) === $i);
-	        $this->assertTrue(strlen(StringUtils::generateRandomPassword($i, false, true)) === $i);
+	        $this->assertTrue(strlen(StringUtils::generateRandom($i, true, true)) === $i);
+	        $this->assertTrue(strlen(StringUtils::generateRandom($i, false, false)) === $i);
+	        $this->assertTrue(strlen(StringUtils::generateRandom($i, true, false)) === $i);
+	        $this->assertTrue(strlen(StringUtils::generateRandom($i, false, true)) === $i);
 	    }
 
 	    // Test wrong values
@@ -1145,14 +1145,14 @@ class StringUtilsTest extends TestCase {
 
 	    // Test exceptions
 	    try {
-	        StringUtils::generateRandomPassword(-1);
+	        StringUtils::generateRandom(-1);
 	        $this->exceptionMessage = '-1 did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
-	        StringUtils::generateRandomPassword('some string');
+	        StringUtils::generateRandom('some string');
 	        $this->exceptionMessage = 'some string did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
