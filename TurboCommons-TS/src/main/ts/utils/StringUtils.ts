@@ -816,20 +816,20 @@ export class StringUtils {
     /**
      * Generates a random string with the specified lenght and options
      *
-     * @param lenght Specify the lengh of the password
+     * @param lenght Specify the lengh of the generated string
      * @param useUpperCase Specify if upper case letters will be also included in the generated string
      * @param useNumbers Specify if numeric digits will be also included in the generated string
      *
-     * @return A randomly generated string that can be used as a password
+     * @return A randomly generated string
      */
-    public static generateRandomPassword(lenght = 5, useUpperCase = true, useNumbers = true) {
+    public static generateRandom(lenght = 5, useUpperCase = true, useNumbers = true) {
     
         if(lenght < 0 || !NumericUtils.isInteger(lenght)){
 
             throw new Error('length must be a positive number');
         }
         
-        // Set the characters to use in the random password
+        // Set the characters to use in the random string
         let chars = 'abcdefghijkmnopqrstuvwxyz023456789';
 
         if(useUpperCase){
@@ -847,13 +847,13 @@ export class StringUtils {
 
         let result = '' ;
 
-        // loop throught all the password defined lenght
+        // loop throught all the string defined lenght
         for(let i=0; i<lenght; i++){
         
             // get an integer between 0 and charslen.
             let num = Math.floor(Math.random() * charsLen);
         
-            // append the random character to the password.
+            // append a random character
             result = result + chars.substr(num, 1);
         }
 

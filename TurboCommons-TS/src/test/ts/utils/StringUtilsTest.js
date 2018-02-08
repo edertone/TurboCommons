@@ -913,26 +913,26 @@ QUnit.todo("formatForFullTextSearch", function(assert) {
 
 
 /**
- * generateRandomPassword
+ * generateRandom
  */
-QUnit.test("generateRandomPassword", function(assert) {
+QUnit.test("generateRandom", function(assert) {
 
     // Test empty values
     assert.throws(function() {
 
-        StringUtils.generateRandomPassword(null, null, null);
+        StringUtils.generateRandom(null, null, null);
     });
 
     // Test ok values
-    assert.ok(StringUtils.generateRandomPassword(0, true, true) === '');
-    assert.ok(StringUtils.generateRandomPassword(0, false, false) === '');
+    assert.ok(StringUtils.generateRandom(0, true, true) === '');
+    assert.ok(StringUtils.generateRandom(0, false, false) === '');
 
     for (var i = 1; i < 50; i++) {
 
-        assert.ok(StringUtils.generateRandomPassword(i, true, true).length === i);
-        assert.ok(StringUtils.generateRandomPassword(i, false, false).length === i);
-        assert.ok(StringUtils.generateRandomPassword(i, true, false).length === i);
-        assert.ok(StringUtils.generateRandomPassword(i, false, true).length === i);
+        assert.ok(StringUtils.generateRandom(i, true, true).length === i);
+        assert.ok(StringUtils.generateRandom(i, false, false).length === i);
+        assert.ok(StringUtils.generateRandom(i, true, false).length === i);
+        assert.ok(StringUtils.generateRandom(i, false, true).length === i);
     }
 
     // Test wrong values
@@ -940,11 +940,11 @@ QUnit.test("generateRandomPassword", function(assert) {
 
     // Test exceptions
     assert.throws(function() {
-        StringUtils.generateRandomPassword(-1);
+        StringUtils.generateRandom(-1);
     });
 
     assert.throws(function() {
-        StringUtils.generateRandomPassword('some string');
+        StringUtils.generateRandom('some string');
     });
 });
 
