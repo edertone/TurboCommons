@@ -92,6 +92,7 @@ QUnit.test("isNumeric", function(assert){
 QUnit.test("isInteger", function(assert){
 
     // Test empty values
+    assert.notOk(NumericUtils.isInteger(undefined));
     assert.notOk(NumericUtils.isInteger(null));
     assert.notOk(NumericUtils.isInteger(''));
     assert.notOk(NumericUtils.isInteger([]));

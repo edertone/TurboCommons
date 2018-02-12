@@ -38,9 +38,9 @@ export class NumericUtils {
     /**
      * Tells if the given value is a numeric integer or not
      *
-     * @param {any} value A value to check
+     * @param value A value to check
      *
-     * @returns {boolean} true if the given value is a numeric integer or represents a a numeric integer value, false otherwise
+     * @returns true if the given value is a numeric integer or represents a a numeric integer value, false otherwise
      */
     public static isInteger(value:any):boolean {
         
