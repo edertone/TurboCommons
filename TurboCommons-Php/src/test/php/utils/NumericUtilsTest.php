@@ -44,7 +44,10 @@ class NumericUtilsTest extends TestCase {
 	 */
 	protected function setUp(){
 
-		// Nothing necessary here
+        $this->exceptionMessage = '';
+
+        $this->emptyValues = [null, '', [], new stdClass(), '     ', "\n\n\n", 0];
+        $this->emptyValuesCount = count($this->emptyValues);
 	}
 
 
@@ -55,7 +58,10 @@ class NumericUtilsTest extends TestCase {
 	 */
 	protected function tearDown(){
 
-		// Nothing necessary here
+	    if($this->exceptionMessage != ''){
+
+	        $this->fail($this->exceptionMessage);
+	    }
 	}
 
 
@@ -206,32 +212,25 @@ class NumericUtilsTest extends TestCase {
 	    $this->assertTrue(NumericUtils::getNumeric(0) == 0);
 	    $this->assertTrue(NumericUtils::getNumeric('0') == 0);
 
-	    $exceptionMessage = '';
-
 	    try {
 	        NumericUtils::getNumeric(null);
-	        $exceptionMessage = 'null did not cause exception';
+	        $this->exceptionMessage = 'null did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        NumericUtils::getNumeric('');
-	        $exceptionMessage = '"" did not cause exception';
+	        $this->exceptionMessage = '"" did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        NumericUtils::getNumeric([]);
-	        $exceptionMessage = '[] did not cause exception';
+	        $this->exceptionMessage = '[] did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
-	    }
-
-	    if($exceptionMessage != ''){
-
-	        $this->fail($exceptionMessage);
 	    }
 
 	    // Test ok values
@@ -268,39 +267,32 @@ class NumericUtilsTest extends TestCase {
 	    $this->assertTrue(NumericUtils::getNumeric('  -1 ') == -1);
 
 	    // Test wrong values
-	    $exceptionMessage = '';
-
 	    try {
 	        NumericUtils::getNumeric('abc');
-	        $exceptionMessage = 'abc did not cause exception';
+	        $this->exceptionMessage = 'abc did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        NumericUtils::getNumeric('1-');
-	        $exceptionMessage = '1- did not cause exception';
+	        $this->exceptionMessage = '1- did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        NumericUtils::getNumeric('1,1');
-	        $exceptionMessage = '1,1 did not cause exception';
+	        $this->exceptionMessage = '1,1 did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
 	        NumericUtils::getNumeric(['hello']);
-	        $exceptionMessage = 'hello did not cause exception';
+	        $this->exceptionMessage = 'hello did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
-	    }
-
-	    if($exceptionMessage != ''){
-
-	        $this->fail($exceptionMessage);
 	    }
 	}
 
@@ -312,61 +304,95 @@ class NumericUtilsTest extends TestCase {
 	 */
 	public function testGenerateRandomInteger(){
 
-	    // Test ok values
-	    for ($i = 0; $i < 1000; $i+=100) {
-
-	        $min = $i;
-	        $max = $i * 2 + 1;
-
-	        $val = NumericUtils::generateRandomInteger($max, $min);
-	        $this->assertTrue($val >= $min && $val <= $max);
-	        $this->assertTrue(NumericUtils::isInteger($val));
-
-	        $min = NumericUtils::generateRandomInteger($max, $min);
-	        $max = $min + NumericUtils::generateRandomInteger($i * 10 + 2, $i + 1);
-
-	        $val = NumericUtils::generateRandomInteger($max, $min);
-	        $this->assertTrue($val >= $min && $val <= $max);
-	        $this->assertTrue(NumericUtils::isInteger($val));
-	    }
-
-	    // Test exceptions
-	    $exceptionValues = [null, '', [], new stdClass(), 'hello', -1, .1, 1.1, [1, 2, 3, 4]];
-	    $exceptionValuesCount = count($exceptionValues);
-
-	    $exceptionMessage = '';
-
+	    // Test empty values
 	    try {
-	        NumericUtils::generateRandomInteger(5, 5);
-	        $exceptionMessage = '5,5 values did not cause exception';
+	        NumericUtils::generateRandomInteger(0, 0);
+	        $this->exceptionMessage = '0,0 did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
-	    try {
-	        NumericUtils::generateRandomInteger(5, 6);
-	        $exceptionMessage = '5,6 values did not cause exception';
-	    } catch (Throwable $e) {
-	        // We expect an exception to happen
-	    }
+	    for ($i = 0; $i < $this->emptyValuesCount; $i++) {
 
-	    for ($i = 0; $i < $exceptionValuesCount; $i++) {
+	        for ($j = 0; $j < $this->emptyValuesCount; $j++) {
 
-	        for ($j = 0; $j < $exceptionValuesCount; $j++) {
+                if($this->emptyValues[$i] !== 0 || $this->emptyValues[$j] !== 0){
 
-	            try {
-	                NumericUtils::generateRandomInteger($exceptionValues[$i], $exceptionValues[$j]);
-	                $exceptionMessage = 'exception value did not cause exception';
-	            } catch (Throwable $e) {
-	                // We expect an exception to happen
-	            }
-	        }
-	    }
+                    try {
+                        NumericUtils::generateRandomInteger($this->emptyValues[$i], $this->emptyValues[$j]);
+                        $this->exceptionMessage = 'non integer values did not cause exception';
+                    } catch (Throwable $e) {
+                        // We expect an exception to happen
+                    }
+                }
+            }
+        }
 
-	    if($exceptionMessage != ''){
+        // Test ok values
+        for ($i = 0; $i < 1000; $i+=100) {
 
-	        $this->fail($exceptionMessage);
-	    }
+            // Both positive
+            $min = $i;
+            $max = $i * 2 + 1;
+
+            $val = NumericUtils::generateRandomInteger($min, $max);
+            $this->assertTrue($val >= $min && $val <= $max);
+            $this->assertTrue(NumericUtils::isInteger($val));
+
+            // Both negative
+            $min = - NumericUtils::generateRandomInteger($min, $max);
+            $max = $min + NumericUtils::generateRandomInteger($i + 1, $i * 10 + 2);
+
+            $val = NumericUtils::generateRandomInteger($min, $max);
+            $this->assertTrue($val >= $min && $val <= $max);
+            $this->assertTrue(NumericUtils::isInteger($val));
+
+            // Negative min, positive max
+            $min = -$i - 1;
+            $max = $i * 2 + 1;
+
+            $val = NumericUtils::generateRandomInteger($min, $max);
+            $this->assertTrue($val >= $min && $val <= $max);
+            $this->assertTrue(NumericUtils::isInteger($val));
+        }
+
+        // Test wrong values
+        try {
+            NumericUtils::generateRandomInteger(10, 0);
+            $this->exceptionMessage = '10,0 did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            NumericUtils::generateRandomInteger(10, 10);
+            $this->exceptionMessage = '10,10 did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            NumericUtils::generateRandomInteger(-10, -20);
+            $this->exceptionMessage = '-10,-20 did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        // Test exceptions
+        $exceptionValues = [new Exception(), 'hello', .1, 1.1, [1, 2, 3, 4]];
+
+        for ($i = 0; $i < count($exceptionValues); $i++) {
+
+            for ($j = 0; $j < count($exceptionValues); $j++) {
+
+                try {
+                    NumericUtils::getNumeric(NumericUtils::generateRandomInteger($exceptionValues[$i], $exceptionValues[$j]));
+                    $this->exceptionMessage = 'wrong values did not cause exception';
+                } catch (Throwable $e) {
+                    // We expect an exception to happen
+                }
+            }
+        }
 	}
 }
 

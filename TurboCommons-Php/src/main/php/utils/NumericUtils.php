@@ -75,27 +75,28 @@ class NumericUtils {
 
 
     /**
-     * Generate a random integer
+     * Generate a random integer between the specified range.
      *
-     * @param int $max highest value to be returned
-     * @param int $min lowest value to be returned (default: 0)
+     * @param int $min lowest possible value (negative values are allowed)
+     * @param int $max highest possible value (negative values are allowed)
      *
-     * @return int A random integer value between min (or 0) and max
+     * @return int A random integer value between min and max
+     *
      * @throws UnexpectedValueException if max is equal or less than min.
      */
-    public static function generateRandomInteger($max, $min = 0){
+    public static function generateRandomInteger($min, $max){
 
-        if(!self::isInteger($max) || $max < 0 || !self::isInteger($min) || $min < 0){
+        if(!self::isInteger($max) || !self::isInteger($min)){
 
-            throw new UnexpectedValueException('NumericUtils->generateRandomInteger : Provided max and min must be positive integers');
+            throw new UnexpectedValueException('Provided max and min must be integers');
         }
 
         if($max <= $min){
 
-            throw new UnexpectedValueException('NumericUtils->generateRandomInteger : Provided max must be higher than min');
+            throw new UnexpectedValueException('Provided max must be higher than min');
         }
 
-        return mt_rand($min, $max);
+        return floor((mt_rand(0, mt_getrandmax() - 1) / mt_getrandmax()) * ($max - $min + 1)) + $min;
     }
 }
 
