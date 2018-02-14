@@ -72,24 +72,25 @@ export class NumericUtils {
     
     
     /**
-     * Generate a random integer
+     * Generate a random integer between the specified range.
      *
-     * @param max highest value to be returned
-     * @param min lowest value to be returned (default: 0)
+     * @param min lowest possible value (negative values are allowed)
+     * @param max highest possible value (negative values are allowed)
      *
-     * @return A random integer value between min (or 0) and max
+     * @return A random integer value between min and max
+     * 
      * @throws Exception if max is equal or less than min.
      */
-    public static generateRandomInteger(max:number, min:number = 0):number {
+    public static generateRandomInteger(min:number, max:number):number {
         
-        if(!NumericUtils.isInteger(max) || max < 0 || !NumericUtils.isInteger(min) || min < 0){
+        if(!NumericUtils.isInteger(max) || !NumericUtils.isInteger(min)){
 
-            throw new Error('NumericUtils.generateRandomInteger : Provided max and min must be positive integers');
+            throw new Error('Provided max and min must be integers');
         }
         
         if(max <= min){
 
-            throw new Error('NumericUtils.generateRandomInteger : Provided max must be higher than min');
+            throw new Error('Provided max must be higher than min');
         }
         
         return Math.floor(Math.random() * (max - min + 1)) + min;

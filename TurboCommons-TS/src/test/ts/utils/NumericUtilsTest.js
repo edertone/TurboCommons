@@ -13,11 +13,17 @@ QUnit.module("NumericUtilsTest", {
     beforeEach : function(){
 
         window.NumericUtils = org_turbocommons.NumericUtils;
+        
+        window.emptyValues = [undefined, null, '', [], {}, '     ', "\n\n\n", 0];
+        window.emptyValuesCount = window.emptyValues.length;
     },
 
     afterEach : function(){
 
         delete window.NumericUtils;
+        
+        delete window.emptyValues;
+        delete window.emptyValuesCount;
     }
 });
 
@@ -234,26 +240,72 @@ QUnit.test("getNumeric", function(assert){
  */
 QUnit.test("generateRandomInteger", function(assert){
 
+    // Test empty values
+    assert.throws(function() {
+        
+        NumericUtils.generateRandomInteger(0, 0);
+    }, /Provided max must be higher than min/);
+    
+    for(var i = 0; i < emptyValuesCount; i++){
+        
+        for(var j = 0; j < emptyValuesCount; j++){
+        
+            if(emptyValues[i] !== 0 || emptyValues[j] !== 0){
+            
+                assert.throws(function() {
+                    
+                    NumericUtils.generateRandomInteger(emptyValues[i], emptyValues[j]);
+                }, /Provided max and min must be integers/);
+            }            
+        }
+    }
+
     // Test ok values
     for (var i = 0; i < 1000; i+=100) {
 
+        // Both positive
         var min = i;
         var max = i * 2 + 1;
 
-        var val = NumericUtils.generateRandomInteger(max, min);
+        var val = NumericUtils.generateRandomInteger(min, max);
         assert.ok(val >= min && val <= max);
         assert.ok(NumericUtils.isInteger(val));
 
-        min = NumericUtils.generateRandomInteger(max, min);
-        max = min + NumericUtils.generateRandomInteger(i * 10 + 2, i + 1);
+        // Both negative
+        min = - NumericUtils.generateRandomInteger(min, max);
+        max = min + NumericUtils.generateRandomInteger(i + 1, i * 10 + 2);
 
-        val = NumericUtils.generateRandomInteger(max, min);
+        val = NumericUtils.generateRandomInteger(min, max);
+        assert.ok(val >= min && val <= max);
+        assert.ok(NumericUtils.isInteger(val));
+        
+        // Negative min, positive max
+        var min = -i - 1;
+        var max = i * 2 + 1;
+
+        var val = NumericUtils.generateRandomInteger(min, max);
         assert.ok(val >= min && val <= max);
         assert.ok(NumericUtils.isInteger(val));
     }
 
+    // Test wrong values
+    assert.throws(function() {
+        
+        NumericUtils.generateRandomInteger(10, 0);
+    }, /Provided max must be higher than min/);
+    
+    assert.throws(function() {
+        
+        NumericUtils.generateRandomInteger(10, 10);
+    }, /Provided max must be higher than min/);
+    
+    assert.throws(function() {
+        
+        NumericUtils.generateRandomInteger(-10, -20);
+    }, /Provided max must be higher than min/);
+
     // Test exceptions
-    var exceptionValues = [null, '', [], new Error(), 'hello', -1, .1, 1.1, [1, 2, 3, 4]];
+    var exceptionValues = [new Error(), 'hello', .1, 1.1, [1, 2, 3, 4]];
 
     for (i = 0; i < exceptionValues.length; i++) {
 
@@ -264,5 +316,5 @@ QUnit.test("generateRandomInteger", function(assert){
                 NumericUtils.getNumeric(NumericUtils.generateRandomInteger(exceptionValues[i], exceptionValues[j]));
             });
         }
-    }
+    }    
 });
