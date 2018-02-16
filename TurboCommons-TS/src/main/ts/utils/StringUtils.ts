@@ -136,7 +136,7 @@ export class StringUtils {
     
     
     /**
-     * Tells if a specified string is empty. The string may contain empty spaces, and new line characters but have some lenght, and therefore be EMPTY.
+     * Tells if a specified string is empty. The string may contain empty spaces, and new line characters but have some length, and therefore be EMPTY.
      * This method checks all these different conditions that can tell us that a string is empty.
      * 
      * @param string String to check
@@ -381,7 +381,7 @@ export class StringUtils {
     
     
     /**
-     * Method that limits the lenght of a string and optionally appends informative characters like ' ...'
+     * Method that limits the length of a string and optionally appends informative characters like ' ...'
      * to inform that the original string was longer.
      * 
      * @param string String to limit
@@ -814,47 +814,82 @@ export class StringUtils {
     
     
     /**
-     * Generates a random string with the specified lenght and options
+     * Generates a random string with the specified length and options
      *
-     * @param lenght Specify the lengh of the generated string
-     * @param useUpperCase Specify if upper case letters will be also included in the generated string
-     * @param useNumbers Specify if numeric digits will be also included in the generated string
+     * @param minLength Specify the minimum possible length for the generated string
+     * @param maxLength Specify the maximum possible length for the generated string
+     * @param charSet Defines the list of possible characters to be generated. Each element of charSet must be a string containing
+     *                the possible characters like 'a1kjuhAO' or a range like 'a-z', 'A-D', '0-5', ... etc.
+     *                Note that - character must be escaped \- when not specified as part of a range
      *
      * @return A randomly generated string
      */
-    public static generateRandom(lenght = 5, useUpperCase = true, useNumbers = true) {
+    public static generateRandom(minLength: number, maxLength: number, charSet = ['0-9', 'a-z', 'A-Z']) {
     
-        if(lenght < 0 || !NumericUtils.isInteger(lenght)){
+        if(minLength < 0 || !NumericUtils.isInteger(minLength) ||
+                maxLength < 0 || !NumericUtils.isInteger(maxLength)) {
 
-            throw new Error('length must be a positive number');
+            throw new Error('minLength and maxLength must be positive numbers');
         }
         
-        // Set the characters to use in the random string
-        let chars = 'abcdefghijkmnopqrstuvwxyz023456789';
+        if(maxLength < minLength){
 
-        if(useUpperCase){
-
-            chars = 'ABCDEFGHIJKMNOPQRSTUVWXYZ' + chars;
+            throw new Error('Provided maxLength must be higher or equal than minLength');
         }
         
-        if(useNumbers){
-
-            chars = '0123456789' + chars;
+        if(!ArrayUtils.isArray(charSet) || charSet.length <= 0){
+            
+            throw new Error('invalid charset');
         }
+        
+        // Define the output charset
+        let finalCharSet = '';
+        let numbers = '0123456789';
+        let lowerCaseLetters = 'abcdefghijkmnopqrstuvwxyz';
+        let upperCaseLetters = 'ABCDEFGHIJKMNOPQRSTUVWXYZ';
+        
+        for (let chars of charSet) {
+	
+            if(!StringUtils.isString(chars) || StringUtils.isEmpty(chars)){
+                
+                throw new Error('invalid charset');
+            }
+            
+            let firstChar = chars.substr(0, 1);
+            let thirdChar = chars.substr(2, 1);
+            
+            // Check if an interval of characters have been defined
+            if(chars.length === 3 && chars.indexOf('-') === 1 && firstChar !== '\\'){
+    
+                // Look for numeric intervals
+                if(numbers.indexOf(firstChar) >= 0) {
+                    
+                    finalCharSet += numbers.substring(numbers.indexOf(firstChar), numbers.indexOf(thirdChar) + 1); 
+                
+                // Look for lower case letter intervals
+                } else if (lowerCaseLetters.indexOf(firstChar) >= 0) {
+                    
+                    finalCharSet += lowerCaseLetters.substring(lowerCaseLetters.indexOf(firstChar), lowerCaseLetters.indexOf(thirdChar) + 1); 
+                
+                // Look for upper case letter intervals
+                } else if(upperCaseLetters.indexOf(firstChar) >= 0) {
+                        
+                    finalCharSet += upperCaseLetters.substring(upperCaseLetters.indexOf(firstChar), upperCaseLetters.indexOf(thirdChar) + 1);
+                }
 
-        // Get the lenght for the chars string to use in random generation process
-        let charsLen = chars.length - 1;
-
+            } else {
+                
+                finalCharSet += StringUtils.replace(chars, '\\-', '-');
+            }            
+        }
+        
+        // Generate as many random characters as required
         let result = '' ;
-
-        // loop throught all the string defined lenght
-        for(let i=0; i<lenght; i++){
+        let length = (minLength === maxLength) ? maxLength : NumericUtils.generateRandomInteger(minLength, maxLength);
         
-            // get an integer between 0 and charslen.
-            let num = Math.floor(Math.random() * charsLen);
+        for(let i=0; i<length; i++){
         
-            // append a random character
-            result = result + chars.substr(num, 1);
+            result += finalCharSet.charAt(Math.floor(Math.random() * finalCharSet.length));
         }
 
         return result;

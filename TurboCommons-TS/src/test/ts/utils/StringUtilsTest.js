@@ -12,6 +12,7 @@
 QUnit.module("StringUtilsTest", {
     beforeEach : function() {
 
+        window.NumericUtils = org_turbocommons.NumericUtils;
         window.StringUtils = org_turbocommons.StringUtils;
         window.ArrayUtils = org_turbocommons.ArrayUtils;
         
@@ -21,6 +22,7 @@ QUnit.module("StringUtilsTest", {
 
     afterEach : function() {
 
+        delete window.NumericUtils;
         delete window.StringUtils;
         delete window.ArrayUtils;
         
@@ -918,34 +920,76 @@ QUnit.todo("formatForFullTextSearch", function(assert) {
 QUnit.test("generateRandom", function(assert) {
 
     // Test empty values
+    assert.ok(StringUtils.generateRandom(0, 0) === '');
+
     assert.throws(function() {
 
-        StringUtils.generateRandom(null, null, null);
-    });
+        StringUtils.generateRandom(undefined, undefined);
+    }, /minLength and maxLength must be positive numbers/);
+    
+    assert.throws(function() {
 
+        StringUtils.generateRandom(null, null);
+    }, /minLength and maxLength must be positive numbers/);
+    
+    assert.throws(function() {
+
+        StringUtils.generateRandom(1, 1, null);
+    }, /invalid charset/);
+    
+    assert.throws(function() {
+
+        StringUtils.generateRandom(1, 1, ['']);
+    }, /invalid charset/);
+    
     // Test ok values
-    assert.ok(StringUtils.generateRandom(0, true, true) === '');
-    assert.ok(StringUtils.generateRandom(0, false, false) === '');
+    assert.ok(StringUtils.generateRandom(1, 1, ['T']) === 'T');
+    assert.ok(StringUtils.generateRandom(3, 3, ['0']) === '000');
+    assert.ok(StringUtils.generateRandom(5, 5, ['a']) === 'aaaaa');
+    
+    for (var i = 1; i < 30; i++) {
 
-    for (var i = 1; i < 50; i++) {
-
-        assert.ok(StringUtils.generateRandom(i, true, true).length === i);
-        assert.ok(StringUtils.generateRandom(i, false, false).length === i);
-        assert.ok(StringUtils.generateRandom(i, true, false).length === i);
-        assert.ok(StringUtils.generateRandom(i, false, true).length === i);
+        assert.ok(StringUtils.generateRandom(i, i).length === i);
+        
+        // test only numeric string
+        var s = StringUtils.generateRandom(i, i*2, ['0-9']);
+        assert.ok(NumericUtils.isNumeric(s));
+        assert.ok(s.length >= i && s.length <= i*2);
+        
+        var s = StringUtils.generateRandom(i, i+1, ['3-6']);
+        assert.ok(NumericUtils.isNumeric(s));
+        assert.ok(s.length >= i && s.length <= i+1);
+        
+        for (var j = 0; j < s.length; j++) {
+            
+            assert.ok('012'.indexOf(s.charAt(j)) < 0);
+            assert.ok('789'.indexOf(s.charAt(j)) < 0);
+            assert.ok('3456'.indexOf(s.charAt(j)) >= 0);
+        }
+        // TODO - falten tests
     }
-
+    
     // Test wrong values
     // not necessary
 
     // Test exceptions
-    assert.throws(function() {
-        StringUtils.generateRandom(-1);
-    });
-
-    assert.throws(function() {
-        StringUtils.generateRandom('some string');
-    });
+//    assert.throws(function() {
+//        StringUtils.generateRandom(-1);
+//    }, /length must be a positive number/);
+//
+//    assert.throws(function() {
+//        StringUtils.generateRandom('some string');
+//    }, /length must be a positive number/);
+//    
+//    assert.throws(function() {
+//
+//        StringUtils.generateRandom(1, 'ertr');
+//    }, /invalid charset/);
+//    
+//    assert.throws(function() {
+//
+//        StringUtils.generateRandom(1, {});
+//    }, /invalid charset/);
 });
 
 
