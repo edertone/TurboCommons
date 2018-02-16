@@ -75,7 +75,7 @@ class NumericUtils {
 
 
     /**
-     * Generate a random integer between the specified range.
+     * Generate a random integer between the specified range (both extremes are included).
      *
      * @param int $min lowest possible value (negative values are allowed)
      * @param int $max highest possible value (negative values are allowed)
