@@ -966,30 +966,100 @@ QUnit.test("generateRandom", function(assert) {
             assert.ok('789'.indexOf(s.charAt(j)) < 0);
             assert.ok('3456'.indexOf(s.charAt(j)) >= 0);
         }
-        // TODO - falten tests
+        
+        // test only lowercase alphabetic strings
+        var s = StringUtils.generateRandom(i, i*2, ['a-z']);
+        assert.ok(StringUtils.isString(s));
+        assert.ok(s.length >= i && s.length <= i*2);
+        
+        var s = StringUtils.generateRandom(i, i+1, ['g-r']);
+        assert.ok(StringUtils.isString(s));
+        assert.ok(s.length >= i && s.length <= i+1);
+        
+        for (var j = 0; j < s.length; j++) {
+            
+            assert.ok(s.charAt(j).toLowerCase() === s.charAt(j));
+            assert.ok('abcdef'.indexOf(s.charAt(j)) < 0);
+            assert.ok('stuvwxyz'.indexOf(s.charAt(j)) < 0);
+            assert.ok('ghijkmnopqr'.indexOf(s.charAt(j)) >= 0);
+        }
+        
+        // test only uppercase alphabetic strings
+        var s = StringUtils.generateRandom(i, i*2, ['A-Z']);
+        assert.ok(StringUtils.isString(s));
+        assert.ok(s.length >= i && s.length <= i*2);
+        
+        var s = StringUtils.generateRandom(i, i+1, ['I-M']);
+        assert.ok(StringUtils.isString(s));
+        assert.ok(s.length >= i && s.length <= i+1);
+        
+        for (var j = 0; j < s.length; j++) {
+            
+            assert.ok(s.charAt(j).toUpperCase() === s.charAt(j));
+            assert.ok('ABCDEFGH'.indexOf(s.charAt(j)) < 0);
+            assert.ok('NOPQRSTUVWXYZ'.indexOf(s.charAt(j)) < 0);
+            assert.ok('IJKM'.indexOf(s.charAt(j)) >= 0);
+        }
+        
+        // Test numbers and upper case and lower case letters
+        var s = StringUtils.generateRandom(i, i*2, ['0-9', 'a-z', 'A-Z']);
+        assert.ok(StringUtils.isString(s));
+        assert.ok(s.length >= i && s.length <= i*2);
+        
+        for (var j = 0; j < s.length; j++) {
+            
+            assert.ok('0123456789'.indexOf(s.charAt(j)) >= 0 ||
+                    'abcdefghijkmnopqrstuvwxyz'.indexOf(s.charAt(j)) >= 0 ||
+                    'ABCDEFGHIJKMNOPQRSTUVWXYZ'.indexOf(s.charAt(j)) >= 0);
+        }
+        
+        // Test fixed characters set
+        var s = StringUtils.generateRandom(i, i*2, ['97hjrfHNgbf71']);
+        assert.ok(StringUtils.isString(s));
+        assert.ok(s.length >= i && s.length <= i*2);
+        
+        for (var j = 0; j < s.length; j++) {
+            
+            assert.ok('97hjrfHNgbf71'.indexOf(s.charAt(j)) >= 0);
+        }
+        
+        var s = StringUtils.generateRandom(1, 500, ['&/$hb\\-81679Ç+\\-']);
+        assert.ok(StringUtils.isString(s));
+        assert.ok(s.length >= 1 && s.length <= 500);
+        
+        for (var j = 0; j < s.length; j++) {
+            
+            assert.ok('&/$hb-81679Ç+-'.indexOf(s.charAt(j)) >= 0);
+        }
     }
     
     // Test wrong values
     // not necessary
 
     // Test exceptions
-//    assert.throws(function() {
-//        StringUtils.generateRandom(-1);
-//    }, /length must be a positive number/);
-//
-//    assert.throws(function() {
-//        StringUtils.generateRandom('some string');
-//    }, /length must be a positive number/);
-//    
-//    assert.throws(function() {
-//
-//        StringUtils.generateRandom(1, 'ertr');
-//    }, /invalid charset/);
-//    
-//    assert.throws(function() {
-//
-//        StringUtils.generateRandom(1, {});
-//    }, /invalid charset/);
+    assert.throws(function() {
+        StringUtils.generateRandom(-1, 1);
+    }, /minLength and maxLength must be positive numbers/);
+    
+    assert.throws(function() {
+        StringUtils.generateRandom(1, -1);
+    }, /minLength and maxLength must be positive numbers/);
+
+    assert.throws(function() {
+        StringUtils.generateRandom('some string', 1);
+    }, /minLength and maxLength must be positive numbers/);
+    
+    assert.throws(function() {
+        StringUtils.generateRandom(1, 'some string');
+    }, /minLength and maxLength must be positive numbers/);
+    
+    assert.throws(function() {
+        StringUtils.generateRandom(1, 2, 'ertr');
+    }, /invalid charset/);
+    
+    assert.throws(function() {
+        StringUtils.generateRandom(1, 2, {});
+    }, /invalid charset/);
 });
 
 
