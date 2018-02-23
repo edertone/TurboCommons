@@ -827,7 +827,7 @@ export class StringUtils {
     public static generateRandom(minLength: number, maxLength: number, charSet = ['0-9', 'a-z', 'A-Z']) {
     
         if(minLength < 0 || !NumericUtils.isInteger(minLength) ||
-                maxLength < 0 || !NumericUtils.isInteger(maxLength)) {
+           maxLength < 0 || !NumericUtils.isInteger(maxLength)) {
 
             throw new Error('minLength and maxLength must be positive numbers');
         }
@@ -858,7 +858,7 @@ export class StringUtils {
             let firstChar = chars.substr(0, 1);
             let thirdChar = chars.substr(2, 1);
             
-            // Check if an interval of characters have been defined
+            // Check if an interval of characters has been defined
             if(chars.length === 3 && chars.indexOf('-') === 1 && firstChar !== '\\'){
     
                 // Look for numeric intervals
