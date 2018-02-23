@@ -147,7 +147,7 @@ class StringUtils {
 
 
     /**
-     * Tells if a specified string is empty. The string may contain empty spaces, and new line characters but have some lenght, and therefore be EMPTY.
+     * Tells if a specified string is empty. The string may contain empty spaces, and new line characters but have some length, and therefore be EMPTY.
      * This method checks all these different conditions that can tell us that a string is empty.
      *
      * @param string $string String to check
@@ -411,7 +411,7 @@ class StringUtils {
 
 
     /**
-     * Method that limits the lenght of a string and optionally appends informative characters like ' ...'
+     * Method that limits the length of a string and optionally appends informative characters like ' ...'
      * to inform that the original string was longer.
      *
      * @param string $string String to limit
@@ -526,7 +526,7 @@ class StringUtils {
         // Process the received string to contain only alphanumeric lowercase values
         $string = self::formatForFullTextSearch($string);
 
-        // Remove all the words that are shorter than the specified lenght
+        // Remove all the words that are shorter than the specified length
         $string = self::removeWordsShorterThan($string, $longerThan);
 
         // Remove all the words longher than specified value
@@ -881,47 +881,82 @@ class StringUtils {
 
 
     /**
-     * Generates a random string with the specified lenght and options
+     * Generates a random string with the specified length and options
      *
-     * @param int $lenght Specify the lengh of the generated string
-     * @param boolean $useUpperCase Specify if upper case letters will be also included in the generated string
-     * @param boolean $useNumbers Specify if numeric digits will be also included in the generated string
+     * @param int $minLength Specify the minimum possible length for the generated string
+     * @param int $maxLength Specify the maximum possible length for the generated string
+     * @param array $charSet Defines the list of possible characters to be generated. Each element of charSet must be a string containing
+     *                the possible characters like 'a1kjuhAO' or a range like 'a-z', 'A-D', '0-5', ... etc.
+     *                Note that - character must be escaped \- when not specified as part of a range
      *
      * @return string A randomly generated string
      */
-    public static function generateRandom(int $lenght = 5, bool $useUpperCase = true, bool $useNumbers = true){
+    public static function generateRandom(int $minLength, int $maxLength, array $charSet = ['0-9', 'a-z', 'A-Z']){
 
-        if($lenght < 0 || !NumericUtils::isInteger($lenght)){
+        if($minLength < 0 || !NumericUtils::isInteger($minLength) ||
+           $maxLength < 0 || !NumericUtils::isInteger($maxLength)) {
 
-            throw new InvalidArgumentException('length must be a positive number');
+               throw new InvalidArgumentException('minLength and maxLength must be positive numbers');
         }
 
-        // Set the characters to use in the random string
-        $chars = 'abcdefghijkmnopqrstuvwxyz023456789';
+        if($maxLength < $minLength){
 
-        if($useUpperCase){
-
-            $chars = 'ABCDEFGHIJKMNOPQRSTUVWXYZ'.$chars;
+            throw new InvalidArgumentException('Provided maxLength must be higher or equal than minLength');
         }
 
-        if($useNumbers){
+        if(!ArrayUtils::isArray($charSet) || count($charSet) <= 0){
 
-            $chars = '0123456789'.$chars;
+            throw new InvalidArgumentException('invalid charset');
         }
 
-        // Get the lenght for the chars string to use in random generation process
-        $charsLen = strlen($chars) - 1;
+        // Define the output charset
+        $finalCharSet = '';
+        $numbers = '0123456789';
+        $lowerCaseLetters = 'abcdefghijkmnopqrstuvwxyz';
+        $upperCaseLetters = 'ABCDEFGHIJKMNOPQRSTUVWXYZ';
 
+        foreach ($charSet as $chars) {
+
+            if(!self::isString($chars) || self::isEmpty($chars)){
+
+                throw new InvalidArgumentException('invalid charset');
+            }
+
+            $firstChar = substr($chars, 0, 1);
+            $thirdChar = substr($chars, 2, 1);
+
+            // Check if an interval of characters has been defined
+            if(strlen($chars) === 3 && strpos($chars, '-') === 1 && $firstChar !== '\\'){
+
+                // Look for numeric intervals
+                if(strpos($numbers, $firstChar) !== false) {
+
+                    $finalCharSet .= substr($numbers, strpos($numbers, $firstChar), strpos($numbers, $thirdChar) + 1 - strpos($numbers, $firstChar));
+
+                    // Look for lower case letter intervals
+                } else if (strpos($lowerCaseLetters, $firstChar) !== false) {
+
+                    $finalCharSet .= substr($lowerCaseLetters, strpos($lowerCaseLetters, $firstChar), strpos($lowerCaseLetters, $thirdChar) + 1 - strpos($lowerCaseLetters, $firstChar));
+
+                    // Look for upper case letter intervals
+                } else if(strpos($upperCaseLetters, $firstChar) !== false) {
+
+                    $finalCharSet .= substr($upperCaseLetters, strpos($upperCaseLetters, $firstChar), strpos($upperCaseLetters, $thirdChar) + 1 - strpos($upperCaseLetters, $firstChar));
+                }
+
+            } else {
+
+                $finalCharSet .= StringUtils::replace($chars, '\\-', '-');
+            }
+        }
+
+        // Generate as many random characters as required
         $result = '' ;
+        $length = ($minLength === $maxLength) ? $maxLength : NumericUtils::generateRandomInteger($minLength, $maxLength);
 
-        // loop throught all the string defined lenght
-        for($i=0; $i<$lenght; $i++){
+        for($i=0; $i<$length; $i++){
 
-            // get an integer between 0 and charslen.
-            $num = mt_rand(0, $charsLen);
-
-            // append a random character
-            $result = $result.substr($chars, $num, 1);
+            $result .= substr($finalCharSet, mt_rand(0, strlen($finalCharSet) - 1), 1);
         }
 
         return $result;

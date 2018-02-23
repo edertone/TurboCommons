@@ -12,6 +12,7 @@
 namespace org\turbocommons\src\test\php\utils;
 
 use org\turbocommons\src\main\php\utils\StringUtils;
+use org\turbocommons\src\main\php\utils\NumericUtils;
 use Throwable;
 use stdClass;
 use Exception;
@@ -1121,42 +1122,164 @@ class StringUtilsTest extends TestCase {
 	public function testGenerateRandom(){
 
 	    // Test empty values
+	    $this->assertTrue(StringUtils::generateRandom(0, 0) === '');
+
 	    try {
-	        StringUtils::generateRandom(null, null, null);
-	        $this->exceptionMessage = '-1 did not cause exception';
-	    } catch (Throwable $e) {
-	        // We expect an exception to happen
-	    }
-
-	    // Test ok values
-	    $this->assertTrue(StringUtils::generateRandom(0, true, true) === '');
-	    $this->assertTrue(StringUtils::generateRandom(0, false, false) === '');
-
-	    for ($i = 1; $i < 50; $i++) {
-
-	        $this->assertTrue(strlen(StringUtils::generateRandom($i, true, true)) === $i);
-	        $this->assertTrue(strlen(StringUtils::generateRandom($i, false, false)) === $i);
-	        $this->assertTrue(strlen(StringUtils::generateRandom($i, true, false)) === $i);
-	        $this->assertTrue(strlen(StringUtils::generateRandom($i, false, true)) === $i);
-	    }
-
-	    // Test wrong values
-	    // not necessary
-
-	    // Test exceptions
-	    try {
-	        StringUtils::generateRandom(-1);
-	        $this->exceptionMessage = '-1 did not cause exception';
+	        StringUtils::generateRandom(null, null);
+	        $this->exceptionMessage = 'null did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
-	        StringUtils::generateRandom('some string');
-	        $this->exceptionMessage = 'some string did not cause exception';
+	        StringUtils::generateRandom(1, 1, null);
+	        $this->exceptionMessage = '[null] did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
+
+	    try {
+	        StringUtils::generateRandom(1, 1, ['']);
+	        $this->exceptionMessage = "[''] did not cause exception";
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+        // Test ok values
+        $this->assertTrue(StringUtils::generateRandom(1, 1, ['T']) === 'T');
+        $this->assertTrue(StringUtils::generateRandom(3, 3, ['0']) === '000');
+        $this->assertTrue(StringUtils::generateRandom(5, 5, ['a']) === 'aaaaa');
+
+        for ($i = 1; $i < 30; $i++) {
+
+            $this->assertTrue(strlen(StringUtils::generateRandom($i, $i)) === $i);
+
+            // test only numeric string
+            $s = StringUtils::generateRandom($i, $i*2, ['0-9']);
+            $this->assertTrue(NumericUtils::isNumeric($s));
+            $this->assertTrue(strlen($s) >= $i && strlen($s) <= $i*2);
+
+            $s = StringUtils::generateRandom($i, $i+1, ['3-6']);
+            $this->assertTrue(NumericUtils::isNumeric($s));
+            $this->assertTrue(strlen($s) >= $i && strlen($s) <= $i+1);
+
+            for ($j = 0; $j < strlen($s); $j++) {
+
+                $this->assertTrue(strpos('012', substr($s, $j, 1)) === false);
+                $this->assertTrue(strpos('789', substr($s, $j, 1)) === false);
+                $this->assertTrue(strpos('3456', substr($s, $j, 1)) !== false);
+            }
+
+            // test only lowercase alphabetic strings
+            $s = StringUtils::generateRandom($i, $i*2, ['a-z']);
+            $this->assertTrue(StringUtils::isString($s));
+            $this->assertTrue(strlen($s) >= $i && strlen($s) <= $i*2);
+
+            $s = StringUtils::generateRandom($i, $i+1, ['g-r']);
+            $this->assertTrue(StringUtils::isString($s));
+            $this->assertTrue(strlen($s) >= $i && strlen($s) <= $i+1);
+
+            for ($j = 0; $j < strlen($s); $j++) {
+
+                $this->assertTrue(strtolower(substr($s, $j, 1)) === substr($s, $j, 1));
+                $this->assertTrue(strpos('abcdef', substr($s, $j, 1)) === false);
+                $this->assertTrue(strpos('stuvwxyz', substr($s, $j, 1)) === false);
+                $this->assertTrue(strpos('ghijkmnopqr', substr($s, $j, 1)) !== false);
+            }
+
+            // test only uppercase alphabetic strings
+            $s = StringUtils::generateRandom($i, $i*2, ['A-Z']);
+            $this->assertTrue(StringUtils::isString($s));
+            $this->assertTrue(strlen($s) >= $i && strlen($s) <= $i*2);
+
+            $s = StringUtils::generateRandom($i, $i+1, ['I-M']);
+            $this->assertTrue(StringUtils::isString($s));
+            $this->assertTrue(strlen($s) >= $i && strlen($s) <= $i+1);
+
+            for ($j = 0; $j < strlen($s); $j++) {
+
+                $this->assertTrue(strtoupper(substr($s, $j, 1)) === substr($s, $j, 1));
+                $this->assertTrue(strpos('ABCDEFGH', substr($s, $j, 1)) === false);
+                $this->assertTrue(strpos('NOPQRSTUVWXYZ', substr($s, $j, 1)) === false);
+                $this->assertTrue(strpos('IJKM', substr($s, $j, 1)) !== false);
+            }
+
+            // Test numbers and upper case and lower case letters
+            $s = StringUtils::generateRandom($i, $i*2, ['0-9', 'a-z', 'A-Z']);
+            $this->assertTrue(StringUtils::isString($s));
+            $this->assertTrue(strlen($s) >= $i && strlen($s) <= $i*2);
+
+            for ($j = 0; $j < strlen($s); $j++) {
+
+                $this->assertTrue(strpos('0123456789', substr($s, $j, 1)) !== false ||
+                    strpos('abcdefghijkmnopqrstuvwxyz', substr($s, $j, 1)) !== false ||
+                    strpos('ABCDEFGHIJKMNOPQRSTUVWXYZ', substr($s, $j, 1)) !== false);
+            }
+
+            // Test fixed characters set
+            $s = StringUtils::generateRandom($i, $i*2, ['97hjrfHNgbf71']);
+            $this->assertTrue(StringUtils::isString($s));
+            $this->assertTrue(strlen($s) >= $i && strlen($s) <= $i*2);
+
+            for ($j = 0; $j < strlen($s); $j++) {
+
+                $this->assertTrue(strpos('97hjrfHNgbf71', substr($s, $j, 1)) !== false);
+            }
+
+            $s = StringUtils::generateRandom(1, 500, ['&/$hb\\-81679Ç+\\-']);
+            $this->assertTrue(StringUtils::isString($s));
+            $this->assertTrue(strlen($s) >= 1 && strlen($s) <= 500);
+
+            for ($j = 0; $j < strlen($s); $j++) {
+
+                $this->assertTrue(strpos('&/$hb-81679Ç+-', substr($s, $j, 1)) !== false);
+            }
+        }
+
+        // Test wrong values
+        // not necessary
+
+        try {
+            StringUtils::generateRandom(-1, 1);
+            $this->exceptionMessage = "-1 1 did not cause exception";
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            StringUtils::generateRandom(1, -1);
+            $this->exceptionMessage = "1, -1 did not cause exception";
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            StringUtils::generateRandom('some string', 1);
+            $this->exceptionMessage = "some string, 1 did not cause exception";
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            StringUtils::generateRandom(1, 'some string');
+            $this->exceptionMessage = "1, some string did not cause exception";
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            StringUtils::generateRandom(1, 2, 'ertr');
+            $this->exceptionMessage = "1, 2, ertr did not cause exception";
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            StringUtils::generateRandom(1, 2, new stdClass());
+            $this->exceptionMessage = "1, 2, new stdClass() did not cause exception";
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
 	}
 
 
