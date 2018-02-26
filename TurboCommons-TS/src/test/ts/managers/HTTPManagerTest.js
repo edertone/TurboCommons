@@ -24,6 +24,9 @@ QUnit.module("HTTPManagerTest", {
         window.sut = new org_turbocommons.HTTPManager();
 
         window.sut.timeout = 3000;
+        
+        window.basePath = './resources/managers/httpManager';
+        window.nonExistantUrl = browserManager.getCurrentUrl() + '3453453454435dgdfg.html';
     },
 
     afterEach : function(){
@@ -37,6 +40,9 @@ QUnit.module("HTTPManagerTest", {
         delete window.HTTPManager;
         delete window.browserManager;
         delete window.sut;
+        
+        delete window.basePath;
+        delete window.nonExistantUrl;
     }
 });
 
@@ -170,14 +176,13 @@ QUnit.test("urlExists", function(assert){
     });
 
     // Test wrong values
-    sut.urlExists('https://www.google.com', function(){
+    sut.urlExists(nonExistantUrl, function(){
         
         assert.ok(false);
         done();
         
     }, function(){
         
-        // Google triggers the noCallback due to CORS restrictions 
         assert.ok(true);
         done();
     });
@@ -228,10 +233,9 @@ QUnit.test("getUrlHeaders", function(assert){
         assert.ok(false);
         done();
         
-    }, function(){
+    }, function(msg, code){
         
-        // Google triggers the noCallback due to CORS restrictions 
-        assert.ok(true);
+        assert.ok(StringUtils.isString(msg));
         done();
     });
 
@@ -325,29 +329,30 @@ QUnit.test("get", function(assert){
     var done = assert.async(2);
     
     sut.get(browserManager.getCurrentUrl(), function(result){
-            
-        assert.ok(!StringUtils.isEmpty(result));
-        done();
-        
-    }, function(){
-        
-        assert.ok(false);
-        done();
-    });
-    
-    sut.get('https://www.iuyyt7ct6u8289gduf823439ryhhgfxhjwer234.casdfase43', function(result){
-        
-        assert.ok(false);
-        done();
-        
-    }, function(){
-        
-        assert.ok(true);
-        done();
-    });
 
+        assert.ok(!StringUtils.isEmpty(result));
+        assert.ok(result.length > 5);
+        done();
+        
+    }, function(){
+        
+        assert.ok(false);
+        done();
+    });
+        
     // Test wrong values
-    // This test is considered innecessary and skiped
+    sut.get(nonExistantUrl, function(result){
+
+        assert.ok(false);
+        done();
+        
+    }, function(msg, code){
+        
+        assert.ok(StringUtils.isString(msg));
+        assert.ok(msg.length > 5);
+        assert.strictEqual(code, 404);
+        done();
+    });
 
     // Test exceptions
     // This test is considered innecessary and skiped
@@ -373,4 +378,76 @@ QUnit.todo("post", function(assert){
 });
 
 
+/**
+ * loadResources
+ */
+QUnit.test("loadResources", function(assert){
 
+    // Test empty values
+    for (var i = 0; i < emptyValuesCount; i++) {
+        
+        assert.throws(function() {
+            sut.loadResources(emptyValues[i]);
+        }, /paths must be a non empty array/);
+    } 
+
+    // Test ok values
+    var done = assert.async(3);
+
+    var resources = [basePath + '/file1.txt',
+                     basePath + '/file2.xml',
+                     basePath + '/file3.json'];
+    
+    sut.loadResources(resources, function(results){
+
+        assert.strictEqual(results.length, 3);
+        assert.strictEqual(results[0], 'text1');
+        assert.strictEqual(results[1], "<test>\r\n    hello\r\n</test>");
+        assert.strictEqual(results[2], '{\r\na: "1",\r\nb: 2\r\n}');
+        done();
+        
+    }, function(){
+        
+        assert.ok(false);
+        done();
+    });
+    
+    // test ok values with resourceLoadedCallback
+    var loadedCalls = 0;
+    
+    sut.loadResources(resources, function(results){
+
+        assert.strictEqual(results.length, 3);
+        assert.strictEqual(results[0], 'text1');
+        assert.strictEqual(results[1], "<test>\r\n    hello\r\n</test>");
+        assert.strictEqual(results[2], '{\r\na: "1",\r\nb: 2\r\n}');
+        assert.strictEqual(loadedCalls, 3);        
+        done();
+        
+    }, function(){
+        
+        assert.ok(false);
+        done();
+        
+    }, function(){
+        
+        loadedCalls ++;
+    });
+
+    // Test wrong values
+    sut.loadResources([nonExistantUrl], function(result){
+
+        assert.ok(false);
+        done();
+        
+    }, function(msg, code){
+        
+        assert.ok(StringUtils.isString(msg));
+        assert.ok(msg.length > 5);
+        assert.strictEqual(code, 404);
+        done();
+    });
+
+    // Test exceptions
+    // not necessary
+});

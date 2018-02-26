@@ -10,6 +10,7 @@
 
 import { StringUtils } from '../utils/StringUtils';
 import { ObjectUtils } from '../utils/ObjectUtils';
+import { ArrayUtils } from '../utils/ArrayUtils';
 import { HashMapObject } from '../model/HashMapObject';
 
    
@@ -72,12 +73,12 @@ export class HTTPManager{
     /**
      * Tells if there's currently a working internet connection available or not.
      *  
-     * @param yesCallback A function that will be executed if the internet connection is available and working
-     * @param noCallback A function that will be executed if the internet connection is NOT available
+     * @param yesCallback Executed if the internet connection is available and working
+     * @param noCallback Executed if the internet connection is NOT available
      * 
      * @return void
      */
-    isInternetAvailable(yesCallback: () => any, noCallback: () => any){
+    isInternetAvailable(yesCallback: () => void, noCallback: () => void){
         
         if(typeof yesCallback  !== 'function' || typeof noCallback !== 'function'){
             
@@ -136,12 +137,12 @@ export class HTTPManager{
      * to check the existence of an url that does not allow CORS outside your application domain.
      * 
      * @param url An full valid internet address to check
-     * @param yesCallback A method that will be executed if the url exists
-     * @param noCallback A method that will be executed if the url does not exist (or is not accessible).
+     * @param yesCallback Executed if the url exists
+     * @param noCallback Executed if the url does not exist (or is not accessible).
      *
      * @return void
      */
-    urlExists(url:string, yesCallback: () => any, noCallback: () => any){
+    urlExists(url:string, yesCallback: () => void, noCallback: () => void){
     
         if(!StringUtils.isString(url)){
 
@@ -160,16 +161,8 @@ export class HTTPManager{
             return;
         }
 
-        this.getUrlHeaders(url, (result) =>{
+        this.get(url, (result) =>{
             
-            for (let code of ['404', '405']) {
-
-                if (result[0].indexOf(code) >= 0){
-
-                    noCallback();
-                }
-            }
-
             yesCallback();
             
         }, (error) => {
@@ -184,14 +177,16 @@ export class HTTPManager{
      * Note that crossdomain security rules may prevent this method from working correctly
      *
      * @param url The url for which we want to get the http headers.
-     * @param successCallback A method that will be executed when headers are read. An array of strings will be passed to this method
+     * @param successCallback Executed when headers are read. An array of strings will be passed to this method
      * containing all the read headers with each header line as an array element.
-     * @param errorCallback A method that will be executed if headers cannot be read. A string containing the error description
-     * will be passed to this method.
+     * @param errorCallback Executed if headers cannot be read. A string containing the error description and the error
+     *                      code will be passed to this method.
      * 
      * @return void
      */
-    getUrlHeaders(url:string, successCallback: (e:string[]) => any, errorCallback: (e:string) => any){
+    getUrlHeaders(url:string,
+                  successCallback: (e:string[]) => void,
+                  errorCallback: (msg:string, code:number) => void){
     
         if(!StringUtils.isString(url)){
 
@@ -205,7 +200,7 @@ export class HTTPManager{
 
         if(!StringUtils.isUrl(url)){
 
-            throw new Error("invalid url");
+            throw new Error("invalid url " + url);
         }
         
         let request = new XMLHttpRequest();
@@ -224,12 +219,12 @@ export class HTTPManager{
 
         request.onerror = () => {
         
-            errorCallback(request.statusText);          
+            errorCallback(request.statusText, request.status);          
         };
         
         request.ontimeout = () => {
             
-            errorCallback(this.timeout + HTTPManager.ERROR_TIMEOUT);          
+            errorCallback(this.timeout + HTTPManager.ERROR_TIMEOUT, 408);          
         };
         
         request.send();
@@ -244,10 +239,10 @@ export class HTTPManager{
      * 
      * @param object An object or a HashMapObject containing key/value pairs that will be used to construct the query string
      * 
-     *@see https://en.wikipedia.org/wiki/Query_string
-     *@see HashMapObject
+     * @see https://en.wikipedia.org/wiki/Query_string
+     * @see HashMapObject
      *
-     *@returns A valid query string that can be used with any url: http://www.url.com?query_string
+     * @returns A valid query string that can be used with any url: http://www.url.com?query_string (Note that ? symbol is not included)
      */
     generateUrlQueryString(object:any){
         
@@ -292,13 +287,17 @@ export class HTTPManager{
      * Perform an HTTP get request to the specified location
      * 
      * @param url The url to call
-     * @param successCallback A method that will be executed once request is successful. Request result will be passed as a string
-     * @param errorCallback A method that will be executed once request fails. The error description will be passed as a string
+     * @param successCallback Executed once request is successful. Request result will be passed as a string
+     * @param errorCallback Executed if headers cannot be read. A string containing the error description and the error
+     *                      code will be passed to this method.
      * @param params TODO - Implement this feature
      * 
      * @returns void
      */
-    get(url:string, successCallback: ((s: string) => any), errorCallback: ((s: string) => any), params:any = null){
+    get(url:string,
+        successCallback: (s: string) => void,
+        errorCallback: (msg:string, code:number) => void,
+        params:any = null){
         
         if(!StringUtils.isString(url) || StringUtils.isEmpty(url)){
             
@@ -324,19 +323,19 @@ export class HTTPManager{
             
             } else {
             
-                errorCallback(request.statusText);
+                errorCallback(request.statusText, request.status);
             }
         };
 
         request.onerror = () => {
           
             // There was a connection error of some sort
-            errorCallback(request.statusText);
+            errorCallback(request.statusText, request.status);
         };
         
         request.ontimeout = () => {
             
-            errorCallback(this.timeout + HTTPManager.ERROR_TIMEOUT);          
+            errorCallback(this.timeout + HTTPManager.ERROR_TIMEOUT, 408);          
         };
 
         request.send();
@@ -346,5 +345,69 @@ export class HTTPManager{
     post(){
         
         // TODO
+    }
+    
+    
+    /**
+     * Loads multiple remote resources data, one after the other.
+     * We give a list containing paths to several resources and this method will load the binary contents of 
+     * each one as a raw string. Once all resources are loaded, an array of strings containing the data
+     * for each resource will be available via the successCallback method.
+     * 
+     * @param paths List with all the urls that we want to load
+     * @param successCallback Executed once all the urls have been loaded and will receive an array of strings 
+     *                        containing the data loaded from each one of the given paths.
+     * @param errorCallback Executed if headers cannot be read. A string containing the error description and the error
+     *                      code will be passed to this method.
+     * @param resourceLoadedCallback Executed after each one of the paths data is correctly loaded. The loaded path string will
+     *                               be passed to this method.
+     * 
+     * @returns void
+     */
+    loadResources(paths: string[],
+                  successCallback: (result: string[]) => void,
+                  errorCallback: (msg:string, code:number) => void,
+                  resourceLoadedCallback: null | ((s: string) => void)){
+    
+        if(!ArrayUtils.isArray(paths) || paths.length <= 0){
+            
+            throw new Error('paths must be a non empty array');
+        }
+
+        // Recursive method that will perform the loading of the specified resources, store
+        // the results inside an array and call the success method
+        let perform = (paths: string[],
+                       results: string[],
+                       success: (s: string[]) => void,
+                       error: (s:string, c:number) => void,
+                       resourceLoaded: null | ((s: string) => void) = null) => {
+            
+            if(paths.length > 0){
+                
+                let url = String(paths.shift());
+                
+                this.get(url, (data: string) => {
+                    
+                    results.push(data);
+                    
+                    if(resourceLoaded !== null){
+                    
+                        resourceLoaded(url);
+                    }
+                    
+                    perform(paths, results, success, error, resourceLoaded);
+                    
+                }, (msg: string, code: number) => {
+                    
+                    errorCallback(msg, code);
+                });
+            
+            }else{
+            
+                successCallback(results);
+            }
+        };
+        
+        perform(ObjectUtils.clone(paths), [], successCallback, errorCallback, resourceLoadedCallback);
     }
 }

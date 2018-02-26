@@ -101,7 +101,7 @@ export class ObjectUtils {
      * 
      * @see https://stackoverflow.com/questions/4459928/how-to-deep-clone-in-javascript
      * 
-     * @param object Any language instance like nubmers, strings, arrays, objects, etc.. that we want to duplicate.
+     * @param object Any language instance like numbers, strings, arrays, objects, etc.. that we want to duplicate.
      * 
      * @returns An exact independent copy of the received object, without any shared reference.
      */
