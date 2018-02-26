@@ -251,17 +251,10 @@ QUnit.test("generateUrlQueryString", function(assert){
 
     // Test empty values
     for (var i = 0; i < emptyValuesCount; i++) {
-        
-        if(ObjectUtils.isObject(emptyValues[i])){
-            
-            assert.strictEqual(sut.generateUrlQueryString(emptyValues[i]), '');
-            
-        }else{
-            
-            assert.throws(function() {
-                sut.generateUrlQueryString(emptyValues[i]);
-            });
-        }
+          
+        assert.throws(function() {
+            sut.generateUrlQueryString(emptyValues[i]);
+        }, /object must be a HashMapObject or a non empty Object/);
     }
 
     // Test ok values with objects
@@ -292,23 +285,23 @@ QUnit.test("generateUrlQueryString", function(assert){
     // Test exceptions
     assert.throws(function() {
         sut.generateUrlQueryString("hello");
-    });
+    }, /object must be a HashMapObject or a non empty Object/);
     
     assert.throws(function() {
         sut.generateUrlQueryString([1,2,3,4]);
-    });
+    }, /object must be a HashMapObject or a non empty Object/);
     
     assert.throws(function() {
         sut.generateUrlQueryString(new Error());
-    });
+    }, /object must be a HashMapObject or a non empty Object/);
     
     assert.throws(function() {
         sut.generateUrlQueryString(10);
-    });
+    }, /object must be a HashMapObject or a non empty Object/);
     
     assert.throws(function() {
         sut.generateUrlQueryString(true);
-    });
+    }, /object must be a HashMapObject or a non empty Object/);
 });
 
 

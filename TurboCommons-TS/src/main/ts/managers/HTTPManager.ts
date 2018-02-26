@@ -244,20 +244,20 @@ export class HTTPManager{
      *
      * @returns A valid query string that can be used with any url: http://www.url.com?query_string (Note that ? symbol is not included)
      */
-    generateUrlQueryString(object:any){
+    generateUrlQueryString(object: { [s: string]: string } | HashMapObject){
         
         let result = '';
         let keys:string[] = [];
         let values:string[] = [];
         
-        if(ObjectUtils.isObject(object)){
+        if(ObjectUtils.isObject(object) && ObjectUtils.getKeys(object).length > 0){
         
             if(object instanceof HashMapObject){
                 
                 keys = (object as HashMapObject).getKeys();
                 values = (object as HashMapObject).getValues();
             
-            }else if(object.constructor.name === 'Object'){
+            } else {
                 
                 keys = Object.getOwnPropertyNames(object);
 
@@ -265,10 +265,6 @@ export class HTTPManager{
 
                     values.push(object[keys[i]]);
                 }
-            
-            }else{
-                
-                throw new Error('object must be a HashMapObject or an Object');
             }
             
             for (var i = 0; i < keys.length; i++) {
@@ -279,7 +275,7 @@ export class HTTPManager{
             return result.substring(1, result.length);        
         }
 
-        throw new Error('object must be a HashMapObject or an Object');
+        throw new Error('object must be a HashMapObject or a non empty Object');
     }
         
     
@@ -290,14 +286,14 @@ export class HTTPManager{
      * @param successCallback Executed once request is successful. Request result will be passed as a string
      * @param errorCallback Executed if headers cannot be read. A string containing the error description and the error
      *                      code will be passed to this method.
-     * @param params TODO - Implement this feature
+     * @param parameters TODO - Implement this feature
      * 
      * @returns void
      */
     get(url:string,
         successCallback: (s: string) => void,
         errorCallback: (msg:string, code:number) => void,
-        params:any = null){
+        parameters:any = null){
         
         if(!StringUtils.isString(url) || StringUtils.isEmpty(url)){
             
@@ -367,7 +363,7 @@ export class HTTPManager{
     loadResources(paths: string[],
                   successCallback: (result: string[]) => void,
                   errorCallback: (msg:string, code:number) => void,
-                  resourceLoadedCallback: null | ((s: string) => void)){
+                  resourceLoadedCallback: null | ((s: string) => void) = null){
     
         if(!ArrayUtils.isArray(paths) || paths.length <= 0){
             
