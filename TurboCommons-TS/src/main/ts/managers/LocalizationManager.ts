@@ -97,12 +97,15 @@ export class LocalizationManager {
      *
      * @param bundle The name of the bundle to load
      * @param successCallback A method that will be executed after the bundle's been correctly loaded
-     * @param errorCallback A method that will be executed if any error happens
-     * @param pathIndex Define the position on the paths array that will be used to lookup for the bundle.
+     * @param errorCallback A method that will be executed if any error happens. If this is not provided, an exception will be thrown
+     * @param pathIndex Define the position on the paths array that will be used to lookup for the bundle. 0 by default
      *
      * @returns void
      */
-    loadBundle(bundle: string, successCallback: Function|null = null, errorCallback: Function|null = null, pathIndex = 0) {
+    loadBundle(bundle: string,
+               successCallback: (() => void) | null = null,
+               errorCallback: ((path: string) => void) | null = null,
+               pathIndex = 0) {
 
         if(!StringUtils.isString(bundle) || StringUtils.isEmpty(bundle)){
             
@@ -124,60 +127,59 @@ export class LocalizationManager {
             throw new Error('invalid pathIndex');
         }
     
-        let errorHappened = false;
-        let callsCount = 0;
+        // Generate the correct paths to the resource bundles
+        let paths: string[] = [];
         
-        let http = new HTTPManager();
-
-        for (const locale of this.locales) {
-
-            const path = this.paths[pathIndex].replace('$locale', locale).replace('$bundle', bundle);
-
+        for (let i = 0; i < this.locales.length; i++) {
+        
             // TODO - if pathsAreUrls is false, we must try to load the path as a file system path 
+            paths.push(this.paths[pathIndex].replace('$locale', this.locales[i]).replace('$bundle', bundle));
+        }
+        
+        // Request all the bundle files
+        let http = new HTTPManager();
+        
+        http.multiGetRequest(paths, (result: string[]) =>{
             
-            http.get(path, (result) => {
-                
-                callsCount++;
+            if (!this._loadedData.hasOwnProperty(bundle)) {
 
-                if (!this._loadedData.hasOwnProperty(bundle)) {
-
-                    this._loadedData[bundle] = {};
-                }
-
-                switch (StringUtils.getFileExtension(path)) {
+                this._loadedData[bundle] = {};
+            }
+            
+            for (let i = 0; i < paths.length; i++) {
+	
+                switch (StringUtils.getFileExtension(paths[i])) {
 
                     case 'json':
-                        this._loadedData[bundle][locale] = this.parseJson(JSON.parse(result));
+                        this._loadedData[bundle][this.locales[i]] = this.parseJson(JSON.parse(result[i]));
                         break;
 
                     case 'properties':
                         // TODO
-                        this._loadedData[bundle][locale] = this.parseProperties(result);
+                        this._loadedData[bundle][this.locales[i]] = this.parseProperties(result[i]);
                         break;
                 }
+            }
+            
+            this._lastBundle = bundle;
 
-                if (!errorHappened && callsCount >= this.locales.length) {
+            if (successCallback !== null) {
 
-                    this._lastBundle = bundle;
+                successCallback();
+            }
+                        
+        }, (path: string, msg: string, code: number) => {
+        
+            if (errorCallback !== null) {
 
-                    if (successCallback !== null) {
-
-                        successCallback();
-                    }
-                }
+                errorCallback(path);
+            
+            } else {
                 
-            }, (err) => {
-
-                callsCount++;
-                
-                if (!errorHappened && errorCallback !== null) {
-
-                    errorCallback();
-                }  
-                
-                errorHappened = true;
-            });
-        }
+                // If no error handler defined, an exception is thrown
+                throw new Error('Failed loading locale: ' + path);
+            }
+        });
     }
 
 

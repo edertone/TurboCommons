@@ -255,9 +255,9 @@ QUnit.test("test-json", function(assert){
         assert.ok(false);
         done();
         
-    }, function(){
+    }, function(path){
         
-        assert.ok(true); 
+        assert.strictEqual(path, window.basePath + '/test-json/en_US/nonexistant.json'); 
         done();
     }, 0);
     
