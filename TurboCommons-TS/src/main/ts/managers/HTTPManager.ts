@@ -293,7 +293,7 @@ export class HTTPManager{
     get(url:string,
         successCallback: (s: string) => void,
         errorCallback: (msg:string, code:number) => void,
-        parameters:any = null){
+        parameters: { [s: string]: string } | HashMapObject | null = null){
         
         if(!StringUtils.isString(url) || StringUtils.isEmpty(url)){
             
@@ -345,25 +345,31 @@ export class HTTPManager{
     
     
     /**
-     * Loads multiple remote resources data, one after the other.
-     * We give a list containing paths to several resources and this method will load the binary contents of 
-     * each one as a raw string. Once all resources are loaded, an array of strings containing the data
-     * for each resource will be available via the successCallback method.
+     * Performs a sequential execution of GET http requests and obtains the response data for each one.
      * 
-     * @param paths List with all the urls that we want to load
-     * @param successCallback Executed once all the urls have been loaded and will receive an array of strings 
-     *                        containing the data loaded from each one of the given paths.
-     * @param errorCallback Executed if headers cannot be read. A string containing the error description and the error
-     *                      code will be passed to this method.
-     * @param resourceLoadedCallback Executed after each one of the paths data is correctly loaded. The loaded path string will
-     *                               be passed to this method.
+     * After a list of urls is provided, this method will secuentially execute each one of them as a GET
+     * request, one after the other and in the same order as they are provided. Once all have 
+     * finished correctly, the result data will be available as an array of strings stored with the same
+     * order as the provided source urls.
+     * 
+     * This method can be used to load multiple resource files at once, process batch requests, etc..
+     *
+     * @param paths List with all the urls that we want to execute as http GET requests
+     * @param successCallback Executed once all the urls have been called. An array of strings containing all
+     *                        the loaded data will be passed to this method.
+     * @param errorCallback Executed if a failure happens on any of the requests. A string containing the error 
+     *                      description and the error code will be passed to this method.
+     * @param parameters TODO - implement this feature after this.get implements it
+     * @param progressCallback Executed after each one of the urls is correctly executed. A string with the correctly
+     *                         requested url will be passed to this method.
      * 
      * @returns void
      */
-    loadResources(paths: string[],
+    multiGetRequest(paths: string[],
                   successCallback: (result: string[]) => void,
                   errorCallback: (msg:string, code:number) => void,
-                  resourceLoadedCallback: null | ((s: string) => void) = null){
+                  parameters: [{[s: string]: string}] | [HashMapObject] | null = null,
+                  progressCallback: null | ((s: string) => void) = null){
     
         if(!ArrayUtils.isArray(paths) || paths.length <= 0){
             
@@ -372,11 +378,7 @@ export class HTTPManager{
 
         // Recursive method that will perform the loading of the specified resources, store
         // the results inside an array and call the success method
-        let perform = (paths: string[],
-                       results: string[],
-                       success: (s: string[]) => void,
-                       error: (s:string, c:number) => void,
-                       resourceLoaded: null | ((s: string) => void) = null) => {
+        let perform = (paths: string[], results: string[]) => {
             
             if(paths.length > 0){
                 
@@ -386,12 +388,12 @@ export class HTTPManager{
                     
                     results.push(data);
                     
-                    if(resourceLoaded !== null){
+                    if(progressCallback !== null){
                     
-                        resourceLoaded(url);
+                        progressCallback(url);
                     }
                     
-                    perform(paths, results, success, error, resourceLoaded);
+                    perform(paths, results);
                     
                 }, (msg: string, code: number) => {
                     
@@ -404,6 +406,6 @@ export class HTTPManager{
             }
         };
         
-        perform(ObjectUtils.clone(paths), [], successCallback, errorCallback, resourceLoadedCallback);
+        perform(ObjectUtils.clone(paths), []);
     }
 }

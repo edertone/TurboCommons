@@ -372,15 +372,15 @@ QUnit.todo("post", function(assert){
 
 
 /**
- * loadResources
+ * multiGetRequest
  */
-QUnit.test("loadResources", function(assert){
+QUnit.test("multiGetRequest", function(assert){
 
     // Test empty values
     for (var i = 0; i < emptyValuesCount; i++) {
         
         assert.throws(function() {
-            sut.loadResources(emptyValues[i]);
+            sut.multiGetRequest(emptyValues[i]);
         }, /paths must be a non empty array/);
     } 
 
@@ -391,7 +391,7 @@ QUnit.test("loadResources", function(assert){
                      basePath + '/file2.xml',
                      basePath + '/file3.json'];
     
-    sut.loadResources(resources, function(results){
+    sut.multiGetRequest(resources, function(results){
 
         assert.strictEqual(results.length, 3);
         assert.strictEqual(results[0], 'text1');
@@ -406,15 +406,15 @@ QUnit.test("loadResources", function(assert){
     });
     
     // test ok values with resourceLoadedCallback
-    var loadedCalls = 0;
+    var progressCalls = 0;
     
-    sut.loadResources(resources, function(results){
+    sut.multiGetRequest(resources, function(results){
 
         assert.strictEqual(results.length, 3);
         assert.strictEqual(results[0], 'text1');
         assert.strictEqual(results[1], "<test>\r\n    hello\r\n</test>");
         assert.strictEqual(results[2], '{\r\na: "1",\r\nb: 2\r\n}');
-        assert.strictEqual(loadedCalls, 3);        
+        assert.strictEqual(progressCalls, 3);        
         done();
         
     }, function(){
@@ -422,13 +422,13 @@ QUnit.test("loadResources", function(assert){
         assert.ok(false);
         done();
         
-    }, function(){
+    }, null, function(){
         
-        loadedCalls ++;
+        progressCalls ++;
     });
 
     // Test wrong values
-    sut.loadResources([nonExistantUrl], function(result){
+    sut.multiGetRequest([nonExistantUrl], function(result){
 
         assert.ok(false);
         done();
