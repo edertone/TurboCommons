@@ -357,8 +357,8 @@ export class HTTPManager{
      * @param paths List with all the urls that we want to execute as http GET requests
      * @param successCallback Executed once all the urls have been called. An array of strings containing all
      *                        the loaded data will be passed to this method.
-     * @param errorCallback Executed if a failure happens on any of the requests. A string containing the error 
-     *                      description and the error code will be passed to this method.
+     * @param errorCallback Executed if a failure happens on any of the requests. The url that caused the error,
+     *                      the error description and the error code will be passed to this method.
      * @param parameters TODO - implement this feature after this.get implements it
      * @param progressCallback Executed after each one of the urls is correctly executed. A string with the correctly
      *                         requested url will be passed to this method.
@@ -367,7 +367,7 @@ export class HTTPManager{
      */
     multiGetRequest(paths: string[],
                   successCallback: (result: string[]) => void,
-                  errorCallback: (msg:string, code:number) => void,
+                  errorCallback: (path:string, msg:string, code:number) => void,
                   parameters: [{[s: string]: string}] | [HashMapObject] | null = null,
                   progressCallback: null | ((s: string) => void) = null){
     
@@ -397,7 +397,7 @@ export class HTTPManager{
                     
                 }, (msg: string, code: number) => {
                     
-                    errorCallback(msg, code);
+                    errorCallback(url, msg, code);
                 });
             
             }else{

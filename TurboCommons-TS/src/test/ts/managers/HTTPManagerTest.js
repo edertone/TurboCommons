@@ -433,8 +433,9 @@ QUnit.test("multiGetRequest", function(assert){
         assert.ok(false);
         done();
         
-    }, function(msg, code){
+    }, function(path, msg, code){
         
+        assert.strictEqual(path, nonExistantUrl);
         assert.ok(StringUtils.isString(msg));
         assert.ok(msg.length > 5);
         assert.strictEqual(code, 404);
