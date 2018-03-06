@@ -396,7 +396,7 @@ QUnit.test("multiGetRequest", function(assert){
         assert.strictEqual(results.length, 3);
         assert.strictEqual(results[0], 'text1');
         assert.strictEqual(results[1], "<test>\r\n    hello\r\n</test>");
-        assert.strictEqual(results[2], '{\r\na: "1",\r\nb: 2\r\n}');
+        assert.strictEqual(results[2], '{\r\n"a": "1",\r\n"b": 2\r\n}');
         done();
         
     }, function(){
@@ -413,7 +413,7 @@ QUnit.test("multiGetRequest", function(assert){
         assert.strictEqual(results.length, 3);
         assert.strictEqual(results[0], 'text1');
         assert.strictEqual(results[1], "<test>\r\n    hello\r\n</test>");
-        assert.strictEqual(results[2], '{\r\na: "1",\r\nb: 2\r\n}');
+        assert.strictEqual(results[2], '{\r\n"a": "1",\r\n"b": 2\r\n}');
         assert.strictEqual(progressCalls, 3);        
         done();
         

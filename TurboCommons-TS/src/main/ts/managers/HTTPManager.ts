@@ -338,9 +338,10 @@ export class HTTPManager{
     }
     
     
+    // TODO
     post(){
         
-        // TODO
+        // Implement this method
     }
     
     
@@ -407,5 +408,16 @@ export class HTTPManager{
         };
         
         perform(ObjectUtils.clone(paths), []);
+    }
+    
+    
+    // TODO
+    multiPostRequest(paths: string[],
+            successCallback: (result: string[]) => void,
+            errorCallback: (path:string, msg:string, code:number) => void,
+            parameters: [{[s: string]: string}] | [HashMapObject] | null = null,
+            progressCallback: null | ((s: string) => void) = null){
+        
+        // Implement this method
     }
 }
