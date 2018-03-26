@@ -719,6 +719,11 @@ class StringUtilsTest extends TestCase {
 		$this->assertTrue(StringUtils::getLines("line1\n   \nline2", []) === ['line1', '   ', 'line2']);
 		$this->assertTrue(StringUtils::getLines("line1\r\n   \r\nline2", []) === ['line1', '   ', 'line2']);
 		$this->assertTrue(StringUtils::getLines("line1\n\n\n\t\r       \nline2", []) === ['line1', "\t", '       ', 'line2']);
+
+		$this->assertTrue(
+		    StringUtils::getLines("# com\n# com2\n\n\n! com\nweb = google\nlan = En\n# com4\n# com5\nmessage = Welcome", ['/\s+/', '/ *#.*| *!.*/']) ===
+	        ['web = google', 'lan = En', 'message = Welcome']
+	    );
 	}
 
 

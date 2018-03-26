@@ -46,12 +46,12 @@ class JavaPropertiesObjectTest extends TestCase {
 
         $this->exceptionMessage = '';
 
-        $this->wrongValues = [null, [], 'key', '=', '=key', '=key=', '=key=value', [1, 2], 1234, new stdclass()];
-        $this->wrongValuesCount = count($this->wrongValues);
-
         $this->filesManager = new FilesManager();
 
         $this->basePath = __DIR__.'/../resources/model/javaPropertiesObject';
+
+        $this->wrongValues = [null, [], 'key', '=', '=key', '=key=', '=key=value', [1, 2], 1234, new stdclass()];
+        $this->wrongValuesCount = count($this->wrongValues);
 
         $this->propertiesFiles = $this->filesManager->getDirectoryList($this->basePath);
     }
