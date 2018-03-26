@@ -628,7 +628,11 @@ QUnit.test("getLines", function(assert) {
     assert.ok(ArrayUtils.isEqualTo(StringUtils.getLines("line1\r   \rline2", []), ['line1', '   ', 'line2']));
     assert.ok(ArrayUtils.isEqualTo(StringUtils.getLines("line1\n   \nline2", []), ['line1', '   ', 'line2']));
     assert.ok(ArrayUtils.isEqualTo(StringUtils.getLines("line1\r\n   \r\nline2", []), ['line1', '   ', 'line2']));
-    assert.ok(ArrayUtils.isEqualTo(StringUtils.getLines("line1\n\n\n\t\r       \nline2", []), ['line1', "\t", '       ', 'line2']));
+    
+    assert.ok(ArrayUtils.isEqualTo(
+        StringUtils.getLines("# com\n# com2\n\n\n! com\nweb = google\nlan = En\n# com4\n# com5\nmessage = Welcome", [/\s+/g, / *#.*| *!.*/g]),
+        ['web = google', 'lan = En', 'message = Welcome'])
+    );    
 });
 
 

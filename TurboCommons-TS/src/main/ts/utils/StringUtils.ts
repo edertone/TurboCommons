@@ -501,10 +501,14 @@ export class StringUtils {
             // Apply specified filters
             if(StringUtils.isString(tmp[i])){
 
-                // TODO: this is not exactly the same behaviour as the php version.
-                // In the php version, we can define an array of filters and if any of the filters matches the current line,
-                // it will not be added to the result. This version only accepts the first element of the filters array, it must be fixed!
-                if(tmp[i].replace(filters[0], '') != ''){
+                let replacedFilters = tmp[i];
+                
+                for (var j = 0; j < filters.length; j++) {
+	
+                    replacedFilters = replacedFilters.replace(filters[j], '');
+                }
+                
+                if(replacedFilters != ''){
 
                     res.push(tmp[i]);
                 }
