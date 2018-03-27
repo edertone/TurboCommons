@@ -238,6 +238,7 @@ QUnit.test("replace", function(assert) {
     assert.strictEqual(StringUtils.replace("string", ["s", "i", "g"], "b"), "btrbnb");
     assert.strictEqual(StringUtils.replace("string", ["s", "i"], ["b", " "]), "btr ng");
     assert.strictEqual(StringUtils.replace("Hello???", ["H", "E", "?"], ["h", "X", "!"]), "hello!!!");
+    assert.strictEqual(StringUtils.replace("  k9 ", ['\\', ' '], ['\\\\', '\\ ']), "\\ \\ k9\\ ");
     
     // Test ok values with limited count
     assert.strictEqual(StringUtils.replace("x", "", "xyz", 1), "x");
@@ -249,8 +250,9 @@ QUnit.test("replace", function(assert) {
     assert.strictEqual(StringUtils.replace("+$-/$\\_", "$", "Q", 1), "+Q-/$\\_");
     assert.strictEqual(StringUtils.replace("8888888888888", "8", "", 5), "88888888");
     
-    assert.strictEqual(StringUtils.replace("123123123", ["1", "2"], "A", 2), "A23A23123");
-    assert.strictEqual(StringUtils.replace("123123123", ["1", "2"], ["A", "B"], 4), "AB3A23A23");
+    assert.strictEqual(StringUtils.replace("123123123", ["1", "2"], "A", 1), "AA3123123");
+    assert.strictEqual(StringUtils.replace("123123123", ["1", "2"], "A", 2), "AA3AA3123");
+    assert.strictEqual(StringUtils.replace("123123123", ["1", "2"], ["A", "B"], 4), "AB3AB3AB3");
     
     // Test wrong values
     // not necessary

@@ -216,7 +216,6 @@ export class StringUtils {
         }
         
         let result = string;
-        let replaceCount = 0;
         let searchArray = StringUtils.isString(search) ? [String(search)] : search;
         let replacementArray = StringUtils.isString(replacement) ? [String(replacement)] : replacement;
         
@@ -229,26 +228,35 @@ export class StringUtils {
             
             if(searchArray[i] !== ''){
                 
-                let r = (replacementArray.length === 1) ? replacementArray[0] : replacementArray[i];
+                let valueToReplace = (replacementArray.length === 1) ? replacementArray[0] : replacementArray[i];
                 
-                if(r === undefined || r === null){
+                if(valueToReplace === undefined || valueToReplace === null){
                     
-                    r = '';
+                    valueToReplace = '';
                 }
                 
-                let occurences = StringUtils.countStringOccurences(result, searchArray[i]);
+                let resultArray = [];
                 
-                for (let j = 0; j < occurences; j++) {
+                let splittedArray = result.split(searchArray[i]);
                 
-                    result = result.replace(searchArray[i], r.replace(/\$/g, "$$$$"));
+                for (let j = 0; j < splittedArray.length; j++) {
                     
-                    replaceCount ++;
+                    resultArray.push(splittedArray[j]);
                     
-                    if(count > 0 && replaceCount >= count){
+                    if(j < splittedArray.length - 1){
+                    
+                        if(count < 0 || j < count){
+                            
+                            resultArray.push(valueToReplace);
                         
-                        return result;
+                        } else {
+                            
+                            resultArray.push(searchArray[i]);
+                        }
                     }
                 }
+                
+                result = resultArray.join('');
             }
         }
         
