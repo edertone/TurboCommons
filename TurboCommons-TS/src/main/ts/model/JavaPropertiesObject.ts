@@ -58,7 +58,7 @@ export class JavaPropertiesObject extends HashMapObject {
         let isWaitingOtherLine = false;
 
         // Generate an array with the properties lines, ignoring blank lines and comments
-        let lines = StringUtils.getLines(string, [/\s+/, / *#.*| *!.*/]);
+        let lines = StringUtils.getLines(string, [/\s+/g, / *#.*| *!.*/g]);
 
         for (let line of lines) {
 
@@ -84,14 +84,14 @@ export class JavaPropertiesObject extends HashMapObject {
                     key += ' ';
                 }
                 
-                key = StringUtils.replace(key, ['\\\\', '\\ ', '\#', '\!', '\=', '\:'], ['\\', ' ', '#', '!', '=', ':']);
+                key = StringUtils.replace(key, ['\\\\', '\\ ', '\\#', '\\!', '\\=', '\\:'], ['\\', ' ', '#', '!', '=', ':']);
                 
                 // Extract the value from the line
                 value = StringUtils.trimLeft(line.substring(keyDividerIndex + 1, line.length));
             }
 
             // Unescape escaped slashes and spaces on the value
-            value = StringUtils.replace(value, ['\\\\', '\\ ', '\\r\\n', '\\n', '\\t'], ['\u005C', ' ', "\r\n", "\n", "\t"]);
+            value = StringUtils.replace(value, ['\\\\', '\\ ', '\\r\\n', '\\n', '\\t'], ['\\u005C', ' ', "\r\n", "\n", "\t"]);
             
             // Check if ends with single '\'
             if(value.substr(value.length - 1) == '\\'){

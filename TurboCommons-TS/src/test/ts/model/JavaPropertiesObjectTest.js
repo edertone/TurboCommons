@@ -11,24 +11,65 @@
 
 
 QUnit.module("JavaPropertiesObjectTest", {
-    beforeEach : function(){
+    
+    before: function(assert) {
 
+        window.StringUtils = org_turbocommons.StringUtils;
         window.basePath = './resources/model/javaPropertiesObject';
+
+        var httpManager = new org_turbocommons.HTTPManager();
+        
+        var done = assert.async();
+        
+        window.propertiesFiles = [basePath + '/1KeyWithValue.properties',
+            basePath + '/2KeysWithValue.properties',
+            basePath + '/BigFile-15000Lines.properties',
+            basePath + '/BigFile-5000Lines.properties',
+            basePath + '/CommentsSlashesAndSpecialChars.properties',
+            basePath + '/LotsOfEmptySpacesEveryWhere.properties',
+            basePath + '/LotsOfLatinKeysAndValues.properties',
+            basePath + '/LotsOfScapedCharacters.properties',
+            basePath + '/MidSizeInternationalizedFile7KeysLotsOfText.properties',
+            basePath + '/MultipleKeysWithDifferentSpaces.properties',
+            basePath + '/VietnameseAndJapaneseCharacters.properties'
+            ];
+
+        httpManager.multiGetRequest(propertiesFiles,
+           function(result){
+       
+               window.propertiesFilesData = result;
+               
+               done();
+           },
+           function(){
+               
+               done();
+           });
+    },
+    
+    beforeEach : function(){
 
         window.JavaPropertiesObject = org_turbocommons.JavaPropertiesObject;
 
         window.wrongValues = [null, [], 'key', '=', '=key', '=key=', '=key=value', [1, 2], 1234, {}];
-        window.wrongValuesCount = window.wrongValues.length;
+        window.wrongValuesCount = window.wrongValues.length; 
     },
 
     afterEach : function(){
-
-        delete window.basePath;
 
         delete window.JavaPropertiesObject;
 
         delete window.wrongValues;
         delete window.wrongValuesCount;
+    },
+    
+    after : function(){
+
+        delete window.StringUtils;
+        delete window.basePath;
+        
+        delete window.propertiesFiles;
+        delete window.propertiesFilesData;
     }
 });
 
@@ -78,6 +119,138 @@ QUnit.test("testConstruct", function(assert){
     assert.ok(test.length() === 1);
     assert.ok(test.get('path') === 'c:\\docs\\doc1');
     
- // TODO - Add all missing tests from PHP version
+    for (var file of propertiesFiles) {
     
+        var fileData = propertiesFilesData[propertiesFiles.indexOf(file)];
+        var test = new JavaPropertiesObject(fileData);
+
+        switch (StringUtils.getFileNameWithExtension(file)) {
+
+            case '1KeyWithValue.properties':
+                assert.ok(test.length() === 1);
+                assert.ok(test.get('keyname') === 'value');
+                break;
+
+            case '2KeysWithValue.properties':
+                assert.ok(test.length() === 2);
+                assert.ok(test.get('keyname') === 'value');
+                assert.ok(test.get('keyname2') === 'value2');
+                break;
+
+            case 'CommentsSlashesAndSpecialChars.properties':
+                assert.ok(test.length() === 5);
+                assert.ok(test.get('website') === 'http://en.wikipedia.org/');
+                assert.ok(test.get('language') === 'English');
+                assert.ok(test.get('message') === 'Welcome to Wikipedia!');
+                assert.ok(test.get('key with spaces') === 'This is the value that could be looked up with the key "key with spaces".');
+                assert.ok(test.get('tab') === "\t");
+                break;
+
+            case 'LotsOfEmptySpacesEveryWhere.properties':
+                assert.strictEqual(12, test.length());
+                assert.ok(test.get('k1') === '');
+                assert.ok(test.get('k2') === ' ');
+                assert.ok(test.get('k3') === '   ');
+                assert.ok(test.get('k4') === '   test');
+                assert.ok(test.get('k5') === '    test   ');
+                assert.ok(test.get('k6') === "   test  \r\ngo");
+                assert.ok(test.get('k7') === '  ');
+                assert.ok(test.get(' k8') === '8');
+                assert.ok(test.get('  k9') === '9');
+                assert.ok(test.get('  k10 ') === '10');
+                assert.ok(test.get('  k11  ') === '11');
+                assert.ok(test.get('  k12  ') === '12');
+                break;
+
+            case 'LotsOfLatinKeysAndValues.properties':
+                assert.ok(test.length() === 45);
+                assert.ok(test.get('period.maintenance.InMillis') === '86400000');
+                assert.ok(test.get('decontamination.frequency.inDays') === '30');
+                assert.ok(test.get('decontamination.warningBeforehand.inDays') === '1');
+                assert.ok(test.get('technicalServiceInspection.frequency.inMonths') === '12');
+                assert.ok(test.get('technicalServiceInspection.warningBeforehand.inDays') === '7');
+                assert.ok(test.get('instrument.restartFrequency.inDays') === '7');
+                assert.ok(test.get('start.purgeFinishedTestsPriorToTheLast.inDays') === '7');
+                assert.ok(test.get('max.error.count') === '-1');
+                assert.ok(test.get('error.delimeter') === '(!)');
+                assert.ok(test.get('log.stdout') === 'N');
+                assert.ok(test.get('portalrolemembership.bb.controlled.fields') === '');
+                assert.ok(test.get('membership.datasource.key') === '');
+                assert.ok(test.get('reconcile') === 'Y');
+                break;
+
+            case 'LotsOfScapedCharacters.properties':
+                assert.ok(test.length() === 6);
+                assert.ok(test.get('escaped key!=:# is __good') === 'And must work as "escaped key!=:# is __good"');
+                assert.ok(test.get('key with spaces') === "This line contains lots ' of \" special # characers \\\\!#'=.::sooo");
+                assert.ok(test.get('key\\with\\slashes') === 'value');
+                assert.ok(test.get('multiline.values') === "line 1\nline 2\nline 3\nline 4\\");
+                assert.ok(test.get('multiplebackslashes') === '\\\\\\value\\\\');
+                assert.ok(test.get('multiline.backslashes') === "value\n\n\\value");
+                break;
+
+            case 'MidSizeInternationalizedFile7KeysLotsOfText.properties':
+                assert.ok(test.length() === 7);
+                assert.ok(test.get('featureName') === 'Spring Dashboard (optional)');
+                assert.ok(test.get('providerName') === 'Pivotal Software, Inc.');
+                assert.ok(test.get('updateSiteName') === 'Eclipse Integration Commons Updates');
+                assert.ok(test.get('description') === 'This feature provides the STS dashboard for displaying RSS feeds and the extensions page');
+                assert.ok(test.get('copyright') === 'Copyright (c) 2015, 2016 Pivotal Software, Inc.');
+                assert.ok(test.get('licenseUrl') === 'open_source_licenses.txt');
+                break;
+
+            case 'MultipleKeysWithDifferentSpaces.properties':
+                assert.ok(test.length() === 4);
+                assert.ok(test.get('keyname') === 'value');
+                assert.ok(test.get('keyname2') === 'value2');
+                assert.ok(test.get('key3') === 'value3');
+                assert.ok(test.get('key4') === 'value4');
+                break;
+
+            case 'VietnameseAndJapaneseCharacters.properties':
+                assert.ok(test.length() === 11);
+                assert.ok(test.get('Currency_Converter') === 'Chuyen doi tien te  ');
+                assert.ok(test.get('Enter_Amount') === 'Nhập vào số lượng  ');
+                assert.ok(test.get('Target_Currency') === 'Đơn vị chuyển  ');
+                assert.ok(test.get('Alert_Mess') === 'Vui lòng nhập một số hợp lệ  ');
+                assert.ok(test.get('Alert_Title') === 'Thong bao ');
+                assert.ok(test.get('SOME_CHINESE_TEXT') === '歾炂盵 溛滁溒 藡覶譒 蓪 顣飁, 殟 畟痄笊 鵁麍儱 螜褣 跬 蔏蔍蓪 荾莯袎 衋醾 骱 棰椻楒 鎈巂鞪 櫞氌瀙 磑禠, 扴汥 礛簼繰 荾莯袎 絟缾臮 跠, 獂猺 槶 鬎鯪鯠 隒雸頍 廘榙榾 歅毼毹 皾籈譧 艜薤 煔 峬峿峹 觛詏貁 蛣袹 馺, 凘墈 橀槶澉 儮嬼懫 諃 姛帡恦 嶕憱撏 磝磢 嘽, 妎岓岕 翣聜蒢 潧 娭屔 湹渵焲 艎艑蔉 絟缾臮 緅 婂崥, 萴葂 鞈頨頧 熿熼燛 暕');
+                assert.ok(test.get('SOME_JAPANESE_TEXT') === '氨䛧 ちゅレ゜頨褤つ 栨プ詞ゞ黨 禺驩へ, なか䤥楯ティ 䨺礨背㛤騟 嶥䰧ツェ餣しょ 查ぴゃ秺 む難 びゃきゃ す鏥䧺来禯 嶥䰧ツェ餣しょ チュ菣じゅ こ䥦杩 そく へが獣儥尤 みゃみ饯䥺愦 り簨と監綩, 夦鰥 う润フ ぱむ難夦鰥 栨プ詞ゞ黨 綩ぞ 苩䋧榧 え礥䏨嫧珣 こ䥦杩みょ奊');
+                assert.ok(test.get('SOME_JAPANESE_TEXT_WITH_MULTILINES') === "氨䛧 ちゅレ゜頨褤つ 栨プ\n\n詞ゞ黨 禺驩へ, なか䤥楯ティ 䨺礨背㛤騟 嶥䰧ツェ餣\nしょ 查ぴゃ秺 む難 びゃ\nきゃ ");
+                break;
+
+            case 'BigFile-5000Lines.properties':
+                assert.ok(test.length() === 5000);
+                assert.ok(test.get('0') === 'value-0');
+                assert.ok(test.get('789') === 'value-789');
+                assert.ok(test.get('1240') === 'value-1240');
+                assert.ok(test.get('3450') === 'value-3450');
+                assert.ok(test.get('4999') === 'value-4999');
+                break;
+
+            case 'BigFile-15000Lines.properties':
+                assert.ok(test.length() === 15000);
+                assert.ok(test.get('0') === 'value-0');
+                assert.ok(test.get('1789') === 'value-1789');
+                assert.ok(test.get('5240') === 'value-5240');
+                assert.ok(test.get('10450') === 'value-10450');
+                assert.ok(test.get('14999') === 'value-14999');
+                break;
+
+            default:
+                assert.ok(false, file + ' Was not tested');
+                break;
+        }
+    }
+
+    // Test exceptions
+//    for ($i = 0; $i < $this->wrongValuesCount; $i++) {
+//
+//        try {
+//            new JavaPropertiesObject($this->wrongValues[$i]);
+//            $this->exceptionMessage = 'wrong value did not cause exception';
+//        } catch (Throwable $e) {
+//            // We expect an exception to happen
+//        }
+//    }
 });
