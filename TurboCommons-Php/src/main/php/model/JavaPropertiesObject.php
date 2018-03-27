@@ -226,7 +226,7 @@ class JavaPropertiesObject extends HashMapObject {
 
         for ($i = 0; $i < $keysCount; $i++) {
 
-            $key = str_replace(['\\', ' ', '#', '!', '=', ':'], ['\\\\', '\\ ', '\#', '\!', '\=', '\:'], $keys[$i]);
+            $key = str_replace(['\\', ' ', '#', '!', '=', ':'], ['\\\\', '\\ ', '\\#', '\\!', '\\=', '\\:'], $keys[$i]);
 
             $value = str_replace(['\\', ' ', "\r\n", "\n", "\t"], ['\\\\', '\\ ', '\\r\\n', '\\n', '\\t'], $this->get($keys[$i]));
 
