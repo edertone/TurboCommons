@@ -86,14 +86,14 @@ class JavaPropertiesObject extends HashMapObject {
                     $key .= ' ';
                 }
 
-                $key = str_replace(['\\\\', '\\ ', '\#', '\!', '\=', '\:'], ['\\', ' ', '#', '!', '=', ':'], $key);
+                $key = str_replace(['\\\\', '\\ ', '\\#', '\\!', '\\=', '\\:'], ['\\', ' ', '#', '!', '=', ':'], $key);
 
                 // Extract the value from the line
                 $value = ltrim(substr($line, $keyDividerIndex + 1, strlen($line)));
             }
 
             // Unescape escaped slashes and spaces on the value
-            $value = str_replace(['\\\\', '\\ ', '\\r\\n', '\\n', '\\t'], ['\u005C', ' ', "\r\n", "\n", "\t"], $value);
+            $value = str_replace(['\\\\', '\\ ', '\\r\\n', '\\n', '\\t'], ['\\u005C', ' ', "\r\n", "\n", "\t"], $value);
 
             // Check if ends with single '\'
             if(substr($value, -1) == '\\'){
