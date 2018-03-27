@@ -229,7 +229,7 @@ export class JavaPropertiesObject extends HashMapObject {
 
         for (let i = 0; i < keysCount; i++) {
             
-            let key = StringUtils.replace(keys[i], ['\\', ' ', '#', '!', '=', ':'], ['\\\\', '\\ ', '\#', '\!', '\=', '\:']);
+            let key = StringUtils.replace(keys[i], ['\\', ' ', '#', '!', '=', ':'], ['\\\\', '\\ ', '\\#', '\\!', '\\=', '\\:']);
             
             let value = StringUtils.replace(this.get(keys[i]), ['\\', ' ', "\r\n", "\n", "\t"], ['\\\\', '\\ ', '\\r\\n', '\\n', '\\t']);
             

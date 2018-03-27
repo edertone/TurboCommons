@@ -244,13 +244,153 @@ QUnit.test("testConstruct", function(assert){
     }
 
     // Test exceptions
-//    for ($i = 0; $i < $this->wrongValuesCount; $i++) {
-//
-//        try {
-//            new JavaPropertiesObject($this->wrongValues[$i]);
-//            $this->exceptionMessage = 'wrong value did not cause exception';
-//        } catch (Throwable $e) {
-//            // We expect an exception to happen
-//        }
-//    }
+    for (var i = 0; i < wrongValuesCount; i++) {
+
+        assert.throws(function() {
+            new JavaPropertiesObject(wrongValues[i]);
+        }, /invalid properties format|value must be a string/g);
+    }
+});
+
+
+/**
+ * testIsJavaProperties
+ */
+QUnit.test("testIsJavaProperties", function(assert){
+
+    assert.notOk(JavaPropertiesObject.isJavaProperties(null));
+    assert.ok(JavaPropertiesObject.isJavaProperties(''));
+    assert.notOk(JavaPropertiesObject.isJavaProperties([]));
+    assert.notOk(JavaPropertiesObject.isJavaProperties({}));
+    assert.notOk(JavaPropertiesObject.isJavaProperties('     '));
+    assert.notOk(JavaPropertiesObject.isJavaProperties("\n\n\n"));
+    assert.notOk(JavaPropertiesObject.isJavaProperties(0));
+
+    assert.ok(JavaPropertiesObject.isJavaProperties(new JavaPropertiesObject()));
+    assert.ok(JavaPropertiesObject.isJavaProperties(new JavaPropertiesObject('')));
+
+    // Test ok values
+    assert.ok(JavaPropertiesObject.isJavaProperties('key='));
+    assert.ok(JavaPropertiesObject.isJavaProperties('key:'));
+    assert.ok(JavaPropertiesObject.isJavaProperties('key=value'));
+    assert.ok(JavaPropertiesObject.isJavaProperties('key:value'));
+
+    for (var file of propertiesFiles) {
+
+        var fileData = propertiesFilesData[propertiesFiles.indexOf(file)];
+        var test = new JavaPropertiesObject(fileData);
+        
+        assert.ok(JavaPropertiesObject.isJavaProperties(fileData));
+        assert.ok(JavaPropertiesObject.isJavaProperties(test));
+    }
+
+    // Test wrong values
+    for (var i = 0; i < wrongValuesCount; i++) {
+
+        assert.notOk(JavaPropertiesObject.isJavaProperties(wrongValues[i]));
+    }
+
+    // Test exceptions
+    // Already tested at wrong values
+});
+
+
+/**
+ * testIsEqualTo
+ */
+QUnit.test("testIsEqualTo", function(assert){
+
+    // Test empty values
+    var properties = new JavaPropertiesObject();
+
+    assert.ok(properties.isEqualTo(''));
+    assert.ok(properties.isEqualTo(new JavaPropertiesObject()));
+
+    assert.throws(function() {
+        properties.isEqualTo(null);
+    }, /properties does not contain valid java properties data/);
+
+    assert.throws(function() {
+        properties.isEqualTo([]);
+    }, /properties does not contain valid java properties data/);
+
+    assert.throws(function() {
+        properties.isEqualTo({});
+    }, /properties does not contain valid java properties data/);
+
+    assert.throws(function() {
+        properties.isEqualTo(0);
+    }, /properties does not contain valid java properties data/);
+
+    // Test ok values
+    for (var file of propertiesFiles) {
+
+        var fileData = propertiesFilesData[propertiesFiles.indexOf(file)];
+        properties = new JavaPropertiesObject(fileData);
+
+        // TODO - This is added for performance reasons. If performance is improved on
+        // isEqualTo method, this constraint can be removed
+        if(properties.length() < 1000){
+
+            assert.ok(properties.isEqualTo(fileData));
+            assert.ok(properties.isEqualTo(properties));
+        }
+    }
+
+    // Test wrong values
+    properties = new JavaPropertiesObject();
+
+    for (var i = 0; i < wrongValuesCount; i++) {
+
+        assert.throws(function() {
+            properties.isEqualTo(wrongValues[i]);
+        }, /properties does not contain valid java properties data/);
+    }
+
+    properties = new JavaPropertiesObject('key1=v1');
+    assert.notOk(properties.isEqualTo('key2=v1'));
+
+    properties = new JavaPropertiesObject('key1=v1');
+    assert.notOk(properties.isEqualTo('key1=v2'));
+
+    properties = new JavaPropertiesObject('key1=v1');
+    assert.notOk(properties.isEqualTo("key1=v1\nkey2=v2"));
+
+    // Test exceptions
+    // Already tested at wrong values
+});
+
+
+/**
+ * testToString
+ */
+QUnit.test("testToString", function(assert){
+
+    // Test empty values
+    var test = new JavaPropertiesObject();
+    assert.ok(test.toString() === '');
+
+    test = new JavaPropertiesObject('');
+    assert.ok(test.toString() === '');
+
+    // Test ok values
+    for (var file of propertiesFiles) {
+
+        var fileData = propertiesFilesData[propertiesFiles.indexOf(file)];
+        
+        test = new JavaPropertiesObject(fileData);
+
+        // TODO - This is added for performance reasons. If performance is improved on
+        // isEqualTo method, this constraint can be removed
+        if(test.length() < 1000){
+            
+            assert.ok(test.isEqualTo(test.toString(), true));
+        }
+    }
+
+    // Test wrong values
+    // Already tested at constructor test
+
+    // Test exceptions
+    // Already tested at constructor test
 });
