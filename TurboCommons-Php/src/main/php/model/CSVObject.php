@@ -46,12 +46,12 @@ class CSVObject extends TableObject{
      */
     public function __construct($string = '', bool $headers = false, string $delimiter = ',', string $enclosure = '"'){
 
+        parent::__construct();
+
         if(!StringUtils::isString($string)){
 
-            throw new UnexpectedValueException('CSVObject->constructor expected a string value');
+            throw new UnexpectedValueException('constructor expects a string value');
         }
-
-        parent::__construct();
 
         if(StringUtils::isEmpty($string)){
 
@@ -163,7 +163,7 @@ class CSVObject extends TableObject{
 
         if(!StringUtils::isString($value)){
 
-            throw new UnexpectedValueException('CSVObject->setCell value must be a string');
+            throw new UnexpectedValueException('value must be a string');
         }
 
         return parent::setCell($row, $column, $value);
@@ -189,7 +189,7 @@ class CSVObject extends TableObject{
 
             try {
 
-                return ($value != null) && (get_class($value) === 'org\\turbocommons\\src\\main\\php\\model\\CSVObject');
+                return ($value !== null) && (get_class($value) === 'org\\turbocommons\\src\\main\\php\\model\\CSVObject');
 
             } catch (Throwable $e) {
 
@@ -231,7 +231,7 @@ class CSVObject extends TableObject{
 
         if($objectToCompare == null){
 
-            throw new UnexpectedValueException('CSVObject->isEqualTo csv does not contain valid csv data');
+            throw new UnexpectedValueException('csv does not contain valid csv data');
         }
 
         $thisRows = $this->countRows();
@@ -247,7 +247,7 @@ class CSVObject extends TableObject{
             return false;
         }
 
-        if($thisRows != $objectToCompare->countRows() || $thisColumns != $objectToCompare->countColumns()){
+        if($thisRows !== $objectToCompare->countRows() || $thisColumns !== $objectToCompare->countColumns()){
 
             return false;
         }
@@ -385,7 +385,7 @@ class CSVObject extends TableObject{
 
 
     /**
-     *Auxiliary method that looks for the next delimiter or newline characters on the csv string starting at the specified position.
+     * Auxiliary method that looks for the next delimiter or newline characters on the csv string starting at the specified position.
      *
      * @param string $string The full csv string to search in.
      * @param integer $currentIndex The csv string starting point for the search
