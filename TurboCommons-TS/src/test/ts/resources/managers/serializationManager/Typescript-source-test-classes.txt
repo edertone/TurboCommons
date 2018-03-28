@@ -1,5 +1,5 @@
 /**
- * This file contains a list of typescript classes that are used by the Serialization Utils 
+ * This file contains a list of typescript classes that are used by the Serialization Manager 
  * tests but converted to js. We can use the typescript playground online tool to easily convert this code
  * to js.
  */

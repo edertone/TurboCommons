@@ -11,6 +11,8 @@
 import { NumericUtils } from '../utils/NumericUtils';
 import { ValidationManager } from "./ValidationManager";
 import { HashMapObject } from '../model/HashMapObject';
+import { XMLObject } from '../model/XMLObject';
+import { JavaPropertiesObject } from '../model/JavaPropertiesObject';
 import { StringUtils } from '../utils/StringUtils';
 import { ArrayUtils } from '../utils/ArrayUtils';
 import { ObjectUtils } from '../utils/ObjectUtils';
@@ -77,10 +79,16 @@ export class SerializationManager {
     }
         
 
-    // TODO - review from PHP
-    javaPropertiesObjectToString(){
+    /**
+     * Convert a JavaPropertiesObject instance to a string that is valid so it can be saved to a .properties file.
+     *
+     * @param javaProperties An instance of a JavaPropertiesObject
+     *
+     * @return An ISO-8859-1 string containing valid properties data, ready to be stored as a .properties java format file.
+     */
+    javaPropertiesObjectToString(javaProperties: JavaPropertiesObject){
 
-        // TODO - implement this translating from PHP
+        return javaProperties.toString();
     }
     
     
@@ -224,10 +232,18 @@ export class SerializationManager {
     }
     
     
-    // TODO - review from PHP
+    /**
+     * Convert a string containing the contents of a Java properties file to a JavaPropertiesObject instance
+     * Note that the input string must be encoded with ISO-8859-1 and strictly follow the Java
+     * properties file format (Otherwise results may not be correct).
+     *
+     * @param string String containing the contents of a .properties Java file
+     *
+     * @return The properties format parsed as an object
+     */
     stringToJavaPropertiesObject(string: string){
 
-        // TODO - review from PHP
+        return new JavaPropertiesObject(string);
     }
     
     
@@ -245,8 +261,8 @@ export class SerializationManager {
             throw new Error('Empty string is not a valid xml value');
         }
         
-     // TODO - implement this and translate it to PHP
-    //        return new XMLObject($string);
+        // TODO - implement this and translate it to PHP
+        //        return new XMLObject(string);
     }
 
 
@@ -257,9 +273,8 @@ export class SerializationManager {
      *
      * @return The textual valid representation of the given XMLObject
      */
-    xmlObjectToString(xml: any){
+    xmlObjectToString(xmlObject: XMLObject){
 
-        // TODO - force XMLObject type to the method parameter
-        return xml.toString();
+        // TODO
     }
 }
