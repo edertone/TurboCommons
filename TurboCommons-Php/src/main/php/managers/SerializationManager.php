@@ -18,25 +18,39 @@ use org\turbocommons\src\main\php\model\JavaPropertiesObject;
  * Contains methods that allow us to convert data from one complex data structure
  * format to another complex data structure format
  */
-class SerializationUtils{
+class SerializationManager{
 
 
-    // TODO
-    public static function classToJson(){
+    /**
+     * When set to true, the structures that are passed as serialization sources must match the structures
+     * that are passed as serialization targets: All keys or properties that are defined on the serialization sources
+     * must exist on the serialization targets, otherwise an exception will be thrown
+     */
+    public $strictMode = true;
+
+
+    /**
+     * TODO - review from TS
+     */
+    public function classToJson(){
 
         // TODO - review from TS
     }
 
 
-    // TODO
-    public static function classToObject(){
+    /**
+     * TODO - review from TS
+     */
+    public function classToObject(){
 
         // TODO - review from TS
     }
 
 
-    // TODO
-    public static function hashMapObjectToClass(){
+    /**
+     * TODO - review from TS
+     */
+    public function hashMapObjectToClass(){
 
         // TODO - review from TS
     }
@@ -49,21 +63,21 @@ class SerializationUtils{
      *
      * @return string An ISO-8859-1 string containing valid properties data, ready to be stored as a .properties java format file.
      */
-    public static function javaPropertiesObjectToString(JavaPropertiesObject $javaProperties){
+    public function javaPropertiesObjectToString(JavaPropertiesObject $javaProperties){
 
         return $javaProperties->toString();
     }
 
 
     // TODO
-    public static function jsonToClass(){
+    public function jsonToClass(){
 
         // TODO - review from TS
     }
 
 
     // TODO
-    public static function objectToClass(){
+    public function objectToClass(){
 
         // TODO - review from TS
     }
@@ -71,7 +85,6 @@ class SerializationUtils{
 
     /**
      * Convert a string containing the contents of a Java properties file to a JavaPropertiesObject instance
-     * For example: tag1=value1 will be converted to ['tag1' => 'value1'].<br><br>
      * Note that the input string must be encoded with ISO-8859-1 and strictly follow the Java
      * properties file format (Otherwise results may not be correct).
      *
@@ -79,21 +92,21 @@ class SerializationUtils{
      *
      * @return JavaPropertiesObject The properties format parsed as an object
      */
-    public static function stringToJavaPropertiesObject($string){
+    public function stringToJavaPropertiesObject($string){
 
         return new JavaPropertiesObject($string);
     }
 
 
     // TODO
-    public static function stringToXmlObject(){
+    public function stringToXmlObject(){
 
         // TODO - review from TS
     }
 
 
     // TODO
-    public static function xmlObjectToString(){
+    public function xmlObjectToString(){
 
         // TODO - review from TS
     }
