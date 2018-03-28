@@ -37,6 +37,10 @@ QUnit.module("HashMapObjectTest", {
         delete window.ArrayUtils;
         delete window.ObjectUtils;
         delete window.HashMapObject;
+        
+        delete window.emptyValues;
+        delete window.emptyValuesCount;
+        delete window.populatedHashMap;
     }
 });
 

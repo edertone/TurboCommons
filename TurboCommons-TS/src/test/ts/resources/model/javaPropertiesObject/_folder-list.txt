@@ -1,0 +1,11 @@
+1KeyWithValue.properties
+2KeysWithValue.properties
+BigFile-15000Lines.properties
+BigFile-5000Lines.properties
+CommentsSlashesAndSpecialChars.properties
+LotsOfEmptySpacesEveryWhere.properties
+LotsOfLatinKeysAndValues.properties
+LotsOfScapedCharacters.properties
+MidSizeInternationalizedFile7KeysLotsOfText.properties
+MultipleKeysWithDifferentSpaces.properties
+VietnameseAndJapaneseCharacters.properties

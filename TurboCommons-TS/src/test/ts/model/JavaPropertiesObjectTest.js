@@ -15,36 +15,25 @@ QUnit.module("JavaPropertiesObjectTest", {
     before: function(assert) {
 
         window.StringUtils = org_turbocommons.StringUtils;
-        window.basePath = './resources/model/javaPropertiesObject';
+        window.basePath = './resources/model/javaPropertiesObject/';
 
         var httpManager = new org_turbocommons.HTTPManager();
         
+        // Load all the properties files
         var done = assert.async();
         
-        window.propertiesFiles = [basePath + '/1KeyWithValue.properties',
-            basePath + '/2KeysWithValue.properties',
-            basePath + '/BigFile-15000Lines.properties',
-            basePath + '/BigFile-5000Lines.properties',
-            basePath + '/CommentsSlashesAndSpecialChars.properties',
-            basePath + '/LotsOfEmptySpacesEveryWhere.properties',
-            basePath + '/LotsOfLatinKeysAndValues.properties',
-            basePath + '/LotsOfScapedCharacters.properties',
-            basePath + '/MidSizeInternationalizedFile7KeysLotsOfText.properties',
-            basePath + '/MultipleKeysWithDifferentSpaces.properties',
-            basePath + '/VietnameseAndJapaneseCharacters.properties'
-            ];
-
-        httpManager.multiGetRequest(propertiesFiles,
-           function(result){
-       
-               window.propertiesFilesData = result;
-               
-               done();
-           },
-           function(){
-               
-               done();
-           });
+        httpManager.loadAllResourcesFromList(basePath + '_folder-list.txt', basePath,
+            function(resourcesList, resourcesData){
+        
+                window.propertiesFiles = resourcesList;
+                window.propertiesFilesData = resourcesData;
+                done();
+                
+            }, function(errorUrl, errorMsg, errorCode){
+                
+                assert.ok(false, 'Error loading file ' + errorUrl);
+                done();
+            });
     },
     
     beforeEach : function(){
