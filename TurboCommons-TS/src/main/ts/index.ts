@@ -18,6 +18,7 @@ export { ValidationManager} from './managers/ValidationManager';
 
 // Model package
 export { BaseStrictClass } from './model/BaseStrictClass';
+export { CSVObject } from './model/CSVObject';
 export { HashMapObject } from './model/HashMapObject';
 export { JavaPropertiesObject } from './model/JavaPropertiesObject';
 export { TableObject } from './model/TableObject';
