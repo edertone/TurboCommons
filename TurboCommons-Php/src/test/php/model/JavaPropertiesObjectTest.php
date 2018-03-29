@@ -26,6 +26,11 @@ use org\turbocommons\src\main\php\managers\FilesManager;
 class JavaPropertiesObjectTest extends TestCase {
 
 
+    protected static $basePath;
+    protected static $propertiesFiles;
+    protected static $propertiesFilesData;
+
+
     /**
      * @see TestCase::setUpBeforeClass()
      *
@@ -33,7 +38,21 @@ class JavaPropertiesObjectTest extends TestCase {
      */
     public static function setUpBeforeClass(){
 
-        // Nothing necessary here
+        self::$basePath = __DIR__.'/../resources/model/javaPropertiesObject';
+
+        // Load all the properties files data
+        self::$propertiesFiles = [];
+        self::$propertiesFilesData = [];
+
+        $filesManager = new FilesManager();
+
+        $filesList = $filesManager->getDirectoryList(self::$basePath);
+
+        foreach ($filesList as $file) {
+
+            self::$propertiesFiles[] = $file;
+            self::$propertiesFilesData[] = $filesManager->readFile(self::$basePath.'/'.$file);
+        }
     }
 
 
@@ -46,14 +65,8 @@ class JavaPropertiesObjectTest extends TestCase {
 
         $this->exceptionMessage = '';
 
-        $this->filesManager = new FilesManager();
-
-        $this->basePath = __DIR__.'/../resources/model/javaPropertiesObject';
-
         $this->wrongValues = [null, [], 'key', '=', '=key', '=key=', '=key=value', [1, 2], 1234, new stdclass()];
         $this->wrongValuesCount = count($this->wrongValues);
-
-        $this->propertiesFiles = $this->filesManager->getDirectoryList($this->basePath);
     }
 
 
@@ -90,11 +103,11 @@ class JavaPropertiesObjectTest extends TestCase {
     public function testConstruct(){
 
         // Test empty values
-        $test = new JavaPropertiesObject();
-        $this->assertTrue($test->length() === 0);
+        $sut = new JavaPropertiesObject();
+        $this->assertTrue($sut->length() === 0);
 
-        $test = new JavaPropertiesObject('');
-        $this->assertTrue($test->length() === 0);
+        $sut = new JavaPropertiesObject('');
+        $this->assertTrue($sut->length() === 0);
 
         try {
             new JavaPropertiesObject('       ');
@@ -111,146 +124,148 @@ class JavaPropertiesObjectTest extends TestCase {
         }
 
         // Test ok values
-        $test = new JavaPropertiesObject('name=Stephen');
-        $this->assertTrue($test->length() === 1);
-        $this->assertTrue($test->get('name') === 'Stephen');
+        $sut = new JavaPropertiesObject('name=Stephen');
+        $this->assertTrue($sut->length() === 1);
+        $this->assertTrue($sut->get('name') === 'Stephen');
 
-        $test = new JavaPropertiesObject('name = Stephen');
-        $this->assertTrue($test->length() === 1);
-        $this->assertTrue($test->get('name') === 'Stephen');
+        $sut = new JavaPropertiesObject('name = Stephen');
+        $this->assertTrue($sut->length() === 1);
+        $this->assertTrue($sut->get('name') === 'Stephen');
 
-        $test = new JavaPropertiesObject('name    =    Stephen');
-        $this->assertTrue($test->length() === 1);
-        $this->assertTrue($test->get('name') === 'Stephen');
+        $sut = new JavaPropertiesObject('name    =    Stephen');
+        $this->assertTrue($sut->length() === 1);
+        $this->assertTrue($sut->get('name') === 'Stephen');
 
-        $test = new JavaPropertiesObject('      name = Stephen');
-        $this->assertTrue($test->length() === 1);
-        $this->assertTrue($test->get('name') === 'Stephen');
+        $sut = new JavaPropertiesObject('      name = Stephen');
+        $this->assertTrue($sut->length() === 1);
+        $this->assertTrue($sut->get('name') === 'Stephen');
 
-        $test = new JavaPropertiesObject('name=Stephen      ');
-        $this->assertTrue($test->length() === 1);
-        $this->assertTrue($test->get('name') === 'Stephen      ');
+        $sut = new JavaPropertiesObject('name=Stephen      ');
+        $this->assertTrue($sut->length() === 1);
+        $this->assertTrue($sut->get('name') === 'Stephen      ');
 
-        $test = new JavaPropertiesObject('path=c:\\\\docs\\\\doc1');
-        $this->assertTrue($test->length() === 1);
-        $this->assertTrue($test->get('path') === 'c:\\docs\\doc1');
+        $sut = new JavaPropertiesObject('path=c:\\\\docs\\\\doc1');
+        $this->assertTrue($sut->length() === 1);
+        $this->assertTrue($sut->get('path') === 'c:\\docs\\doc1');
 
-        foreach ($this->propertiesFiles as $file) {
+        for ($i = 0; $i < count(self::$propertiesFiles); $i++) {
 
-            $fileData = $this->filesManager->readFile($this->basePath.'/'.$file);
-            $test = new JavaPropertiesObject($fileData);
+            $file = self::$propertiesFiles[$i];
+            $fileData = self::$propertiesFilesData[$i];
+
+            $sut = new JavaPropertiesObject($fileData);
 
             switch ($file) {
 
                 case '1KeyWithValue.properties':
-                    $this->assertTrue($test->length() === 1);
-                    $this->assertTrue($test->get('keyname') === 'value');
+                    $this->assertTrue($sut->length() === 1);
+                    $this->assertTrue($sut->get('keyname') === 'value');
                     break;
 
                 case '2KeysWithValue.properties':
-                    $this->assertTrue($test->length() === 2);
-                    $this->assertTrue($test->get('keyname') === 'value');
-                    $this->assertTrue($test->get('keyname2') === 'value2');
+                    $this->assertTrue($sut->length() === 2);
+                    $this->assertTrue($sut->get('keyname') === 'value');
+                    $this->assertTrue($sut->get('keyname2') === 'value2');
                     break;
 
                 case 'CommentsSlashesAndSpecialChars.properties':
-                    $this->assertTrue($test->length() === 5);
-                    $this->assertTrue($test->get('website') === 'http://en.wikipedia.org/');
-                    $this->assertTrue($test->get('language') === 'English');
-                    $this->assertTrue($test->get('message') === 'Welcome to Wikipedia!');
-                    $this->assertTrue($test->get('key with spaces') === 'This is the value that could be looked up with the key "key with spaces".');
-                    $this->assertTrue($test->get('tab') === "\t");
+                    $this->assertTrue($sut->length() === 5);
+                    $this->assertTrue($sut->get('website') === 'http://en.wikipedia.org/');
+                    $this->assertTrue($sut->get('language') === 'English');
+                    $this->assertTrue($sut->get('message') === 'Welcome to Wikipedia!');
+                    $this->assertTrue($sut->get('key with spaces') === 'This is the value that could be looked up with the key "key with spaces".');
+                    $this->assertTrue($sut->get('tab') === "\t");
                     break;
 
                 case 'LotsOfEmptySpacesEveryWhere.properties':
-                    $this->assertEquals(12, $test->length());
-                    $this->assertTrue($test->get('k1') === '');
-                    $this->assertTrue($test->get('k2') === ' ');
-                    $this->assertTrue($test->get('k3') === '   ');
-                    $this->assertTrue($test->get('k4') === '   test');
-                    $this->assertTrue($test->get('k5') === '    test   ');
-                    $this->assertTrue($test->get('k6') === "   test  \r\ngo");
-                    $this->assertTrue($test->get('k7') === '  ');
-                    $this->assertTrue($test->get(' k8') === '8');
-                    $this->assertTrue($test->get('  k9') === '9');
-                    $this->assertTrue($test->get('  k10 ') === '10');
-                    $this->assertTrue($test->get('  k11  ') === '11');
-                    $this->assertTrue($test->get('  k12  ') === '12');
+                    $this->assertSame(12, $sut->length());
+                    $this->assertTrue($sut->get('k1') === '');
+                    $this->assertTrue($sut->get('k2') === ' ');
+                    $this->assertTrue($sut->get('k3') === '   ');
+                    $this->assertTrue($sut->get('k4') === '   test');
+                    $this->assertTrue($sut->get('k5') === '    test   ');
+                    $this->assertTrue($sut->get('k6') === "   test  \r\ngo");
+                    $this->assertTrue($sut->get('k7') === '  ');
+                    $this->assertTrue($sut->get(' k8') === '8');
+                    $this->assertTrue($sut->get('  k9') === '9');
+                    $this->assertTrue($sut->get('  k10 ') === '10');
+                    $this->assertTrue($sut->get('  k11  ') === '11');
+                    $this->assertTrue($sut->get('  k12  ') === '12');
                     break;
 
                 case 'LotsOfLatinKeysAndValues.properties':
-                    $this->assertTrue($test->length() === 45);
-                    $this->assertTrue($test->get('period.maintenance.InMillis') === '86400000');
-                    $this->assertTrue($test->get('decontamination.frequency.inDays') === '30');
-                    $this->assertTrue($test->get('decontamination.warningBeforehand.inDays') === '1');
-                    $this->assertTrue($test->get('technicalServiceInspection.frequency.inMonths') === '12');
-                    $this->assertTrue($test->get('technicalServiceInspection.warningBeforehand.inDays') === '7');
-                    $this->assertTrue($test->get('instrument.restartFrequency.inDays') === '7');
-                    $this->assertTrue($test->get('start.purgeFinishedTestsPriorToTheLast.inDays') === '7');
-                    $this->assertTrue($test->get('max.error.count') === '-1');
-                    $this->assertTrue($test->get('error.delimeter') === '(!)');
-                    $this->assertTrue($test->get('log.stdout') === 'N');
-                    $this->assertTrue($test->get('portalrolemembership.bb.controlled.fields') === '');
-                    $this->assertTrue($test->get('membership.datasource.key') === '');
-                    $this->assertTrue($test->get('reconcile') === 'Y');
+                    $this->assertTrue($sut->length() === 45);
+                    $this->assertTrue($sut->get('period.maintenance.InMillis') === '86400000');
+                    $this->assertTrue($sut->get('decontamination.frequency.inDays') === '30');
+                    $this->assertTrue($sut->get('decontamination.warningBeforehand.inDays') === '1');
+                    $this->assertTrue($sut->get('technicalServiceInspection.frequency.inMonths') === '12');
+                    $this->assertTrue($sut->get('technicalServiceInspection.warningBeforehand.inDays') === '7');
+                    $this->assertTrue($sut->get('instrument.restartFrequency.inDays') === '7');
+                    $this->assertTrue($sut->get('start.purgeFinishedTestsPriorToTheLast.inDays') === '7');
+                    $this->assertTrue($sut->get('max.error.count') === '-1');
+                    $this->assertTrue($sut->get('error.delimeter') === '(!)');
+                    $this->assertTrue($sut->get('log.stdout') === 'N');
+                    $this->assertTrue($sut->get('portalrolemembership.bb.controlled.fields') === '');
+                    $this->assertTrue($sut->get('membership.datasource.key') === '');
+                    $this->assertTrue($sut->get('reconcile') === 'Y');
                     break;
 
                 case 'LotsOfScapedCharacters.properties':
-                    $this->assertTrue($test->length() === 6);
-                    $this->assertTrue($test->get('escaped key!=:# is __good') === 'And must work as "escaped key!=:# is __good"');
-                    $this->assertTrue($test->get('key with spaces') === "This line contains lots ' of \" special # characers \\\\!#'=.::sooo");
-                    $this->assertTrue($test->get('key\\with\\slashes') === 'value');
-                    $this->assertTrue($test->get('multiline.values') === "line 1\nline 2\nline 3\nline 4\\");
-                    $this->assertTrue($test->get('multiplebackslashes') === '\\\\\\value\\\\');
-                    $this->assertTrue($test->get('multiline.backslashes') === "value\n\n\\value");
+                    $this->assertTrue($sut->length() === 6);
+                    $this->assertTrue($sut->get('escaped key!=:# is __good') === 'And must work as "escaped key!=:# is __good"');
+                    $this->assertTrue($sut->get('key with spaces') === "This line contains lots ' of \" special # characers \\\\!#'=.::sooo");
+                    $this->assertTrue($sut->get('key\\with\\slashes') === 'value');
+                    $this->assertTrue($sut->get('multiline.values') === "line 1\nline 2\nline 3\nline 4\\");
+                    $this->assertTrue($sut->get('multiplebackslashes') === '\\\\\\value\\\\');
+                    $this->assertTrue($sut->get('multiline.backslashes') === "value\n\n\\value");
                     break;
 
                 case 'MidSizeInternationalizedFile7KeysLotsOfText.properties':
-                    $this->assertTrue($test->length() === 7);
-                    $this->assertTrue($test->get('featureName') === 'Spring Dashboard (optional)');
-                    $this->assertTrue($test->get('providerName') === 'Pivotal Software, Inc.');
-                    $this->assertTrue($test->get('updateSiteName') === 'Eclipse Integration Commons Updates');
-                    $this->assertTrue($test->get('description') === 'This feature provides the STS dashboard for displaying RSS feeds and the extensions page');
-                    $this->assertTrue($test->get('copyright') === 'Copyright (c) 2015, 2016 Pivotal Software, Inc.');
-                    $this->assertTrue($test->get('licenseUrl') === 'open_source_licenses.txt');
+                    $this->assertTrue($sut->length() === 7);
+                    $this->assertTrue($sut->get('featureName') === 'Spring Dashboard (optional)');
+                    $this->assertTrue($sut->get('providerName') === 'Pivotal Software, Inc.');
+                    $this->assertTrue($sut->get('updateSiteName') === 'Eclipse Integration Commons Updates');
+                    $this->assertTrue($sut->get('description') === 'This feature provides the STS dashboard for displaying RSS feeds and the extensions page');
+                    $this->assertTrue($sut->get('copyright') === 'Copyright (c) 2015, 2016 Pivotal Software, Inc.');
+                    $this->assertTrue($sut->get('licenseUrl') === 'open_source_licenses.txt');
                     break;
 
                 case 'MultipleKeysWithDifferentSpaces.properties':
-                    $this->assertTrue($test->length() === 4);
-                    $this->assertTrue($test->get('keyname') === 'value');
-                    $this->assertTrue($test->get('keyname2') === 'value2');
-                    $this->assertTrue($test->get('key3') === 'value3');
-                    $this->assertTrue($test->get('key4') === 'value4');
+                    $this->assertTrue($sut->length() === 4);
+                    $this->assertTrue($sut->get('keyname') === 'value');
+                    $this->assertTrue($sut->get('keyname2') === 'value2');
+                    $this->assertTrue($sut->get('key3') === 'value3');
+                    $this->assertTrue($sut->get('key4') === 'value4');
                     break;
 
                 case 'VietnameseAndJapaneseCharacters.properties':
-                    $this->assertTrue($test->length() === 11);
-                    $this->assertTrue($test->get('Currency_Converter') === 'Chuyen doi tien te  ');
-                    $this->assertTrue($test->get('Enter_Amount') === 'Nhập vào số lượng  ');
-                    $this->assertTrue($test->get('Target_Currency') === 'Đơn vị chuyển  ');
-                    $this->assertTrue($test->get('Alert_Mess') === 'Vui lòng nhập một số hợp lệ  ');
-                    $this->assertTrue($test->get('Alert_Title') === 'Thong bao ');
-                    $this->assertTrue($test->get('SOME_CHINESE_TEXT') === '歾炂盵 溛滁溒 藡覶譒 蓪 顣飁, 殟 畟痄笊 鵁麍儱 螜褣 跬 蔏蔍蓪 荾莯袎 衋醾 骱 棰椻楒 鎈巂鞪 櫞氌瀙 磑禠, 扴汥 礛簼繰 荾莯袎 絟缾臮 跠, 獂猺 槶 鬎鯪鯠 隒雸頍 廘榙榾 歅毼毹 皾籈譧 艜薤 煔 峬峿峹 觛詏貁 蛣袹 馺, 凘墈 橀槶澉 儮嬼懫 諃 姛帡恦 嶕憱撏 磝磢 嘽, 妎岓岕 翣聜蒢 潧 娭屔 湹渵焲 艎艑蔉 絟缾臮 緅 婂崥, 萴葂 鞈頨頧 熿熼燛 暕');
-                    $this->assertTrue($test->get('SOME_JAPANESE_TEXT') === '氨䛧 ちゅレ゜頨褤つ 栨プ詞ゞ黨 禺驩へ, なか䤥楯ティ 䨺礨背㛤騟 嶥䰧ツェ餣しょ 查ぴゃ秺 む難 びゃきゃ す鏥䧺来禯 嶥䰧ツェ餣しょ チュ菣じゅ こ䥦杩 そく へが獣儥尤 みゃみ饯䥺愦 り簨と監綩, 夦鰥 う润フ ぱむ難夦鰥 栨プ詞ゞ黨 綩ぞ 苩䋧榧 え礥䏨嫧珣 こ䥦杩みょ奊');
-                    $this->assertTrue($test->get('SOME_JAPANESE_TEXT_WITH_MULTILINES') === "氨䛧 ちゅレ゜頨褤つ 栨プ\n\n詞ゞ黨 禺驩へ, なか䤥楯ティ 䨺礨背㛤騟 嶥䰧ツェ餣\nしょ 查ぴゃ秺 む難 びゃ\nきゃ ");
+                    $this->assertTrue($sut->length() === 11);
+                    $this->assertTrue($sut->get('Currency_Converter') === 'Chuyen doi tien te  ');
+                    $this->assertTrue($sut->get('Enter_Amount') === 'Nhập vào số lượng  ');
+                    $this->assertTrue($sut->get('Target_Currency') === 'Đơn vị chuyển  ');
+                    $this->assertTrue($sut->get('Alert_Mess') === 'Vui lòng nhập một số hợp lệ  ');
+                    $this->assertTrue($sut->get('Alert_Title') === 'Thong bao ');
+                    $this->assertTrue($sut->get('SOME_CHINESE_TEXT') === '歾炂盵 溛滁溒 藡覶譒 蓪 顣飁, 殟 畟痄笊 鵁麍儱 螜褣 跬 蔏蔍蓪 荾莯袎 衋醾 骱 棰椻楒 鎈巂鞪 櫞氌瀙 磑禠, 扴汥 礛簼繰 荾莯袎 絟缾臮 跠, 獂猺 槶 鬎鯪鯠 隒雸頍 廘榙榾 歅毼毹 皾籈譧 艜薤 煔 峬峿峹 觛詏貁 蛣袹 馺, 凘墈 橀槶澉 儮嬼懫 諃 姛帡恦 嶕憱撏 磝磢 嘽, 妎岓岕 翣聜蒢 潧 娭屔 湹渵焲 艎艑蔉 絟缾臮 緅 婂崥, 萴葂 鞈頨頧 熿熼燛 暕');
+                    $this->assertTrue($sut->get('SOME_JAPANESE_TEXT') === '氨䛧 ちゅレ゜頨褤つ 栨プ詞ゞ黨 禺驩へ, なか䤥楯ティ 䨺礨背㛤騟 嶥䰧ツェ餣しょ 查ぴゃ秺 む難 びゃきゃ す鏥䧺来禯 嶥䰧ツェ餣しょ チュ菣じゅ こ䥦杩 そく へが獣儥尤 みゃみ饯䥺愦 り簨と監綩, 夦鰥 う润フ ぱむ難夦鰥 栨プ詞ゞ黨 綩ぞ 苩䋧榧 え礥䏨嫧珣 こ䥦杩みょ奊');
+                    $this->assertTrue($sut->get('SOME_JAPANESE_TEXT_WITH_MULTILINES') === "氨䛧 ちゅレ゜頨褤つ 栨プ\n\n詞ゞ黨 禺驩へ, なか䤥楯ティ 䨺礨背㛤騟 嶥䰧ツェ餣\nしょ 查ぴゃ秺 む難 びゃ\nきゃ ");
                     break;
 
                 case 'BigFile-5000Lines.properties':
-                    $this->assertTrue($test->length() === 5000);
-                    $this->assertTrue($test->get('0') === 'value-0');
-                    $this->assertTrue($test->get('789') === 'value-789');
-                    $this->assertTrue($test->get('1240') === 'value-1240');
-                    $this->assertTrue($test->get('3450') === 'value-3450');
-                    $this->assertTrue($test->get('4999') === 'value-4999');
+                    $this->assertTrue($sut->length() === 5000);
+                    $this->assertTrue($sut->get('0') === 'value-0');
+                    $this->assertTrue($sut->get('789') === 'value-789');
+                    $this->assertTrue($sut->get('1240') === 'value-1240');
+                    $this->assertTrue($sut->get('3450') === 'value-3450');
+                    $this->assertTrue($sut->get('4999') === 'value-4999');
                     break;
 
                 case 'BigFile-15000Lines.properties':
-                    $this->assertTrue($test->length() === 15000);
-                    $this->assertTrue($test->get('0') === 'value-0');
-                    $this->assertTrue($test->get('1789') === 'value-1789');
-                    $this->assertTrue($test->get('5240') === 'value-5240');
-                    $this->assertTrue($test->get('10450') === 'value-10450');
-                    $this->assertTrue($test->get('14999') === 'value-14999');
+                    $this->assertTrue($sut->length() === 15000);
+                    $this->assertTrue($sut->get('0') === 'value-0');
+                    $this->assertTrue($sut->get('1789') === 'value-1789');
+                    $this->assertTrue($sut->get('5240') === 'value-5240');
+                    $this->assertTrue($sut->get('10450') === 'value-10450');
+                    $this->assertTrue($sut->get('14999') === 'value-14999');
                     break;
 
                 default:
@@ -296,12 +311,14 @@ class JavaPropertiesObjectTest extends TestCase {
         $this->assertTrue(JavaPropertiesObject::isJavaProperties('key=value'));
         $this->assertTrue(JavaPropertiesObject::isJavaProperties('key:value'));
 
-        foreach ($this->propertiesFiles as $file) {
+        for ($i = 0; $i < count(self::$propertiesFiles); $i++) {
 
-            $fileData = $this->filesManager->readFile($this->basePath.'/'.$file);
-            $test = new JavaPropertiesObject($fileData);
+            $file = self::$propertiesFiles[$i];
+            $fileData = self::$propertiesFilesData[$i];
+
+            $sut = new JavaPropertiesObject($fileData);
             $this->assertTrue(JavaPropertiesObject::isJavaProperties($fileData));
-            $this->assertTrue(JavaPropertiesObject::isJavaProperties($test));
+            $this->assertTrue(JavaPropertiesObject::isJavaProperties($sut));
         }
 
         // Test wrong values
@@ -323,75 +340,77 @@ class JavaPropertiesObjectTest extends TestCase {
     public function testIsEqualTo(){
 
         // Test empty values
-        $properties = new JavaPropertiesObject();
+        $sut = new JavaPropertiesObject();
 
-        $this->assertTrue($properties->isEqualTo(''));
-        $this->assertTrue($properties->isEqualTo(new JavaPropertiesObject()));
+        $this->assertTrue($sut->isEqualTo(''));
+        $this->assertTrue($sut->isEqualTo(new JavaPropertiesObject()));
 
         try {
-            $properties->isEqualTo(null);
+            $sut->isEqualTo(null);
             $this->exceptionMessage = 'null value did not cause exception';
         } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
-            $properties->isEqualTo([]);
+            $sut->isEqualTo([]);
             $this->exceptionMessage = '[] value did not cause exception';
         } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
-            $properties->isEqualTo(new stdClass());
+            $sut->isEqualTo(new stdClass());
             $this->exceptionMessage = 'new stdClass() value did not cause exception';
         } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
-            $properties->isEqualTo(0);
+            $sut->isEqualTo(0);
             $this->exceptionMessage = '0 value did not cause exception';
         } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         // Test ok values
-        foreach ($this->propertiesFiles as $file) {
+        for ($i = 0; $i < count(self::$propertiesFiles); $i++) {
 
-            $fileData = $this->filesManager->readFile($this->basePath.'/'.$file);
-            $properties = new JavaPropertiesObject($fileData);
+            $file = self::$propertiesFiles[$i];
+            $fileData = self::$propertiesFilesData[$i];
+
+            $sut = new JavaPropertiesObject($fileData);
 
             // TODO - This is added for performance reasons. If performance is improved on
             // isEqualTo method, this constraint can be removed
-            if($properties->length() < 1000){
+            if($sut->length() < 1000){
 
-                $this->assertTrue($properties->isEqualTo($fileData));
-                $this->assertTrue($properties->isEqualTo($properties));
+                $this->assertTrue($sut->isEqualTo($fileData));
+                $this->assertTrue($sut->isEqualTo($sut));
             }
         }
 
         // Test wrong values
-        $properties = new JavaPropertiesObject();
+        $sut = new JavaPropertiesObject();
 
         for ($i = 0; $i < $this->wrongValuesCount; $i++) {
 
             try {
-                $properties->isEqualTo($this->wrongValues[$i]);
+                $sut->isEqualTo($this->wrongValues[$i]);
                 $this->exceptionMessage = $this->wrongValues[$i].' wrong value did not cause exception';
             } catch (Throwable $e) {
                 // We expect an exception to happen
             }
         }
 
-        $properties = new JavaPropertiesObject('key1=v1');
-        $this->assertFalse($properties->isEqualTo('key2=v1'));
+        $sut = new JavaPropertiesObject('key1=v1');
+        $this->assertFalse($sut->isEqualTo('key2=v1'));
 
-        $properties = new JavaPropertiesObject('key1=v1');
-        $this->assertFalse($properties->isEqualTo('key1=v2'));
+        $sut = new JavaPropertiesObject('key1=v1');
+        $this->assertFalse($sut->isEqualTo('key1=v2'));
 
-        $properties = new JavaPropertiesObject('key1=v1');
-        $this->assertFalse($properties->isEqualTo("key1=v1\nkey2=v2"));
+        $sut = new JavaPropertiesObject('key1=v1');
+        $this->assertFalse($sut->isEqualTo("key1=v1\nkey2=v2"));
 
         // Test exceptions
         // Already tested at wrong values
@@ -406,24 +425,25 @@ class JavaPropertiesObjectTest extends TestCase {
     public function testToString(){
 
         // Test empty values
-        $test = new JavaPropertiesObject();
-        $this->assertTrue($test->toString() === '');
+        $sut = new JavaPropertiesObject();
+        $this->assertTrue($sut->toString() === '');
 
-        $test = new JavaPropertiesObject('');
-        $this->assertTrue($test->toString() === '');
+        $sut = new JavaPropertiesObject('');
+        $this->assertTrue($sut->toString() === '');
 
         // Test ok values
-        foreach ($this->propertiesFiles as $file) {
+        for ($i = 0; $i < count(self::$propertiesFiles); $i++) {
 
-            $fileData = $this->filesManager->readFile($this->basePath.'/'.$file);
+            $file = self::$propertiesFiles[$i];
+            $fileData = self::$propertiesFilesData[$i];
 
-            $test = new JavaPropertiesObject($fileData);
+            $sut = new JavaPropertiesObject($fileData);
 
             // TODO - This is added for performance reasons. If performance is improved on
             // isEqualTo method, this constraint can be removed
-            if($test->length() < 1000){
+            if($sut->length() < 1000){
 
-                $this->assertTrue($test->isEqualTo($test->toString(), true), $file.' has a problem');
+                $this->assertTrue($sut->isEqualTo($sut->toString(), true), $file.' has a problem');
             }
         }
 
