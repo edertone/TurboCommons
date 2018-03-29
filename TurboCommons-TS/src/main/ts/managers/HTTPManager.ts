@@ -185,8 +185,8 @@ export class HTTPManager{
      * @return void
      */
     getUrlHeaders(url:string,
-                  successCallback: (e:string[]) => void,
-                  errorCallback: (msg:string, code:number) => void){
+                  successCallback: (headersArray:string[]) => void,
+                  errorCallback: (errorMsg:string, errorCode:number) => void){
     
         if(!StringUtils.isString(url)){
 
@@ -244,7 +244,7 @@ export class HTTPManager{
      *
      * @returns A valid query string that can be used with any url: http://www.url.com?query_string (Note that ? symbol is not included)
      */
-    generateUrlQueryString(object: { [s: string]: string } | HashMapObject){
+    generateUrlQueryString(object: { [key: string]: string } | HashMapObject){
         
         let result = '';
         let keys:string[] = [];
@@ -291,8 +291,8 @@ export class HTTPManager{
      * @returns void
      */
     get(url:string,
-        successCallback: (s: string) => void,
-        errorCallback: (msg:string, code:number) => void,
+        successCallback: (response: string) => void,
+        errorCallback: (errorMsg:string, errorCode:number) => void,
         parameters: { [s: string]: string } | HashMapObject | null = null){
         
         if(!StringUtils.isString(url) || StringUtils.isEmpty(url)){
@@ -367,10 +367,10 @@ export class HTTPManager{
      * @returns void
      */
     multiGetRequest(paths: string[],
-                  successCallback: (result: string[]) => void,
-                  errorCallback: (path:string, msg:string, code:number) => void,
-                  parameters: [{[s: string]: string}] | [HashMapObject] | null = null,
-                  progressCallback: null | ((s: string) => void) = null){
+                    successCallback: (responses: string[]) => void,
+                    errorCallback: (errorUrl:string, errorMsg:string, errorCode:number) => void,
+                    parameters: [{[s: string]: string}] | [HashMapObject] | null = null,
+                    progressCallback: null | ((completedUrl: string) => void) = null){
     
         if(!ArrayUtils.isArray(paths) || paths.length <= 0){
             
@@ -385,9 +385,9 @@ export class HTTPManager{
                 
                 let url = String(paths.shift());
                 
-                this.get(url, (data: string) => {
+                this.get(url, (response: string) => {
                     
-                    results.push(data);
+                    results.push(response);
                     
                     if(progressCallback !== null){
                     
@@ -396,9 +396,9 @@ export class HTTPManager{
                     
                     perform(paths, results);
                     
-                }, (msg: string, code: number) => {
+                }, (errorMsg:string, errorCode:number) => {
                     
-                    errorCallback(url, msg, code);
+                    errorCallback(url, errorMsg, errorCode);
                 });
             
             }else{
@@ -413,11 +413,71 @@ export class HTTPManager{
     
     // TODO
     multiPostRequest(paths: string[],
-            successCallback: (result: string[]) => void,
-            errorCallback: (path:string, msg:string, code:number) => void,
-            parameters: [{[s: string]: string}] | [HashMapObject] | null = null,
-            progressCallback: null | ((s: string) => void) = null){
-        
+                     successCallback: (results: string[]) => void,
+                     errorCallback: (errorUrl:string, errorMsg:string, errorCode:number) => void,
+                     parameters: [{[s: string]: string}] | [HashMapObject] | null = null,
+                     progressCallback: null | ((completedUrl: string) => void) = null){
+                
         // Implement this method
+    }
+    
+    
+    /**
+     * Given a url that contains a list of resources (files), this method will perform a request for each one of them and
+     * store the whole file contents inside an array. After all the process completes, the array containing all the loaded
+     * data will be available.
+     * 
+     * This method implements a technique that allows us to read a big list of files from an http server without needing to
+     * write much code. We simply put the files on the server, create a list with all the file names, and call this method.
+     * When the process succeeds, we will have all the files loaded and ready to be used. We have also an progress callback
+     * that will notify us when each one of the files is correctly loaded.
+     * 
+     * @param urlToResourcesList A url that contains the list of resources that will be loaded. It normally contains a list of file names
+     * @param basePath A url that will be used as the root for all the files of the list when the load is performed. This usually is the path
+     *                 to the folder that contains the files
+     * @param successCallback Executed once all the resources have been loaded. Two parameters will be passed to this method: An array with
+     *                        The list of resources as they are defined on the urlToResourcesList, and an array containing all the data for each
+     *                        one of the loaded resources. 
+     * @param errorCallback Executed if a failure happens on any of the requests. The url that caused the error,
+     *                      the error description and the error code will be passed to this method.
+     * @param progressCallback Executed after each one of the resources is correctly loaded. A string with the correctly
+     *                         requested url will be passed to this method.
+     * 
+     * @returns void
+     */
+    loadResourcesFromList(urlToResourcesList: string,
+                             basePath: string,
+                             successCallback: (resourcesList: string[], resourcesData: string[]) => void,
+                             errorCallback: (errorUrl:string, errorMsg:string, errorCode:number) => void,
+                             progressCallback: null | ((completedUrl: string) => void) = null){
+        
+        if(!StringUtils.isString(basePath) || StringUtils.isEmpty(basePath)){
+            
+            throw new Error('basePath must be a non empty string');
+        }
+
+        let basePathFormatted = basePath + ((basePath.charAt(basePath.length - 1) === '/') ? '' : '/');
+        
+        this.get(urlToResourcesList, (response) => {
+        
+            let resourcesFullUrls: string[] = [];
+            
+            var resourcesList = StringUtils.getLines(response);
+            
+            for (var resource of resourcesList){
+                
+                resourcesFullUrls.push(basePathFormatted + resource);  
+            }
+            
+            this.multiGetRequest(resourcesFullUrls, (resourcesData) => {
+
+                successCallback(resourcesList, resourcesData);
+                
+            }, errorCallback, null, progressCallback);
+            
+        }, (errorMsg, errorCode) => {
+            
+            errorCallback(urlToResourcesList, errorMsg, errorCode);
+        });
     }
 }

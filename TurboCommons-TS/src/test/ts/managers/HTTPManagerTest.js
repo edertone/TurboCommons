@@ -399,9 +399,9 @@ QUnit.test("multiGetRequest", function(assert){
         assert.strictEqual(results[2], '{\r\n"a": "1",\r\n"b": 2\r\n}');
         done();
         
-    }, function(){
+    }, function(errorUrl, errorMsg, errorCode){
         
-        assert.ok(false);
+        assert.ok(false, errorUrl + ' ' + errorMsg + ' ' + errorCode);
         done();
     });
     
@@ -417,9 +417,9 @@ QUnit.test("multiGetRequest", function(assert){
         assert.strictEqual(progressCalls, 3);        
         done();
         
-    }, function(){
+    }, function(errorUrl, errorMsg, errorCode){
         
-        assert.ok(false);
+        assert.ok(false, errorUrl + ' ' + errorMsg + ' ' + errorCode);
         done();
         
     }, null, function(){
@@ -433,12 +433,113 @@ QUnit.test("multiGetRequest", function(assert){
         assert.ok(false);
         done();
         
-    }, function(path, msg, code){
+    }, function(errorUrl, errorMsg, errorCode){
         
-        assert.strictEqual(path, nonExistantUrl);
-        assert.ok(StringUtils.isString(msg));
-        assert.ok(msg.length > 5);
-        assert.strictEqual(code, 404);
+        assert.strictEqual(errorUrl, nonExistantUrl);
+        assert.ok(StringUtils.isString(errorMsg));
+        assert.ok(errorMsg.length > 5);
+        assert.strictEqual(errorCode, 404);
+        done();
+    });
+
+    // Test exceptions
+    // not necessary
+});
+
+
+/**
+ * multiPostRequest
+ */
+QUnit.todo("multiPostRequest", function(assert){
+
+    // Test empty values
+    // TODO
+
+    // Test ok values
+    // TODO
+
+    // Test wrong values
+    // TODO
+
+    // Test exceptions
+    // TODO
+});
+
+
+/**
+ * loadResourcesFromList
+ */
+QUnit.test("loadResourcesFromList", function(assert){
+
+    // Test empty values
+    for (var i = 0; i < emptyValuesCount; i++) {
+        
+        assert.throws(function() {
+            sut.loadResourcesFromList(emptyValues[i], 'somepath');
+        }, /url must be a non empty string/);
+        
+        assert.throws(function() {
+            sut.loadResourcesFromList('somepath', emptyValues[i]);
+        }, /basePath must be a non empty string/);
+    } 
+
+    // Test ok values
+    var done = assert.async(3);
+
+    sut.loadResourcesFromList(basePath + '/files-list.txt', basePath, function(resourcesList, resourcesData){
+
+        assert.strictEqual(resourcesList.length, 3);
+        assert.strictEqual(resourcesList[0], 'file1.txt');
+        assert.strictEqual(resourcesList[1], 'file2.xml');
+        assert.strictEqual(resourcesList[2], 'file3.json');
+        assert.strictEqual(resourcesData[0], 'text1');
+        assert.strictEqual(resourcesData[1], "<test>\r\n    hello\r\n</test>");
+        assert.strictEqual(resourcesData[2], '{\r\n"a": "1",\r\n"b": 2\r\n}');
+        done();
+        
+    }, function(errorUrl, errorMsg, errorCode){
+        
+        assert.ok(false, errorUrl + ' ' + errorMsg + ' ' + errorCode);
+        done();
+    });
+    
+    // test ok values with resourceLoadedCallback
+    var progressCalls = 0;
+    
+    sut.loadResourcesFromList(basePath + '/files-list.txt', basePath + '/', function(resourcesList, resourcesData){
+
+        assert.strictEqual(resourcesList.length, 3);
+        assert.strictEqual(resourcesList[0], 'file1.txt');
+        assert.strictEqual(resourcesList[1], 'file2.xml');
+        assert.strictEqual(resourcesList[2], 'file3.json');
+        assert.strictEqual(resourcesData[0], 'text1');
+        assert.strictEqual(resourcesData[1], "<test>\r\n    hello\r\n</test>");
+        assert.strictEqual(resourcesData[2], '{\r\n"a": "1",\r\n"b": 2\r\n}');
+        assert.strictEqual(progressCalls, 3);        
+        done();
+        
+    }, function(errorUrl, errorMsg, errorCode){
+        
+        assert.ok(false, errorUrl + ' ' + errorMsg + ' ' + errorCode);
+        done();
+        
+    }, function(completedUrl){
+        
+        progressCalls ++;
+    });
+
+    // Test wrong values
+    sut.loadResourcesFromList(nonExistantUrl, basePath, function(result){
+
+        assert.ok(false);
+        done();
+        
+    }, function(errorUrl, errorMsg, errorCode){
+        
+        assert.strictEqual(errorUrl, nonExistantUrl);
+        assert.ok(StringUtils.isString(errorMsg));
+        assert.ok(errorMsg.length > 5);
+        assert.strictEqual(errorCode, 404);
         done();
     });
 
