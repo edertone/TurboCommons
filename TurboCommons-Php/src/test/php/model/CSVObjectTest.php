@@ -30,6 +30,13 @@ use org\turbocommons\src\main\php\utils\NumericUtils;
 class CSVObjectTest extends TestCase {
 
 
+    protected static $basePath;
+    protected static $csvFiles;
+    protected static $csvFilesData;
+    protected static $propertiesFiles;
+    protected static $propertiesFilesData;
+
+
     /**
      * @see TestCase::setUpBeforeClass()
      *
@@ -37,7 +44,32 @@ class CSVObjectTest extends TestCase {
      */
     public static function setUpBeforeClass(){
 
-        // Nothing necessary here
+        self::$basePath = __DIR__.'/../resources/model/csvObject';
+
+        // Load all the csv and properties files data
+        self::$csvFiles = [];
+        self::$csvFilesData = [];
+        self::$propertiesFiles = [];
+        self::$propertiesFilesData = [];
+
+        $filesManager = new FilesManager();
+
+        $filesList = $filesManager->getDirectoryList(self::$basePath);
+
+        foreach ($filesList as $file) {
+
+            if(StringUtils::getFileExtension($file) === 'csv'){
+
+                self::$csvFiles[] = $file;
+                self::$csvFilesData[] = $filesManager->readFile(self::$basePath.'/'.$file);
+            }
+
+            if(StringUtils::getFileExtension($file) === 'properties'){
+
+                self::$propertiesFiles[] = $file;
+                self::$propertiesFilesData[] = $filesManager->readFile(self::$basePath.'/'.$file);
+            }
+        }
     }
 
 
@@ -55,23 +87,6 @@ class CSVObjectTest extends TestCase {
 
         $this->wrongValues = [123, [1, 2, 3], ['asdf'], new Exception()];
         $this->wrongValuesCount = count($this->wrongValues);
-
-        $this->filesManager = new FilesManager();
-
-        $this->basePath = __DIR__.'/../resources/model/csvObject';
-
-        $this->csvFiles = [];
-        $files = $this->filesManager->getDirectoryList($this->basePath);
-
-        foreach ($files as $file) {
-
-            if(StringUtils::getFileExtension($file) === 'csv'){
-
-                $this->csvFiles[] = $file;
-            }
-        }
-
-        $this->csvFilesCount = count($this->csvFiles);
     }
 
 
@@ -108,21 +123,21 @@ class CSVObjectTest extends TestCase {
 	public function testConstruct(){
 
 	    // Test empty values
-	    $test = new CSVObject();
-        $this->assertEquals(0, $test->countColumns());
-        $this->assertEquals(0, $test->countRows());
+	    $sut = new CSVObject();
+        $this->assertSame(0, $sut->countColumns());
+        $this->assertSame(0, $sut->countRows());
 
-        $test = new CSVObject('');
-        $this->assertEquals(0, $test->countColumns());
-        $this->assertEquals(0, $test->countRows());
+        $sut = new CSVObject('');
+        $this->assertSame(0, $sut->countColumns());
+        $this->assertSame(0, $sut->countRows());
 
-        $test = new CSVObject('     ');
-        $this->assertEquals(0, $test->countColumns());
-        $this->assertEquals(0, $test->countRows());
+        $sut = new CSVObject('     ');
+        $this->assertSame(0, $sut->countColumns());
+        $this->assertSame(0, $sut->countRows());
 
-        $test = new CSVObject("\n\n\n");
-        $this->assertEquals(0, $test->countColumns());
-        $this->assertEquals(0, $test->countRows());
+        $sut = new CSVObject("\n\n\n");
+        $this->assertSame(0, $sut->countColumns());
+        $this->assertSame(0, $sut->countRows());
 
         for ($i = 0; $i < $this->emptyValuesCount; $i++) {
 
@@ -137,151 +152,152 @@ class CSVObjectTest extends TestCase {
 	    // Test ok values
 
 	    // Single value csv
-	    $test = new CSVObject('value');
-	    $this->assertEquals('value', $test->getCell(0, 0));
-	    $this->assertEquals(1, $test->countRows());
-	    $this->assertEquals(1, $test->countColumns());
-	    $this->assertEquals('value', $test->getCell(0, 0));
-	    $this->assertTrue($test->isEqualTo('value'));
+	    $sut = new CSVObject('value');
+	    $this->assertSame('value', $sut->getCell(0, 0));
+	    $this->assertSame(1, $sut->countRows());
+	    $this->assertSame(1, $sut->countColumns());
+	    $this->assertSame('value', $sut->getCell(0, 0));
+	    $this->assertTrue($sut->isEqualTo('value'));
 
 	    // Simple one row empty csv
-	    $test = new CSVObject(',"",');
-	    $this->assertEquals('', $test->getCell(0, 0));
-	    $this->assertEquals('', $test->getCell(0, 1));
-	    $this->assertEquals('', $test->getCell(0, 2));
-	    $this->assertTrue($test->isEqualTo(',,'));
+	    $sut = new CSVObject(',"",');
+	    $this->assertSame('', $sut->getCell(0, 0));
+	    $this->assertSame('', $sut->getCell(0, 1));
+	    $this->assertSame('', $sut->getCell(0, 2));
+	    $this->assertTrue($sut->isEqualTo(',,'));
 
 	    // Simple one row empty csv with headers
-	    $test = new CSVObject("c1,c2,c3\r\n,,", true);
-	    $this->assertEquals('', $test->getCell(0, 'c1'));
-	    $this->assertEquals('', $test->getCell(0, 'c2'));
-	    $this->assertEquals('', $test->getCell(0, 'c3'));
-	    $this->assertEquals('', $test->getCell(0, 0));
-	    $this->assertEquals('', $test->getCell(0, 1));
-	    $this->assertEquals('', $test->getCell(0, 2));
-	    $this->assertTrue($test->isEqualTo("c1,\"c2\",c3\n,,"));
+	    $sut = new CSVObject("c1,c2,c3\r\n,,", true);
+	    $this->assertSame('', $sut->getCell(0, 'c1'));
+	    $this->assertSame('', $sut->getCell(0, 'c2'));
+	    $this->assertSame('', $sut->getCell(0, 'c3'));
+	    $this->assertSame('', $sut->getCell(0, 0));
+	    $this->assertSame('', $sut->getCell(0, 1));
+	    $this->assertSame('', $sut->getCell(0, 2));
+	    $this->assertTrue($sut->isEqualTo("c1,\"c2\",c3\n,,"));
 
 	    // Simple one row csv without headers
-	    $test = new CSVObject('a,b,c');
-	    $this->assertEquals('a', $test->getCell(0, 0));
-	    $this->assertEquals('b', $test->getCell(0, 1));
-	    $this->assertEquals('c', $test->getCell(0, 2));
-	    $this->assertTrue($test->isEqualTo('a,b,c'));
+	    $sut = new CSVObject('a,b,c');
+	    $this->assertSame('a', $sut->getCell(0, 0));
+	    $this->assertSame('b', $sut->getCell(0, 1));
+	    $this->assertSame('c', $sut->getCell(0, 2));
+	    $this->assertTrue($sut->isEqualTo('a,b,c'));
 
 	    // Simple one row csv with headers
-	    $test = new CSVObject("c1,c2,c3\n1,2,3", true);
-	    $this->assertEquals('1', $test->getCell(0, 'c1'));
-	    $this->assertEquals('2', $test->getCell(0, 'c2'));
-	    $this->assertEquals('3', $test->getCell(0, 'c3'));
-	    $this->assertEquals('1', $test->getCell(0, 0));
-	    $this->assertEquals('2', $test->getCell(0, 1));
-	    $this->assertEquals('3', $test->getCell(0, 2));
-	    $this->assertTrue($test->isEqualTo("c1,c2,c3\r\n1,2,3"));
+	    $sut = new CSVObject("c1,c2,c3\n1,2,3", true);
+	    $this->assertSame('1', $sut->getCell(0, 'c1'));
+	    $this->assertSame('2', $sut->getCell(0, 'c2'));
+	    $this->assertSame('3', $sut->getCell(0, 'c3'));
+	    $this->assertSame('1', $sut->getCell(0, 0));
+	    $this->assertSame('2', $sut->getCell(0, 1));
+	    $this->assertSame('3', $sut->getCell(0, 2));
+	    $this->assertTrue($sut->isEqualTo("c1,c2,c3\r\n1,2,3"));
 
 	    // Simple one row csv without headers and scaped fields
-	    $test = new CSVObject('"a","b","c"');
-	    $this->assertEquals('a', $test->getCell(0, 0));
-	    $this->assertEquals('b', $test->getCell(0, 1));
-	    $this->assertEquals('c', $test->getCell(0, 2));
-	    $this->assertTrue($test->isEqualTo('a,b,c'));
+	    $sut = new CSVObject('"a","b","c"');
+	    $this->assertSame('a', $sut->getCell(0, 0));
+	    $this->assertSame('b', $sut->getCell(0, 1));
+	    $this->assertSame('c', $sut->getCell(0, 2));
+	    $this->assertTrue($sut->isEqualTo('a,b,c'));
 
 	    // Simple one row csv with headers and scaped fields
-	    $test = new CSVObject("c1,c2,c3\r\"a\",\"b\",\"c\"", true);
-	    $this->assertEquals('a', $test->getCell(0, 'c1'));
-	    $this->assertEquals('b', $test->getCell(0, 'c2'));
-	    $this->assertEquals('c', $test->getCell(0, 'c3'));
-	    $this->assertEquals('a', $test->getCell(0, 0));
-	    $this->assertEquals('b', $test->getCell(0, 1));
-	    $this->assertEquals('c', $test->getCell(0, 2));
-	    $this->assertTrue($test->isEqualTo("c1,c2,c3\na,b,c"));
+	    $sut = new CSVObject("c1,c2,c3\r\"a\",\"b\",\"c\"", true);
+	    $this->assertSame('a', $sut->getCell(0, 'c1'));
+	    $this->assertSame('b', $sut->getCell(0, 'c2'));
+	    $this->assertSame('c', $sut->getCell(0, 'c3'));
+	    $this->assertSame('a', $sut->getCell(0, 0));
+	    $this->assertSame('b', $sut->getCell(0, 1));
+	    $this->assertSame('c', $sut->getCell(0, 2));
+	    $this->assertTrue($sut->isEqualTo("c1,c2,c3\na,b,c"));
 
 	    // Simple csv without headers and edge cases
-	    $test = new CSVObject(' a ,b  ,c  ');
-	    $this->assertEquals(' a ', $test->getCell(0, 0));
-	    $this->assertEquals('b  ', $test->getCell(0, 1));
-	    $this->assertEquals('c  ', $test->getCell(0, 2));
-	    $this->assertTrue($test->isEqualTo(' a ,"b  ",c  '));
+	    $sut = new CSVObject(' a ,b  ,c  ');
+	    $this->assertSame(' a ', $sut->getCell(0, 0));
+	    $this->assertSame('b  ', $sut->getCell(0, 1));
+	    $this->assertSame('c  ', $sut->getCell(0, 2));
+	    $this->assertTrue($sut->isEqualTo(' a ,"b  ",c  '));
 
 	    // Multiple lines csv with different newline characters (windows: \r\n, Linux/Unix: \n, Mac: \r)
-	    $test = new CSVObject("1,2,3\na,b,c\r\n4,5,6\r");
-	    $this->assertEquals('1', $test->getCell(0, 0));
-	    $this->assertEquals('2', $test->getCell(0, 1));
-	    $this->assertEquals('3', $test->getCell(0, 2));
-	    $this->assertEquals('a', $test->getCell(1, 0));
-	    $this->assertEquals('b', $test->getCell(1, 1));
-	    $this->assertEquals('c', $test->getCell(1, 2));
-	    $this->assertEquals('4', $test->getCell(2, 0));
-	    $this->assertEquals('5', $test->getCell(2, 1));
-	    $this->assertEquals('6', $test->getCell(2, 2));
-	    $this->assertTrue($test->isEqualTo("1,2,3\na,b,c\r\r4,5,6\r\n"));
-	    $this->assertTrue($test->countColumns() === 3);
-	    $this->assertTrue($test->countRows() === 3);
+	    $sut = new CSVObject("1,2,3\na,b,c\r\n4,5,6\r");
+	    $this->assertSame('1', $sut->getCell(0, 0));
+	    $this->assertSame('2', $sut->getCell(0, 1));
+	    $this->assertSame('3', $sut->getCell(0, 2));
+	    $this->assertSame('a', $sut->getCell(1, 0));
+	    $this->assertSame('b', $sut->getCell(1, 1));
+	    $this->assertSame('c', $sut->getCell(1, 2));
+	    $this->assertSame('4', $sut->getCell(2, 0));
+	    $this->assertSame('5', $sut->getCell(2, 1));
+	    $this->assertSame('6', $sut->getCell(2, 2));
+	    $this->assertTrue($sut->isEqualTo("1,2,3\na,b,c\r\r4,5,6\r\n"));
+	    $this->assertTrue($sut->countColumns() === 3);
+	    $this->assertTrue($sut->countRows() === 3);
 
 	    // Simple csv without headers and scaped fields and characters with edge cases
-	    $test = new CSVObject(' """"" 1",",,,2",    "3", "4,"   ,  "5 " ');
-	    $this->assertEquals('"" 1', $test->getCell(0, 0));
-	    $this->assertEquals(',,,2', $test->getCell(0, 1));
-	    $this->assertEquals('3', $test->getCell(0, 2));
-	    $this->assertEquals('4,', $test->getCell(0, 3));
-	    $this->assertEquals('5 ', $test->getCell(0, 4));
-	    $this->assertTrue($test->isEqualTo('""""" 1",",,,2","3","4,","5 "'));
+	    $sut = new CSVObject(' """"" 1",",,,2",    "3", "4,"   ,  "5 " ');
+	    $this->assertSame('"" 1', $sut->getCell(0, 0));
+	    $this->assertSame(',,,2', $sut->getCell(0, 1));
+	    $this->assertSame('3', $sut->getCell(0, 2));
+	    $this->assertSame('4,', $sut->getCell(0, 3));
+	    $this->assertSame('5 ', $sut->getCell(0, 4));
+	    $this->assertTrue($sut->isEqualTo('""""" 1",",,,2","3","4,","5 "'));
 
 	    // Simple two row csv without headers and scaped fields and characters
-	    $test = new CSVObject("\"1\",\"2\",\"3\"\r\n\"a\"\"a\",\"b\",\"c\"");
-	    $this->assertEquals('1', $test->getCell(0, 0));
-	    $this->assertEquals('2', $test->getCell(0, 1));
-	    $this->assertEquals('3', $test->getCell(0, 2));
-	    $this->assertEquals('a"a', $test->getCell(1, 0));
-	    $this->assertEquals('b', $test->getCell(1, 1));
-	    $this->assertEquals('c', $test->getCell(1, 2));
-	    $this->assertTrue($test->isEqualTo("\"1\",\"2\",\"3\"\r\n\"a\"\"a\",\"b\",\"c\""));
+	    $sut = new CSVObject("\"1\",\"2\",\"3\"\r\n\"a\"\"a\",\"b\",\"c\"");
+	    $this->assertSame('1', $sut->getCell(0, 0));
+	    $this->assertSame('2', $sut->getCell(0, 1));
+	    $this->assertSame('3', $sut->getCell(0, 2));
+	    $this->assertSame('a"a', $sut->getCell(1, 0));
+	    $this->assertSame('b', $sut->getCell(1, 1));
+	    $this->assertSame('c', $sut->getCell(1, 2));
+	    $this->assertTrue($sut->isEqualTo("\"1\",\"2\",\"3\"\r\n\"a\"\"a\",\"b\",\"c\""));
 
 	    // Simple two row csv with headers and mixed scaped and non scaped fields and characters
-	    $test = new CSVObject("c1,\"c,\"\"2\",c3\r1,\"2\", 3 \r\n\"a \"\",a\",b,\"c\"", true);
-	    $this->assertEquals(['c1', 'c,"2', 'c3'], $test->getColumnNames());
-	    $this->assertEquals('1', $test->getCell(0, 'c1'));
-	    $this->assertEquals('2', $test->getCell(0, 'c,"2'));
-	    $this->assertEquals(' 3 ', $test->getCell(0, 'c3'));
-	    $this->assertEquals('1', $test->getCell(0, 0));
-	    $this->assertEquals('2', $test->getCell(0, 1));
-	    $this->assertEquals(' 3 ', $test->getCell(0, 2));
-	    $this->assertEquals('a ",a', $test->getCell(1, 'c1'));
-	    $this->assertEquals('b', $test->getCell(1, 'c,"2'));
-	    $this->assertEquals('c', $test->getCell(1, 'c3'));
-	    $this->assertEquals('a ",a', $test->getCell(1, 0));
-	    $this->assertEquals('b', $test->getCell(1, 1));
-	    $this->assertEquals('c', $test->getCell(1, 2));
-	    $this->assertTrue($test->isEqualTo("c1,\"c,\"\"2\",c3\r1,\"2\", 3 \r\n\"a \"\",a\",b,\"c\""));
+	    $sut = new CSVObject("c1,\"c,\"\"2\",c3\r1,\"2\", 3 \r\n\"a \"\",a\",b,\"c\"", true);
+	    $this->assertSame(['c1', 'c,"2', 'c3'], $sut->getColumnNames());
+	    $this->assertSame('1', $sut->getCell(0, 'c1'));
+	    $this->assertSame('2', $sut->getCell(0, 'c,"2'));
+	    $this->assertSame(' 3 ', $sut->getCell(0, 'c3'));
+	    $this->assertSame('1', $sut->getCell(0, 0));
+	    $this->assertSame('2', $sut->getCell(0, 1));
+	    $this->assertSame(' 3 ', $sut->getCell(0, 2));
+	    $this->assertSame('a ",a', $sut->getCell(1, 'c1'));
+	    $this->assertSame('b', $sut->getCell(1, 'c,"2'));
+	    $this->assertSame('c', $sut->getCell(1, 'c3'));
+	    $this->assertSame('a ",a', $sut->getCell(1, 0));
+	    $this->assertSame('b', $sut->getCell(1, 1));
+	    $this->assertSame('c', $sut->getCell(1, 2));
+	    $this->assertTrue($sut->isEqualTo("c1,\"c,\"\"2\",c3\r1,\"2\", 3 \r\n\"a \"\",a\",b,\"c\""));
 
 	    // test csv files from resources
-	    // Expected values are expected to be stored on a properties file for each one of the csv files.
+	    // Assertion expected values are stored on a properties file for each one of the csv files.
 	    // It must have exactly the same name but with .properties extension
-	    foreach ($this->csvFiles as $file) {
+	    for($i = 0; $i < count(self::$csvFiles); $i++){
 
-            $fileData = $this->filesManager->readFile($this->basePath.'/'.$file);
+	        $csvFileName = self::$csvFiles[$i];
+	        $csvFileData = self::$csvFilesData[$i];
 
-            $test = new CSVObject($fileData, StringUtils::countStringOccurences($file, 'WithHeader') === 1);
+	        $sut = new CSVObject($csvFileData, StringUtils::countStringOccurences($csvFileName, 'WithHeader') === 1);
 
-            $resultFile = StringUtils::getFileNameWithoutExtension($file).'.properties';
-            $resultData = new JavaPropertiesObject($this->filesManager->readFile($this->basePath.'/'.$resultFile));
+	        $propertiesFileName = StringUtils::getFileNameWithoutExtension($csvFileName).'.properties';
+	        $csvFileAssertions = new JavaPropertiesObject(self::$propertiesFilesData[array_search($propertiesFileName, self::$propertiesFiles)]);
 
-            $this->assertEquals($resultData->get('rows'), $test->countRows(), 'File: '.$file);
-            $this->assertEquals($resultData->get('cols'), $test->countColumns(), 'File: '.$file);
+	        $this->assertSame((int)$csvFileAssertions->get('rows'), $sut->countRows(), 'File: '.$csvFileName);
+	        $this->assertSame((int)$csvFileAssertions->get('cols'), $sut->countColumns(), 'File: '.$csvFileName);
 
-            foreach ($resultData->getKeys() as $key) {
+	        foreach ($csvFileAssertions->getKeys() as $key) {
 
-                if($key !== 'rows' && $key !== 'cols'){
+	            if($key !== 'rows' && $key !== 'cols'){
 
-                    $rowCol = explode('-', $key, 2);
+	                $rowCol = explode('-', $key, 2);
 
                     $columnFormatted = NumericUtils::isNumeric($rowCol[1]) ? (int)$rowCol[1] : $rowCol[1];
 
-                    $expected = $resultData->get($key);
-                    $value = $test->getCell((int)$rowCol[0], $columnFormatted);
+                    $expected = $csvFileAssertions->get($key);
+                    $value = $sut->getCell((int)$rowCol[0], $columnFormatted);
 
-                    $this->assertEquals($expected, $value, 'File: '.$file.' row and col: '.$key);
-                }
-            }
+                    $this->assertSame($expected, $value, 'File: '.$csvFileName.' row and col: '.$key);
+	            }
+	        }
 	    }
 
 	    // Test wrong values
@@ -308,18 +324,18 @@ class CSVObjectTest extends TestCase {
 	public function testSetCell(){
 
 	    // Test empty values
-	    $test = new CSVObject();
-	    $test->addColumns(5);
-	    $test->addRows(5);
+	    $sut = new CSVObject();
+	    $sut->addColumns(5);
+	    $sut->addRows(5);
 
-	    $this->assertTrue($test->getCell(0, 0) === null);
-	    $this->assertTrue($test->setCell(0, 0, '') === '');
-	    $this->assertTrue($test->getCell(0, 0) === '');
+	    $this->assertTrue($sut->getCell(0, 0) === '');
+	    $this->assertTrue($sut->setCell(0, 0, '') === '');
+	    $this->assertTrue($sut->getCell(0, 0) === '');
 
 	    for ($i = 0; $i < $this->emptyValuesCount; $i++) {
 
 	        try {
-	            $test->setCell(0, 0, $this->emptyValues[$i]);
+	            $sut->setCell(0, 0, $this->emptyValues[$i]);
 	            $this->exceptionMessage = $this->emptyValues[$i].' empty value did not cause exception';
 	        } catch (Throwable $e) {
 	            // We expect an exception to happen
@@ -327,64 +343,64 @@ class CSVObjectTest extends TestCase {
 	    }
 
 	    // Test ok values
-	    $this->assertTrue($test->getCell(0, 2) === null);
-	    $this->assertTrue($test->setCell(0, 2, 'somevalue') === 'somevalue');
-	    $this->assertTrue($test->getCell(0, 2) === 'somevalue');
+	    $this->assertTrue($sut->getCell(0, 2) === '');
+	    $this->assertTrue($sut->setCell(0, 2, 'somevalue') === 'somevalue');
+	    $this->assertTrue($sut->getCell(0, 2) === 'somevalue');
 
-	    $this->assertTrue($test->getCell(0, 4) === null);
-	    $this->assertTrue($test->setCell(0, 4, 'somevalue4') === 'somevalue4');
-	    $this->assertTrue($test->getCell(0, 4) === 'somevalue4');
+	    $this->assertTrue($sut->getCell(0, 4) === '');
+	    $this->assertTrue($sut->setCell(0, 4, 'somevalue4') === 'somevalue4');
+	    $this->assertTrue($sut->getCell(0, 4) === 'somevalue4');
 
-	    $this->assertTrue($test->getCell(2, 0) === null);
-	    $this->assertTrue($test->setCell(2, 0, '2-0') === '2-0');
-	    $this->assertTrue($test->getCell(2, 0) === '2-0');
+	    $this->assertTrue($sut->getCell(2, 0) === '');
+	    $this->assertTrue($sut->setCell(2, 0, '2-0') === '2-0');
+	    $this->assertTrue($sut->getCell(2, 0) === '2-0');
 
-	    $this->assertTrue($test->getCell(2, 2) === null);
-	    $this->assertTrue($test->setCell(2, 2, '2-2') === '2-2');
-	    $this->assertTrue($test->getCell(2, 2) === '2-2');
+	    $this->assertTrue($sut->getCell(2, 2) === '');
+	    $this->assertTrue($sut->setCell(2, 2, '2-2') === '2-2');
+	    $this->assertTrue($sut->getCell(2, 2) === '2-2');
 
-	    $this->assertTrue($test->getCell(4, 4) === null);
-	    $this->assertTrue($test->setCell(4, 4, '4-4') === '4-4');
-	    $this->assertTrue($test->getCell(4, 4) === '4-4');
+	    $this->assertTrue($sut->getCell(4, 4) === '');
+	    $this->assertTrue($sut->setCell(4, 4, '4-4') === '4-4');
+	    $this->assertTrue($sut->getCell(4, 4) === '4-4');
 
 	    // Test wrong values
 	    try {
-	        $test->setCell(-1, 0, '');
+	        $sut->setCell(-1, 0, '');
 	        $this->exceptionMessage = '-1,0 value did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
-	        $test->setCell(10, 0, '');
+	        $sut->setCell(10, 0, '');
 	        $this->exceptionMessage = '10,0 value did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
-	        $test->setCell(0, -1, '');
+	        $sut->setCell(0, -1, '');
 	        $this->exceptionMessage = '0,-1 value did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
-	        $test->setCell(0, 10, '');
+	        $sut->setCell(0, 10, '');
 	        $this->exceptionMessage = '0,10 value did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
-	        $test->setCell(0, 0, 10);
+	        $sut->setCell(0, 0, 10);
 	        $this->exceptionMessage = '10 value did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
-	        $test->setCell(0, 0, new stdClass());
+	        $sut->setCell(0, 0, new stdClass());
 	        $this->exceptionMessage = 'new stdClass() value did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
@@ -425,11 +441,9 @@ class CSVObjectTest extends TestCase {
 	    $this->assertTrue(CSVObject::isCSV("\"1\",\"2\",\"3\"\r\n\"a\"\"a\",\"b\",\"c\""));
 	    $this->assertTrue(CSVObject::isCSV("c1,\"c,\"\"2\",c3\r1,\"2\", 3 \r\n\"a \"\",a\",b,\"c\""));
 
-	    foreach ($this->csvFiles as $file) {
+	    for ($i = 0; $i < count(self::$csvFiles); $i++) {
 
-	        $fileData = $this->filesManager->readFile($this->basePath.'/'.$file);
-
-	        $this->assertTrue(CSVObject::isCSV($fileData));
+	        $this->assertTrue(CSVObject::isCSV(self::$csvFilesData[$i]));
 	    }
 
 	    // Test wrong values
@@ -452,85 +466,85 @@ class CSVObjectTest extends TestCase {
 	public function testIsEqualTo(){
 
 	    // Test empty values
-	    $test = new CSVObject();
+	    $sut = new CSVObject();
 
-	    $this->assertTrue($test->isEqualTo(''));
-	    $this->assertTrue($test->isEqualTo(new CSVObject()));
+	    $this->assertTrue($sut->isEqualTo(''));
+	    $this->assertTrue($sut->isEqualTo(new CSVObject()));
 
 	    try {
-	        $test->isEqualTo(null);
+	        $sut->isEqualTo(null);
 	        $this->exceptionMessage = 'null value did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
-	        $test->isEqualTo([]);
+	        $sut->isEqualTo([]);
 	        $exceptionMessage = '[] value did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
-	        $test->isEqualTo(new stdClass());
+	        $sut->isEqualTo(new stdClass());
 	        $exceptionMessage = 'new stdClass() value did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    try {
-	        $test->isEqualTo(0);
+	        $sut->isEqualTo(0);
 	        $exceptionMessage = '0 value did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
 	    // Test ok and wrong values
-	    for ($i = 1; $i < $this->csvFilesCount; $i++) {
+	    for ($i = 1; $i < count(self::$csvFiles); $i++) {
 
 	        if($i == 1){
 
-	            $previousFileData = $this->filesManager->readFile($this->basePath.'/'.$this->csvFiles[$i-1]);
-	            $previousTest = new CSVObject($previousFileData, StringUtils::countStringOccurences($this->csvFiles[$i-1], 'WithHeader') === 1);
+	            $previousFileData = self::$csvFilesData[$i-1];
+	            $previousSut = new CSVObject($previousFileData, StringUtils::countStringOccurences(self::$csvFiles[$i-1], 'WithHeader') === 1);
 
 	        }else{
 
 	            $previousFileData = $fileData;
-	            $previousTest = $test;
+	            $previousSut = $sut;
 	        }
 
-	        $fileData = $this->filesManager->readFile($this->basePath.'/'.$this->csvFiles[$i]);
-	        $test = new CSVObject($fileData, StringUtils::countStringOccurences($this->csvFiles[$i], 'WithHeader') === 1);
+	        $fileData = self::$csvFilesData[$i];
+	        $sut = new CSVObject($fileData, StringUtils::countStringOccurences(self::$csvFiles[$i], 'WithHeader') === 1);
 
 	        // TODO - This is added for performance reasons. If performance is improved on
 	        // isEqualTo method, this constraint can be removed
-	        if($test->countRows() < 1000 && $previousTest->countRows() < 1000){
+	        if($sut->countRows() < 1000 && $previousSut->countRows() < 1000){
 
-	            $this->assertTrue($test->isEqualTo($fileData));
-	            $this->assertTrue($test->isEqualTo($test));
+	            $this->assertTrue($sut->isEqualTo($fileData));
+	            $this->assertTrue($sut->isEqualTo($sut));
 
-	            $this->assertFalse($test->isEqualTo($previousFileData));
-	            $this->assertFalse($test->isEqualTo($previousTest));
+	            $this->assertFalse($sut->isEqualTo($previousFileData));
+	            $this->assertFalse($sut->isEqualTo($previousSut));
 	        }
         }
 
 	    // Test exceptions
         try {
-            $test->isEqualTo(123234);
+            $sut->isEqualTo(123234);
             $exceptionMessage = '123234 value did not cause exception';
         } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
-            $test->isEqualTo([1,'dfgdfg']);
+            $sut->isEqualTo([1,'dfgdfg']);
             $exceptionMessage = '[1,"dfgdfg"] value did not cause exception';
         } catch (Throwable $e) {
             // We expect an exception to happen
         }
 
         try {
-            $test->isEqualTo(new Exception());
+            $sut->isEqualTo(new Exception());
             $exceptionMessage = 'new Exception() value did not cause exception';
         } catch (Throwable $e) {
             // We expect an exception to happen
@@ -546,83 +560,81 @@ class CSVObjectTest extends TestCase {
 	public function testToString(){
 
 	    // Test empty values
-	    $test = new CSVObject();
-	    $this->assertTrue($test->toString() === '');
+	    $sut = new CSVObject();
+	    $this->assertTrue($sut->toString() === '');
 
-	    $test = new CSVObject('');
-	    $this->assertTrue($test->toString() === '');
+	    $sut = new CSVObject('');
+	    $this->assertTrue($sut->toString() === '');
 
-	    $test = new CSVObject('      ');
-	    $this->assertTrue($test->toString() === '');
+	    $sut = new CSVObject('      ');
+	    $this->assertTrue($sut->toString() === '');
 
-	    $test = new CSVObject("\n\n\n\n");
-	    $this->assertTrue($test->toString() === '');
+	    $sut = new CSVObject("\n\n\n\n");
+	    $this->assertTrue($sut->toString() === '');
 
-	    $test = new CSVObject("\r\n\r\n\r\n\r\n");
-	    $this->assertTrue($test->toString() === '');
+	    $sut = new CSVObject("\r\n\r\n\r\n\r\n");
+	    $this->assertTrue($sut->toString() === '');
 
 	    // Test ok values
 
 	    // Single value csv
-	    $test = new CSVObject('value');
-	    $this->assertEquals('value', $test->toString());
+	    $sut = new CSVObject('value');
+	    $this->assertSame('value', $sut->toString());
 
 	    // Simple one row empty csv
-	    $test = new CSVObject(',,');
-	    $this->assertEquals(',,', $test->toString());
+	    $sut = new CSVObject(',,');
+	    $this->assertSame(',,', $sut->toString());
 
 	    // Simple one row empty csv with headers
-	    $test = new CSVObject("c1,c2,c3\r\n,,", true);
-	    $this->assertEquals("c1,c2,c3\r\n,,", $test->toString());
+	    $sut = new CSVObject("c1,c2,c3\r\n,,", true);
+	    $this->assertSame("c1,c2,c3\r\n,,", $sut->toString());
 
 	    // Simple one row csv without headers
-	    $test = new CSVObject('a,b,c');
-	    $this->assertEquals('a,b,c', $test->toString());
+	    $sut = new CSVObject('a,b,c');
+	    $this->assertSame('a,b,c', $sut->toString());
 
 	    // Simple one row csv with headers
-	    $test = new CSVObject("c1,c2,c3\n1,2,3", true);
-	    $this->assertEquals("c1,c2,c3\r\n1,2,3", $test->toString());
+	    $sut = new CSVObject("c1,c2,c3\n1,2,3", true);
+	    $this->assertSame("c1,c2,c3\r\n1,2,3", $sut->toString());
 
 	    // Simple one row csv without headers and scaped fields
-	    $test = new CSVObject('"a","b","c"');
-	    $this->assertEquals('a,b,c', $test->toString());
+	    $sut = new CSVObject('"a","b","c"');
+	    $this->assertSame('a,b,c', $sut->toString());
 
 	    // Simple one row csv with headers and scaped fields
-	    $test = new CSVObject("c1,c2,c3\r\"a\",\"b\",\"c\"", true);
-	    $this->assertEquals("c1,c2,c3\r\na,b,c", $test->toString());
+	    $sut = new CSVObject("c1,c2,c3\r\"a\",\"b\",\"c\"", true);
+	    $this->assertSame("c1,c2,c3\r\na,b,c", $sut->toString());
 
 	    // Simple csv without headers and edge cases
-	    $test = new CSVObject(' a ,b  ,c  ');
-	    $this->assertEquals(' a ,b  ,c  ', $test->toString());
+	    $sut = new CSVObject(' a ,b  ,c  ');
+	    $this->assertSame(' a ,b  ,c  ', $sut->toString());
 
 	    // Multiple lines csv with different newline characters (windows: \r\n, Linux/Unix: \n, Mac: \r)
-	    $test = new CSVObject("1,2,3\na,b,c\r\n4,5,6\r");
-	    $this->assertEquals("1,2,3\r\na,b,c\r\n4,5,6", $test->toString());
+	    $sut = new CSVObject("1,2,3\na,b,c\r\n4,5,6\r");
+	    $this->assertSame("1,2,3\r\na,b,c\r\n4,5,6", $sut->toString());
 
 	    // Simple csv without headers and scaped fields and characters with edge cases
-	    $test = new CSVObject(' """"" 1",",,,2",    "3", "4,"   ,  "5 " ');
-	    $this->assertEquals('""""" 1",",,,2",3,"4,",5 ', $test->toString());
+	    $sut = new CSVObject(' """"" 1",",,,2",    "3", "4,"   ,  "5 " ');
+	    $this->assertSame('""""" 1",",,,2",3,"4,",5 ', $sut->toString());
 
 	    // Simple two row csv without headers and scaped fields and characters
-	    $test = new CSVObject("\"1\",\"2\",\"3\"\r\n\"a\"\"a\",\"b\",\"c\"");
-	    $this->assertEquals("1,2,3\r\n\"a\"\"a\",b,c", $test->toString());
+	    $sut = new CSVObject("\"1\",\"2\",\"3\"\r\n\"a\"\"a\",\"b\",\"c\"");
+	    $this->assertSame("1,2,3\r\n\"a\"\"a\",b,c", $sut->toString());
 
 	    // Simple two row csv with headers and mixed scaped and non scaped fields and characters
-	    $test = new CSVObject("c1,\"c,\"\"2\",c3\r1,\"2\", 3 \r\n\"a \"\",a\",b,\"c\"", true);
-	    $this->assertEquals("c1,\"c,\"\"2\",c3\r\n1,2, 3 \r\n\"a \"\",a\",b,c", $test->toString());
+	    $sut = new CSVObject("c1,\"c,\"\"2\",c3\r1,\"2\", 3 \r\n\"a \"\",a\",b,\"c\"", true);
+	    $this->assertSame("c1,\"c,\"\"2\",c3\r\n1,2, 3 \r\n\"a \"\",a\",b,c", $sut->toString());
 
-	    foreach ($this->csvFiles as $file) {
+	    for ($i = 0; $i < count(self::$csvFiles); $i++) {
 
-	        $fileData = $this->filesManager->readFile($this->basePath.'/'.$file);
-
-	        $test = new CSVObject($fileData, StringUtils::countStringOccurences($file, 'WithHeader') === 1);
+            $sut = new CSVObject(self::$csvFilesData[$i], StringUtils::countStringOccurences(self::$csvFiles[$i], 'WithHeader') === 1);
 
 	        // TODO - This is added for performance reasons. If performance is improved on
 	        // isEqualTo method, this constraint can be removed
-	        if($test->countRows() < 1000){
+	        if($sut->countRows() < 1000){
 
-	           $this->assertTrue($test->isEqualTo($test->toString()), $file.' has a problem');
-	           $this->assertTrue($test->isEqualTo($test), $file.' has a problem');
+	            $this->assertTrue($sut->isEqualTo($sut->toString()), self::$csvFiles[$i].' has a problem');
+	            $this->assertTrue($sut->isEqualTo($sut), self::$csvFiles[$i].' has a problem');
 	        }
 	    }
 
