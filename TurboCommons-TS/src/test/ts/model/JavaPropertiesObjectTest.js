@@ -22,7 +22,7 @@ QUnit.module("JavaPropertiesObjectTest", {
         // Load all the properties files
         var done = assert.async();
         
-        httpManager.loadAllResourcesFromList(basePath + '_folder-list.txt', basePath,
+        httpManager.loadResourcesFromList(basePath + '_folder-list.txt', basePath,
             function(resourcesList, resourcesData){
         
                 window.propertiesFiles = resourcesList;
