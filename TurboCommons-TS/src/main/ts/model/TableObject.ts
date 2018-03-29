@@ -110,7 +110,7 @@ export class TableObject {
 
         if(!StringUtils.isString(name)){
 
-            throw new Error('setColumnName name must be a string');
+            throw new Error('name must be a string');
         }
 
         this._columnNames.set(String(columnIndex), name);
@@ -133,7 +133,7 @@ export class TableObject {
 
             if(ArrayUtils.hasDuplicateElements(names)){
 
-                throw new Error('setColumnNames array must not contain duplicate elements');
+                throw new Error('array must not contain duplicate elements');
             }
 
             let namesCount = names.length;
@@ -143,7 +143,7 @@ export class TableObject {
 
                 if(!StringUtils.isString(names[i])){
 
-                    throw new Error('setColumnNames List of names must be an array of strings');
+                    throw new Error('List of names must be an array of strings');
                 }
 
                 this._columnNames.set(String(i), names[i]);
@@ -152,7 +152,7 @@ export class TableObject {
             return names;
         }
 
-        throw new Error('setColumnNames List of names must match number of columns');
+        throw new Error('List of names must match number of columns');
     }
     
     
@@ -210,7 +210,7 @@ export class TableObject {
 
         if(!StringUtils.isString(name) || name === ''){
 
-            throw new Error('getColumnIndex value must be a non empty string');
+            throw new Error('value must be a non empty string');
         }
 
         let keys = this._columnNames.getKeys();
@@ -223,7 +223,7 @@ export class TableObject {
             }
         }
 
-        throw new Error('getColumnIndex provided column name does not exist');
+        throw new Error('provided column name does not exist');
     }
 
 
@@ -262,17 +262,17 @@ export class TableObject {
 
         if(!ArrayUtils.isArray(names)){
 
-            throw new Error('addColumns names must be an array');
+            throw new Error('names must be an array');
         }
         
         if(!NumericUtils.isInteger(number) || number <= 0){
 
-            throw new Error('addColumns number must be a positive integer');
+            throw new Error('number must be a positive integer');
         }
 
         if(!NumericUtils.isInteger(at) || at < -1 || at >= this._columnsCount){
 
-            throw new Error('addColumns at must be a valid column index');
+            throw new Error('at must be a valid column index');
         }
 
         if(at >= 0){
@@ -303,7 +303,7 @@ export class TableObject {
 
             if(namesCount != number){
 
-                throw new Error('addColumns names length must be the same as number');
+                throw new Error('names length must be the same as number');
             }
 
             let colIndex = at < 0 ? this._columnsCount : at;
@@ -334,12 +334,12 @@ export class TableObject {
 
         if(dataCount <= 0){
 
-            throw new Error('setColumn data must not be empty');
+            throw new Error('data must not be empty');
         }
 
         if(this._rowsCount != dataCount){
 
-            throw new Error('setColumn data length and number of rows must match');
+            throw new Error('data length and number of rows must match');
         }
 
         let columnIndex = this._validateColumnIndex(column);
@@ -485,12 +485,12 @@ export class TableObject {
 
         if(!NumericUtils.isInteger(number) || number <= 0){
 
-            throw new Error('addRows number must be a positive integer');
+            throw new Error('number must be a positive integer');
         }
 
         if(!NumericUtils.isInteger(at) || at < -1 || at >= this._rowsCount){
 
-            throw new Error('addRows at must be a valid row index');
+            throw new Error('at must be a valid row index');
         }
 
         if(at >= 0){
@@ -529,12 +529,12 @@ export class TableObject {
 
         if(dataCount <= 0){
 
-            throw new Error('setRow data must not be empty');
+            throw new Error('data must not be empty');
         }
 
         if(this._columnsCount != dataCount){
 
-            throw new Error('setRow data length and number of columns must match');
+            throw new Error('data length and number of columns must match');
         }
 
         let rowIndex = this._validateRowIndex(row);
@@ -653,7 +653,7 @@ export class TableObject {
 
         if(columnIndex < 0 || columnIndex >= this._columnsCount){
 
-            throw new Error('_calculateColumnIndex Invalid column value');
+            throw new Error('Invalid column value');
         }
 
         return columnIndex;
@@ -673,7 +673,7 @@ export class TableObject {
 
         if(rowIndex < 0 || rowIndex >= this._rowsCount){
 
-            throw new Error('_calculateColumnIndex Invalid row value');
+            throw new Error('Invalid row value');
         }
 
         return rowIndex;

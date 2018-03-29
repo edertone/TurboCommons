@@ -121,7 +121,7 @@ class TableObject{
 
         if(!StringUtils::isString($name)){
 
-            throw new UnexpectedValueException('setColumnName name must be a string');
+            throw new UnexpectedValueException('name must be a string');
         }
 
         $this->_columnNames->set((string)$columnIndex, $name);
@@ -145,7 +145,7 @@ class TableObject{
 
             if(ArrayUtils::hasDuplicateElements($names)){
 
-                throw new UnexpectedValueException('setColumnNames array must not contain duplicate elements');
+                throw new UnexpectedValueException('array must not contain duplicate elements');
             }
 
             $namesCount = count($names);
@@ -155,7 +155,7 @@ class TableObject{
 
                 if(!StringUtils::isString($names[$i])){
 
-                    throw new UnexpectedValueException('setColumnNames List of names must be an array of strings');
+                    throw new UnexpectedValueException('List of names must be an array of strings');
                 }
 
                 $this->_columnNames->set((string)$i, $names[$i]);
@@ -164,7 +164,7 @@ class TableObject{
             return $names;
         }
 
-        throw new UnexpectedValueException('setColumnNames List of names must match number of columns');
+        throw new UnexpectedValueException('List of names must match number of columns');
     }
 
 
@@ -224,7 +224,7 @@ class TableObject{
 
         if(!StringUtils::isString($name) || $name === ''){
 
-            throw new UnexpectedValueException('getColumnIndex value must be a non empty string');
+            throw new UnexpectedValueException('value must be a non empty string');
         }
 
         $keys = $this->_columnNames->getKeys();
@@ -237,7 +237,7 @@ class TableObject{
             }
         }
 
-        throw new UnexpectedValueException('getColumnIndex provided column name does not exist');
+        throw new UnexpectedValueException('provided column name does not exist');
     }
 
 
@@ -277,12 +277,12 @@ class TableObject{
 
         if(!NumericUtils::isInteger($number) || $number <= 0){
 
-            throw new UnexpectedValueException('addColumns number must be a positive integer');
+            throw new UnexpectedValueException('number must be a positive integer');
         }
 
         if(!NumericUtils::isInteger($at) || $at < -1 || $at >= $this->_columnsCount){
 
-            throw new UnexpectedValueException('addColumns at must be a valid column index');
+            throw new UnexpectedValueException('at must be a valid column index');
         }
 
         if($at >= 0){
@@ -313,7 +313,7 @@ class TableObject{
 
             if($namesCount != $number){
 
-                throw new UnexpectedValueException('addColumns names length must be the same as number');
+                throw new UnexpectedValueException('names length must be the same as number');
             }
 
             $colIndex = $at < 0 ? $this->_columnsCount : $at;
@@ -345,12 +345,12 @@ class TableObject{
 
         if($dataCount <= 0){
 
-            throw new UnexpectedValueException('setColumn data must not be empty');
+            throw new UnexpectedValueException('data must not be empty');
         }
 
         if($this->_rowsCount != $dataCount){
 
-            throw new UnexpectedValueException('setColumn data length and number of rows must match');
+            throw new UnexpectedValueException('data length and number of rows must match');
         }
 
         $columnIndex = $this->_validateColumnIndex($column);
@@ -497,12 +497,12 @@ class TableObject{
 
         if(!NumericUtils::isInteger($number) || $number <= 0){
 
-            throw new UnexpectedValueException('addRows number must be a positive integer');
+            throw new UnexpectedValueException('number must be a positive integer');
         }
 
         if(!NumericUtils::isInteger($at) || $at < -1 || $at >= $this->_rowsCount){
 
-            throw new UnexpectedValueException('addRows at must be a valid row index');
+            throw new UnexpectedValueException('at must be a valid row index');
         }
 
         if($at >= 0){
@@ -542,12 +542,12 @@ class TableObject{
 
         if($dataCount <= 0){
 
-            throw new UnexpectedValueException('setRow data must not be empty');
+            throw new UnexpectedValueException('data must not be empty');
         }
 
         if($this->_columnsCount != $dataCount){
 
-            throw new UnexpectedValueException('setRow data length and number of columns must match');
+            throw new UnexpectedValueException('data length and number of columns must match');
         }
 
         $rowIndex = $this->_validateRowIndex($row);
@@ -668,7 +668,7 @@ class TableObject{
 
         if($columnIndex < 0 || $columnIndex >= $this->_columnsCount){
 
-            throw new UnexpectedValueException('_calculateColumnIndex Invalid column value');
+            throw new UnexpectedValueException('Invalid column value');
         }
 
         return $columnIndex;
@@ -690,7 +690,7 @@ class TableObject{
 
         if($rowIndex < 0 || $rowIndex >= $this->_rowsCount){
 
-            throw new UnexpectedValueException('_calculateColumnIndex Invalid row value');
+            throw new UnexpectedValueException('Invalid row value');
         }
 
         return $rowIndex;
