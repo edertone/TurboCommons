@@ -141,6 +141,22 @@ export class CSVObject extends TableObject{
     
     
     /**
+     * Get the value contained at the specified csv cell
+     *
+     * @param row An integer containing the index for the row that we want to retrieve
+     * @param column An integer or a string containing the index or label for the column that we want to retrieve
+     *
+     * @return The value for the cell that is located at the specified row and column
+     */
+    getCell(row: number, column: number|string): string{
+
+        let result = super.getCell(row, column);
+
+        return result === null ? '' : result;
+    }
+    
+    
+    /**
      * Set the value for a csv cell
      *
      * @param row An integer containing the index for the row that we want to set
