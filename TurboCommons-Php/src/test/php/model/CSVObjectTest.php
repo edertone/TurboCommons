@@ -502,6 +502,8 @@ class CSVObjectTest extends TestCase {
 	    // Test ok and wrong values
 	    for ($i = 1; $i < count(self::$csvFiles); $i++) {
 
+	        $fileData = '';
+
 	        if($i == 1){
 
 	            $previousFileData = self::$csvFilesData[$i-1];
