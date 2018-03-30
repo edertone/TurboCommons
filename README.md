@@ -57,6 +57,12 @@ npm install turbocommons-es6
 var StringUtils = org_turbocommons.StringUtils;
 var n = StringUtils.countWords("word1 word2 word3");
 ```
+- NodeJS projects:
+```
+npm install turbocommons-ts
+const {StringUtils} = require('turbocommons-ts');
+var n = StringUtils.countWords("word1 word2 word3");
+```
 
 ### Download
 If you don't want to use a package manager like npm or composer, latest compiled versions can be found at:
