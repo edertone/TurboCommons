@@ -24,78 +24,34 @@ use org\turbocommons\src\main\php\model\BaseStrictClass;
 class FilesManager extends BaseStrictClass{
 
 
-    /** Defines if some of the class methods will accept internet urls in addition to regular OS filesystem paths as parameters */
-    // TODO - Accept urls must disappear from files manager. It will be only used with local file system.
-    public $acceptUrls = false;
-
-
     /**
-     * Check if the specified path or url is a file or not.
+     * Check if the specified path is a file or not.
      *
-     * Note: Internet urls will be also accepted if $this->acceptUrls is true.
-     * Checking urls can be a slow process, so use it very carefully
+     * @param string $path An Operating system path to test
      *
-     * @param string $path An Operating system path or an internet url to test
-     *
-     * @return bool true if the path exists and is a file, false otherwise. If an url is provided, true will be returned if the url exists and contains information.
+     * @return bool true if the path exists and is a file, false otherwise.
      */
     public function isFile($path){
 
-        if(is_file($path)){
-
-            return true;
-        }
-
-        if($this->acceptUrls && (new HTTPManager())->urlExists($path)){
-
-            if(!ini_get('allow_url_fopen')){
-
-                throw new UnexpectedValueException('allow_url_fopen flag must be set to TRUE on php.ini');
-            }
-
-            if(strlen(file_get_contents($path, null, null, null, 10)) != 0){
-
-                return true;
-            }
-        }
-
-        return false;
+        return is_file($path);
     }
 
 
     /**
      * Check if the specified path is a directory or not.
      *
-     * Note: Internet urls will be also accepted if $this->acceptUrls is true.
-     * Checking urls can be a slow process, so use it very carefully
+     * @param string $path An Operating system path to test
      *
-     * @param string $path An Operating system path or an internet url to test
-     *
-     * @return bool true if the path exists and is a directory, false otherwise. If an url is provided, true will be returned if the url is valid and exists
+     * @return bool true if the path exists and is a directory, false otherwise.
      */
     public function isDirectory($path){
 
-        if(is_dir($path)){
-
-            return true;
-        }
-
-        if($this->acceptUrls){
-
-            if((new HTTPManager())->urlExists($path)){
-
-                return true;
-            }
-        }
-
-        return false;
+        return is_dir($path);
     }
 
 
     /**
-     * Checks that the specified folder is empty
-     *
-     * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
+     * Checks if the specified folder is empty
      *
      * @param string $path The path to the directory we want to check
      *
@@ -105,7 +61,7 @@ class FilesManager extends BaseStrictClass{
 
         if (!is_readable($path)){
 
-            throw new UnexpectedValueException('FilesManager->isDirectoryEmpty: Path does not exist: '.$path);
+            throw new UnexpectedValueException('Path does not exist: '.$path);
         }
 
         $handle = opendir($path);
@@ -143,7 +99,6 @@ class FilesManager extends BaseStrictClass{
      * guarantee us that we have a unique directory name that does not collide with any other folder or file that currently exists on the path.
      *
      * NOTE: This method does not create any folder or alter the given path in any way.
-     * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
      *
      * @param string $path The full path to the directoy we want to check for a unique folder name
      * @param string $desiredName We can specify a suggested name for the unique directory. This method will verify that it does not exist, or otherwise give us a name that is unique for the given path
@@ -161,7 +116,7 @@ class FilesManager extends BaseStrictClass{
 
         while(is_dir($path.DIRECTORY_SEPARATOR.$result) || is_file($path.DIRECTORY_SEPARATOR.$result)){
 
-            $result = self::_generateUniqueNameAux($i, $desiredName, $text, $separator, $isPrefix);
+            $result = $this->_generateUniqueNameAux($i, $desiredName, $text, $separator, $isPrefix);
 
             $i++;
         }
@@ -177,7 +132,6 @@ class FilesManager extends BaseStrictClass{
      * guarantee us that we have a unique file name that does not collide with any other file or folder that currently exists on the path.
      *
      * NOTE: This method does not create any file or alter the given path in any way.
-     * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
      *
      * @param string $path The full path to the directoy we want to check for a unique file name
      * @param string $desiredName We can specify a suggested name for the unique file. This method will verify that it does not exist, or otherwise give us a name that is unique for the given path
@@ -196,7 +150,7 @@ class FilesManager extends BaseStrictClass{
 
         while(is_dir($path.DIRECTORY_SEPARATOR.$result) || is_file($path.DIRECTORY_SEPARATOR.$result)){
 
-            $result = self::_generateUniqueNameAux($i, StringUtils::getFileNameWithoutExtension($desiredName), $text, $separator, $isPrefix);
+            $result = $this->_generateUniqueNameAux($i, StringUtils::getFileNameWithoutExtension($desiredName), $text, $separator, $isPrefix);
 
             if($extension != ''){
 
@@ -227,26 +181,26 @@ class FilesManager extends BaseStrictClass{
 
         if($isPrefix){
 
-            if($text != ''){
+            if($text !== ''){
 
                 $result[] = $text;
             }
 
             $result[] = $i;
 
-            if($desiredName != ''){
+            if($desiredName !== ''){
 
                 $result[] = $desiredName;
             }
 
         }else{
 
-            if($desiredName != ''){
+            if($desiredName !== ''){
 
                 $result[] = $desiredName;
             }
 
-            if($text != ''){
+            if($text !== ''){
 
                 $result[] = $text;
             }
@@ -261,9 +215,7 @@ class FilesManager extends BaseStrictClass{
     /**
      * Create a directory at the specified filesystem path
      *
-     * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
-     *
-     * @param string $path The full path to the directoy we want to create
+     * @param string $path The full path to the directoy we want to create. For example: c:\apps\my_new_folder
      * @param bool $recursive Allows the creation of nested directories specified in the pathname. Defaults to false.
      *
      * @return bool Returns true on success or false if the folder already exists (an exception may be thrown if a file exists with the same name or folder cannot be created).
@@ -279,7 +231,7 @@ class FilesManager extends BaseStrictClass{
         // If specified folder exists as a file, exception will happen
         if(is_file($path)){
 
-            throw new UnexpectedValueException('FilesManager->createDirectory: specified path is an existing file '.$path);
+            throw new UnexpectedValueException('specified path is an existing file '.$path);
         }
 
         // Create the requested folder
@@ -310,8 +262,6 @@ class FilesManager extends BaseStrictClass{
      * using it (This is specially important if the tmp folder contains sensitive data). Even so, this method tries to delete the generated tmp
      * folder by default when the application ends.
      *
-     * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
-     *
      * @param string $desiredName A name we want for the new directory to be created. If name is not available, a unique one (based on the given name) will be generated automatically.
      * @param boolean $deleteOnExecutionEnd Defines if the generated temp folder must be deleted after the current script execution finishes. Note that when files inside the folder are still used by the app or OS, exceptions or problems may happen, and it is not 100% guaranteed that the folder will be always deleted.
      *
@@ -321,11 +271,11 @@ class FilesManager extends BaseStrictClass{
 
         $tempRoot = StringUtils::formatPath(sys_get_temp_dir());
 
-        $tempDirectory = $tempRoot.DIRECTORY_SEPARATOR.self::findUniqueDirectoryName($tempRoot, $desiredName);
+        $tempDirectory = $tempRoot.DIRECTORY_SEPARATOR.$this->findUniqueDirectoryName($tempRoot, $desiredName);
 
-        if(!self::createDirectory($tempDirectory)){
+        if(!$this->createDirectory($tempDirectory)){
 
-            throw new UnexpectedValueException('FilesManager->createTempDirectory: Could not create TMP directory '.$tempDirectory);
+            throw new UnexpectedValueException('Could not create TMP directory '.$tempDirectory);
         }
 
         // Add a shutdown function to try to delete the file when the current script execution ends
@@ -333,7 +283,7 @@ class FilesManager extends BaseStrictClass{
 
             register_shutdown_function(function () use ($tempDirectory) {
 
-                self::deleteDirectory($tempDirectory);
+                $this->deleteDirectory($tempDirectory);
             });
         }
 
@@ -345,8 +295,6 @@ class FilesManager extends BaseStrictClass{
      * Gives the list of items that are stored on the specified folder. It will give files and directories, and each element will be the item name, without the path to it.
      * The contents of any subfolder will not be listed. We must call this method for each child folder if we want to get it's list.
      * (The method ignores the . and .. items if exist).
-     *
-     * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
      *
      * @param string $path Full path to the directory we want to list
      * @param string $sort Specifies the sort for the result:<br>
@@ -370,7 +318,7 @@ class FilesManager extends BaseStrictClass{
         $result = [];
         $sortRes = [];
 
-        if($path != ''){
+        if($path !== ''){
 
             $dirIterator = new DirectoryIterator($path);
 
@@ -430,8 +378,6 @@ class FilesManager extends BaseStrictClass{
     /**
      * Calculate the full size in bytes for a specified folder.
      *
-     * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
-     *
      * @param string $path Full path to the directory we want to calculate its size
      *
      * @return int the size of the file in bytes, or false (and generates an error of level E_WARNING) in case of an error.
@@ -452,7 +398,7 @@ class FilesManager extends BaseStrictClass{
 
                     if (is_dir($currentFile)) {
 
-                        $result += self::getDirectorySize($currentFile);
+                        $result += $this->getDirectorySize($currentFile);
 
                     }else {
 
@@ -463,14 +409,11 @@ class FilesManager extends BaseStrictClass{
         }
 
         return $result;
-
     }
 
 
     /**
-     * Delete a directory from the filesystem and return a boolean telling if the directory delete success or not
-     *
-     * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
+     * Delete a directory from the filesystem and return a boolean telling if the directory delete succeeded or not
      *
      * @param string $path The path to the directory
      * @param string $deleteDirectoryItself Set it to true if the specified directory must also be deleted.
@@ -499,7 +442,7 @@ class FilesManager extends BaseStrictClass{
 
                 if(is_dir($path.DIRECTORY_SEPARATOR.$fileInfo->getFilename())){
 
-                    if(!self::deleteDirectory($path.DIRECTORY_SEPARATOR.$fileInfo->getFilename())){
+                    if(!$this->deleteDirectory($path.DIRECTORY_SEPARATOR.$fileInfo->getFilename())){
 
                         return false;
                     }
@@ -524,8 +467,6 @@ class FilesManager extends BaseStrictClass{
 
     /**
      * Create a file to the specified filesystem path and write the specified data to it.
-     *
-     * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
      *
      * @param string $path The full path where the file will be stored, including the full file name
      * @param string $fileData Information to store on the file (a string, a block of bytes, etc...)
@@ -569,9 +510,7 @@ class FilesManager extends BaseStrictClass{
 
 
     /**
-     * Gets file size
-     *
-     * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
+     * Get the size from a file
      *
      * @param string $path The file full path
      *
@@ -587,40 +526,20 @@ class FilesManager extends BaseStrictClass{
      * Read and return the content of a file. Not suitable for big files (More than 5 MB) cause the script memory
      * may get full and the execution fail
      *
-     * Note: Internet urls will be also accepted if $this->acceptUrls is true.
-     * Reading urls can be a slow process, so use it very carefully
-     *
-     * @param string $path An Operating system full or relative path or an internet url containing some file
+     * @param string $path An Operating system full or relative path containing some file
      *
      * @return string The file contents (binary or string). If the file is not found or cannot be read, an exception will be thrown.
      */
     public function readFile(string $path){
 
-        $fileFound = true;
-
         if(!is_file($path)){
 
-            $fileFound = false;
-
-            if($this->acceptUrls && (new HTTPManager())->urlExists($path)){
-
-                if(!ini_get('allow_url_fopen')){
-
-                    throw new UnexpectedValueException('FilesManager->readFile: allow_url_fopen flag must be set to TRUE on php.ini');
-                }
-
-                $fileFound = true;
-            }
-        }
-
-        if(!$fileFound){
-
-            throw new UnexpectedValueException('FilesManager->readFile: File not found - '.$path);
+            throw new UnexpectedValueException('File not found - '.$path);
         }
 
         if(($contents = file_get_contents($path, true)) === false){
 
-            throw new UnexpectedValueException('FilesManager->readFile: Error reading file - '.$path);
+            throw new UnexpectedValueException('Error reading file - '.$path);
         }
 
         return $contents;
@@ -703,8 +622,6 @@ class FilesManager extends BaseStrictClass{
     /**
      * Copies a file from a source location to the defined destination
      *
-     * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
-     *
      * @param string $sourcePath The full path to the source file that must be copied (including the filename itself).
      * @param string $destPath The full path to the destination where the file must be copied (including the filename itself).
      *
@@ -713,16 +630,13 @@ class FilesManager extends BaseStrictClass{
     public function copyFile(string $sourcePath, string $destPath){
 
         return copy($sourcePath, $destPath);
-
     }
 
 
     /**
      * Delete a filesystem file.
      *
-     * NOTE: This method only works with OS filesystem paths. won't accept urls even if $this->acceptUrls is true
-     *
-     * @param string $path    The file filesystem path
+     * @param string $path The file filesystem path
      *
      * @return boolean Returns true on success or false on failure.
      */
@@ -734,7 +648,6 @@ class FilesManager extends BaseStrictClass{
         }
 
         return unlink($path);
-
     }
 }
 

@@ -40,9 +40,6 @@ class FilesManagerTest extends TestCase {
 		$this->assertTrue($filesManager->isDirectoryEmpty($basePath));
 		$this->assertTrue(!$filesManager->isFile($basePath));
 
-		// Test with urls disabled
-		$filesManager->acceptUrls = false;
-
 		$this->assertTrue(!$filesManager->isFile(null));
 		$this->assertTrue(!$filesManager->isFile(''));
 		$this->assertTrue(!$filesManager->isFile('49568456'));
@@ -52,17 +49,8 @@ class FilesManagerTest extends TestCase {
 		$this->assertTrue(!$filesManager->isFile('http://www.facebook.com'));
 
 		// Test a created file
+		$this->assertFalse($filesManager->isFile($basePath.DIRECTORY_SEPARATOR.'File.txt'));
 		$filesManager->createFile($basePath.DIRECTORY_SEPARATOR.'File.txt', 'Hello baby');
-		$this->assertTrue($filesManager->isFile($basePath.DIRECTORY_SEPARATOR.'File.txt'));
-
-		// Test with urls enabled
-		$filesManager->acceptUrls = true;
-
-		$this->assertTrue(!$filesManager->isFile(null));
-		$this->assertTrue(!$filesManager->isFile(''));
-		$this->assertTrue(!$filesManager->isFile('49568456'));
-		$this->assertTrue(!$filesManager->isFile('http://www.adkgadsifi.com/ieriteroter3453458852t.pdf'));
-
 		$this->assertTrue($filesManager->isFile($basePath.DIRECTORY_SEPARATOR.'File.txt'));
 	}
 
@@ -75,9 +63,6 @@ class FilesManagerTest extends TestCase {
 	public function testIsDirectory(){
 
 		$filesManager = new FilesManager();
-
-		// Test with urls disabled
-		$filesManager->acceptUrls = false;
 
 		// Create a temporary folder
 		$basePath = $filesManager->createTempDirectory('TurboCommons-Php');
@@ -92,13 +77,6 @@ class FilesManagerTest extends TestCase {
 		// Test a created file
 		$filesManager->createFile($basePath.DIRECTORY_SEPARATOR.'File.txt', 'Hello baby');
 		$this->assertTrue(!$filesManager->isDirectory($basePath.DIRECTORY_SEPARATOR.'File.txt'));
-
-		// Test with urls enabled
-		$filesManager->acceptUrls = true;
-
-		$this->assertTrue(!$filesManager->isDirectory(null));
-		$this->assertTrue(!$filesManager->isDirectory(''));
-		$this->assertTrue(!$filesManager->isDirectory('49568456'));
 	}
 
 
