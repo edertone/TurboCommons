@@ -851,25 +851,69 @@ QUnit.test("formatCase", function(assert) {
 QUnit.test("formatPath", function(assert) {
 
     var osSeparator = '/';
+    
+    // Test empty values
+    assert.strictEqual(StringUtils.formatPath(null), '');
+    assert.strictEqual(StringUtils.formatPath(''), '');
+    assert.strictEqual(StringUtils.formatPath('       '), '       ');
+    assert.strictEqual(StringUtils.formatPath("\n\n\n\n"), "\n\n\n\n");
 
-    assert.ok(StringUtils.formatPath(null) === '');
-    assert.ok(StringUtils.formatPath('') === '');
-    assert.ok(StringUtils.formatPath('       ') === '       ');
-    assert.ok(StringUtils.formatPath('test//test/') === 'test' + osSeparator + 'test');
-    assert.ok(StringUtils.formatPath('////test//////test////') === osSeparator + 'test' + osSeparator + 'test');
-    assert.ok(StringUtils.formatPath('\\\\////test//test/') === osSeparator + 'test' + osSeparator + 'test');
-    assert.ok(StringUtils.formatPath('test\\test/hello\\\\') === 'test' + osSeparator + 'test' + osSeparator + 'hello');
-
-    // Test non string paths throw exception
     assert.throws(function() {
+        StringUtils.formatPath('somepath', null);
+    }, /separator must be a slash or backslash/);
 
+    assert.throws(function() {
+        StringUtils.formatPath('somepath', '');
+    }, /separator must be a slash or backslash/);
+
+    assert.throws(function() {
+        StringUtils.formatPath('somepath', '     ');
+    }, /separator must be a slash or backslash/);
+
+    assert.throws(function() {
+        StringUtils.formatPath('somepath', "\n\n\n\n");
+    }, /separator must be a slash or backslash/);
+
+    // Test ok values
+    assert.strictEqual(StringUtils.formatPath('test//test/'), 'test' + osSeparator + 'test');
+    assert.strictEqual(StringUtils.formatPath('////test//////test////'), osSeparator + 'test' + osSeparator + 'test');
+    assert.strictEqual(StringUtils.formatPath('\\\\////test//test/'), osSeparator + 'test' + osSeparator + 'test');
+    assert.strictEqual(StringUtils.formatPath('test\\test/hello\\\\'), 'test' + osSeparator + 'test' + osSeparator + 'hello');
+    assert.strictEqual(StringUtils.formatPath('someutf8_//转注字\\\\轉注/字'), 'someutf8_' + osSeparator + '转注字' + osSeparator + '轉注' + osSeparator + '字');
+
+    assert.strictEqual(StringUtils.formatPath('test//test', '/'), 'test' + '/' + 'test');
+    assert.strictEqual(StringUtils.formatPath('////test//////test', '/'), '/' + 'test' + '/' + 'test');
+    assert.strictEqual(StringUtils.formatPath('\\\\////test//test', '/'), '/' + 'test' + '/' + 'test');
+    assert.strictEqual(StringUtils.formatPath('C:\\Users///someuser\\git\\\\project/newProject', '/'), 'C:/Users/someuser/git/project/newProject');
+    assert.strictEqual(StringUtils.formatPath('someutf8_//转注字\\\\轉注/字', '/'), 'someutf8_/转注字/轉注/字');
+
+    assert.strictEqual(StringUtils.formatPath('test//test/', '\\'), 'test' + '\\' + 'test');
+    assert.strictEqual(StringUtils.formatPath('////test//////test////', '\\'), '\\' + 'test' + '\\' + 'test');
+    assert.strictEqual(StringUtils.formatPath('\\\\////test//test/', '\\'), '\\' + 'test' + '\\' + 'test');
+    assert.strictEqual(StringUtils.formatPath('C:\\Users///someuser\\git\\\\project/newProject', '\\'), 'C:\\Users\\someuser\\git\\project\\newProject');
+    assert.strictEqual(StringUtils.formatPath('someutf8_//转注字\\\\轉注/字', '\\'), 'someutf8_\\转注字\\轉注\\字');
+
+    // Test wrong values
+    assert.strictEqual(StringUtils.formatPath('!"(&%"·$|||'), '!"(&%"·$|||');
+    assert.strictEqual(StringUtils.formatPath("\n\ntest//wrong", '/'), "\n\ntest/wrong");
+    assert.strictEqual(StringUtils.formatPath("_____"), "_____");
+
+    // Test exceptions
+    assert.throws(function() {
         StringUtils.formatPath(['1']);
-    });
+    }, /path must be a string/);
 
     assert.throws(function() {
-
         StringUtils.formatPath(1);
-    });
+    }, /path must be a string/);
+
+    assert.throws(function() {
+        StringUtils.formatPath('path/path', 'W');
+    }, /separator must be a slash or backslash/);
+
+    assert.throws(function() {
+        StringUtils.formatPath('path/path', 9);
+    }, /separator must be a slash or backslash/);
 });
 
 

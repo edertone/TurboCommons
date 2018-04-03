@@ -710,22 +710,24 @@ export class StringUtils {
     
     
     /**
-     * Given a raw string containing a file system path, this method will process it to obtain a path that
-     * is 100% format valid for the current operating system.
-     * Directory separators will be converted to the OS valid ones, no directory separator will be present
-     * at the end and duplicate separators will be removed.
-     * This method basically standarizes the given path so it does not fail for the current OS.
-     * 
-     * NOTE: This method will not check if the path is a real path on the current file system; it will only fix formatting problems
-     * 
-     * @param path The path that must be formatted
+     * Given a string with a list of elements separated by '/' or '\' that represent some kind of unformatted path,
+     * this method will process it to get a standarized one by applying the following rules:
      *
-     * @returns The correctly formatted path without any trailing directory separator
+     * - Duplicate separator characters will be removed: "a\\\b\\c" will become "a/b/c"
+     * - All separator characters will be unified to the same one: "a\b/c\d" will become "a/b/c/d"
+     * - No trailing separator will exist: "a\b\c\" will become "a\b\c"
+     *
+     * NOTE: This method only applies format to the received string. It does not check if the path is a real
+     *       location or a valid url, and won't also fail if the received path contains strange characters or is invalid.
+     *
+     * @param path A raw path to be formatted
+     * @param separator The character to use as the element divider. Only slash '/' or backslash '\' are allowed.
+     *                  if not specified, the current OS separator will be used when possible.
+     *
+     * @return The correctly formatted path without any trailing separator
      */
-    public static formatPath(path:string):string {
+    public static formatPath(path:any, separator = '/'):string {
     
-        var osSeparator:string = '/';
-
         if(path == null || path == undefined){
 
             return '';
@@ -733,21 +735,26 @@ export class StringUtils {
 
         if(!StringUtils.isString(path)){
 
-            throw new Error("Specified path must be a string");
+            throw new Error('path must be a string');
         }
 
-        // Replace all slashes on the path with the os default
-        path = path.replace(/\//g, osSeparator);
-        path = path.replace(/\\/g, osSeparator);
+        if(separator !== '/' && separator !== '\\'){
+
+            throw new Error('separator must be a slash or backslash');
+        }
+        
+        // Standarize all the separator characters
+        path = path.replace(/\//g, separator);
+        path = path.replace(/\\/g, separator);
 
         // Remove duplicate path separator characters
-        while(path.indexOf(osSeparator + osSeparator) >= 0) {
+        while(path.indexOf(separator + separator) >= 0) {
 
-            path = path.replace(osSeparator + osSeparator, osSeparator);
+            path = path.replace(separator + separator, separator);
         }
 
-        // Remove the last slash only if it exists, to prevent duplicate directory separator
-        if(path.substr(path.length - 1) == osSeparator){
+        // Remove the last separator only if it exists
+        if(path.substr(path.length - 1) == separator){
 
             path = path.substr(0, path.length - 1);
         }

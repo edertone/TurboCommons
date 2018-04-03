@@ -1068,16 +1068,66 @@ class StringUtilsTest extends TestCase {
 	 */
 	public function testFormatPath(){
 
-		$this->assertTrue(StringUtils::formatPath(null) === '');
-		$this->assertTrue(StringUtils::formatPath('') === '');
-		$this->assertTrue(StringUtils::formatPath('       ') === '       ');
-		$this->assertTrue(StringUtils::formatPath('test//test/') == 'test'.DIRECTORY_SEPARATOR.'test');
-		$this->assertTrue(StringUtils::formatPath('////test//////test////') == DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'test');
-		$this->assertTrue(StringUtils::formatPath('\\\\////test//test/') == DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'test');
-		$this->assertTrue(StringUtils::formatPath('test\\test/hello\\\\') == 'test'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'hello');
+	    // Test empty values
+	    $this->assertSame(StringUtils::formatPath(null), '');
+	    $this->assertSame(StringUtils::formatPath(''), '');
+	    $this->assertSame(StringUtils::formatPath('       '), '       ');
+	    $this->assertSame(StringUtils::formatPath("\n\n\n\n"), "\n\n\n\n");
 
-		// Test non string paths throw exception
-		try {
+	    try {
+	        StringUtils::formatPath('somepath', null);
+	        $this->exceptionMessage = 'null did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::formatPath('somepath', '');
+	        $this->exceptionMessage = '"" did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::formatPath('somepath', '     ');
+	        $this->exceptionMessage = '"     " did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::formatPath('somepath', "\n\n\n\n");
+	        $this->exceptionMessage = '"\n\n\n\n" did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    // Test ok values
+	    $this->assertSame(StringUtils::formatPath('test//test/'), 'test'.DIRECTORY_SEPARATOR.'test');
+	    $this->assertSame(StringUtils::formatPath('////test//////test////'), DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'test');
+	    $this->assertSame(StringUtils::formatPath('\\\\////test//test/'), DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'test');
+	    $this->assertSame(StringUtils::formatPath('test\\test/hello\\\\'), 'test'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'hello');
+	    $this->assertSame(StringUtils::formatPath('someutf8_//转注字\\\\轉注/字'), 'someutf8_'.DIRECTORY_SEPARATOR.'转注字'.DIRECTORY_SEPARATOR.'轉注'.DIRECTORY_SEPARATOR.'字');
+
+	    $this->assertSame(StringUtils::formatPath('test//test', '/'), 'test'.'/'.'test');
+	    $this->assertSame(StringUtils::formatPath('////test//////test', '/'), '/'.'test'.'/'.'test');
+	    $this->assertSame(StringUtils::formatPath('\\\\////test//test', '/'), '/'.'test'.'/'.'test');
+	    $this->assertSame(StringUtils::formatPath('C:\\Users///someuser\\git\\\\project/newProject', '/'), 'C:/Users/someuser/git/project/newProject');
+	    $this->assertSame(StringUtils::formatPath('someutf8_//转注字\\\\轉注/字', '/'), 'someutf8_/转注字/轉注/字');
+
+	    $this->assertSame(StringUtils::formatPath('test//test/', '\\'), 'test'.'\\'.'test');
+	    $this->assertSame(StringUtils::formatPath('////test//////test////', '\\'), '\\'.'test'.'\\'.'test');
+	    $this->assertSame(StringUtils::formatPath('\\\\////test//test/', '\\'), '\\'.'test'.'\\'.'test');
+	    $this->assertSame(StringUtils::formatPath('C:\\Users///someuser\\git\\\\project/newProject', '\\'), 'C:\\Users\\someuser\\git\\project\\newProject');
+	    $this->assertSame(StringUtils::formatPath('someutf8_//转注字\\\\轉注/字', '\\'), 'someutf8_\\转注字\\轉注\\字');
+
+	    // Test wrong values
+	    $this->assertSame(StringUtils::formatPath('!"(&%"·$|||'), '!"(&%"·$|||');
+	    $this->assertSame(StringUtils::formatPath("\n\ntest//wrong", '/'), "\n\ntest/wrong");
+	    $this->assertSame(StringUtils::formatPath("_____"), "_____");
+
+	    // Test exceptions
+	    try {
 			StringUtils::formatPath(['1']);
 			$this->exceptionMessage = '[1] did not cause exception';
 		} catch (Throwable $e) {
@@ -1089,6 +1139,20 @@ class StringUtilsTest extends TestCase {
 			$this->exceptionMessage = '1 did not cause exception';
 		} catch (Throwable $e) {
 			// We expect an exception to happen
+		}
+
+		try {
+		    StringUtils::formatPath('path/path', 'W');
+		    $this->exceptionMessage = 'W did not cause exception';
+		} catch (Throwable $e) {
+		    // We expect an exception to happen
+		}
+
+		try {
+		    StringUtils::formatPath('path/path', 9);
+		    $this->exceptionMessage = '9 did not cause exception';
+		} catch (Throwable $e) {
+		    // We expect an exception to happen
 		}
 	}
 
