@@ -129,15 +129,15 @@ class FilesManagerTest extends TestCase {
 
 
 	/**
-	 * testGetDirectorySeparator
+	 * testDirSep
 	 *
 	 * @return void
 	 */
-	public function testGetDirectorySeparator(){
+	public function testDirSep(){
 
 		$filesManager = new FilesManager();
 
-		$this->assertTrue($filesManager->getDirectorySeparator() === DIRECTORY_SEPARATOR);
+		$this->assertTrue($filesManager->dirSep() === DIRECTORY_SEPARATOR);
 	}
 
 

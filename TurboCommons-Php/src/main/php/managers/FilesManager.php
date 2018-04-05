@@ -59,23 +59,20 @@ class FilesManager extends BaseStrictClass{
      */
     public function isDirectoryEmpty(string $path) {
 
-        if (!is_readable($path)){
+        if (!$this->isDirectory($path)){
 
             throw new UnexpectedValueException('Path does not exist: '.$path);
         }
 
-        $handle = opendir($path);
+        $files = $this->getDirectoryList($path);
 
-        while (false !== ($entry = readdir($handle))) {
+        foreach ($files as $file) {
 
-            if ($entry != '.' && $entry != '..') {
+            if ($file !== '.' && $file !== '..') {
 
                 return false;
             }
         }
-
-        // Required on windows to prevent permision denied errors
-        closedir($handle);
 
         return true;
     }
@@ -86,7 +83,7 @@ class FilesManager extends BaseStrictClass{
      *
      * @return string The current OS directory separator character
      */
-    public function getDirectorySeparator(){
+    public function dirSep(){
 
         return DIRECTORY_SEPARATOR;
     }
@@ -111,10 +108,11 @@ class FilesManager extends BaseStrictClass{
     public function findUniqueDirectoryName(string $path, string $desiredName = '', string $text = '', string $separator = '-', bool $isPrefix = false){
 
         $i = 1;
-        $path = StringUtils::formatPath($path);
+        $path = StringUtils::formatPath($path, DIRECTORY_SEPARATOR);
         $result = ($desiredName == '' ? $i : $desiredName);
 
-        while(is_dir($path.DIRECTORY_SEPARATOR.$result) || is_file($path.DIRECTORY_SEPARATOR.$result)){
+        while(is_dir($path.DIRECTORY_SEPARATOR.$result) ||
+              is_file($path.DIRECTORY_SEPARATOR.$result)){
 
             $result = $this->_generateUniqueNameAux($i, $desiredName, $text, $separator, $isPrefix);
 
@@ -144,11 +142,12 @@ class FilesManager extends BaseStrictClass{
     public function findUniqueFileName(string $path, string $desiredName = '', string $text = '', string $separator = '-', bool $isPrefix = false){
 
         $i = 1;
-        $path = StringUtils::formatPath($path);
+        $path = StringUtils::formatPath($path, DIRECTORY_SEPARATOR);
         $result = ($desiredName == '' ? $i : $desiredName);
         $extension = StringUtils::getFileExtension($desiredName);
 
-        while(is_dir($path.DIRECTORY_SEPARATOR.$result) || is_file($path.DIRECTORY_SEPARATOR.$result)){
+        while(is_dir($path.DIRECTORY_SEPARATOR.$result) ||
+              is_file($path.DIRECTORY_SEPARATOR.$result)){
 
             $result = $this->_generateUniqueNameAux($i, StringUtils::getFileNameWithoutExtension($desiredName), $text, $separator, $isPrefix);
 
@@ -257,19 +256,23 @@ class FilesManager extends BaseStrictClass{
 
 
     /**
-     * Create a TEMPORARY directory on the operating system tmp files location, and gives us the full path to access it.
+     * Create a TEMPORARY directory on the operating system tmp files location, and get us the full path to access it.
      * OS should take care of its removal but it is not assured, so it is recommended to make sure all the tmp data is deleted after
-     * using it (This is specially important if the tmp folder contains sensitive data). Even so, this method tries to delete the generated tmp
-     * folder by default when the application ends.
+     * using it (This is specially important if the tmp folder contains sensitive data).
      *
-     * @param string $desiredName A name we want for the new directory to be created. If name is not available, a unique one (based on the given name) will be generated automatically.
-     * @param boolean $deleteOnExecutionEnd Defines if the generated temp folder must be deleted after the current script execution finishes. Note that when files inside the folder are still used by the app or OS, exceptions or problems may happen, and it is not 100% guaranteed that the folder will be always deleted.
+     * @param string $desiredName A name we want for the new directory to be created. If name is not available, a unique one
+     *                            (based on the provided desired name) will be generated automatically.
+     * @param boolean $deleteOnExecutionEnd Defines if the generated temp folder must be deleted after the current application execution finishes.
+     *                                      Note that when files inside the folder are still used by the app or OS, exceptions or problems may happen,
+     *                                      and it is not 100% guaranteed that the folder will be always deleted. So it is better to always handle the
+     *                                      temporary folder removal in our code
      *
-     * @return string The full path to the newly created temporary directory, including the directory itself (without a trailing slash). For example: C:\Users\Me\AppData\Local\Temp\MyDesiredName
+     * @return string The full path to the newly created temporary directory, including the directory itself (without a trailing slash).
+     *                For example: C:\Users\Me\AppData\Local\Temp\MyDesiredName
      */
     public function createTempDirectory(string $desiredName, $deleteOnExecutionEnd = true) {
 
-        $tempRoot = StringUtils::formatPath(sys_get_temp_dir());
+        $tempRoot = StringUtils::formatPath(sys_get_temp_dir(), DIRECTORY_SEPARATOR);
 
         $tempDirectory = $tempRoot.DIRECTORY_SEPARATOR.$this->findUniqueDirectoryName($tempRoot, $desiredName);
 
@@ -414,6 +417,7 @@ class FilesManager extends BaseStrictClass{
 
     /**
      * Delete a directory from the filesystem and return a boolean telling if the directory delete succeeded or not
+     * Note: All directory contents, folders and files will be also removed.
      *
      * @param string $path The path to the directory
      * @param string $deleteDirectoryItself Set it to true if the specified directory must also be deleted.
@@ -422,12 +426,7 @@ class FilesManager extends BaseStrictClass{
      */
     public function deleteDirectory(string $path, bool $deleteDirectoryItself = true){
 
-        $path = StringUtils::formatPath($path);
-
-        if (!file_exists($path)){
-
-            return false;
-        }
+        $path = StringUtils::formatPath($path, DIRECTORY_SEPARATOR);
 
         if (!is_dir($path)){
 
@@ -621,6 +620,7 @@ class FilesManager extends BaseStrictClass{
 
     /**
      * Copies a file from a source location to the defined destination
+     * If the destination file already exists, it will be overwritten.
      *
      * @param string $sourcePath The full path to the source file that must be copied (including the filename itself).
      * @param string $destPath The full path to the destination where the file must be copied (including the filename itself).
