@@ -10,6 +10,7 @@
 
 // Managers package
 export { BrowserManager } from './managers/BrowserManager';
+export { FilesManager } from './managers/FilesManager';
 export { HTTPManager } from './managers/HTTPManager';
 export { LocalizationManager} from './managers/LocalizationManager';
 export { ModelHistoryManager} from './managers/ModelHistoryManager';
