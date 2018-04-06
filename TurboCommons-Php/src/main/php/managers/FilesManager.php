@@ -33,7 +33,19 @@ class FilesManager extends BaseStrictClass{
      */
     public function isFile($path){
 
-        return is_file($path);
+        if (!is_string($path)){
+
+            throw new UnexpectedValueException('path must be a string');
+        }
+
+        try {
+
+            return is_file($path);
+
+        } catch (Exception $e) {
+
+            return false;
+        }
     }
 
 
@@ -46,7 +58,19 @@ class FilesManager extends BaseStrictClass{
      */
     public function isDirectory($path){
 
-        return is_dir($path);
+        if (!is_string($path)){
+
+            throw new UnexpectedValueException('path must be a string');
+        }
+
+        try {
+
+            return is_dir($path);
+
+        } catch (Exception $e) {
+
+            return false;
+        }
     }
 
 
@@ -57,11 +81,11 @@ class FilesManager extends BaseStrictClass{
      *
      * @return boolean True if directory is empty, false if not. If it does not exist or cannot be read, an exception will be generated
      */
-    public function isDirectoryEmpty(string $path) {
+    public function isDirectoryEmpty($path) {
 
         if (!$this->isDirectory($path)){
 
-            throw new UnexpectedValueException('Path does not exist: '.$path);
+            throw new UnexpectedValueException('path does not exist: '.$path);
         }
 
         $files = $this->getDirectoryList($path);
@@ -93,23 +117,38 @@ class FilesManager extends BaseStrictClass{
      * Search for a folder name that does not exist on the provided path.
      *
      * If we want to create a new folder inside another one without knowing for sure what does it contain, this method will
-     * guarantee us that we have a unique directory name that does not collide with any other folder or file that currently exists on the path.
+     * guarantee us that we have a unique directory name that does not collide with any other folder or file that currently
+     * exists on the path.
      *
      * NOTE: This method does not create any folder or alter the given path in any way.
      *
      * @param string $path The full path to the directoy we want to check for a unique folder name
-     * @param string $desiredName We can specify a suggested name for the unique directory. This method will verify that it does not exist, or otherwise give us a name that is unique for the given path
-     * @param string $text Text that will be appended to the suggested name in case it already exists. For example: Setting text to 'copy' will generate a result like 'NewFolder-copy-1' if a folder named 'NewFolder' already exists
-     * @param string $separator String that will be used to join the suggested name with the text and the numeric file counter. For example: Setting separator to '---' will generate a result like 'NewFolder---copy---1' if a folder named 'NewFolder' already exists
-     * @param string $isPrefix Defines if the extra text that will be appended to the desired name will be placed after or before the name on the result. For example, setting this to true will generate a result like 'copy-1-NewFolder' if a folder named 'NewFolder' already exists
+     * @param string $desiredName We can specify a suggested name for the unique directory. This method will verify that it
+     *                            does not exist, or otherwise give us a name based on our desired one that is unique for the path
+     * @param string $text Text that will be appended to the suggested name in case it already exists.
+     *                     For example: text='copy' will generate a result like 'NewFolder-copy' or 'NewFolder-copy-1' if a folder named 'NewFolder' exists
+     * @param string $separator String that will be used to join the suggested name with the text and the numeric file counter.
+     *                          For example: separator='---' will generate a result like 'NewFolder---copy---1' if a folder named 'NewFolder' already exists
+     * @param string $isPrefix Defines if the extra text that will be appended to the desired name will be placed after or before the name on the result.
+     *                         For example: isPrefix=true will generate a result like 'copy-1-NewFolder' if a folder named 'NewFolder' already exists
      *
-     * @return string A directory name that can be safely created on the specified path, cause no one exists with the same name (No path is returned with this method, only a directory name. For example: 'folder-1', 'directoryName-5', etc..).
+     * @return string A directory name that can be safely created on the specified path, cause no one exists with the same name
+     *                (No path is returned by this method, only a directory name. For example: 'folder-1', 'directoryName-5', etc..).
      */
-    public function findUniqueDirectoryName(string $path, string $desiredName = '', string $text = '', string $separator = '-', bool $isPrefix = false){
+    public function findUniqueDirectoryName(string $path,
+                                            string $desiredName = '',
+                                            string $text = '',
+                                            string $separator = '-',
+                                            bool $isPrefix = false){
+
+        if (!$this->isDirectory($path)){
+
+            throw new UnexpectedValueException('path does not exist: '.$path);
+        }
 
         $i = 1;
-        $path = StringUtils::formatPath($path, DIRECTORY_SEPARATOR);
         $result = ($desiredName == '' ? $i : $desiredName);
+        $path = StringUtils::formatPath($path, DIRECTORY_SEPARATOR);
 
         while(is_dir($path.DIRECTORY_SEPARATOR.$result) ||
               is_file($path.DIRECTORY_SEPARATOR.$result)){
@@ -127,19 +166,34 @@ class FilesManager extends BaseStrictClass{
      * Search for a file name that does not exist on the provided path.
      *
      * If we want to create a new file inside a folder without knowing for sure what does it contain, this method will
-     * guarantee us that we have a unique file name that does not collide with any other file or folder that currently exists on the path.
+     * guarantee us that we have a unique file name that does not collide with any other folder or file that currently
+     * exists on the path.
      *
      * NOTE: This method does not create any file or alter the given path in any way.
      *
      * @param string $path The full path to the directoy we want to check for a unique file name
-     * @param string $desiredName We can specify a suggested name for the unique file. This method will verify that it does not exist, or otherwise give us a name that is unique for the given path
-     * @param string $text Text that will be appended to the suggested name in case it already exists. For example: Setting text to 'copy' will generate a result like 'NewFile-copy-1' if a file named 'NewFile' already exists
-     * @param string $separator String that will be used to join the suggested name with the text and the numeric file counter. For example: Setting separator to '---' will generate a result like 'NewFile---copy---1' if a file named 'NewFile' already exists
-     * @param string $isPrefix Defines if the extra text that will be appended to the desired name will be placed after or before the name on the result. For example, setting this to true will generate a result like 'copy-1-NewFile' if a file named 'NewFile' already exists
+     * @param string $desiredName We can specify a suggested name for the unique file. This method will verify that it
+     *                            does not exist, or otherwise give us a name based on our desired one that is unique for the path
+     * @param string $text Text that will be appended to the suggested name in case it already exists.
+     *                     For example: text='copy' will generate a result like 'NewFile-copy' or 'NewFile-copy-1' if a file named 'NewFile' exists
+     * @param string $separator String that will be used to join the suggested name with the text and the numeric file counter.
+     *                          For example: separator='---' will generate a result like 'NewFile---copy---1' if a file named 'NewFile' already exists
+     * @param string $isPrefix Defines if the extra text that will be appended to the desired name will be placed after or before the name on the result.
+     *                         For example: isPrefix=true will generate a result like 'copy-1-NewFile' if a file named 'NewFile' already exists
      *
-     * @return string A file name that can be safely created on the specified path, cause no one exists with the same name (No path is returned with this method, only a file name. For example: 'file-1', 'fileName-5', etc..).
+     * @return string A file name that can be safely created on the specified path, cause no one exists with the same name
+     *                (No path is returned by this method, only a file name. For example: 'file-1', 'fileName-5', etc..).
      */
-    public function findUniqueFileName(string $path, string $desiredName = '', string $text = '', string $separator = '-', bool $isPrefix = false){
+     public function findUniqueFileName(string $path,
+                                        string $desiredName = '',
+                                        string $text = '',
+                                        string $separator = '-',
+                                        bool $isPrefix = false){
+
+        if (!$this->isDirectory($path)){
+
+            throw new UnexpectedValueException('path does not exist: '.$path);
+        }
 
         $i = 1;
         $path = StringUtils::formatPath($path, DIRECTORY_SEPARATOR);
@@ -314,32 +368,29 @@ class FilesManager extends BaseStrictClass{
         // If folder does not exist, we will throw an exception
         if(!is_dir($path)){
 
-            throw new UnexpectedValueException('Specified path <'.$path.'> does not exist or is not a directory');
+            throw new UnexpectedValueException('path does not exist: '.$path);
         }
 
         // Get all the folder contents
         $result = [];
         $sortRes = [];
 
-        if($path !== ''){
+        $dirIterator = new DirectoryIterator($path);
 
-            $dirIterator = new DirectoryIterator($path);
+        foreach ($dirIterator as $fileInfo){
 
-            foreach ($dirIterator as $fileInfo){
+            if(!$fileInfo->isDot()){
 
-                if(!$fileInfo->isDot()){
+                switch($sort) {
 
-                    switch($sort) {
+                    case 'mDateAsc':
+                    case 'mDateDesc':
+                        $sortRes[$fileInfo->getMTime()] = $fileInfo->getFilename();
+                        break;
 
-                        case 'mDateAsc':
-                        case 'mDateDesc':
-                            $sortRes[$fileInfo->getMTime()] = $fileInfo->getFilename();
-                            break;
-
-                        default:
-                            $result[] = $fileInfo->getFilename();
-                            break;
-                    }
+                    default:
+                        $result[] = $fileInfo->getFilename();
+                        break;
                 }
             }
         }
@@ -357,7 +408,6 @@ class FilesManager extends BaseStrictClass{
 
             case 'mDateAsc':
                 ksort($sortRes);
-
                 foreach ($sortRes as $value) {
 
                     $result[] = $value;
@@ -365,13 +415,19 @@ class FilesManager extends BaseStrictClass{
                 break;
 
             case 'mDateDesc':
-                krsort($result);
-
+                krsort($sortRes);
                 foreach ($sortRes as $value) {
 
                     $result[] = $value;
                 }
                 break;
+
+            default:
+                if($sort !== ''){
+
+                    throw new UnexpectedValueException('Unknown sort method');
+                }
+
         }
 
         return $result;
@@ -383,30 +439,33 @@ class FilesManager extends BaseStrictClass{
      *
      * @param string $path Full path to the directory we want to calculate its size
      *
-     * @return int the size of the file in bytes, or false (and generates an error of level E_WARNING) in case of an error.
+     * @return int the size of the file in bytes. An exception will be thrown if value cannot be obtained
      */
     public function getDirectorySize(string $path){
 
         $result = 0;
 
-        if($path != ''){
+        // If folder does not exist, we will throw an exception
+        if(!is_dir($path)){
 
-            $dirIterator = new DirectoryIterator($path);
+            throw new UnexpectedValueException('Specified path <'.$path.'> does not exist or is not a directory');
+        }
 
-            foreach ($dirIterator as $fileInfo){
+        $contents = $this->getDirectoryList($path);
 
-                $currentFile = $path.DIRECTORY_SEPARATOR.$fileInfo->getFilename();
+        foreach ($contents as $fileOrDir){
 
-                if(!$fileInfo->isDot()){
+            $fileOrDirPath = $path.DIRECTORY_SEPARATOR.$fileOrDir;
 
-                    if (is_dir($currentFile)) {
+            if ($fileOrDir !== '.' && $fileOrDir !== '..') {
 
-                        $result += $this->getDirectorySize($currentFile);
+                if (is_dir($fileOrDirPath)) {
 
-                    }else {
+                    $result += $this->getDirectorySize($fileOrDirPath);
 
-                        $result += filesize($currentFile);
-                    }
+                }else {
+
+                    $result += $this->getFileSize($fileOrDirPath);
                 }
             }
         }
@@ -511,13 +570,25 @@ class FilesManager extends BaseStrictClass{
     /**
      * Get the size from a file
      *
-     * @param string $path The file full path
+     * @param string $path The file full path, including the file name and extension
      *
-     * @return int the size of the file in bytes, or false (and generates an error of level E_WARNING) in case of an error.
+     * @return int the size of the file in bytes. An exception will be thrown if value cannot be obtained
      */
     public function getFileSize(string $path){
 
-        return filesize($path);
+        if(!is_file($path)){
+
+            throw new UnexpectedValueException('File not found - '.$path);
+        }
+
+        $fileSize = filesize($path);
+
+        if($fileSize === false){
+
+            throw new UnexpectedValueException('Error reading file size');
+        }
+
+        return $fileSize;
     }
 
 
@@ -527,7 +598,7 @@ class FilesManager extends BaseStrictClass{
      *
      * @param string $path An Operating system full or relative path containing some file
      *
-     * @return string The file contents (binary or string). If the file is not found or cannot be read, an exception will be thrown.
+     * @return string The file contents as a string. If the file is not found or cannot be read, an exception will be thrown.
      */
     public function readFile(string $path){
 

@@ -12,10 +12,13 @@
 namespace org\turbocommons\src\test\php\managers;
 
 use PHPUnit\Framework\TestCase;
+use stdClass;
 use Throwable;
 use org\turbocommons\src\main\php\managers\ValidationManager;
 use org\turbocommons\src\main\php\utils\ArrayUtils;
 use org\turbocommons\src\main\php\managers\FilesManager;
+use org\turbocommons\src\main\php\utils\NumericUtils;
+use org\turbocommons\src\main\php\utils\StringUtils;
 
 
 /**
@@ -26,6 +29,64 @@ use org\turbocommons\src\main\php\managers\FilesManager;
 class FilesManagerTest extends TestCase {
 
 
+    /**
+     * @see TestCase::setUpBeforeClass()
+     *
+     * @return void
+     */
+    public static function setUpBeforeClass(){
+
+        // Nothing necessary here
+    }
+
+
+    /**
+     * @see TestCase::setUp()
+     *
+     * @return void
+     */
+    protected function setUp(){
+
+        $this->exceptionMessage = '';
+
+        $this->sut = new FilesManager();
+
+        // Create a temporary folder
+        $this->tempFolder = $this->sut->createTempDirectory('TurboCommons-FilesManagerTest');
+        $this->assertTrue(strpos($this->tempFolder, 'TurboCommons-FilesManagerTest') !== false);
+        $this->assertTrue($this->sut->isDirectoryEmpty($this->tempFolder));
+        $this->assertFalse($this->sut->isFile($this->tempFolder));
+    }
+
+
+    /**
+     * @see TestCase::tearDown()
+     *
+     * @return void
+     */
+    protected function tearDown(){
+
+        // Delete temporary folder
+        $this->sut->deleteDirectory($this->tempFolder);
+
+        if($this->exceptionMessage != ''){
+
+            $this->fail($this->exceptionMessage);
+        }
+    }
+
+
+    /**
+     * @see TestCase::tearDownAfterClass()
+     *
+     * @return void
+     */
+    public static function tearDownAfterClass(){
+
+        // Nothing necessary here
+    }
+
+
 	/**
 	 * testIsFile
 	 *
@@ -33,25 +94,55 @@ class FilesManagerTest extends TestCase {
 	 */
 	public function testIsFile(){
 
-		$filesManager = new FilesManager();
+	    // Test empty values
+	    try {
+	        $this->sut->isFile(null);
+	        $this->exceptionMessage = 'null did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Create a temporary folder
-		$basePath = $filesManager->createTempDirectory('TurboCommons-Php');
-		$this->assertTrue($filesManager->isDirectoryEmpty($basePath));
-		$this->assertTrue(!$filesManager->isFile($basePath));
+	    try {
+	        $this->sut->isFile(new stdClass());
+	        $this->exceptionMessage = 'new stdClass() did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		$this->assertTrue(!$filesManager->isFile(null));
-		$this->assertTrue(!$filesManager->isFile(''));
-		$this->assertTrue(!$filesManager->isFile('49568456'));
-		$this->assertTrue(!$filesManager->isFile('http://www.adkgadsifi.com/ieriteroter3453458852t.pdf'));
-		$this->assertTrue(!$filesManager->isFile('http://www.google.com'));
-		$this->assertTrue(!$filesManager->isFile('https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'));
-		$this->assertTrue(!$filesManager->isFile('http://www.facebook.com'));
+	    try {
+	        $this->sut->isFile(0);
+	        $this->exceptionMessage = '0 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Test a created file
-		$this->assertFalse($filesManager->isFile($basePath.DIRECTORY_SEPARATOR.'File.txt'));
-		$filesManager->createFile($basePath.DIRECTORY_SEPARATOR.'File.txt', 'Hello baby');
-		$this->assertTrue($filesManager->isFile($basePath.DIRECTORY_SEPARATOR.'File.txt'));
+	    $this->assertFalse($this->sut->isFile(''));
+	    $this->assertFalse($this->sut->isFile('          '));
+	    $this->assertFalse($this->sut->isFile("\n\n\n"));
+
+	    // Test ok values
+	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'File.txt', '');
+	    $this->assertTrue($this->sut->isFile($this->tempFolder.DIRECTORY_SEPARATOR.'File.txt'));
+	    $this->sut->deleteFile($this->tempFolder.DIRECTORY_SEPARATOR.'File.txt');
+	    $this->assertFalse($this->sut->isFile($this->tempFolder.DIRECTORY_SEPARATOR.'File.txt'));
+
+	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'File2.txt', 'Hello baby');
+	    $this->assertTrue($this->sut->isFile($this->tempFolder.DIRECTORY_SEPARATOR.'File2.txt'));
+        $this->sut->deleteFile($this->tempFolder.DIRECTORY_SEPARATOR.'File2.txt');
+	    $this->assertFalse($this->sut->isFile($this->tempFolder.DIRECTORY_SEPARATOR.'File2.txt'));
+
+	    // Test wrong values
+	    $this->assertFalse($this->sut->isFile($this->tempFolder));
+	    $this->assertFalse($this->sut->isFile($this->tempFolder.DIRECTORY_SEPARATOR.'asdfsdf.txt353455'));
+	    $this->assertFalse($this->sut->isFile($this->tempFolder.DIRECTORY_SEPARATOR.'asdfsdf.txt'));
+	    $this->assertFalse($this->sut->isFile('49568456'));
+	    $this->assertFalse($this->sut->isFile('http://www.adkgadsifi.com/ieriteroter3453458852t.pdf'));
+	    $this->assertFalse($this->sut->isFile('http://www.google.com'));
+	    $this->assertFalse($this->sut->isFile('https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'));
+	    $this->assertFalse($this->sut->isFile('http://www.facebook.com'));
+
+	    // Test exceptions
+	    // Not necessary
 	}
 
 
@@ -62,21 +153,62 @@ class FilesManagerTest extends TestCase {
 	 */
 	public function testIsDirectory(){
 
-		$filesManager = new FilesManager();
+	    // Test empty values
+	    try {
+	        $this->sut->isDirectory(null);
+	        $this->exceptionMessage = 'null did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Create a temporary folder
-		$basePath = $filesManager->createTempDirectory('TurboCommons-Php');
-		$this->assertTrue($filesManager->isDirectoryEmpty($basePath));
-		$this->assertTrue($filesManager->isDirectory($basePath));
+	    try {
+	        $this->sut->isDirectory(new stdClass());
+	        $this->exceptionMessage = 'new stdClass() did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Test a non existing file
-		$this->assertTrue(!$filesManager->isDirectory(null));
-		$this->assertTrue(!$filesManager->isDirectory(''));
-		$this->assertTrue(!$filesManager->isDirectory('49568456'));
+	    try {
+	        $this->sut->isDirectory(0);
+	        $this->exceptionMessage = '0 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Test a created file
-		$filesManager->createFile($basePath.DIRECTORY_SEPARATOR.'File.txt', 'Hello baby');
-		$this->assertTrue(!$filesManager->isDirectory($basePath.DIRECTORY_SEPARATOR.'File.txt'));
+	    $this->assertFalse($this->sut->isDirectory(''));
+	    $this->assertFalse($this->sut->isDirectory('          '));
+	    $this->assertFalse($this->sut->isDirectory("\n\n\n"));
+
+	    // Test ok values
+	    $this->assertTrue($this->sut->isDirectory($this->tempFolder));
+
+	    $averageDirectory = $this->tempFolder.DIRECTORY_SEPARATOR.'some folder';
+	    $this->sut->createDirectory($averageDirectory, true);
+	    $this->assertTrue($this->sut->isDirectory($averageDirectory));
+	    $this->sut->deleteDirectory($averageDirectory);
+	    $this->assertFalse($this->sut->isDirectory($averageDirectory));
+
+	    $recursiveDirectory = $this->tempFolder.DIRECTORY_SEPARATOR.'a'.DIRECTORY_SEPARATOR.'b'.DIRECTORY_SEPARATOR.'c';
+	    $this->sut->createDirectory($recursiveDirectory, true);
+	    $this->assertTrue($this->sut->isDirectory($recursiveDirectory));
+	    $this->sut->deleteDirectory($recursiveDirectory);
+	    $this->assertFalse($this->sut->isDirectory($recursiveDirectory));
+	    $this->assertTrue($this->sut->isDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'a'.DIRECTORY_SEPARATOR.'b'));
+
+	    // Test wrong values
+	    $this->assertFalse($this->sut->isDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'asdfsdf.txt353455'));
+	    $this->assertFalse($this->sut->isDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'asdfsdf.txt'));
+	    $this->assertFalse($this->sut->isDirectory('49568456'));
+	    $this->assertFalse($this->sut->isDirectory('http://www.adkgadsifi.com/ieriteroter3453458852t.pdf'));
+	    $this->assertFalse($this->sut->isDirectory('http://www.google.com'));
+	    $this->assertFalse($this->sut->isDirectory('https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'));
+	    $this->assertFalse($this->sut->isDirectory('http://www.facebook.com'));
+
+	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'File.txt', '');
+	    $this->assertFalse($this->sut->isDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'File.txt'));
+
+	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'File2.txt', 'Hello baby');
+	    $this->assertFalse($this->sut->isDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'File2.txt'));
 	}
 
 
@@ -87,44 +219,83 @@ class FilesManagerTest extends TestCase {
 	 */
 	public function testIsDirectoryEmpty(){
 
-		$filesManager = new FilesManager();
+	    // Test empty values
+	    try {
+	        $this->sut->isDirectoryEmpty(null);
+	        $this->exceptionMessage = 'null did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Create a temporary folder
-		$basePath = $filesManager->createTempDirectory('TurboCommons-Php');
-		$this->assertTrue($filesManager->isDirectoryEmpty($basePath));
+	    try {
+	        $this->sut->isDirectoryEmpty(new stdClass());
+	        $this->exceptionMessage = 'new stdClass() did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Create some file
-		$filesManager->createFile($basePath.DIRECTORY_SEPARATOR.'File.txt', 'Hello baby');
-		$this->assertTrue(!$filesManager->isDirectoryEmpty($basePath));
+	    try {
+	        $this->sut->isDirectoryEmpty(0);
+	        $this->exceptionMessage = '0 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// test that exception happens with non existant folder
-		$exceptionMessage = '';
+	    try {
+	        $this->sut->isDirectoryEmpty('');
+	        $this->exceptionMessage = '"" did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		try {
-			$filesManager->isDirectoryEmpty($basePath.DIRECTORY_SEPARATOR.'asdfwer');
-			$exceptionMessage = 'asdfwer did not cause exception';
-		} catch (Throwable $e) {
-			// We expect an exception to happen
-		}
+	    try {
+	        $this->sut->isDirectoryEmpty('          ');
+	        $this->exceptionMessage = '"         " did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		try {
-			$filesManager->isDirectoryEmpty(null);
-			$exceptionMessage = 'Null did not cause exception';
-		} catch (Throwable $e) {
-			// We expect an exception to happen
-		}
+	    try {
+	        $this->sut->isDirectoryEmpty("\n\n\n");
+	        $this->exceptionMessage = '"\n\n\n" did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		try {
-			$filesManager->isDirectoryEmpty('etrtert');
-			$exceptionMessage = 'etrtert did not cause exception';
-		} catch (Throwable $e) {
-			// We expect an exception to happen
-		}
+	    // Test ok values
+	    $this->assertTrue($this->sut->isDirectoryEmpty($this->tempFolder));
 
-		if($exceptionMessage != ''){
+	    $averageDirectory = $this->tempFolder.DIRECTORY_SEPARATOR.'some folder';
+	    $this->sut->createDirectory($averageDirectory);
+	    $this->assertTrue($this->sut->isDirectoryEmpty($averageDirectory));
+	    $this->sut->createFile($averageDirectory.DIRECTORY_SEPARATOR.'File.txt', 'Hello baby');
+	    $this->assertFalse($this->sut->isDirectoryEmpty($averageDirectory));
 
-			$this->fail($exceptionMessage);
-		}
+	    // Test wrong values
+	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'File.txt', 'Hello baby');
+	    $this->assertFalse($this->sut->isDirectoryEmpty($this->tempFolder));
+
+	    // Test exceptions
+	    try {
+	        $this->sut->isDirectoryEmpty($this->tempFolder.DIRECTORY_SEPARATOR.'asdfwer');
+	        $this->exceptionMessage = 'asdfwer did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->sut->isDirectoryEmpty('etrtert');
+	        $this->exceptionMessage = 'etrtert did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->sut->isDirectoryEmpty('http://www.google.com');
+	        $this->exceptionMessage = 'http://www.google.com did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 	}
 
 
@@ -135,9 +306,7 @@ class FilesManagerTest extends TestCase {
 	 */
 	public function testDirSep(){
 
-		$filesManager = new FilesManager();
-
-		$this->assertTrue($filesManager->dirSep() === DIRECTORY_SEPARATOR);
+	    $this->assertTrue($this->sut->dirSep() === DIRECTORY_SEPARATOR);
 	}
 
 
@@ -148,49 +317,79 @@ class FilesManagerTest extends TestCase {
 	 */
 	public function testFindUniqueDirectoryName(){
 
-		$filesManager = new FilesManager();
+	    // Test empty values
+	    try {
+	        $this->sut->findUniqueDirectoryName(null);
+	        $this->exceptionMessage = 'null did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Create a temporary folder
-		$basePath = $filesManager->createTempDirectory('TurboCommons-Php');
-		$this->assertTrue($filesManager->isDirectoryEmpty($basePath));
+	    try {
+	        $this->sut->findUniqueDirectoryName('');
+	        $this->exceptionMessage = '"" did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Test generated directory names for the created empty folder
-		$this->assertTrue($filesManager->findUniqueDirectoryName($basePath) == '1');
-		$this->assertTrue($filesManager->findUniqueDirectoryName($basePath, 'NewFolder') == 'NewFolder');
-		$this->assertTrue($filesManager->findUniqueDirectoryName($basePath, 'NewFolder', '-') == 'NewFolder');
-		$this->assertTrue($filesManager->findUniqueDirectoryName($basePath, 'NewFolder', '-', true) == 'NewFolder');
+	    try {
+	        $this->sut->findUniqueDirectoryName(new stdClass());
+	        $this->exceptionMessage = '"" did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Create some folders
-		$filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'1');
-		$this->assertTrue($filesManager->isDirectory($basePath.DIRECTORY_SEPARATOR.'1'));
-		$filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'NewFolder');
-		$this->assertTrue($filesManager->isDirectory($basePath.DIRECTORY_SEPARATOR.'NewFolder'));
+	    try {
+	        $this->sut->findUniqueDirectoryName('           ');
+	        $this->exceptionMessage = '"" did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Create a file that is named like a directory (without extension)
-		$filesManager->createFile($basePath.DIRECTORY_SEPARATOR.'2', 'test file');
-		$this->assertTrue($filesManager->isFile($basePath.DIRECTORY_SEPARATOR.'2'));
+	    // Test ok values
+	    // Test generated directory names for the created empty folder
+	    $this->assertTrue($this->sut->findUniqueDirectoryName($this->tempFolder) == '1');
+	    $this->assertTrue($this->sut->findUniqueDirectoryName($this->tempFolder, 'NewFolder') == 'NewFolder');
+	    $this->assertTrue($this->sut->findUniqueDirectoryName($this->tempFolder, 'NewFolder', '-') == 'NewFolder');
+	    $this->assertTrue($this->sut->findUniqueDirectoryName($this->tempFolder, 'NewFolder', '-', true) == 'NewFolder');
 
-		// Verify generated dir names when folders already exist at destination path
-		$this->assertTrue($filesManager->findUniqueDirectoryName($basePath) == '3');
-		$this->assertTrue($filesManager->findUniqueDirectoryName($basePath, 'NewFolder') == 'NewFolder-1');
-		$this->assertTrue($filesManager->findUniqueDirectoryName($basePath, 'NewFolder', '', '-', true) == '1-NewFolder');
-		$this->assertTrue($filesManager->findUniqueDirectoryName($basePath, 'NewFolder', 'copy', '-', false) == 'NewFolder-copy-1');
-		$this->assertTrue($filesManager->findUniqueDirectoryName($basePath, 'NewFolder', 'copy', '-', true) == 'copy-1-NewFolder');
+	    // Create some folders
+	    $this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'1');
+	    $this->assertTrue($this->sut->isDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'1'));
+	    $this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'NewFolder');
+	    $this->assertTrue($this->sut->isDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'NewFolder'));
 
-		// Create some more folders
-		$filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'3');
-		$this->assertTrue($filesManager->isDirectory($basePath.DIRECTORY_SEPARATOR.'3'));
-		$filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'NewFolder-1');
-		$this->assertTrue($filesManager->isDirectory($basePath.DIRECTORY_SEPARATOR.'NewFolder-1'));
-		$filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'NewFolder-copy-1');
-		$this->assertTrue($filesManager->isDirectory($basePath.DIRECTORY_SEPARATOR.'NewFolder-copy-1'));
+	    // Create a file that is named like a directory (without extension)
+	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'2', 'test file');
+	    $this->assertTrue($this->sut->isFile($this->tempFolder.DIRECTORY_SEPARATOR.'2'));
 
-		// Verify generated names again
-		$this->assertTrue($filesManager->findUniqueDirectoryName($basePath) == '4');
-		$this->assertTrue($filesManager->findUniqueDirectoryName($basePath, 'NewFolder') == 'NewFolder-2');
-		$this->assertTrue($filesManager->findUniqueDirectoryName($basePath, 'NewFolder', '', '-', true) == '1-NewFolder');
-		$this->assertTrue($filesManager->findUniqueDirectoryName($basePath, 'NewFolder', 'copy', '-', false) == 'NewFolder-copy-2');
-		$this->assertTrue($filesManager->findUniqueDirectoryName($basePath, 'NewFolder', 'copy', '-', true) == 'copy-1-NewFolder');
+	    // Verify generated dir names when folders already exist at destination path
+	    $this->assertTrue($this->sut->findUniqueDirectoryName($this->tempFolder) == '3');
+	    $this->assertTrue($this->sut->findUniqueDirectoryName($this->tempFolder, 'NewFolder') == 'NewFolder-1');
+	    $this->assertTrue($this->sut->findUniqueDirectoryName($this->tempFolder, 'NewFolder', '', '-', true) == '1-NewFolder');
+	    $this->assertTrue($this->sut->findUniqueDirectoryName($this->tempFolder, 'NewFolder', 'copy', '-', false) == 'NewFolder-copy-1');
+	    $this->assertTrue($this->sut->findUniqueDirectoryName($this->tempFolder, 'NewFolder', 'copy', '-', true) == 'copy-1-NewFolder');
+
+	    // Create some more folders
+	    $this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'3');
+	    $this->assertTrue($this->sut->isDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'3'));
+	    $this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'NewFolder-1');
+	    $this->assertTrue($this->sut->isDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'NewFolder-1'));
+	    $this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'NewFolder-copy-1');
+	    $this->assertTrue($this->sut->isDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'NewFolder-copy-1'));
+
+	    // Verify generated names again
+	    $this->assertTrue($this->sut->findUniqueDirectoryName($this->tempFolder) == '4');
+	    $this->assertTrue($this->sut->findUniqueDirectoryName($this->tempFolder, 'NewFolder') == 'NewFolder-2');
+	    $this->assertTrue($this->sut->findUniqueDirectoryName($this->tempFolder, 'NewFolder', '', '-', true) == '1-NewFolder');
+	    $this->assertTrue($this->sut->findUniqueDirectoryName($this->tempFolder, 'NewFolder', 'copy', '-', false) == 'NewFolder-copy-2');
+	    $this->assertTrue($this->sut->findUniqueDirectoryName($this->tempFolder, 'NewFolder', 'copy', '-', true) == 'copy-1-NewFolder');
+
+	    // Test wrong values
+	    // not necessary
+
+	    // Test exceptions
+	    // not necessary
 	}
 
 
@@ -201,49 +400,79 @@ class FilesManagerTest extends TestCase {
 	 */
 	public function testFindUniqueFileName(){
 
-		$filesManager = new FilesManager();
+	    // Test empty values
+	    try {
+	        $this->sut->findUniqueFileName(null);
+	        $this->exceptionMessage = 'null did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Create a temporary folder
-		$basePath = $filesManager->createTempDirectory('TurboCommons-Php');
-		$this->assertTrue($filesManager->isDirectoryEmpty($basePath));
+	    try {
+	        $this->sut->findUniqueFileName('');
+	        $this->exceptionMessage = '"" did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Test generated file names for the created empty folder
-		$this->assertTrue($filesManager->findUniqueFileName($basePath) == '1', 'error '.$filesManager->findUniqueFileName($basePath));
-		$this->assertTrue($filesManager->findUniqueFileName($basePath, 'NewFile.txt') == 'NewFile.txt');
-		$this->assertTrue($filesManager->findUniqueFileName($basePath, 'NewFile.txt', '-') == 'NewFile.txt');
-		$this->assertTrue($filesManager->findUniqueFileName($basePath, 'NewFile.txt', '-', true) == 'NewFile.txt');
+	    try {
+	        $this->sut->findUniqueFileName(new stdClass());
+	        $this->exceptionMessage = '"" did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Create some files
-		$filesManager->createFile($basePath.DIRECTORY_SEPARATOR.'1', 'hello baby');
-		$this->assertTrue($filesManager->isFile($basePath.DIRECTORY_SEPARATOR.'1'));
-		$filesManager->createFile($basePath.DIRECTORY_SEPARATOR.'NewFile.txt', 'hello baby');
-		$this->assertTrue($filesManager->isFile($basePath.DIRECTORY_SEPARATOR.'NewFile.txt'));
+	    try {
+	        $this->sut->findUniqueFileName('           ');
+	        $this->exceptionMessage = '"" did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Create a folder that is named like a possible file
-		$filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'2');
-		$this->assertTrue($filesManager->isDirectory($basePath.DIRECTORY_SEPARATOR.'2'));
+	    // Test ok values
+	    // Test generated file names for the created empty folder
+	    $this->assertTrue($this->sut->findUniqueFileName($this->tempFolder) == '1', 'error '.$this->sut->findUniqueFileName($this->tempFolder));
+	    $this->assertTrue($this->sut->findUniqueFileName($this->tempFolder, 'NewFile.txt') == 'NewFile.txt');
+	    $this->assertTrue($this->sut->findUniqueFileName($this->tempFolder, 'NewFile.txt', '-') == 'NewFile.txt');
+	    $this->assertTrue($this->sut->findUniqueFileName($this->tempFolder, 'NewFile.txt', '-', true) == 'NewFile.txt');
 
-		// Verify generated file names when files already exist at destination path
-		$this->assertTrue($filesManager->findUniqueFileName($basePath) == '3');
-		$this->assertTrue($filesManager->findUniqueFileName($basePath, 'NewFile.txt') == 'NewFile-1.txt');
-		$this->assertTrue($filesManager->findUniqueFileName($basePath, 'NewFile.txt', '', '-', true) == '1-NewFile.txt');
-		$this->assertTrue($filesManager->findUniqueFileName($basePath, 'NewFile.txt', 'copy', '-', false) == 'NewFile-copy-1.txt');
-		$this->assertTrue($filesManager->findUniqueFileName($basePath, 'NewFile.txt', 'copy', '-', true) == 'copy-1-NewFile.txt');
+	    // Create some files
+	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'1', 'hello baby');
+	    $this->assertTrue($this->sut->isFile($this->tempFolder.DIRECTORY_SEPARATOR.'1'));
+	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'NewFile.txt', 'hello baby');
+	    $this->assertTrue($this->sut->isFile($this->tempFolder.DIRECTORY_SEPARATOR.'NewFile.txt'));
 
-		// Create some more files
-		$filesManager->createFile($basePath.DIRECTORY_SEPARATOR.'3', 'hello baby');
-		$this->assertTrue($filesManager->isFile($basePath.DIRECTORY_SEPARATOR.'3'));
-		$filesManager->createFile($basePath.DIRECTORY_SEPARATOR.'NewFile-1.txt', 'hello baby');
-		$this->assertTrue($filesManager->isFile($basePath.DIRECTORY_SEPARATOR.'NewFile-1.txt'));
-		$filesManager->createFile($basePath.DIRECTORY_SEPARATOR.'NewFile-copy-1.txt', 'hello baby');
-		$this->assertTrue($filesManager->isFile($basePath.DIRECTORY_SEPARATOR.'NewFile-copy-1.txt'));
+	    // Create a folder that is named like a possible file
+	    $this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'2');
+	    $this->assertTrue($this->sut->isDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'2'));
 
-		// Verify generated names again
-		$this->assertTrue($filesManager->findUniqueFileName($basePath) == '4');
-		$this->assertTrue($filesManager->findUniqueFileName($basePath, 'NewFile.txt') == 'NewFile-2.txt');
-		$this->assertTrue($filesManager->findUniqueFileName($basePath, 'NewFile.txt', '', '-', true) == '1-NewFile.txt');
-		$this->assertTrue($filesManager->findUniqueFileName($basePath, 'NewFile.txt', 'copy', '-', false) == 'NewFile-copy-2.txt');
-		$this->assertTrue($filesManager->findUniqueFileName($basePath, 'NewFile.txt', 'copy', '-', true) == 'copy-1-NewFile.txt');
+	    // Verify generated file names when files already exist at destination path
+	    $this->assertTrue($this->sut->findUniqueFileName($this->tempFolder) == '3');
+	    $this->assertTrue($this->sut->findUniqueFileName($this->tempFolder, 'NewFile.txt') == 'NewFile-1.txt');
+	    $this->assertTrue($this->sut->findUniqueFileName($this->tempFolder, 'NewFile.txt', '', '-', true) == '1-NewFile.txt');
+	    $this->assertTrue($this->sut->findUniqueFileName($this->tempFolder, 'NewFile.txt', 'copy', '-', false) == 'NewFile-copy-1.txt');
+	    $this->assertTrue($this->sut->findUniqueFileName($this->tempFolder, 'NewFile.txt', 'copy', '-', true) == 'copy-1-NewFile.txt');
+
+	    // Create some more files
+	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'3', 'hello baby');
+	    $this->assertTrue($this->sut->isFile($this->tempFolder.DIRECTORY_SEPARATOR.'3'));
+	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'NewFile-1.txt', 'hello baby');
+	    $this->assertTrue($this->sut->isFile($this->tempFolder.DIRECTORY_SEPARATOR.'NewFile-1.txt'));
+	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'NewFile-copy-1.txt', 'hello baby');
+	    $this->assertTrue($this->sut->isFile($this->tempFolder.DIRECTORY_SEPARATOR.'NewFile-copy-1.txt'));
+
+	    // Verify generated names again
+	    $this->assertTrue($this->sut->findUniqueFileName($this->tempFolder) == '4');
+	    $this->assertTrue($this->sut->findUniqueFileName($this->tempFolder, 'NewFile.txt') == 'NewFile-2.txt');
+	    $this->assertTrue($this->sut->findUniqueFileName($this->tempFolder, 'NewFile.txt', '', '-', true) == '1-NewFile.txt');
+	    $this->assertTrue($this->sut->findUniqueFileName($this->tempFolder, 'NewFile.txt', 'copy', '-', false) == 'NewFile-copy-2.txt');
+	    $this->assertTrue($this->sut->findUniqueFileName($this->tempFolder, 'NewFile.txt', 'copy', '-', true) == 'copy-1-NewFile.txt');
+
+	    // Test wrong values
+	    // not necessary
+
+	    // Test exceptions
+	    // not necessary
 	}
 
 
@@ -254,82 +483,87 @@ class FilesManagerTest extends TestCase {
 	 */
 	public function testCreateDirectory(){
 
-		$filesManager = new FilesManager();
+	    // Test empty values
+	    try {
+	        $this->sut->createDirectory(null);
+	        $this->exceptionMessage = 'Null did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Create a temporary folder
-		$basePath = $filesManager->createTempDirectory('TurboCommons-Php');
-		$this->assertTrue($filesManager->isDirectoryEmpty($basePath));
+	    try {
+	        $this->sut->createDirectory('');
+	        $this->exceptionMessage = '"" did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Test empty and wrong parameters
-		$exceptionMessage = '';
+	    try {
+	        $this->sut->createDirectory('     ');
+	        $this->exceptionMessage = '"     " did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		try {
-			$filesManager->createDirectory(null);
-			$exceptionMessage = 'Null did not cause exception';
-		} catch (Throwable $e) {
-			// We expect an exception to happen
-		}
+	    try {
+	        $this->sut->createDirectory("\n\n\n");
+	        $this->exceptionMessage = '"     " did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		try {
-			$filesManager->createDirectory('');
-			$exceptionMessage = '"" did not cause exception';
-		} catch (Throwable $e) {
-			// We expect an exception to happen
-		}
+	    // Test ok values
+	    $this->assertTrue($this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'test1'));
+	    $this->assertTrue($this->sut->isDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'test1'));
 
-		try {
-			$filesManager->createDirectory('     ');
-			$exceptionMessage = '"     " did not cause exception';
-		} catch (Throwable $e) {
-			// We expect an exception to happen
-		}
+	    $this->assertTrue($this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'1234'));
+	    $this->assertTrue($this->sut->isDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'1234'));
 
-		try {
-			$filesManager->createDirectory('\345\ertert');
-			$exceptionMessage = '\345\ertert did not cause exception';
-		} catch (Throwable $e) {
-			// We expect an exception to happen
-		}
+	    $this->assertTrue($this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'-go-'));
+	    $this->assertTrue($this->sut->isDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'-go-'));
 
-		// Test correct cases
-		$this->assertTrue($filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'test1'));
-		$this->assertTrue($filesManager->isDirectory($basePath.DIRECTORY_SEPARATOR.'test1'));
+	    // Test already existing folders
+	    $this->assertTrue(!$this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'test1'));
+	    $this->assertTrue(!$this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'1234'));
+	    $this->assertTrue(!$this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'-go-'));
 
-		$this->assertTrue($filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'1234'));
-		$this->assertTrue($filesManager->isDirectory($basePath.DIRECTORY_SEPARATOR.'1234'));
+	    // Test already existing files
+	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'3', 'hello baby');
+	    try {
+	        $this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'3');
+	        $this->exceptionMessage = 'basepath did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		$this->assertTrue($filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'-go-'));
-		$this->assertTrue($filesManager->isDirectory($basePath.DIRECTORY_SEPARATOR.'-go-'));
+	    // Test creating recursive folders
+	    try {
+	        $this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'test55'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'tes5'.DIRECTORY_SEPARATOR.'t5');
+	        $this->exceptionMessage = 'test55 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Test already existing folders
-		$this->assertTrue(!$filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'test1'));
-		$this->assertTrue(!$filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'1234'));
-		$this->assertTrue(!$filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'-go-'));
+	    $this->assertTrue($this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'test55'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'tes5'.DIRECTORY_SEPARATOR.'t5', true));
+	    $this->assertTrue($this->sut->isDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'test55'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'tes5'.DIRECTORY_SEPARATOR.'t5'));
 
-		// Test already existing files
-		$filesManager->createFile($basePath.DIRECTORY_SEPARATOR.'3', 'hello baby');
-		try {
-			$filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'3');
-			$exceptionMessage = 'basepath did not cause exception';
-		} catch (Throwable $e) {
-			// We expect an exception to happen
-		}
+	    // Test wrong values
+	    // not necessary
 
-		// Test creating recursive folders
-		try {
-			$filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'test55'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'tes5'.DIRECTORY_SEPARATOR.'t5');
-			$exceptionMessage = 'test55 did not cause exception';
-		} catch (Throwable $e) {
-			// We expect an exception to happen
-		}
+	    // Test exceptions
+	    try {
+	        $this->sut->createDirectory('\345\ertert');
+	        $this->exceptionMessage = '\345\ertert did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		$this->assertTrue($filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'test55'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'tes5'.DIRECTORY_SEPARATOR.'t5', true));
-		$this->assertTrue($filesManager->isDirectory($basePath.DIRECTORY_SEPARATOR.'test55'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'tes5'.DIRECTORY_SEPARATOR.'t5'));
-
-		if($exceptionMessage != ''){
-
-			$this->fail($exceptionMessage);
-		}
+	    try {
+	        $this->sut->createDirectory(['\345\ertert', 1]);
+	        $this->exceptionMessage = '\345\ertert did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 	}
 
 
@@ -340,45 +574,58 @@ class FilesManagerTest extends TestCase {
 	 */
 	public function testCreateTempDirectory(){
 
-		$filesManager = new FilesManager();
+	    // Test empty values
+	    try {
+	        $this->sut->createTempDirectory(null);
+	        $this->exceptionMessage = 'null did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Create a temporary folder
-		$basePath = $filesManager->createTempDirectory('TurboCommons-Php');
-		$this->assertTrue($filesManager->isDirectoryEmpty($basePath));
-		$this->assertTrue(strpos($basePath, 'TurboCommons-Php') !== false);
+	    try {
+	        $this->sut->createTempDirectory('   ');
+	        $this->exceptionMessage = '"    " did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Create a temp directory without specifying a name
-		$basePath = $filesManager->createTempDirectory('');
-		$this->assertTrue($filesManager->isDirectoryEmpty($basePath));
+	    try {
+	        $this->sut->createTempDirectory([]);
+	        $this->exceptionMessage = '[] did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Test wrong parameters
-		$exceptionMessage = '';
+	    try {
+	        $this->sut->createTempDirectory("\n\n\n");
+	        $this->exceptionMessage = '"\n\n\n"did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		try {
-		    $filesManager->createTempDirectory(null);
-		    $exceptionMessage = 'null did not cause exception';
-		} catch (Throwable $e) {
-		    // We expect an exception to happen
-		}
+	    // Test ok values
 
-		try {
-		    $filesManager->createTempDirectory('   ');
-		    $exceptionMessage = '"    " did not cause exception';
-		} catch (Throwable $e) {
-		    // We expect an exception to happen
-		}
+	    // Create a temp directory without specifying a name
+	    $emptyTempFolder = $this->sut->createTempDirectory('');
+	    $this->assertTrue($this->sut->isDirectoryEmpty($emptyTempFolder));
+	    $this->assertTrue(NumericUtils::isNumeric(StringUtils::getFileNameWithExtension($emptyTempFolder)));
 
-		try {
-			$filesManager->createTempDirectory([]);
-			$exceptionMessage = '[] did not cause exception';
-		} catch (Throwable $e) {
-			// We expect an exception to happen
-		}
+	    // Create a temp directory with a name
+	    $someTempFolder = $this->sut->createTempDirectory('some-folder');
+	    $this->assertTrue($this->sut->isDirectoryEmpty($someTempFolder));
+	    $this->assertTrue(strpos($someTempFolder, 'some-folder') !== false);
 
-		if($exceptionMessage != ''){
+	    // Try to create a temp folder with the same name
+	    $someTempFolder2 = $this->sut->createTempDirectory('some-folder');
+	    $this->assertTrue($this->sut->isDirectoryEmpty($someTempFolder2));
+	    $this->assertFalse(($someTempFolder === $someTempFolder2));
+	    $this->assertTrue(strpos($someTempFolder, 'some-folder') !== false);
 
-			$this->fail($exceptionMessage);
-		}
+	    // Test wrong values
+	    // not necesary
+
+	    // Test exceptions
+	    // already tested
 	}
 
 
@@ -389,74 +636,80 @@ class FilesManagerTest extends TestCase {
 	 */
 	public function testGetDirectoryList(){
 
-		$validationManager = new ValidationManager();
-		$filesManager = new FilesManager();
+	    $validationManager = new ValidationManager();
 
-		// Create a temporary folder
-		$basePath = $filesManager->createTempDirectory('TurboCommons-Php');
-		$this->assertTrue($filesManager->isDirectoryEmpty($basePath));
+	    // Test empty values
+	    try {
+	        $this->sut->getDirectoryList(null);
+	        $this->exceptionMessage = 'null did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Create some folders and files
-		$this->assertTrue($filesManager->createFile($basePath.DIRECTORY_SEPARATOR.'file.txt', 'hello baby'));
-		$this->assertTrue($filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'test1'));
-		$this->assertTrue($filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'1234'));
-		$this->assertTrue($filesManager->createDirectory($basePath.DIRECTORY_SEPARATOR.'-go-'));
+	    try {
+	        $this->sut->getDirectoryList('');
+	        $this->exceptionMessage = '"" did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Check that list is ok
-		$res = $filesManager->getDirectoryList($basePath);
-		$this->assertTrue($validationManager->isArray($res));
-		$this->assertTrue(count($res) == 4);
-		$this->assertTrue(in_array('file.txt', $res));
-		$this->assertTrue(in_array('test1', $res));
-		$this->assertTrue(in_array('1234', $res));
-		$this->assertTrue(in_array('-go-', $res));
+	    try {
+	        $this->sut->getDirectoryList('       ');
+	        $this->exceptionMessage = '"      " did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		// Check sorted lists
-		$res = $filesManager->getDirectoryList($basePath, 'nameAsc');
-		$this->assertTrue(ArrayUtils::isEqualTo($res, ['-go-', '1234', 'file.txt', 'test1']));
+	    // Test ok values
 
-		$res = $filesManager->getDirectoryList($basePath, 'nameDesc');
-		$this->assertTrue(ArrayUtils::isEqualTo($res, ['test1', 'file.txt', '1234', '-go-']));
+	    // Create some folders and files
+	    $this->assertTrue($this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'file.txt', 'hello baby'));
+	    $this->assertTrue($this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'test1'));
+	    $this->assertTrue($this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'1234'));
+	    $this->assertTrue($this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'-go-'));
 
-		//$res = $filesManager->getDirectoryList($basePath, 'mDateAsc');
-		//$this->assertTrue(ArrayUtils::isEqualTo($res, ['file.txt', 'test1', '1234', '-go-']));
+	    // Check that list is ok
+	    $res = $this->sut->getDirectoryList($this->tempFolder);
+	    $this->assertTrue($validationManager->isArray($res));
+	    $this->assertTrue(count($res) == 4);
+	    $this->assertTrue(in_array('file.txt', $res));
+	    $this->assertTrue(in_array('test1', $res));
+	    $this->assertTrue(in_array('1234', $res));
+	    $this->assertTrue(in_array('-go-', $res));
 
-		//$res = $filesManager->getDirectoryList($basePath, 'mDateDesc');
-		//$this->assertTrue(ArrayUtils::isEqualTo($res, ['-go-', '1234', 'test1', 'file.txt']));
+	    // Check sorted lists
+	    $res = $this->sut->getDirectoryList($this->tempFolder, 'nameAsc');
+	    $this->assertTrue(ArrayUtils::isEqualTo($res, ['-go-', '1234', 'file.txt', 'test1']));
 
-		// Test wrong parameteres
-		$exceptionMessage = '';
+	    $res = $this->sut->getDirectoryList($this->tempFolder, 'nameDesc');
+	    $this->assertTrue(ArrayUtils::isEqualTo($res, ['test1', 'file.txt', '1234', '-go-']));
 
-		try {
-			$filesManager->getDirectoryList(null);
-			$exceptionMessage = 'null did not cause exception';
-		} catch (Throwable $e) {
-			// We expect an exception to happen
-		}
+	    // TODO - test sort by modification date
+	    //$res = $this->sut->getDirectoryList($this->tempFolder, 'mDateAsc');
+	    //$this->assertTrue(ArrayUtils::isEqualTo($res, ['file.txt', 'test1', '1234', '-go-']));
 
-		try {
-			$filesManager->getDirectoryList('');
-			$exceptionMessage = '"" did not cause exception';
-		} catch (Throwable $e) {
-			// We expect an exception to happen
-		}
+	    //$res = $this->sut->getDirectoryList($this->tempFolder, 'mDateDesc');
+	    //$this->assertTrue(ArrayUtils::isEqualTo($res, ['-go-', '1234', 'test1', 'file.txt']));
 
-		try {
-			$filesManager->getDirectoryList('wrtwrtyeyery');
-			$exceptionMessage = 'wrtwrtyeyery did not cause exception';
-		} catch (Throwable $e) {
-			// We expect an exception to happen
-		}
+	    // Test wrong values
+	    // Test exceptions
+	    try {
+	        $this->sut->getDirectoryList('wrtwrtyeyery');
+	        $this->exceptionMessage = 'wrtwrtyeyery did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-		if($exceptionMessage != ''){
-
-			$this->fail($exceptionMessage);
-		}
+	    try {
+	        $this->sut->getDirectoryList([1,2,3,4]);
+	        $this->exceptionMessage = 'wrtwrtyeyery did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 	}
 
 
 	// TODO - Add all missing tests
-
 }
 
 ?>
