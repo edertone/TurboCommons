@@ -49,7 +49,12 @@ export class FilesManager{
      *
      * @return true if the path exists and is a file, false otherwise.
      */
-    isFile(path: any){
+    isFile(path: string){
+        
+        if (!StringUtils.isString(path)){
+
+            throw new Error('path must be a string');
+        }
         
         try {
             
@@ -71,8 +76,13 @@ export class FilesManager{
      */
     isDirectory(path: any){
 
+        if (!StringUtils.isString(path)){
+
+            throw new Error('path must be a string');
+        }
+        
         try {
-	
+            
             return this.fs.lstatSync(path).isDirectory();
             
         } catch (e) {
@@ -93,7 +103,7 @@ export class FilesManager{
 
         if (!this.isDirectory(path)){
 
-            throw new Error('Path does not exist: ' + path);
+            throw new Error('path does not exist: ' + path);
         }
 
         let files = this.getDirectoryList(path);
@@ -125,24 +135,39 @@ export class FilesManager{
      * Search for a folder name that does not exist on the provided path.
      *
      * If we want to create a new folder inside another one without knowing for sure what does it contain, this method will
-     * guarantee us that we have a unique directory name that does not collide with any other folder or file that currently exists on the path.
+     * guarantee us that we have a unique directory name that does not collide with any other folder or file that currently
+     * exists on the path.
      *
      * NOTE: This method does not create any folder or alter the given path in any way.
      *
      * @param path The full path to the directoy we want to check for a unique folder name
-     * @param desiredName We can specify a suggested name for the unique directory. This method will verify that it does not exist, or otherwise give us a name that is unique for the given path
-     * @param text Text that will be appended to the suggested name in case it already exists. For example: Setting text to 'copy' will generate a result like 'NewFolder-copy-1' if a folder named 'NewFolder' already exists
-     * @param separator String that will be used to join the suggested name with the text and the numeric file counter. For example: Setting separator to '---' will generate a result like 'NewFolder---copy---1' if a folder named 'NewFolder' already exists
-     * @param isPrefix Defines if the extra text that will be appended to the desired name will be placed after or before the name on the result. For example, setting this to true will generate a result like 'copy-1-NewFolder' if a folder named 'NewFolder' already exists
+     * @param desiredName We can specify a suggested name for the unique directory. This method will verify that it
+     *                    does not exist, or otherwise give us a name based on our desired one that is unique for the path
+     * @param text Text that will be appended to the suggested name in case it already exists.
+     *             For example: text='copy' will generate a result like 'NewFolder-copy' or 'NewFolder-copy-1' if a folder named 'NewFolder' exists
+     * @param separator String that will be used to join the suggested name with the text and the numeric file counter.
+     *                  For example: separator='---' will generate a result like 'NewFolder---copy---1' if a folder named 'NewFolder' already exists
+     * @param isPrefix Defines if the extra text that will be appended to the desired name will be placed after or before the name on the result.
+     *                 For example: isPrefix=true will generate a result like 'copy-1-NewFolder' if a folder named 'NewFolder' already exists
      *
-     * @return A directory name that can be safely created on the specified path, cause no one exists with the same name (No path is returned with this method, only a directory name. For example: 'folder-1', 'directoryName-5', etc..).
+     * @return A directory name that can be safely created on the specified path, cause no one exists with the same name
+     *         (No path is returned by this method, only a directory name. For example: 'folder-1', 'directoryName-5', etc..).
      */
-    findUniqueDirectoryName(path: string, desiredName = '', text = '', separator = '-', isPrefix = false){
+    findUniqueDirectoryName(path: string,
+                            desiredName = '',
+                            text = '',
+                            separator = '-',
+                            isPrefix = false){
 
+        if (!this.isDirectory(path)){
+
+            throw new Error('path does not exist: ' + path);
+        }
+        
         let i = 1;
-        path = StringUtils.formatPath(path, this.dirSep());
         let result = (desiredName == '' ? i : desiredName);
-
+        path = StringUtils.formatPath(path, this.dirSep());
+        
         while(this.isDirectory(path + this.dirSep() + result) ||
               this.isFile(path + this.dirSep() + result)){
 
@@ -159,20 +184,35 @@ export class FilesManager{
      * Search for a file name that does not exist on the provided path.
      *
      * If we want to create a new file inside a folder without knowing for sure what does it contain, this method will
-     * guarantee us that we have a unique file name that does not collide with any other file or folder that currently exists on the path.
+     * guarantee us that we have a unique file name that does not collide with any other folder or file that currently
+     * exists on the path.
      *
      * NOTE: This method does not create any file or alter the given path in any way.
      *
      * @param path The full path to the directoy we want to check for a unique file name
-     * @param desiredName We can specify a suggested name for the unique file. This method will verify that it does not exist, or otherwise give us a name that is unique for the given path
-     * @param text Text that will be appended to the suggested name in case it already exists. For example: Setting text to 'copy' will generate a result like 'NewFile-copy-1' if a file named 'NewFile' already exists
-     * @param separator String that will be used to join the suggested name with the text and the numeric file counter. For example: Setting separator to '---' will generate a result like 'NewFile---copy---1' if a file named 'NewFile' already exists
-     * @param isPrefix Defines if the extra text that will be appended to the desired name will be placed after or before the name on the result. For example, setting this to true will generate a result like 'copy-1-NewFile' if a file named 'NewFile' already exists
+     * @param desiredName We can specify a suggested name for the unique file. This method will verify that it
+     *                    does not exist, or otherwise give us a name based on our desired one that is unique for the path
+     * @param text Text that will be appended to the suggested name in case it already exists.
+     *             For example: text='copy' will generate a result like 'NewFile-copy' or 'NewFile-copy-1' if a file named 'NewFile' exists
+     * @param separator String that will be used to join the suggested name with the text and the numeric file counter.
+     *                  For example: separator='---' will generate a result like 'NewFile---copy---1' if a file named 'NewFile' already exists
+     * @param isPrefix Defines if the extra text that will be appended to the desired name will be placed after or before the name on the result.
+     *                 For example: isPrefix=true will generate a result like 'copy-1-NewFile' if a file named 'NewFile' already exists
      *
-     * @return A file name that can be safely created on the specified path, cause no one exists with the same name (No path is returned with this method, only a file name. For example: 'file-1', 'fileName-5', etc..).
+     * @return A file name that can be safely created on the specified path, cause no one exists with the same name
+     *         (No path is returned by this method, only a file name. For example: 'file-1', 'fileName-5', etc..).
      */
-    findUniqueFileName(path: string, desiredName = '', text = '', separator = '-', isPrefix = false){
+    findUniqueFileName(path: string,
+                       desiredName = '',
+                       text = '',
+                       separator = '-',
+                       isPrefix = false){
 
+        if (!this.isDirectory(path)){
+
+            throw new Error('path does not exist: ' + path);
+        }
+        
         let i = 1;
         path = StringUtils.formatPath(path, this.dirSep());
         let result = (desiredName == '' ? i : desiredName);
@@ -268,7 +308,7 @@ export class FilesManager{
         // Create the requested folder
         try{
 
-            // TODO - recursive option is currently missing!
+            // TODO - recursive option is currently not working
             this.fs.mkdirSync(path);
 
         }catch(e){
@@ -355,11 +395,38 @@ export class FilesManager{
      *
      * @param path Full path to the directory we want to calculate its size
      *
-     * @return the size of the file in bytes, or false (and generates an error of level E_WARNING) in case of an error.
+     * @return the size of the file in bytes. An exception will be thrown if value cannot be obtained
      */
     getDirectorySize(path: string){
 
-        // TODO - translate from php
+        let result = 0;
+
+        // If folder does not exist, we will throw an exception
+        if(!this.isDirectory(path)){
+
+            throw new Error('Specified path <' + path + '> does not exist or is not a directory');
+        }
+
+        let contents = this.getDirectoryList(path);
+        
+        for (let fileOrDir of contents) {
+
+            let fileOrDirPath = path + this.dirSep() + fileOrDir;
+
+            if(fileOrDir !== '.' && fileOrDir !== '..'){
+
+                if (this.isDirectory(fileOrDirPath)) {
+
+                    result += this.getDirectorySize(fileOrDirPath);
+
+                }else {
+
+                    result += this.getFileSize(fileOrDirPath);
+                }
+            }
+        }
+
+        return result;
     }
 
 
@@ -448,13 +515,25 @@ export class FilesManager{
     /**
      * Get the size from a file
      *
-     * @param path The file full path
+     * @param path The file full path, including the file name and extension
      *
-     * @return int the size of the file in bytes, or false (and generates an error of level E_WARNING) in case of an error.
+     * @return int the size of the file in bytes. An exception will be thrown if value cannot be obtained
      */
     getFileSize(path: string){
 
-        // TODO - translate from php
+        if(!this.isFile(path)){
+
+            throw new Error('File not found - ' + path);
+        }
+
+        try {
+	
+            return this.fs.statSync(path).size;
+
+        } catch (e) {
+            
+            throw new Error('Error reading file size');
+        }
     }
 
 
@@ -468,7 +547,12 @@ export class FilesManager{
      */
     readFile(path: string){
 
-        // TODO - translate from php
+        if(!this.isFile(path)){
+
+            throw new Error('File not found - ' + path);
+        }
+
+        return this.fs.readFileSync(path, "utf8");
     }
 
 
