@@ -12,6 +12,7 @@
 namespace org\turbocommons\src\main\php\managers;
 
 use org\turbocommons\src\main\php\model\BaseStrictClass;
+use org\turbocommons\src\main\php\utils\StringUtils;
 
 
 /**
