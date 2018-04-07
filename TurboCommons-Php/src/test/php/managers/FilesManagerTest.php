@@ -87,6 +87,64 @@ class FilesManagerTest extends TestCase {
     }
 
 
+    /**
+     * Helper method to create a dummy structure of folders with some parameters
+     *
+     * @param string $root Base directory where the structure will be created
+     * @param int $folders Number of folders to create per depth level
+     * @param int $depth Number of subfolders to create
+     * @param string $fileBaseName Base name for each file to be created
+     * @param int $filesPerFolder Number of files to create per each folder
+     * @param string $filesContent Content to place inside each created file
+     *
+     * @return void
+     */
+    private function createDummyDirectoryStucture(string $root,
+                                                  int $folders,
+                                                  int $depth,
+                                                  string $fileBaseName,
+                                                  int $filesPerFolder,
+                                                  string $filesContent){
+
+        $s = DIRECTORY_SEPARATOR;
+
+        // Create the structure of folders
+        for ($i = 0; $i < $folders; $i++) {
+
+            $pathToCreate = $root;
+
+            for ($j = 0; $j < $depth; $j++) {
+
+                $pathToCreate = $pathToCreate.$s.'folder-'.$i.'-'.$j;
+
+                $this->sut->createDirectory($pathToCreate, true);
+
+                for ($k = 0; $k < $filesPerFolder; $k++) {
+
+                    $fileToCreate = $pathToCreate.$s.$fileBaseName.'-'.$i.'-'.$j.'-'.$k.'.txt';
+
+                    $this->sut->createFile($fileToCreate, $filesContent);
+
+                    $this->assertTrue($this->sut->isFile($fileToCreate));
+                }
+            }
+
+            $this->assertTrue($this->sut->isDirectory($pathToCreate));
+        }
+    }
+
+
+    /**
+     * testDirSep
+     *
+     * @return void
+     */
+    public function testDirSep(){
+
+        $this->assertTrue($this->sut->dirSep() === DIRECTORY_SEPARATOR);
+    }
+
+
 	/**
 	 * testIsFile
 	 *
@@ -300,13 +358,153 @@ class FilesManagerTest extends TestCase {
 
 
 	/**
-	 * testDirSep
+	 * testFindDirectoryItems
 	 *
 	 * @return void
 	 */
-	public function testDirSep(){
+	public function testFindDirectoryItems(){
 
-	    $this->assertTrue($this->sut->dirSep() === DIRECTORY_SEPARATOR);
+	    // Test empty values
+	    try {
+	        $this->sut->findDirectoryItems(null);
+	        $this->exceptionMessage = 'null did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->sut->findDirectoryItems(0);
+	        $this->exceptionMessage = '0 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->sut->findDirectoryItems('');
+	        $this->exceptionMessage = '"" did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->sut->findDirectoryItems('       ');
+	        $this->exceptionMessage = '"       " did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    // Test ok values
+	    $this->assertTrue(ArrayUtils::isEqualTo($this->sut->findDirectoryItems($this->tempFolder, '/file/'), []));
+	    $this->assertTrue(ArrayUtils::isEqualTo($this->sut->findDirectoryItems($this->tempFolder, '/.*/'), []));
+	    $this->assertTrue(ArrayUtils::isEqualTo($this->sut->findDirectoryItems($this->tempFolder, '/^name$/'), []));
+
+	    // Create a structure of folders and files
+	    $this->createDummyDirectoryStucture($this->tempFolder, 4, 4, 'somefile', 5, 'file content');
+
+	    // Test resultFormat = 'name'
+
+	    // Test finding all *.txt files on the folder
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', -1, 'name')) === 4 * 4 * 5);
+
+	    // Test finding all files or folders on the 1st folder depth
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*$/', 0, 'name')) === 4);
+
+	    // Test finding all *.txt files on the 1st 2d and 3d folder depth
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 0, 'name')) === 0);
+        $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 1, 'name')) === 20);
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 2, 'name')) === 40);
+
+	    // Test finding all files starting with somefile on the folder
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^somefile.*/', -1, 'name')) === 4 * 4 * 5);
+
+	    // Test finding all files starting with samefile on the folder
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^samefile.*/', -1, 'name')) === 0);
+
+	    // Test finding all files named somefile-2.txt on the folder
+	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^somefile-0-0-2.txt$/', -1, 'name') === ['somefile-0-0-2.txt']);
+	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^somefile-0-1-2.txt$/', -1, 'name') === ['somefile-0-1-2.txt']);
+	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^somefile-2-2-2.txt$/', -1, 'name') === ['somefile-2-2-2.txt']);
+
+	    // Test finding all files named *-4.txt on the folder
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^.*-4.txt$/', -1, 'name')) === 16);
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^.*-4.txt$/', 0, 'name')) === 0);
+
+	    // Test finding all folders named folder-3-3 on the folder
+	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^folder-3-3$/', -1, 'name') === ['folder-3-3']);
+	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^folder-1-2$/', -1, 'name') === ['folder-1-2']);
+	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^folder-1-2$/', 0, 'name') === []);
+
+	    // Test resultFormat = 'relative'
+
+	    // Test finding all *.txt files on the folder
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', -1, 'relative')) === 4 * 4 * 5);
+
+	    // Test finding all files or folders on the 1st folder depth
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*$/', 0, 'relative')) === 4);
+
+	    // Test finding all *.txt files on the 1st 2d and 3d folder depth
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 0, 'relative')) === 0);
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 1, 'relative')) === 20);
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 2, 'relative')) === 40);
+
+	    // Test finding all files starting with somefile on the folder
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^somefile.*/', -1, 'relative')) === 4 * 4 * 5);
+
+	    // Test finding all files starting with samefile on the folder
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^samefile.*/', -1, 'relative')) === 0);
+
+	    // Test finding all files named somefile-2.txt on the folder
+	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^somefile-0-0-2.txt$/', -1, 'relative') === ['folder-0-0'.DIRECTORY_SEPARATOR.'somefile-0-0-2.txt']);
+	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^somefile-0-1-2.txt$/', -1, 'relative') === ['folder-0-0'.DIRECTORY_SEPARATOR.'folder-0-1'.DIRECTORY_SEPARATOR.'somefile-0-1-2.txt']);
+	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^somefile-2-2-2.txt$/', -1, 'relative') === ['folder-2-0'.DIRECTORY_SEPARATOR.'folder-2-1'.DIRECTORY_SEPARATOR.'folder-2-2'.DIRECTORY_SEPARATOR.'somefile-2-2-2.txt']);
+
+	    // Test finding all files named *-4.txt on the folder
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^.*-4.txt$/', -1, 'relative')) === 16);
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^.*-4.txt$/', 0, 'relative')) === 0);
+
+	    // Test finding all folders named folder-3-3 on the folder
+	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^folder-3-3$/', -1, 'relative') === ['folder-3-0'.DIRECTORY_SEPARATOR.'folder-3-1'.DIRECTORY_SEPARATOR.'folder-3-2'.DIRECTORY_SEPARATOR.'folder-3-3']);
+	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^folder-1-2$/', -1, 'relative') === ['folder-1-0'.DIRECTORY_SEPARATOR.'folder-1-1'.DIRECTORY_SEPARATOR.'folder-1-2']);
+	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^folder-1-2$/', 0, 'relative') === []);
+
+	    // Test resultFormat = 'absolute'
+
+	    // Test finding all *.txt files on the folder
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', -1, 'absolute')) === 4 * 4 * 5);
+
+	    // Test finding all files or folders on the 1st folder depth
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*$/', 0, 'absolute')) === 4);
+
+	    // Test finding all *.txt files on the 1st 2d and 3d folder depth
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 0, 'absolute')) === 0);
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 1, 'absolute')) === 20);
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 2, 'absolute')) === 40);
+
+	    // Test finding all files starting with somefile on the folder
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^somefile.*/', -1, 'absolute')) === 4 * 4 * 5);
+
+	    // Test finding all files starting with samefile on the folder
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^samefile.*/', -1, 'absolute')) === 0);
+
+	    // Test finding all files named somefile-2.txt on the folder
+	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^somefile-0-0-2.txt$/', -1, 'absolute') === [$this->tempFolder.DIRECTORY_SEPARATOR.'folder-0-0'.DIRECTORY_SEPARATOR.'somefile-0-0-2.txt']);
+	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^somefile-0-1-2.txt$/', -1, 'absolute') === [$this->tempFolder.DIRECTORY_SEPARATOR.'folder-0-0'.DIRECTORY_SEPARATOR.'folder-0-1'.DIRECTORY_SEPARATOR.'somefile-0-1-2.txt']);
+	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^somefile-2-2-2.txt$/', -1, 'absolute') === [$this->tempFolder.DIRECTORY_SEPARATOR.'folder-2-0'.DIRECTORY_SEPARATOR.'folder-2-1'.DIRECTORY_SEPARATOR.'folder-2-2'.DIRECTORY_SEPARATOR.'somefile-2-2-2.txt']);
+
+	    // Test finding all files named *-4.txt on the folder
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^.*-4.txt$/', -1, 'absolute')) === 16);
+	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^.*-4.txt$/', 0, 'absolute')) === 0);
+
+	    // Test finding all folders named folder-3-3 on the folder
+	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^folder-3-3$/', -1, 'absolute') === [$this->tempFolder.DIRECTORY_SEPARATOR.'folder-3-0'.DIRECTORY_SEPARATOR.'folder-3-1'.DIRECTORY_SEPARATOR.'folder-3-2'.DIRECTORY_SEPARATOR.'folder-3-3']);
+	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^folder-1-2$/', -1, 'absolute') === [$this->tempFolder.DIRECTORY_SEPARATOR.'folder-1-0'.DIRECTORY_SEPARATOR.'folder-1-1'.DIRECTORY_SEPARATOR.'folder-1-2']);
+	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^folder-1-2$/', 0, 'absolute') === []);
+
+	    // Test wrong values
+	    // Not necessary
+
+	    // Test exceptions
+	    // Not necessary
 	}
 
 
@@ -706,6 +904,69 @@ class FilesManagerTest extends TestCase {
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
+	}
+
+
+	/**
+	 * testGetDirectorySize
+	 *
+	 * @return void
+	 */
+	public function testGetDirectorySize(){
+
+	    // Test empty values
+	    // TODO
+
+	    // Test ok values
+	    // TODO
+
+	    // Test wrong values
+	    // TODO
+
+	    // Test exceptions
+	    // TODO
+	}
+
+
+	/**
+	 * testCopyDirectory
+	 *
+	 * @return void
+	 */
+	public function testCopyDirectory(){
+
+	    // Test empty values
+	    // TODO
+
+	    // Test ok values
+	    // TODO
+
+	    // Test wrong values
+	    // TODO
+
+	    // Test exceptions
+	    // TODO
+	}
+
+
+	/**
+	 * testSyncDirectories
+	 *
+	 * @return void
+	 */
+	public function testSyncDirectories(){
+
+	    // Test empty values
+	    // TODO
+
+	    // Test ok values
+	    // TODO
+
+	    // Test wrong values
+	    // TODO
+
+	    // Test exceptions
+	    // TODO
 	}
 
 
