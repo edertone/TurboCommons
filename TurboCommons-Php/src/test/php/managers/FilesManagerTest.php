@@ -1069,16 +1069,97 @@ class FilesManagerTest extends TestCase {
 	public function testCopyDirectory(){
 
 	    // Test empty values
-	    // TODO
+	    try {
+	        $this->sut->copyDirectory(null, null);
+	        $this->exceptionMessage = 'null did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->sut->copyDirectory('', '');
+	        $this->exceptionMessage = '"" did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->sut->copyDirectory('       ', '       ');
+	        $this->exceptionMessage = '"      " did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
 	    // Test ok values
-	    // TODO
+
+	    // Create some folder structures
+	    $dir1 = $this->tempFolder.DIRECTORY_SEPARATOR.'dir1';
+	    $dir2 = $this->tempFolder.DIRECTORY_SEPARATOR.'dir2';
+	    $this->createDummyDirectoryStucture($dir1, 4, 4, 'somefile', 5, 'file content');
+	    $this->createDummyDirectoryStucture($dir2, 2, 4, 'somefile', 3, 'asdfasdfasdfasdf');
+
+	    $dest1 = $this->tempFolder.DIRECTORY_SEPARATOR.'dest1';
+	    $dest2 = $this->tempFolder.DIRECTORY_SEPARATOR.'dest2';
+	    $this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'dest1');
+	    $this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'dest2');
+
+	    $this->assertTrue($this->sut->copyDirectory($dir1, $dest1));
+	    $this->assertTrue($this->sut->isDirectoryEqualTo($dir1, $dest1));
+
+	    $this->assertTrue($this->sut->copyDirectory($dest2, $dir1, false));
+	    $this->assertTrue($this->sut->isDirectoryEmpty($dest2));
+	    $this->assertFalse($this->sut->isDirectoryEmpty($dir1));
+	    $this->assertFalse($this->sut->isDirectoryEqualTo($dest2, $dir1));
+
+	    $this->assertTrue($this->sut->copyDirectory($dir1, $dest1, false));
+	    $this->assertTrue($this->sut->isDirectoryEqualTo($dir1, $dest1));
+
+	    $this->assertTrue($this->sut->copyDirectory($dir2, $dest1, false));
+	    $this->assertFalse($this->sut->isDirectoryEqualTo($dir1, $dest1));
 
 	    // Test wrong values
-	    // TODO
+	    try {
+	        $this->sut->copyDirectory($dir1, $dir1);
+	        $this->exceptionMessage = 'copy on same folder did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->sut->copyDirectory($dir1, $dir1, false);
+	        $this->exceptionMessage = 'copy on same folder did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->sut->copyDirectory($dir1, $dest1);
+	        $this->exceptionMessage = 'copy on non empty folder did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->sut->copyDirectory($dir1, $this->tempFolder.DIRECTORY_SEPARATOR.'nonexistant');
+	        $this->exceptionMessage = 'non existant folder did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
 	    // Test exceptions
-	    // TODO
+	    try {
+	        $this->sut->copyDirectory('wrtwrtyeyery');
+	        $this->exceptionMessage = 'wrtwrtyeyery did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->sut->copyDirectory([1,2,3,4]);
+	        $this->exceptionMessage = 'wrtwrtyeyery did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 	}
 
 

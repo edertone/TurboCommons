@@ -563,12 +563,26 @@ class FilesManager extends BaseStrictClass{
 
 
     /**
-     * TODO
+     * Copy all the contents from a source directory to a destination one.
+     * Both source and destination paths must exist.
+     *
+     * @param string $sourcePath The full path to the source directory where files and folders to copy exist
+     * @param string $destPath The full path to the destination directory where files and folders will be copied
+     * @param boolean $destMustBeEmpty if set to true, an exception will be thrown if the destination directory is not empty.
+     *
+     * @throws UnexpectedValueException
+     *
+     * @return boolean True if copy was successful, false otherwise
      */
     public function copyDirectory(string $sourcePath, string $destPath, $destMustBeEmpty = true){
 
         $sourcePath = StringUtils::formatPath($sourcePath, DIRECTORY_SEPARATOR);
         $destPath = StringUtils::formatPath($destPath, DIRECTORY_SEPARATOR);
+
+        if($sourcePath === $destPath){
+
+            throw new UnexpectedValueException('cannot copy a directory into itself: '.$sourcePath);
+        }
 
         if($destMustBeEmpty && !$this->isDirectoryEmpty($destPath)){
 
@@ -587,7 +601,7 @@ class FilesManager extends BaseStrictClass{
                     return false;
                 }
 
-                if(!$this->copyDirectory($sourceItemPath, $destItemPath)){
+                if(!$this->copyDirectory($sourceItemPath, $destItemPath, $destMustBeEmpty)){
 
                     return false;
                 }
