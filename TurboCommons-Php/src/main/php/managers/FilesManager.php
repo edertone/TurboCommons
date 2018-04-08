@@ -83,13 +83,13 @@ class FilesManager extends BaseStrictClass{
             throw new UnexpectedValueException('Not a file: '.$file2);
         }
 
-        if (filesize($file1) !== filesize($file2) &&
-            md5_file($file1) !== md5_file($file2)){
+        if (filesize($file1) === filesize($file2) &&
+            md5_file($file1) === md5_file($file2)){
 
-                return false;
+                return true;
         }
 
-        return true;
+        return false;
     }
 
 
@@ -587,64 +587,7 @@ class FilesManager extends BaseStrictClass{
 
 
     /**
-     * TODO Implement this
-     */
-    /**
-     * This metod will convert a destination directory into an exact copy of a source one.
-     * All files or folders that are exactly the same on source and dest folders won't be modified.
-     * All files or folders that exist on dest but not on source will be deleted.
-     * Source directory won't be modified in any way by this method.
-     *
-     * @param string $sourcePath
-     * @param string $destPath
-     *
-     * @return boolean True if the process finished successfully, false otherwise.
-     */
-    public function mirrorDirectoryTo(string $sourcePath, string $destPath){
-
-        $sourcePath = StringUtils::formatPath($sourcePath, DIRECTORY_SEPARATOR);
-        $destPath = StringUtils::formatPath($destPath, DIRECTORY_SEPARATOR);
-
-        $sourceItems = $this->getDirectoryList($sourcePath);
-        $destItems = $this->getDirectoryList($destPath);
-
-        for ($i = 0, $l = count($sourceItems); $i < $l; $i++) {
-
-            $sourceItemPath = $sourcePath.DIRECTORY_SEPARATOR.$sourceItems[$i];
-            $targetpath = $destPath.DIRECTORY_SEPARATOR.$sourceItems[$i];
-
-            if(in_array($sourceItems[$i], $destItems, true)){
-
-                if(is_dir($sourceItemPath)){
-
-                }else{
-
-
-                }
-
-            }else{
-
-                if(is_dir($sourceItemPath)){
-
-                    if(!$this->createDirectory($sourcePath, $targetpath) ||
-                       !$this->copyDirectory($sourcePath, $targetpath)){
-
-                        return false;
-                    }
-
-                }else{
-
-                    $this->copyFile($sourceItemPath, $destPath.DIRECTORY_SEPARATOR.$sourceItems[$i]);
-                }
-            }
-        }
-
-        return true;
-    }
-
-
-    /**
-     * TODO
+     * TODO implement this method
      */
     public function syncDirectories(string $path1, string $path2){
 

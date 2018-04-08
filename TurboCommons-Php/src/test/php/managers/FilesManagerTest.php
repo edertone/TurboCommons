@@ -212,18 +212,67 @@ class FilesManagerTest extends TestCase {
 	public function testIsFileEqualTo(){
 
 	    // Test empty values
-	    // TODO
+	    try {
+	        $this->sut->isFileEqualTo(null, null);
+	        $this->exceptionMessage = 'null did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->sut->isFileEqualTo('', '');
+	        $this->exceptionMessage = 'new stdClass() did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->sut->isFileEqualTo(0, 0);
+	        $this->exceptionMessage = '0 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
 	    // Test ok values
-	    // TODO
+
+	    // Create some files
+	    $file1 = $this->tempFolder.DIRECTORY_SEPARATOR.'file1';
+	    $file2 = $this->tempFolder.DIRECTORY_SEPARATOR.'file2';
+	    $file3 = $this->tempFolder.DIRECTORY_SEPARATOR.'file3';
+	    $file4 = $this->tempFolder.DIRECTORY_SEPARATOR.'file4';
+	    $this->assertTrue($this->sut->createFile($file1, 'file 1'));
+	    $this->assertTrue($this->sut->createFile($file2, 'file 2'));
+	    $this->assertTrue($this->sut->createFile($file3, 'file 3'));
+	    $this->assertTrue($this->sut->createFile($file4, 'file 1'));
+
+	    $this->assertTrue($this->sut->isFileEqualTo($file1, $file1));
+	    $this->assertFalse($this->sut->isFileEqualTo($file1, $file2));
+	    $this->assertFalse($this->sut->isFileEqualTo($file2, $file3));
+	    $this->assertFalse($this->sut->isFileEqualTo($file3, $file4));
+	    $this->assertTrue($this->sut->isFileEqualTo($file1, $file4));
 
 	    // Test wrong values
-	    // TODO
-
 	    // Test exceptions
-	    // TODO
+	    try {
+	        $this->sut->isFileEqualTo($file3, $this->tempFolder);
+	        $this->exceptionMessage = 'tempFolder did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
-	    $this->markTestIncomplete('This test has not been implemented yet.');
+	    try {
+	        $this->sut->isFileEqualTo($file3, 'etrtert');
+	        $this->exceptionMessage = 'etrtert did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->sut->isFileEqualTo('http://www.google.com', $file3);
+	        $this->exceptionMessage = 'http://www.google.com did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 	}
 
 
@@ -1183,27 +1232,6 @@ class FilesManagerTest extends TestCase {
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
-	}
-
-
-	/**
-	 * testMirrorDirectoryTo
-	 *
-	 * @return void
-	 */
-	public function testMirrorDirectoryTo(){
-
-	    // Test empty values
-	    // TODO
-
-	    // Test ok values
-	    // TODO
-
-	    // Test wrong values
-	    // TODO
-
-	    // Test exceptions
-	    // TODO
 	}
 
 
