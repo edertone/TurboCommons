@@ -32,7 +32,7 @@ export class ArrayUtils {
     
 
 	/**
-	 * Check if two provided arrays are identical
+	 * Check if two provided arrays are identical (have exactly the same elements and in the same order).
 	 * 
 	 * @param array1 First array to compare
 	 * @param array2 Second array to compare
