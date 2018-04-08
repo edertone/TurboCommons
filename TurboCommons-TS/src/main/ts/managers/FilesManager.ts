@@ -18,6 +18,17 @@ import { StringUtils } from '../utils/StringUtils';
  *       File system functionalities are not available at the browser.
  */
 export class FilesManager{
+
+
+    /**
+     * Gives us the current OS directory separator character, so we can build cross platform file paths
+     *
+     * @return The current OS directory separator character
+     */
+    dirSep(){
+
+        return this.path.sep;
+    }
     
     
     /**
@@ -92,6 +103,13 @@ export class FilesManager{
     }
     
     
+    // TODO - translate from php
+    isDirectoryEqualTo(){
+
+        // TODO - translate from php
+    }
+    
+    
     /**
      * Checks if the specified folder is empty
      *
@@ -101,33 +119,14 @@ export class FilesManager{
      */
     isDirectoryEmpty(path: string) {
 
-        if (!this.isDirectory(path)){
-
-            throw new Error('path does not exist: ' + path);
-        }
-
-        let files = this.getDirectoryList(path);
-
-        for (let file of files) {
-            
-            if (file !== '.' && file !== '..') {
-
-                return false;
-            }
-        }
-
-        return true;
+        return this.getDirectoryList(path).length <= 0;
     }
+    
+    
+    // TODO - translate from php
+    findDirectoryItems(){
 
-
-    /**
-     * Gives us the current OS directory separator character, so we can build cross platform file paths
-     *
-     * @return The current OS directory separator character
-     */
-    dirSep(){
-
-        return this.path.sep;
+        // TODO - translate from php
     }
 
 
@@ -382,7 +381,7 @@ export class FilesManager{
      *
      * @return The list of item names inside the specified path sorted as requested, or an empty array if no items found inside the folder.
      */
-    getDirectoryList(path: string, sort = ''){
+    getDirectoryList(path: string, sort = ''): string[]{
 
         // TODO - code is temporary. adapt from the PHP version
         
@@ -391,7 +390,7 @@ export class FilesManager{
 
 
     /**
-     * Calculate the full size in bytes for a specified folder.
+     * Calculate the full size in bytes for a specified folder and all its contents.
      *
      * @param path Full path to the directory we want to calculate its size
      *
@@ -401,32 +400,39 @@ export class FilesManager{
 
         let result = 0;
 
-        // If folder does not exist, we will throw an exception
-        if(!this.isDirectory(path)){
-
-            throw new Error('Specified path <' + path + '> does not exist or is not a directory');
-        }
-
-        let contents = this.getDirectoryList(path);
-        
-        for (let fileOrDir of contents) {
+        for (let fileOrDir of this.getDirectoryList(path)) {
 
             let fileOrDirPath = path + this.dirSep() + fileOrDir;
 
-            if(fileOrDir !== '.' && fileOrDir !== '..'){
+            if (this.isDirectory(fileOrDirPath)) {
 
-                if (this.isDirectory(fileOrDirPath)) {
+                result += this.getDirectorySize(fileOrDirPath);
 
-                    result += this.getDirectorySize(fileOrDirPath);
+            }else {
 
-                }else {
-
-                    result += this.getFileSize(fileOrDirPath);
-                }
+                result += this.getFileSize(fileOrDirPath);
             }
         }
 
         return result;
+    }
+    
+    
+    /**
+     * TODO - translate from php
+     */
+    copyDirectory(){
+
+        // TODO - translate from php
+    }
+
+
+    /**
+     * TODO - translate from php
+     */
+    syncDirectories(){
+
+        // TODO - translate from php
     }
 
 
@@ -448,25 +454,20 @@ export class FilesManager{
             return false;
         }
 
-        let files = this.getDirectoryList(path);
+        for (let file of this.getDirectoryList(path)) {
+  
+            if(this.isDirectory(path + this.dirSep() + file)){
 
-        for (let file of files) {
+                if(!this.deleteDirectory(path + this.dirSep() + file)){
 
-            if(file !== '.' && file !== '..'){
+                    return false;
+                }
 
-                if(this.isDirectory(path + this.dirSep() + file)){
+            }else{
 
-                    if(!this.deleteDirectory(path + this.dirSep() + file)){
+                if(!this.deleteFile(path + this.dirSep() + file)){
 
-                        return false;
-                    }
-
-                }else{
-
-                    if(!this.deleteFile(path + this.dirSep() + file)){
-
-                        return false;
-                    }
+                    return false;
                 }
             }
         }
@@ -506,9 +507,12 @@ export class FilesManager{
     }
 
 
-    /** TODO */
+    /**
+     * TODO - translate from php
+     */
     createTempFile(){
 
+        // TODO - translate from php
     }
 
 
