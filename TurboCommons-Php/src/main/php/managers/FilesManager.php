@@ -16,6 +16,7 @@ use Exception;
 use UnexpectedValueException;
 use org\turbocommons\src\main\php\utils\StringUtils;
 use org\turbocommons\src\main\php\model\BaseStrictClass;
+use org\turbocommons\src\main\php\utils\ArrayUtils;
 
 
 /**
@@ -86,6 +87,57 @@ class FilesManager extends BaseStrictClass{
 
 
     /**
+     * Check if two directories contain exactly the same folder structure and files.
+     *
+     * @param string $sourcePath The full path to the source directory to compare
+     * @param string $destPath The full path to the destination directory to compare
+     *
+     * @return bool true if both paths are valid directories and contain exactly the same files and folders tree.
+     */
+    public function isDirectoryEqualTo($sourcePath, $destPath){
+
+        $sourcePath = StringUtils::formatPath($sourcePath, DIRECTORY_SEPARATOR);
+        $destPath = StringUtils::formatPath($destPath, DIRECTORY_SEPARATOR);
+
+        $sourceItems = $this->getDirectoryList($sourcePath);
+        $destItems = $this->getDirectoryList($destPath);
+
+        sort($sourceItems);
+        sort($destItems);
+
+        // Both paths must contain exactly the same items
+        if(!ArrayUtils::isEqualTo($sourceItems, $destItems)){
+
+            return false;
+        }
+
+        for ($i = 0, $l = count($sourceItems); $i < $l; $i++) {
+
+            $sourceItemPath = $sourcePath.DIRECTORY_SEPARATOR.$sourceItems[$i];
+            $destItemPath = $destPath.DIRECTORY_SEPARATOR.$destItems[$i];
+
+            if(is_dir($sourceItemPath)){
+
+                if(!$this->isDirectoryEqualTo($sourceItemPath, $destItemPath)){
+
+                    return false;
+                }
+
+            }else{
+
+                if (filesize($sourceItemPath) !== filesize($destItemPath) &&
+                    md5_file($sourceItemPath) !== md5_file($destItemPath)){
+
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+
+    /**
      * Checks if the specified folder is empty
      *
      * @param string $path The path to the directory we want to check
@@ -110,19 +162,19 @@ class FilesManager extends BaseStrictClass{
      *        /text/       - Match all files or folders which name contains 'text'<br>
      *        /^file\.txt$/ - Match all files or folders which name is exactly 'file.txt'
      *
-     * @param boolean $depth Defines the maximum number of subfolders where the search will be performed:<br>
+     * @param string $returnFormat Defines how will be returned the array of results. Three values are possible:<br>
+     *        - If set to 'name' each result element will contain its file (with extension) or folder name<br>
+     *        - If set to 'relative' each result element will contain its file (with extension) or folder name plus its path relative to the search root<br>
+     *        - If set to 'absolute' each result element will contain its file (with extension) or folder name plus its full OS absolute path
+     *
+     * @param int $depth Defines the maximum number of subfolders where the search will be performed:<br>
      *        - If set to -1 the search will be performed on the whole folder contents<br>
      *        - If set to 0 the search will be performed only on the path root elements<br>
      *        - If set to 2 the search will be performed on the root, first and second depth level of subfolders
      *
-     * @param string $returnFormat Defines how will be returned the array of results. Three values are possible:<br>
-*             - If set to 'name' each result element will contain its file (with extension) or folder name<br>
-     *        - If set to 'relative' each result element will contain its file (with extension) or folder name plus its path relative to the search root<br>
-     *        - If set to 'absolute' each result element will contain its file (with extension) or folder name plus its full OS absolute path
-     *
      * @return array A list formatted as defined in returnFormat, with all the elements that meet the search criteria
      */
-    public function findDirectoryItems($path, string $searchRegexp, $depth = -1, $returnFormat = 'relative'){
+    public function findDirectoryItems($path, string $searchRegexp, string $returnFormat = 'relative', int $depth = -1){
 
         $result = [];
         $path = StringUtils::formatPath($path, DIRECTORY_SEPARATOR);
@@ -138,7 +190,7 @@ class FilesManager extends BaseStrictClass{
 
             if($depth !== 0 && is_dir($fileOrDirPath)){
 
-                $result = array_merge($result, $this->findDirectoryItems($fileOrDirPath, $searchRegexp, $depth - 1, 'absolute'));
+                $result = array_merge($result, $this->findDirectoryItems($fileOrDirPath, $searchRegexp, 'absolute', $depth - 1));
             }
         }
 
@@ -424,9 +476,7 @@ class FilesManager extends BaseStrictClass{
         $result = [];
         $sortRes = [];
 
-        $dirIterator = new DirectoryIterator($path);
-
-        foreach ($dirIterator as $fileInfo){
+        foreach (new DirectoryIterator($path) as $fileInfo){
 
             if(!$fileInfo->isDot()){
 
@@ -484,7 +534,7 @@ class FilesManager extends BaseStrictClass{
 
 
     /**
-     * Calculate the full size in bytes for a specified folder.
+     * Calculate the full size in bytes for a specified folder and all its contents.
      *
      * @param string $path Full path to the directory we want to calculate its size
      *
@@ -494,9 +544,7 @@ class FilesManager extends BaseStrictClass{
 
         $result = 0;
 
-        $contents = $this->getDirectoryList($path);
-
-        foreach ($contents as $fileOrDir){
+        foreach ($this->getDirectoryList($path) as $fileOrDir){
 
             $fileOrDirPath = $path.DIRECTORY_SEPARATOR.$fileOrDir;
 
@@ -527,9 +575,7 @@ class FilesManager extends BaseStrictClass{
             throw new UnexpectedValueException('destPath must be empty');
         }
 
-        $contents = $this->getDirectoryList($sourcePath);
-
-        foreach ($contents as $sourceItem){
+        foreach ($this->getDirectoryList($sourcePath) as $sourceItem){
 
             $sourceItemPath = $sourcePath.DIRECTORY_SEPARATOR.$sourceItem;
             $destItemPath = $destPath.DIRECTORY_SEPARATOR.$sourceItem;
@@ -573,9 +619,7 @@ class FilesManager extends BaseStrictClass{
         $this->copyDirectory($sourcePath, $destPath);
 
         // Delete all dest items that do not exist on source
-        $destContents = $this->getDirectoryList($destPath);
-
-        foreach ($destContents as $destItem){
+        foreach ($this->getDirectoryList($destPath) as $destItem){
 
             $sourceItemPath = $sourcePath.DIRECTORY_SEPARATOR.$destItem;
             $destItemPath = $destPath.DIRECTORY_SEPARATOR.$destItem;
@@ -623,9 +667,7 @@ class FilesManager extends BaseStrictClass{
             return false;
         }
 
-        $dirIterator = new DirectoryIterator($path);
-
-        foreach ($dirIterator as $fileInfo){
+        foreach (new DirectoryIterator($path) as $fileInfo){
 
             if(!$fileInfo->isDot()){
 
