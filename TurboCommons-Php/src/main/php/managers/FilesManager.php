@@ -62,6 +62,38 @@ class FilesManager extends BaseStrictClass{
 
 
     /**
+     * Check if two provided files are identical
+     *
+     * @param string $file1 The first file to compare
+     * @param string $file2 The second file to compare
+     *
+     * @throws UnexpectedValueException
+     *
+     * @return boolean True if both files are identical, false otherwise
+     */
+    public function isFileEqualTo($file1, $file2){
+
+        if(!is_file($file1)){
+
+            throw new UnexpectedValueException('Not a file: '.$file1);
+        }
+
+        if(!is_file($file2)){
+
+            throw new UnexpectedValueException('Not a file: '.$file2);
+        }
+
+        if (filesize($file1) !== filesize($file2) &&
+            md5_file($file1) !== md5_file($file2)){
+
+                return false;
+        }
+
+        return true;
+    }
+
+
+    /**
      * Check if the specified path is a directory or not.
      *
      * @param string $path An Operating system path to test
@@ -89,47 +121,39 @@ class FilesManager extends BaseStrictClass{
     /**
      * Check if two directories contain exactly the same folder structure and files.
      *
-     * @param string $sourcePath The full path to the source directory to compare
-     * @param string $destPath The full path to the destination directory to compare
+     * @param string $path1 The full path to the first directory to compare
+     * @param string $path2 The full path to the second directory to compare
      *
      * @return bool true if both paths are valid directories and contain exactly the same files and folders tree.
      */
-    public function isDirectoryEqualTo($sourcePath, $destPath){
+    public function isDirectoryEqualTo($path1, $path2){
 
-        $sourcePath = StringUtils::formatPath($sourcePath, DIRECTORY_SEPARATOR);
-        $destPath = StringUtils::formatPath($destPath, DIRECTORY_SEPARATOR);
+        $path1 = StringUtils::formatPath($path1, DIRECTORY_SEPARATOR);
+        $path2 = StringUtils::formatPath($path2, DIRECTORY_SEPARATOR);
 
-        $sourceItems = $this->getDirectoryList($sourcePath);
-        $destItems = $this->getDirectoryList($destPath);
+        $path1Items = $this->getDirectoryList($path1, 'nameAsc');
+        $path2Items = $this->getDirectoryList($path2, 'nameAsc');
 
-        sort($sourceItems);
-        sort($destItems);
-
-        // Both paths must contain exactly the same items
-        if(!ArrayUtils::isEqualTo($sourceItems, $destItems)){
+        // Both paths must be exactly the same
+        if(!ArrayUtils::isEqualTo($path1Items, $path2Items)){
 
             return false;
         }
 
-        for ($i = 0, $l = count($sourceItems); $i < $l; $i++) {
+        for ($i = 0, $l = count($path1Items); $i < $l; $i++) {
 
-            $sourceItemPath = $sourcePath.DIRECTORY_SEPARATOR.$sourceItems[$i];
-            $destItemPath = $destPath.DIRECTORY_SEPARATOR.$destItems[$i];
+            $item1Path = $path1.DIRECTORY_SEPARATOR.$path1Items[$i];
+            $item2Path = $path2.DIRECTORY_SEPARATOR.$path2Items[$i];
+            $isItem1ADir = is_dir($item1Path);
 
-            if(is_dir($sourceItemPath)){
+            if($isItem1ADir && !$this->isDirectoryEqualTo($item1Path, $item2Path)){
 
-                if(!$this->isDirectoryEqualTo($sourceItemPath, $destItemPath)){
+                return false;
+            }
 
-                    return false;
-                }
+            if (!$isItem1ADir && !$this->isFileEqualTo($item1Path, $item2Path)){
 
-            }else{
-
-                if (filesize($sourceItemPath) !== filesize($destItemPath) &&
-                    md5_file($sourceItemPath) !== md5_file($destItemPath)){
-
-                    return false;
-                }
+                return false;
             }
         }
 
@@ -199,14 +223,9 @@ class FilesManager extends BaseStrictClass{
 
             for ($i = 0, $l = count($result); $i < $l; $i++){
 
-                if($returnFormat === 'name'){
-
-                    $result[$i] = StringUtils::getFileNameWithExtension($result[$i]);
-
-                }else{
-
-                    $result[$i] = StringUtils::replace($result[$i], $path.DIRECTORY_SEPARATOR, '');
-                }
+                $result[$i] = ($returnFormat === 'name') ?
+                    StringUtils::getFileNameWithExtension($result[$i]) :
+                    StringUtils::replace($result[$i], $path.DIRECTORY_SEPARATOR, '');
             }
         }
 
@@ -242,6 +261,8 @@ class FilesManager extends BaseStrictClass{
                                             string $separator = '-',
                                             bool $isPrefix = false){
 
+        $path = StringUtils::formatPath($path, DIRECTORY_SEPARATOR);
+
         if (!$this->isDirectory($path)){
 
             throw new UnexpectedValueException('path does not exist: '.$path);
@@ -249,7 +270,6 @@ class FilesManager extends BaseStrictClass{
 
         $i = 1;
         $result = ($desiredName == '' ? $i : $desiredName);
-        $path = StringUtils::formatPath($path, DIRECTORY_SEPARATOR);
 
         while(is_dir($path.DIRECTORY_SEPARATOR.$result) ||
               is_file($path.DIRECTORY_SEPARATOR.$result)){
@@ -291,13 +311,14 @@ class FilesManager extends BaseStrictClass{
                                         string $separator = '-',
                                         bool $isPrefix = false){
 
+        $path = StringUtils::formatPath($path, DIRECTORY_SEPARATOR);
+
         if (!$this->isDirectory($path)){
 
             throw new UnexpectedValueException('path does not exist: '.$path);
         }
 
         $i = 1;
-        $path = StringUtils::formatPath($path, DIRECTORY_SEPARATOR);
         $result = ($desiredName == '' ? $i : $desiredName);
         $extension = StringUtils::getFileExtension($desiredName);
 
@@ -315,54 +336,6 @@ class FilesManager extends BaseStrictClass{
         }
 
         return $result;
-    }
-
-
-    /**
-     * Auxiliary method that is used by the findUniqueFileName and findUniqueDirectoryName methods
-     *
-     * @param int $i Current index for the name generation
-     * @param string $desiredName Desired name as used on the parent method
-     * @param string $text text name as used on the parent method
-     * @param string $separator separator name as used on the parent method
-     * @param bool $isPrefix isPrefix name as used on the parent method
-     *
-     * @return string The generated name
-     */
-    private function _generateUniqueNameAux(int $i, string $desiredName, string $text, string $separator, bool $isPrefix){
-
-        $result = [];
-
-        if($isPrefix){
-
-            if($text !== ''){
-
-                $result[] = $text;
-            }
-
-            $result[] = $i;
-
-            if($desiredName !== ''){
-
-                $result[] = $desiredName;
-            }
-
-        }else{
-
-            if($desiredName !== ''){
-
-                $result[] = $desiredName;
-            }
-
-            if($text !== ''){
-
-                $result[] = $text;
-            }
-
-            $result[] = $i;
-        }
-
-        return implode($separator, $result);
     }
 
 
@@ -526,7 +499,6 @@ class FilesManager extends BaseStrictClass{
 
                     throw new UnexpectedValueException('Unknown sort method');
                 }
-
         }
 
         return $result;
@@ -548,14 +520,9 @@ class FilesManager extends BaseStrictClass{
 
             $fileOrDirPath = $path.DIRECTORY_SEPARATOR.$fileOrDir;
 
-            if (is_dir($fileOrDirPath)) {
-
-                $result += $this->getDirectorySize($fileOrDirPath);
-
-            }else {
-
-                $result += $this->getFileSize($fileOrDirPath);
-            }
+            $result += is_dir($fileOrDirPath) ?
+                $this->getDirectorySize($fileOrDirPath) :
+                $this->getFileSize($fileOrDirPath);
         }
 
         return $result;
@@ -620,46 +587,68 @@ class FilesManager extends BaseStrictClass{
 
 
     /**
-     * TODO mode will tell how sync works: left to right or both
+     * TODO Implement this
      */
-    public function syncDirectories(string $sourcePath, string $destPath, string $mode){
+    /**
+     * This metod will convert a destination directory into an exact copy of a source one.
+     * All files or folders that are exactly the same on source and dest folders won't be modified.
+     * All files or folders that exist on dest but not on source will be deleted.
+     * Source directory won't be modified in any way by this method.
+     *
+     * @param string $sourcePath
+     * @param string $destPath
+     *
+     * @return boolean True if the process finished successfully, false otherwise.
+     */
+    public function mirrorDirectoryTo(string $sourcePath, string $destPath){
 
         $sourcePath = StringUtils::formatPath($sourcePath, DIRECTORY_SEPARATOR);
         $destPath = StringUtils::formatPath($destPath, DIRECTORY_SEPARATOR);
 
-        // Copy all the source directory to dest
-        // TODO - this does not look like an efficient idea. Every time the recursive method is called,
-        //        the full folder copy will be executed again...
-        $this->copyDirectory($sourcePath, $destPath);
+        $sourceItems = $this->getDirectoryList($sourcePath);
+        $destItems = $this->getDirectoryList($destPath);
 
-        // Delete all dest items that do not exist on source
-        foreach ($this->getDirectoryList($destPath) as $destItem){
+        for ($i = 0, $l = count($sourceItems); $i < $l; $i++) {
 
-            $sourceItemPath = $sourcePath.DIRECTORY_SEPARATOR.$destItem;
-            $destItemPath = $destPath.DIRECTORY_SEPARATOR.$destItem;
+            $sourceItemPath = $sourcePath.DIRECTORY_SEPARATOR.$sourceItems[$i];
+            $targetpath = $destPath.DIRECTORY_SEPARATOR.$sourceItems[$i];
 
-            if(!$this->findDirectoryItems($destItem, $sourcePath)){
+            if(in_array($sourceItems[$i], $destItems, true)){
 
-                if(is_dir($destItemPath) && !$this->deleteDirectory($destItemPath)){
+                if(is_dir($sourceItemPath)){
 
-                    return false;
-                }
+                }else{
 
-                if(is_file($destItemPath) && !$this->deleteFile($destItemPath)){
 
-                    return false;
                 }
 
             }else{
 
-                if(is_dir($destItemPath) && !$this->syncDirectories($sourceItemPath, $destItemPath)){
+                if(is_dir($sourceItemPath)){
 
-                    return false;
+                    if(!$this->createDirectory($sourcePath, $targetpath) ||
+                       !$this->copyDirectory($sourcePath, $targetpath)){
+
+                        return false;
+                    }
+
+                }else{
+
+                    $this->copyFile($sourceItemPath, $destPath.DIRECTORY_SEPARATOR.$sourceItems[$i]);
                 }
             }
         }
 
         return true;
+    }
+
+
+    /**
+     * TODO
+     */
+    public function syncDirectories(string $path1, string $path2){
+
+        // TODO - this method will modify both directories so they merge all files from one side to the other
     }
 
 
@@ -929,6 +918,54 @@ class FilesManager extends BaseStrictClass{
         }
 
         return $result;
+    }
+
+
+    /**
+     * Auxiliary method that is used by the findUniqueFileName and findUniqueDirectoryName methods
+     *
+     * @param int $i Current index for the name generation
+     * @param string $desiredName Desired name as used on the parent method
+     * @param string $text text name as used on the parent method
+     * @param string $separator separator name as used on the parent method
+     * @param bool $isPrefix isPrefix name as used on the parent method
+     *
+     * @return string The generated name
+     */
+    private function _generateUniqueNameAux(int $i, string $desiredName, string $text, string $separator, bool $isPrefix){
+
+        $result = [];
+
+        if($isPrefix){
+
+            if($text !== ''){
+
+                $result[] = $text;
+            }
+
+            $result[] = $i;
+
+            if($desiredName !== ''){
+
+                $result[] = $desiredName;
+            }
+
+        }else{
+
+            if($desiredName !== ''){
+
+                $result[] = $desiredName;
+            }
+
+            if($text !== ''){
+
+                $result[] = $text;
+            }
+
+            $result[] = $i;
+        }
+
+        return implode($separator, $result);
     }
 }
 

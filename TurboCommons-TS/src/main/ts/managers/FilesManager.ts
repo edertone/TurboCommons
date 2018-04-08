@@ -78,6 +78,13 @@ export class FilesManager{
     }
     
     
+    // TODO - translate from php
+    isFileEqualTo(){
+
+        // TODO - translate from php
+    }
+    
+    
     /**
      * Check if the specified path is a directory or not.
      *
@@ -158,6 +165,8 @@ export class FilesManager{
                             separator = '-',
                             isPrefix = false){
 
+        path = StringUtils.formatPath(path, this.dirSep());
+        
         if (!this.isDirectory(path)){
 
             throw new Error('path does not exist: ' + path);
@@ -165,7 +174,6 @@ export class FilesManager{
         
         let i = 1;
         let result = (desiredName == '' ? i : desiredName);
-        path = StringUtils.formatPath(path, this.dirSep());
         
         while(this.isDirectory(path + this.dirSep() + result) ||
               this.isFile(path + this.dirSep() + result)){
@@ -207,13 +215,14 @@ export class FilesManager{
                        separator = '-',
                        isPrefix = false){
 
+        path = StringUtils.formatPath(path, this.dirSep());
+        
         if (!this.isDirectory(path)){
 
             throw new Error('path does not exist: ' + path);
         }
         
         let i = 1;
-        path = StringUtils.formatPath(path, this.dirSep());
         let result = (desiredName == '' ? i : desiredName);
         let extension = StringUtils.getFileExtension(desiredName);
 
@@ -231,54 +240,6 @@ export class FilesManager{
         }
 
         return result;
-    }
-
-
-    /**
-     * Auxiliary method that is used by the findUniqueFileName and findUniqueDirectoryName methods
-     *
-     * @param i Current index for the name generation
-     * @param desiredName Desired name as used on the parent method
-     * @param text text name as used on the parent method
-     * @param separator separator name as used on the parent method
-     * @param isPrefix isPrefix name as used on the parent method
-     *
-     * @return The generated name
-     */
-    private _generateUniqueNameAux(i: number, desiredName: string, text: string, separator: string, isPrefix: boolean){
-
-        let result: string[] = [];
-
-        if(isPrefix){
-
-            if(text !== ''){
-
-                result.push(text);
-            }
-
-            result.push(String(i));
-
-            if(desiredName !== ''){
-
-                result.push(desiredName);
-            }
-
-        }else{
-
-            if(desiredName !== ''){
-
-                result.push(desiredName);
-            }
-
-            if(text !== ''){
-
-                result.push(text);
-            }
-
-            result.push(String(i));
-        }
-
-        return result.join(separator);
     }
 
 
@@ -404,14 +365,9 @@ export class FilesManager{
 
             let fileOrDirPath = path + this.dirSep() + fileOrDir;
 
-            if (this.isDirectory(fileOrDirPath)) {
-
-                result += this.getDirectorySize(fileOrDirPath);
-
-            }else {
-
-                result += this.getFileSize(fileOrDirPath);
-            }
+            result += this.isDirectory(fileOrDirPath) ?
+                    this.getDirectorySize(fileOrDirPath) :
+                    this.getFileSize(fileOrDirPath);
         }
 
         return result;
@@ -422,6 +378,15 @@ export class FilesManager{
      * TODO - translate from php
      */
     copyDirectory(){
+
+        // TODO - translate from php
+    }
+    
+    
+    /**
+     * TODO - translate from php
+     */
+    mirrorDirectoryTo(){
 
         // TODO - translate from php
     }
@@ -625,5 +590,53 @@ export class FilesManager{
             
             return false;
         }
+    }
+    
+    
+    /**
+     * Auxiliary method that is used by the findUniqueFileName and findUniqueDirectoryName methods
+     *
+     * @param i Current index for the name generation
+     * @param desiredName Desired name as used on the parent method
+     * @param text text name as used on the parent method
+     * @param separator separator name as used on the parent method
+     * @param isPrefix isPrefix name as used on the parent method
+     *
+     * @return The generated name
+     */
+    private _generateUniqueNameAux(i: number, desiredName: string, text: string, separator: string, isPrefix: boolean){
+
+        let result: string[] = [];
+
+        if(isPrefix){
+
+            if(text !== ''){
+
+                result.push(text);
+            }
+
+            result.push(String(i));
+
+            if(desiredName !== ''){
+
+                result.push(desiredName);
+            }
+
+        }else{
+
+            if(desiredName !== ''){
+
+                result.push(desiredName);
+            }
+
+            if(text !== ''){
+
+                result.push(text);
+            }
+
+            result.push(String(i));
+        }
+
+        return result.join(separator);
     }
 }

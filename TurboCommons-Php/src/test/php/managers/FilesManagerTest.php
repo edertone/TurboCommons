@@ -205,6 +205,29 @@ class FilesManagerTest extends TestCase {
 
 
 	/**
+	 * testIsFileEqualTo
+	 *
+	 * @return void
+	 */
+	public function testIsFileEqualTo(){
+
+	    // Test empty values
+	    // TODO
+
+	    // Test ok values
+	    // TODO
+
+	    // Test wrong values
+	    // TODO
+
+	    // Test exceptions
+	    // TODO
+
+	    $this->markTestIncomplete('This test has not been implemented yet.');
+	}
+
+
+	/**
 	 * testIsDirectory
 	 *
 	 * @return void
@@ -1160,6 +1183,27 @@ class FilesManagerTest extends TestCase {
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
+	}
+
+
+	/**
+	 * testMirrorDirectoryTo
+	 *
+	 * @return void
+	 */
+	public function testMirrorDirectoryTo(){
+
+	    // Test empty values
+	    // TODO
+
+	    // Test ok values
+	    // TODO
+
+	    // Test wrong values
+	    // TODO
+
+	    // Test exceptions
+	    // TODO
 	}
 
 
