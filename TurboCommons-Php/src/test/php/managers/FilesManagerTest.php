@@ -317,26 +317,28 @@ class FilesManagerTest extends TestCase {
 	    $this->assertTrue($this->sut->isDirectoryEqualTo($this->tempFolder, $this->tempFolder));
 
 	    // Create some folder structures
-	    $this->createDummyDirectoryStucture($this->tempFolder.DIRECTORY_SEPARATOR.'dir1', 4, 4, 'somefile', 5, 'file content');
-	    $this->createDummyDirectoryStucture($this->tempFolder.DIRECTORY_SEPARATOR.'dir2', 4, 4, 'somefile', 5, 'file content');
-	    $this->createDummyDirectoryStucture($this->tempFolder.DIRECTORY_SEPARATOR.'dir3', 4, 4, 'somefile', 5, 'file conten');
-	    $this->createDummyDirectoryStucture($this->tempFolder.DIRECTORY_SEPARATOR.'dir4', 8, 2, 'somefile', 2, 'f');
+	    $dir1 = $this->tempFolder.DIRECTORY_SEPARATOR.'dir1';
+	    $dir2 = $this->tempFolder.DIRECTORY_SEPARATOR.'dir2';
+	    $dir3 = $this->tempFolder.DIRECTORY_SEPARATOR.'dir3';
+	    $dir4 = $this->tempFolder.DIRECTORY_SEPARATOR.'dir4';
+	    $this->createDummyDirectoryStucture($dir1, 4, 4, 'somefile', 5, 'file content');
+	    $this->createDummyDirectoryStucture($dir2, 4, 4, 'somefile', 5, 'file content');
+	    $this->createDummyDirectoryStucture($dir3, 4, 4, 'somefile', 5, 'file conten');
+	    $this->createDummyDirectoryStucture($dir4, 8, 2, 'somefile', 2, 'f');
 
-	    $this->assertTrue($this->sut->isDirectoryEqualTo($this->tempFolder.DIRECTORY_SEPARATOR.'dir1', $this->tempFolder.DIRECTORY_SEPARATOR.'dir1'));
-	    $this->assertTrue($this->sut->isDirectoryEqualTo($this->tempFolder.DIRECTORY_SEPARATOR.'dir1', $this->tempFolder.DIRECTORY_SEPARATOR.'dir2'));
-	    $this->assertTrue($this->sut->isDirectoryEqualTo($this->tempFolder.DIRECTORY_SEPARATOR.'dir2', $this->tempFolder.DIRECTORY_SEPARATOR.'dir2'));
-	    $this->assertTrue($this->sut->isDirectoryEqualTo($this->tempFolder.DIRECTORY_SEPARATOR.'dir3', $this->tempFolder.DIRECTORY_SEPARATOR.'dir3'));
-	    $this->assertTrue($this->sut->isDirectoryEqualTo($this->tempFolder.DIRECTORY_SEPARATOR.'dir4', $this->tempFolder.DIRECTORY_SEPARATOR.'dir4'));
+	    $this->assertTrue($this->sut->isDirectoryEqualTo($dir1, $dir1));
+	    $this->assertTrue($this->sut->isDirectoryEqualTo($dir1, $dir2));
+	    $this->assertTrue($this->sut->isDirectoryEqualTo($dir2, $dir2));
+	    $this->assertTrue($this->sut->isDirectoryEqualTo($dir3, $dir3));
+	    $this->assertTrue($this->sut->isDirectoryEqualTo($dir4, $dir4));
 
-	    $this->assertFalse($this->sut->isDirectoryEqualTo($this->tempFolder.DIRECTORY_SEPARATOR.'dir1', $this->tempFolder.DIRECTORY_SEPARATOR.'dir3'));
-	    $this->assertFalse($this->sut->isDirectoryEqualTo($this->tempFolder.DIRECTORY_SEPARATOR.'dir2', $this->tempFolder.DIRECTORY_SEPARATOR.'dir3'));
-	    $this->assertFalse($this->sut->isDirectoryEqualTo($this->tempFolder.DIRECTORY_SEPARATOR.'dir1', $this->tempFolder.DIRECTORY_SEPARATOR.'dir4'));
-	    $this->assertFalse($this->sut->isDirectoryEqualTo($this->tempFolder.DIRECTORY_SEPARATOR.'dir3', $this->tempFolder.DIRECTORY_SEPARATOR.'dir4'));
+	    $this->assertFalse($this->sut->isDirectoryEqualTo($dir1, $dir3));
+	    $this->assertFalse($this->sut->isDirectoryEqualTo($dir2, $dir3));
+	    $this->assertFalse($this->sut->isDirectoryEqualTo($dir1, $dir4));
+	    $this->assertFalse($this->sut->isDirectoryEqualTo($dir3, $dir4));
 
-	    $file1 = $this->sut->findDirectoryItems($this->tempFolder.DIRECTORY_SEPARATOR.'dir1', '/^somefile-0-0-0\.txt$/', 'absolute')[0];
-	    $this->assertTrue($this->sut->deleteFile($file1));
-
-	    $this->assertFalse($this->sut->isDirectoryEqualTo($this->tempFolder.DIRECTORY_SEPARATOR.'dir1', $this->tempFolder.DIRECTORY_SEPARATOR.'dir2'));
+	    $this->sut->deleteFiles($this->sut->findDirectoryItems($dir1, '/^somefile-0-0-0\.txt$/', 'absolute'));
+	    $this->assertFalse($this->sut->isDirectoryEqualTo($dir1, $dir2));
 
 	    // Test wrong values
 	    // Test exceptions
@@ -1040,7 +1042,6 @@ class FilesManagerTest extends TestCase {
 	    $this->assertTrue($this->sut->getDirectorySize($this->tempFolder.DIRECTORY_SEPARATOR.'testsize-2') === 10000);
 
 	    $this->assertTrue($this->sut->getDirectorySize($this->tempFolder) === 12960);
-	    // TODO
 
 	    // Test wrong values
 	    // Test exceptions

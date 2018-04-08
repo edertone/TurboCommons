@@ -893,6 +893,29 @@ class FilesManager extends BaseStrictClass{
 
         return unlink($path);
     }
+
+
+    /**
+     * Delete a list of filesystem files.
+     *
+     * @param array $paths A list of filesystem paths to delete
+     *
+     * @return boolean Returns true on success or false if any of the files failed to be deleted
+     */
+    public function deleteFiles(array $paths){
+
+        $result = true;
+
+        for ($i = 0, $l = count($paths); $i < $l; $i++) {
+
+            if(!$this->deleteFile($paths[$i])){
+
+                $result = false;
+            }
+        }
+
+        return $result;
+    }
 }
 
 ?>
