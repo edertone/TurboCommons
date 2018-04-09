@@ -743,64 +743,271 @@ class StringUtilsTest extends TestCase {
 
 
 	/**
-	 * testGetFileNameWithExtension
+	 * testGetPathElement
 	 *
 	 * @return void
 	 */
-	public function testGetFileNameWithExtension(){
+	public function testGetPathElement(){
 
-		$this->assertTrue(StringUtils::getFileNameWithExtension(null) === '');
-		$this->assertTrue(StringUtils::getFileNameWithExtension('') === '');
-		$this->assertTrue(StringUtils::getFileNameWithExtension('       ') === '');
-		$this->assertTrue(StringUtils::getFileNameWithExtension('C:\\Program Files\\CCleaner\\CCleaner64.exe') == 'CCleaner64.exe');
-		$this->assertTrue(StringUtils::getFileNameWithExtension('\\Files/CCleaner/CCleaner64.exe') == 'CCleaner64.exe');
-		$this->assertTrue(StringUtils::getFileNameWithExtension('//folder/folder2/folder3/file.txt') == 'file.txt');
-		$this->assertTrue(StringUtils::getFileNameWithExtension('CCleaner64.exe') == 'CCleaner64.exe');
-		$this->assertTrue(StringUtils::getFileNameWithExtension('\\\\\\CCleaner64.exe') == 'CCleaner64.exe');
-		$this->assertTrue(StringUtils::getFileNameWithExtension('\\some long path containing lots of spaces\\///CCleaner64.exe') == 'CCleaner64.exe');
-		$this->assertTrue(StringUtils::getFileNameWithExtension("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe") == 'CCleaner64.exe');
+	    // Test empty values
+	    $this->assertSame(StringUtils::getPathElement(null), '');
+	    $this->assertSame(StringUtils::getPathElement(''), '');
+	    $this->assertSame(StringUtils::getPathElement('       '), '');
+	    $this->assertSame(StringUtils::getPathElement([]), '');
+
+	    // Test ok values
+	    $this->assertSame(StringUtils::getPathElement('/'), '');
+	    $this->assertSame(StringUtils::getPathElement('///////'), '');
+	    $this->assertSame(StringUtils::getPathElement('\\'), '');
+	    $this->assertSame(StringUtils::getPathElement('folder'), 'folder');
+	    $this->assertSame(StringUtils::getPathElement('//folder'), 'folder');
+	    $this->assertSame(StringUtils::getPathElement('C:\\Program Files\\CCleaner\\CCleaner64.exe'), 'CCleaner64.exe');
+	    $this->assertSame(StringUtils::getPathElement('\\Files/CCleaner/CCleaner64.exe'), 'CCleaner64.exe');
+	    $this->assertSame(StringUtils::getPathElement('//folder/folder2/folder3/file.txt'), 'file.txt');
+	    $this->assertSame(StringUtils::getPathElement('CCleaner64.exe'), 'CCleaner64.exe');
+	    $this->assertSame(StringUtils::getPathElement('\\\\\\CCleaner64.exe'), 'CCleaner64.exe');
+	    $this->assertSame(StringUtils::getPathElement('\\some long path containing lots of spaces\\///CCleaner64.exe'), 'CCleaner64.exe');
+	    $this->assertSame(StringUtils::getPathElement("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe"), 'CCleaner64.exe');
+	    $this->assertSame(StringUtils::getPathElement("folder1\\\\folder2//folder3///\\\\folder4"), 'folder4');
+	    $this->assertSame(StringUtils::getPathElement('//folder/folder2/folder3/'), 'folder3');
+	    $this->assertSame(StringUtils::getPathElement('https://www.google.es'), 'www.google.es');
+	    $this->assertSame(StringUtils::getPathElement('https://www.google.es//////'), 'www.google.es');
+	    $this->assertSame(StringUtils::getPathElement('https://www.youtube.com/watch?v=bvOGIDiLzMk'), 'watch?v=bvOGIDiLzMk');
+	    $this->assertSame(StringUtils::getPathElement('https://www.google.es/search?q=zero+latency'), 'search?q=zero+latency');
+
+	    $this->assertSame(StringUtils::getPathElement("folder1\\\\folder2//folder3///\\\\folder4", 0), 'folder1');
+	    $this->assertSame(StringUtils::getPathElement("folder1\\\\folder2//folder3///\\\\folder4", 1), 'folder2');
+	    $this->assertSame(StringUtils::getPathElement("folder1\\\\folder2//folder3///\\\\folder4", 2), 'folder3');
+	    $this->assertSame(StringUtils::getPathElement("folder1\\\\folder2//folder3///\\\\folder4", 3), 'folder4');
+	    $this->assertSame(StringUtils::getPathElement('//folder/folder2/folder3/file.txt', 0), 'folder');
+	    $this->assertSame(StringUtils::getPathElement('//folder/folder2/folder3/file.txt', 1), 'folder2');
+	    $this->assertSame(StringUtils::getPathElement('//folder/folder2/folder3/file.txt', 2), 'folder3');
+	    $this->assertSame(StringUtils::getPathElement('//folder/folder2/folder3/file.txt', 3), 'file.txt');
+	    $this->assertSame(StringUtils::getPathElement('https://www.google.es/search?q=zero+latency', 0), 'https:');
+	    $this->assertSame(StringUtils::getPathElement('https://www.google.es/search?q=zero+latency', 1), 'www.google.es');
+	    $this->assertSame(StringUtils::getPathElement('https://www.google.es/search?q=zero+latency', 2), 'search?q=zero+latency');
+	    $this->assertSame(StringUtils::getPathElement('https:\\www.google.es/search?q=zero\\+latency', 0), 'https:');
+	    $this->assertSame(StringUtils::getPathElement('https:\\www.google.es/search?q=zero\\+latency', 1), 'www.google.es');
+	    $this->assertSame(StringUtils::getPathElement('https:\\www.google.es/search?q=zero\\+latency', 2), 'search?q=zero');
+	    $this->assertSame(StringUtils::getPathElement('https:\\www.google.es/search?q=zero\\+latency', 3), '+latency');
+
+	    // Test wrong values
+	    try {
+	        StringUtils::getPathElement('//folder/folder2/folder3/file.txt', 4);
+	        $this->exceptionMessage = 'index 4 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::getPathElement('//folder/folder2/folder3/file.txt', 100);
+	        $this->exceptionMessage = 'index 100 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::getPathElement('//folder/folder2/folder3/file.txt', -10);
+	        $this->exceptionMessage = 'index -10 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    // Test exceptions
+	    try {
+	        StringUtils::getPathElement(['//folder/folder2/folder3/file.txt']);
+	        $this->exceptionMessage = 'array did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::getPathElement(125);
+	        $this->exceptionMessage = '125 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::getPathElement(new stdClass());
+	        $this->exceptionMessage = 'new stdClass() did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 	}
 
 
 	/**
-	 * testGetFileNameWithoutExtension
+	 * testGetPathElementWithoutExt
 	 *
 	 * @return void
 	 */
-	public function testGetFileNameWithoutExtension(){
+	public function testGetPathElementWithoutExt(){
 
-		$this->assertTrue(StringUtils::getFileNameWithoutExtension(null) === '');
-		$this->assertTrue(StringUtils::getFileNameWithoutExtension('') === '');
-		$this->assertTrue(StringUtils::getFileNameWithoutExtension('       ') === '');
-		$this->assertTrue(StringUtils::getFileNameWithoutExtension('C:\\Program Files\\CCleaner\\CCleaner64.exe') == 'CCleaner64');
-		$this->assertTrue(StringUtils::getFileNameWithoutExtension('\\Files/CCleaner/CCleaner64.exe') == 'CCleaner64');
-		$this->assertTrue(StringUtils::getFileNameWithoutExtension('//folder/folder2/folder3/file.txt') == 'file');
-		$this->assertTrue(StringUtils::getFileNameWithoutExtension('CCleaner64.exe') == 'CCleaner64');
-		$this->assertTrue(StringUtils::getFileNameWithoutExtension('\\\\\\CCleaner64.exe') == 'CCleaner64');
-		$this->assertTrue(StringUtils::getFileNameWithoutExtension('\\some long path containing lots of spaces\\///CCleaner64.exe') == 'CCleaner64');
-		$this->assertTrue(StringUtils::getFileNameWithoutExtension("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe") == 'CCleaner64');
-	}
+	    // Test empty values
+	    $this->assertTrue(StringUtils::getPathElementWithoutExt(null) === '');
+	    $this->assertTrue(StringUtils::getPathElementWithoutExt('') === '');
+	    $this->assertTrue(StringUtils::getPathElementWithoutExt('       ') === '');
+	    $this->assertTrue(StringUtils::getPathElementWithoutExt([]) === '');
+
+	    // Test ok values
+	    $this->assertTrue(StringUtils::getPathElementWithoutExt('C:\\Program Files\\CCleaner\\CCleaner64.exe') == 'CCleaner64');
+	    $this->assertTrue(StringUtils::getPathElementWithoutExt('\\Files/CCleaner/CCleaner64.exe') == 'CCleaner64');
+	    $this->assertTrue(StringUtils::getPathElementWithoutExt('//folder/folder2/folder3/file.txt') == 'file');
+	    $this->assertTrue(StringUtils::getPathElementWithoutExt('CCleaner64.exe') == 'CCleaner64');
+	    $this->assertTrue(StringUtils::getPathElementWithoutExt('\\\\\\CCleaner64.exe') == 'CCleaner64');
+	    $this->assertTrue(StringUtils::getPathElementWithoutExt('\\some long path containing lots of spaces\\///CCleaner64.exe') == 'CCleaner64');
+	    $this->assertTrue(StringUtils::getPathElementWithoutExt("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe") == 'CCleaner64');
+	    $this->assertTrue(StringUtils::getPathElementWithoutExt('//folder/folder2/folder3/file.extension.txt') == 'file.extension');
+	    $this->assertTrue(StringUtils::getPathElementWithoutExt('//folder/folder2.txt/folder3/file.extension.txt') == 'file.extension');
+
+	    $this->assertSame(StringUtils::getPathElementWithoutExt("folder1.a.b.txt\\\\folder2//folder3///\\\\folder4", 0), 'folder1.a.b');
+	    $this->assertSame(StringUtils::getPathElementWithoutExt("folder1\\\\folder2.jpg//folder3///\\\\folder4", 1), 'folder2');
+	    $this->assertSame(StringUtils::getPathElementWithoutExt("folder1\\\\folder2//folder3///\\\\folder4", 2), 'folder3');
+	    $this->assertSame(StringUtils::getPathElementWithoutExt("folder1\\\\folder2//folder3///\\\\folder4.txt", 3), 'folder4');
+	    $this->assertSame(StringUtils::getPathElementWithoutExt("folder1\\\\folder2//folder3///\\\\folder4", 3), 'folder4');
+	    $this->assertSame(StringUtils::getPathElementWithoutExt('//folder/folder2/folder3/file.txt', 0), 'folder');
+	    $this->assertSame(StringUtils::getPathElementWithoutExt('//folder/folder2/folder3/file.txt', 3), 'file');
+	    $this->assertSame(StringUtils::getPathElementWithoutExt('https://www.google.es/search?q=zero+latency', 0), 'https:');
+	    $this->assertSame(StringUtils::getPathElementWithoutExt('https://www.google.es/search?q=zero+latency', 2), 'search?q=zero+latency');
+	    $this->assertSame(StringUtils::getPathElementWithoutExt('https:\\www.google.es/search?q=zero\\+latency', 0), 'https:');
+	    $this->assertSame(StringUtils::getPathElementWithoutExt('https:\\www.google.es/search?q=zero.html', 2), 'search?q=zero');
+
+	    $this->assertTrue(StringUtils::getPathElementWithoutExt('//folder/folder2.txt/folder3/file-extension.txt', -1, '-') == 'file');
+	    $this->assertTrue(StringUtils::getPathElementWithoutExt('//folder/folder2.txt/folder3/file-extension.txt', 1, '-') == 'folder2.txt');
+	    $this->assertTrue(StringUtils::getPathElementWithoutExt('//folder/folder2.txt/folder3/file-extension.txt', 0, 'd') == 'fol');
+
+	    // Test wrong values
+	    try {
+	        StringUtils::getPathElementWithoutExt('//folder/folder2/folder3/file.txt', 4);
+	        $this->exceptionMessage = 'index 4 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::getPathElementWithoutExt('//folder/folder2/folder3/file.txt', 100);
+	        $this->exceptionMessage = 'index 100 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::getPathElementWithoutExt('//folder/folder2/folder3/file.txt', -10);
+	        $this->exceptionMessage = 'index -10 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    // Test exceptions
+	    try {
+	        StringUtils::getPathElementWithoutExt(['//folder/folder2/folder3/file.txt']);
+	        $this->exceptionMessage = 'array did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::getPathElementWithoutExt(125);
+	        $this->exceptionMessage = '125 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::getPathElementWithoutExt(new stdClass());
+	        $this->exceptionMessage = 'new stdClass() did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+    }
 
 
 	/**
-	 * testGetFileExtension
+	 * testGetPathExtension
 	 *
 	 * @return void
 	 */
-	public function testGetFileExtension(){
+	public function testGetPathExtension(){
 
-		$this->assertTrue(StringUtils::getFileExtension(null) === '');
-		$this->assertTrue(StringUtils::getFileExtension('') === '');
-		$this->assertTrue(StringUtils::getFileExtension('       ') === '');
-		$this->assertTrue(StringUtils::getFileExtension('C:\Program Files\\CCleaner\\CCleaner64.exe') == 'exe');
-		$this->assertTrue(StringUtils::getFileExtension('\\Files/CCleaner/CCleaner64.exe') == 'exe');
-		$this->assertTrue(StringUtils::getFileExtension('//folder/folder2/folder3/file.txt') == 'txt');
-		$this->assertTrue(StringUtils::getFileExtension('CCleaner64.exe') == 'exe');
-		$this->assertTrue(StringUtils::getFileExtension('\\\\\\CCleaner64.exe') == 'exe');
-		$this->assertTrue(StringUtils::getFileExtension('\\some long path containing lots of spaces\\///CCleaner64.exe') == 'exe');
-		$this->assertTrue(StringUtils::getFileExtension('CCleaner64.EXE') == 'EXE');
-		$this->assertTrue(StringUtils::getFileExtension('\\\\\\CCleaner64.eXEfile') == 'eXEfile');
-		$this->assertTrue(StringUtils::getFileExtension("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe") == 'exe');
+	    // Test empty values
+	    $this->assertTrue(StringUtils::getPathExtension(null) === '');
+	    $this->assertTrue(StringUtils::getPathExtension('') === '');
+	    $this->assertTrue(StringUtils::getPathExtension('       ') === '');
+	    $this->assertTrue(StringUtils::getPathExtension([]) === '');
+
+	    // Test ok values
+	    $this->assertTrue(StringUtils::getPathExtension('C:\Program Files\\CCleaner') == '');
+	    $this->assertTrue(StringUtils::getPathExtension('C:\Program Files\\CCleaner\\CCleaner64.exe') == 'exe');
+	    $this->assertTrue(StringUtils::getPathExtension('\\Files/CCleaner/CCleaner64.exe') == 'exe');
+	    $this->assertTrue(StringUtils::getPathExtension('//folder/folder2/folder3/file.txt') == 'txt');
+	    $this->assertTrue(StringUtils::getPathExtension('CCleaner64.exe') == 'exe');
+	    $this->assertTrue(StringUtils::getPathExtension('\\\\\\CCleaner64.exe') == 'exe');
+	    $this->assertTrue(StringUtils::getPathExtension('\\some long path containing lots of spaces\\///CCleaner64.exe') == 'exe');
+	    $this->assertTrue(StringUtils::getPathExtension('CCleaner64.EXE') == 'EXE');
+	    $this->assertTrue(StringUtils::getPathExtension('\\\\\\CCleaner64.eXEfile') == 'eXEfile');
+	    $this->assertTrue(StringUtils::getPathExtension("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe") == 'exe');
+	    $this->assertTrue(StringUtils::getPathExtension("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64") == '');
+
+	    $this->assertSame(StringUtils::getPathExtension("folder1.a.b.txt\\\\folder2//folder3///\\\\folder4", 0), 'txt');
+	    $this->assertSame(StringUtils::getPathExtension("folder1\\\\folder2.jpg//folder3///\\\\folder4", 1), 'jpg');
+	    $this->assertSame(StringUtils::getPathExtension("folder1\\\\folder2//folder3///\\\\folder4", 2), '');
+	    $this->assertSame(StringUtils::getPathExtension("folder1\\\\folder2//folder3///\\\\folder4.txt", 3), 'txt');
+	    $this->assertSame(StringUtils::getPathExtension("folder1\\\\folder2//folder3///\\\\folder4", 3), '');
+	    $this->assertSame(StringUtils::getPathExtension('//folder/folder2/folder3/file.txt', 0), '');
+	    $this->assertSame(StringUtils::getPathExtension('//folder/folder2/folder3/file.txt', 3), 'txt');
+	    $this->assertSame(StringUtils::getPathExtension('https://www.google.es/search?q=zero+latency', 0), '');
+	    $this->assertSame(StringUtils::getPathExtension('https://www.google.es/search?q=zero+latency', 2), '');
+	    $this->assertSame(StringUtils::getPathExtension('https:\\www.google.es/search?q=zero\\+latency', 0), '');
+	    $this->assertSame(StringUtils::getPathExtension('https:\\www.google.es/search?q=zero.html', 2), 'html');
+
+	    $this->assertTrue(StringUtils::getPathExtension('//folder/folder2.txt/folder3/file-extension.txt', -1, '-') == 'extension.txt');
+	    $this->assertTrue(StringUtils::getPathExtension('//folder/folder2.txt/folder3/file-extension.txt', 1, '-') == '');
+	    $this->assertTrue(StringUtils::getPathExtension('//folder/folder2.txt/folder3/file-extension.txt', 0, 'd') == 'er');
+
+	    // Test wrong values
+	    try {
+	        StringUtils::getPathExtension('//folder/folder2/folder3/file.txt', 4);
+	        $this->exceptionMessage = 'index 4 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::getPathExtension('//folder/folder2/folder3/file.txt', 100);
+	        $this->exceptionMessage = 'index 100 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::getPathExtension('//folder/folder2/folder3/file.txt', -10);
+	        $this->exceptionMessage = 'index -10 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    // Test exceptions
+	    try {
+	        StringUtils::getPathExtension(['//folder/folder2/folder3/file.txt']);
+	        $this->exceptionMessage = 'array did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::getPathExtension(125);
+	        $this->exceptionMessage = '125 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::getPathExtension(new stdClass());
+	        $this->exceptionMessage = 'new stdClass() did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 	}
 
 

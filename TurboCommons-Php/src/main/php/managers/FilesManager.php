@@ -224,7 +224,7 @@ class FilesManager extends BaseStrictClass{
             for ($i = 0, $l = count($result); $i < $l; $i++){
 
                 $result[$i] = ($returnFormat === 'name') ?
-                    StringUtils::getFileNameWithExtension($result[$i]) :
+                    StringUtils::getPathElement($result[$i]) :
                     StringUtils::replace($result[$i], $path.DIRECTORY_SEPARATOR, '');
             }
         }
@@ -320,12 +320,12 @@ class FilesManager extends BaseStrictClass{
 
         $i = 1;
         $result = ($desiredName == '' ? $i : $desiredName);
-        $extension = StringUtils::getFileExtension($desiredName);
+        $extension = StringUtils::getPathExtension($desiredName);
 
         while(is_dir($path.DIRECTORY_SEPARATOR.$result) ||
               is_file($path.DIRECTORY_SEPARATOR.$result)){
 
-            $result = $this->_generateUniqueNameAux($i, StringUtils::getFileNameWithoutExtension($desiredName), $text, $separator, $isPrefix);
+            $result = $this->_generateUniqueNameAux($i, StringUtils::getPathElementWithoutExt($desiredName), $text, $separator, $isPrefix);
 
             if($extension != ''){
 

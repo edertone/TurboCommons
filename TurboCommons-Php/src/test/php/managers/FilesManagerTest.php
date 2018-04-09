@@ -973,7 +973,7 @@ class FilesManagerTest extends TestCase {
 	    // Create a temp directory without specifying a name
 	    $emptyTempFolder = $this->sut->createTempDirectory('');
 	    $this->assertTrue($this->sut->isDirectoryEmpty($emptyTempFolder));
-	    $this->assertTrue(NumericUtils::isNumeric(StringUtils::getFileNameWithExtension($emptyTempFolder)));
+	    $this->assertTrue(NumericUtils::isNumeric(StringUtils::getPathElement($emptyTempFolder)));
 
 	    // Create a temp directory with a name
 	    $someTempFolder = $this->sut->createTempDirectory('some-temp-folder');

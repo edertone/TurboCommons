@@ -58,13 +58,13 @@ class CSVObjectTest extends TestCase {
 
         foreach ($filesList as $file) {
 
-            if(StringUtils::getFileExtension($file) === 'csv'){
+            if(StringUtils::getPathExtension($file) === 'csv'){
 
                 self::$csvFiles[] = $file;
                 self::$csvFilesData[] = $filesManager->readFile(self::$basePath.'/'.$file);
             }
 
-            if(StringUtils::getFileExtension($file) === 'properties'){
+            if(StringUtils::getPathExtension($file) === 'properties'){
 
                 self::$propertiesFiles[] = $file;
                 self::$propertiesFilesData[] = $filesManager->readFile(self::$basePath.'/'.$file);
@@ -278,7 +278,7 @@ class CSVObjectTest extends TestCase {
 
 	        $sut = new CSVObject($csvFileData, StringUtils::countStringOccurences($csvFileName, 'WithHeader') === 1);
 
-	        $propertiesFileName = StringUtils::getFileNameWithoutExtension($csvFileName).'.properties';
+	        $propertiesFileName = StringUtils::getPathElementWithoutExt($csvFileName).'.properties';
 	        $csvFileAssertions = new JavaPropertiesObject(self::$propertiesFilesData[array_search($propertiesFileName, self::$propertiesFiles)]);
 
 	        $this->assertSame((int)$csvFileAssertions->get('rows'), $sut->countRows(), 'File: '.$csvFileName);

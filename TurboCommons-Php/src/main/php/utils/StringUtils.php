@@ -567,76 +567,94 @@ class StringUtils {
 
 
     /**
-     * Given a filesystem path which contains some file, this method extracts the filename plus its extension.
-     * Example: "//folder/folder2/folder3/file.txt" -> results in "file.txt"
+     * Given a string with a list of elements separated by '/' or '\' that represent some arbitrary path structure,
+     * this method will return the element that is located at the requested position. If no position is defined,
+     * the last element of the path will be returned (the most to the right one).
      *
-     * @param string $path An OS system path containing some file
+     * This method can be used with Operating system file paths, urls, or any other string that uses the 'slash separated'
+     * format to encode a path.
      *
-     * @return string The extracted filename and extension, like: finemane.txt
+     * @example "//folder/folder2/folder3/file.txt" -> results in "file.txt" if no position is defined<br>
+     *          "//folder/folder2\folder3\file.txt" -> results in "folder3" if position 2 is defined
+     *
+     * @param string $path A string containing some arbitrary path.
+     * @param integer $position The index for the element that we want to extract from the path. If not specified, the
+     *                          last one will be returned.
+     *
+     * @return string The element at the specified path position or the last one if no position is defined
      */
-    public static function getFileNameWithExtension($path){
-
-        $osSeparator = DIRECTORY_SEPARATOR;
+    public static function getPathElement($path, int $position = -1){
 
         if(self::isEmpty($path)){
 
             return '';
         }
 
-        $path = self::formatPath($path);
+        $path = self::formatPath($path, '/');
 
-        if(strpos($path, $osSeparator) !== false){
+        $path = (strpos($path, '/') === 0) ? substr($path, 1) : $path;
 
-            $path = substr(strrchr($path, $osSeparator), 1);
-        }
+        $elements = explode('/', $path);
 
-        return $path;
+        return $position === -1 ? $elements[count($elements) - 1] : $elements[$position];
     }
 
 
     /**
-     * Given a filesystem path which contains some file, this method extracts the filename WITHOUT its extension.
-     * Example: "//folder/folder2/folder3/file.txt" -> results in "file"
+     * This method works in the same way as getPathElement but it also removes the extension part from the result
+     * if it has any.
      *
-     * @param string $path An OS system path containing some file
+     * @example "//folder/folder2/folder3/file.txt" -> results in "file" if position = -1. Notice that ".txt" extension is removed<br>
+     *          "//folder/folder2\folder3\file.txt" -> results in "folder3" if position = 2. "folder3" has no extension so it does not get modified.
      *
-     * @return string The extracted filename WITHOUT extension, like: finemane
+     * @see StringUtils::getPathElement
+     *
+     * @param string $path A string containing some arbitrary path.
+     * @param integer $position The index for the element that we want to extract from the path. If not specified, the
+     *                          last one will be returned.
+     * @param string $extensionSeparator The character to be used as the extension separator. The most commonly used is '.'
+     *
+     * @return string The element at the specified path position with it's extension removed or the last one if no position is defined
      */
-    public static function getFileNameWithoutExtension($path){
+    public static function getPathElementWithoutExt($path, int $position = -1, $extensionSeparator = '.'){
 
-        if(self::isEmpty($path)){
+        $element = self::getPathElement($path, $position);
 
-            return '';
+        if(strpos($element, $extensionSeparator) !== false){
+
+            $element = substr($element, 0, strrpos($element, $extensionSeparator));
         }
 
-        $path = self::getFileNameWithExtension($path);
-
-        if(strpos($path, '.') !== false){
-
-            $path = substr($path, 0, strrpos($path, '.'));
-        }
-
-        return $path;
+        return $element;
     }
 
 
     /**
-     * Given a filesystem path which contains some file, this method extracts only the file extension
-     * Example: "//folder/folder2/folder3/file.txt" -> results in "txt"
+     * This method works in the same way as getPathElement but it only gives the element extension if it has any.
      *
-     * @param string $path An OS system path containing some file
+     * @example "//folder/folder2/folder3/file.txt" -> results in "txt" if position = -1. Notice that extension without separator character is returned<br>
+     *          "//folder/folder2\folder3\file.txt" -> results in "folder3" if position = 2. "folder3" has no extension so it does not get modified.
      *
-     * @return string The file extension WITHOUT the dot character. For example: jpg, png, js, exe ...
+     * @see StringUtils::getPathElement
+     *
+     * @param string $path A string containing some arbitrary path.
+     * @param integer $position The index for the element extension that we want to extract from the path. If not specified, the
+     *                          last one will be returned.
+     * @param string $extensionSeparator The character to be used as the extension separator. The most commonly used is '.'
+     *
+     * @return string The extension from the element at the specified path position or the extension from the last one if no position is defined
      */
-    public static function getFileExtension($path){
+    public static function getPathExtension($path, int $position = -1, $extensionSeparator = '.'){
 
-        if(self::isEmpty($path)){
+        $element = self::getPathElement($path, $position);
+
+        if(strpos($element, $extensionSeparator) === false){
 
             return '';
         }
 
         // Find the extension by getting the last position of the dot character
-        return substr($path, strrpos($path, '.') + 1);
+        return substr($element, strrpos($element, $extensionSeparator) + 1);
     }
 
 
