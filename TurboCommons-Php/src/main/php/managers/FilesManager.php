@@ -83,8 +83,11 @@ class FilesManager extends BaseStrictClass{
             throw new UnexpectedValueException('Not a file: '.$file2);
         }
 
+        $file1Hash = md5_file($file1);
+        $file2Hash = md5_file($file2);
+
         if (filesize($file1) === filesize($file2) &&
-            md5_file($file1) === md5_file($file2)){
+            $file1Hash === $file2Hash){
 
                 return true;
         }

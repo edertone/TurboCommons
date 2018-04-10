@@ -9,13 +9,11 @@
  
 
 import { StringUtils } from '../utils/StringUtils';
+import { ArrayUtils } from '../utils/ArrayUtils';
 
 
 /**
  * Class that contains the most common file system interaction functionalities
- * 
- * NOTE: The ts/js version of this class works only on server side enviroments (nodejs).
- *       File system functionalities are not available at the browser.
  */
 export class FilesManager{
 
@@ -39,16 +37,17 @@ export class FilesManager{
      * This constructor requires some node modules to work, which are passed as dependencies
      *  
      * @param fs A node fs module instance (const fs = require('fs'))
-     * @param os A os fs module instance (const os = require('os'))
-     * @param path A path fs module instance (const path = require('path'))
-     * @param process A process fs module instance
+     * @param os A node os module instance (const os = require('os'))
+     * @param path A node path module instance (const path = require('path'))
+     * @param process A node process module instance
      * 
      * @return A FilesManager instance
      */
     constructor(private fs:any,
                 private os:any,
                 private path:any,
-                private process: any) {
+                private process: any,
+                private crypto: any) {
 	
     }
     
@@ -78,10 +77,38 @@ export class FilesManager{
     }
     
     
-    // TODO - translate from php
-    isFileEqualTo(){
+    /**
+     * Check if two provided files are identical
+     *
+     * @param file1 The first file to compare
+     * @param file2 The second file to compare
+     *
+     * @throws Error
+     *
+     * @return True if both files are identical, false otherwise
+     */
+    isFileEqualTo(file1: string, file2: string){
 
-        // TODO - translate from php
+        if(!this.isFile(file1)){
+
+            throw new Error('Not a file: ' + file1);
+        }
+
+        if(!this.isFile(file2)){
+
+            throw new Error('Not a file: ' + file2);
+        }
+        
+        let file1Hash = this.crypto.createHash('md5').update(this.readFile(file1), 'utf8').digest('hex');
+        let file2Hash = this.crypto.createHash('md5').update(this.readFile(file2), 'utf8').digest('hex');
+        
+        if (this.getFileSize(file1) === this.getFileSize(file2) &&
+                file1Hash === file2Hash){
+
+                return true;
+        }
+
+        return false;
     }
     
     
@@ -110,10 +137,46 @@ export class FilesManager{
     }
     
     
-    // TODO - translate from php
-    isDirectoryEqualTo(){
+    /**
+     * Check if two directories contain exactly the same folder structure and files.
+     *
+     * @param path1 The full path to the first directory to compare
+     * @param path2 The full path to the second directory to compare
+     *
+     * @return true if both paths are valid directories and contain exactly the same files and folders tree.
+     */
+    isDirectoryEqualTo(path1: string, path2: string){
 
-        // TODO - translate from php
+        path1 = StringUtils.formatPath(path1, this.dirSep());
+        path2 = StringUtils.formatPath(path2, this.dirSep());
+
+        let path1Items = this.getDirectoryList(path1, 'nameAsc');
+        let path2Items = this.getDirectoryList(path2, 'nameAsc');
+
+        // Both paths must be exactly the same
+        if(!ArrayUtils.isEqualTo(path1Items, path2Items)){
+
+            return false;
+        }
+
+        for (let i = 0; i < path1Items.length; i++) {
+
+            let item1Path = path1 + this.dirSep() + path1Items[i];
+            let item2Path = path2 + this.dirSep() + path2Items[i];
+            let isItem1ADir = this.isDirectory(item1Path);
+
+            if(isItem1ADir && !this.isDirectoryEqualTo(item1Path, item2Path)){
+
+                return false;
+            }
+
+            if (!isItem1ADir && !this.isFileEqualTo(item1Path, item2Path)){
+
+                return false;
+            }
+        }
+
+        return true;
     }
     
     
@@ -130,10 +193,62 @@ export class FilesManager{
     }
     
     
-    // TODO - translate from php
-    findDirectoryItems(){
+    /**
+     * Find all the elements on a directory which name matches the specified regexp pattern
+     *
+     * @param path A directory where the search will be performed
+     *
+     * @param searchRegexp A regular expression that files or folders must match to be included
+     *        into the results. Here are some useful patterns:<br>
+     *        /.*\.txt$/   - Match all files or folders which name ends with '.txt'<br>
+     *        /^some.*./   - Match all files or folders which name starts with 'some'<br>
+     *        /text/       - Match all files or folders which name contains 'text'<br>
+     *        /^file\.txt$/ - Match all files or folders which name is exactly 'file.txt'
+     *
+     * @param returnFormat Defines how will be returned the array of results. Three values are possible:<br>
+     *        - If set to 'name' each result element will contain its file (with extension) or folder name<br>
+     *        - If set to 'relative' each result element will contain its file (with extension) or folder name plus its path relative to the search root<br>
+     *        - If set to 'absolute' each result element will contain its file (with extension) or folder name plus its full OS absolute path
+     *
+     * @param depth Defines the maximum number of subfolders where the search will be performed:<br>
+     *        - If set to -1 the search will be performed on the whole folder contents<br>
+     *        - If set to 0 the search will be performed only on the path root elements<br>
+     *        - If set to 2 the search will be performed on the root, first and second depth level of subfolders
+     *
+     * @return A list formatted as defined in returnFormat, with all the elements that meet the search criteria
+     */
+    findDirectoryItems(path: string, searchRegexp: string, returnFormat = 'relative', depth = -1): string[]{
 
-        // TODO - translate from php
+        let result: string[] = [];
+        path = StringUtils.formatPath(path, this.dirSep());
+
+        for (let fileOrDir of this.getDirectoryList(path)) {
+
+            let fileOrDirPath = path + this.dirSep() + fileOrDir;
+
+            if((new RegExp(searchRegexp)).test(fileOrDir)){
+
+                result.push(fileOrDirPath);
+            }
+
+            if(depth !== 0 && this.isDirectory(fileOrDirPath)){
+
+                result = result.concat(this.findDirectoryItems(fileOrDirPath, searchRegexp, 'absolute', depth - 1));
+            }
+        }
+
+        // Process the results with the specified format
+        if(returnFormat !== 'absolute'){
+
+            for (let i = 0; i < result.length; i++){
+
+                result[i] = (returnFormat === 'name') ?
+                    StringUtils.getPathElement(result[i]) :
+                    StringUtils.replace(result[i], path + this.dirSep(), '');
+            }
+        }
+
+        return result;
     }
 
 
@@ -344,9 +459,62 @@ export class FilesManager{
      */
     getDirectoryList(path: string, sort = ''): string[]{
 
-        // TODO - code is temporary. adapt from the PHP version
-        
-        return this.fs.readdirSync(path);   
+        // If folder does not exist, we will throw an exception
+        if(!this.isDirectory(path)){
+
+            throw new Error('path does not exist: ' + path);
+        }
+
+        // Get all the folder contents
+        let result = [];
+        let sortRes = [];
+
+        for (let fileInfo of this.fs.readdirSync(path)) {
+
+            if(fileInfo !== '.' && fileInfo !== '..'){
+
+                switch(sort) {
+
+                    case 'mDateAsc':
+                    case 'mDateDesc':
+                        // TODO - Date sort is not implemented. Translate from php
+                        break;
+
+                    default:
+                        result.push(fileInfo);
+                        break;
+                }
+            }
+        }
+
+        // Apply result sorting as requested
+        switch(sort) {
+
+            case 'nameAsc':
+                result.sort();
+                break;
+
+            case 'nameDesc':
+                result.sort();
+                result.reverse();
+                break;
+
+            case 'mDateAsc':
+                // TODO - Date sort is not implemented. Translate from php
+                break;
+
+            case 'mDateDesc':
+                // TODO - Date sort is not implemented. Translate from php
+                break;
+
+            default:
+                if(sort !== ''){
+
+                    throw new Error('Unknown sort method');
+                }
+        }
+
+        return result; 
     }
 
 
@@ -375,11 +543,61 @@ export class FilesManager{
     
     
     /**
-     * TODO - translate from php
+     * Copy all the contents from a source directory to a destination one (Both source and destination paths must exist).
+     *
+     * Any source files that exist on destination will be overwritten without warning.
+     * Files that exist on destination but not on source won't be modified, removed or altered in any way.
+     *
+     * @param sourcePath The full path to the source directory where files and folders to copy exist
+     * @param destPath The full path to the destination directory where files and folders will be copied
+     * @param destMustBeEmpty if set to true, an exception will be thrown if the destination directory is not empty.
+     *
+     * @throws Error
+     *
+     * @return True if copy was successful, false otherwise
      */
-    copyDirectory(){
+    copyDirectory(sourcePath: string, destPath: string, destMustBeEmpty = true){
 
-        // TODO - translate from php
+        sourcePath = StringUtils.formatPath(sourcePath, this.dirSep());
+        destPath = StringUtils.formatPath(destPath, this.dirSep());
+
+        if(sourcePath === destPath){
+
+            throw new Error('cannot copy a directory into itself: ' + sourcePath);
+        }
+
+        if(destMustBeEmpty && !this.isDirectoryEmpty(destPath)){
+
+            throw new Error('destPath must be empty');
+        }
+
+        for (let sourceItem of this.getDirectoryList(sourcePath)) {
+
+            let sourceItemPath = sourcePath + this.dirSep() + sourceItem;
+            let destItemPath = destPath + this.dirSep() + sourceItem;
+
+            if(this.isDirectory(sourceItemPath)){
+
+                if(!this.isDirectory(destItemPath) && !this.createDirectory(destItemPath)){
+
+                    return false;
+                }
+
+                if(!this.copyDirectory(sourceItemPath, destItemPath, destMustBeEmpty)){
+
+                    return false;
+                }
+
+            }else{
+
+                if(!this.copyFile(sourceItemPath, destItemPath)){
+
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
 
@@ -581,6 +799,29 @@ export class FilesManager{
             
             return false;
         }
+    }
+    
+    
+    /**
+     * Delete a list of filesystem files.
+     *
+     * @param paths A list of filesystem paths to delete
+     *
+     * @return Returns true on success or false if any of the files failed to be deleted
+     */
+    deleteFiles(paths: string[]){
+
+        let result = true;
+
+        for (let i = 0; i < paths.length; i++) {
+
+            if(!this.deleteFile(paths[i])){
+
+                result = false;
+            }
+        }
+
+        return result;
     }
     
     
