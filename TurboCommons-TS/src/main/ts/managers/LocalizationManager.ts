@@ -148,7 +148,7 @@ export class LocalizationManager {
             
             for (let i = 0; i < paths.length; i++) {
 	
-                switch (StringUtils.getFileExtension(paths[i])) {
+                switch (StringUtils.getPathExtension(paths[i])) {
 
                     case 'json':
                         this._loadedData[bundle][this.locales[i]] = this.parseJson(JSON.parse(result[i]));

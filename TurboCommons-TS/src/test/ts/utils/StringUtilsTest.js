@@ -648,58 +648,211 @@ QUnit.todo("getKeyWords", function(assert) {
 
 
 /**
- * getFileNameWithExtension
+ * getPathElement
  */
-QUnit.test("getFileNameWithExtension", function(assert) {
+QUnit.test("getPathElement", function(assert) {
 
-    assert.ok(StringUtils.getFileNameWithExtension(null) === '');
-    assert.ok(StringUtils.getFileNameWithExtension('') === '');
-    assert.ok(StringUtils.getFileNameWithExtension('       ') === '');
-    assert.ok(StringUtils.getFileNameWithExtension('C:\\Program Files\\CCleaner\\CCleaner64.exe') === 'CCleaner64.exe');
-    assert.ok(StringUtils.getFileNameWithExtension('\\Files/CCleaner/CCleaner64.exe') === 'CCleaner64.exe');
-    assert.ok(StringUtils.getFileNameWithExtension('//folder/folder2/folder3/file.txt') === 'file.txt');
-    assert.ok(StringUtils.getFileNameWithExtension('CCleaner64.exe') === 'CCleaner64.exe');
-    assert.ok(StringUtils.getFileNameWithExtension('\\\\\\CCleaner64.exe') === 'CCleaner64.exe');
-    assert.ok(StringUtils.getFileNameWithExtension('\\some long path containing lots of spaces\\///CCleaner64.exe') === 'CCleaner64.exe');
-    assert.ok(StringUtils.getFileNameWithExtension("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe") === 'CCleaner64.exe');
+    // Test empty values
+    assert.strictEqual(StringUtils.getPathElement(null), '');
+    assert.strictEqual(StringUtils.getPathElement(''), '');
+    assert.strictEqual(StringUtils.getPathElement('       '), '');
+    assert.strictEqual(StringUtils.getPathElement([]), '');
+
+    // Test ok values
+    assert.strictEqual(StringUtils.getPathElement('/'), '');
+    assert.strictEqual(StringUtils.getPathElement('///////'), '');
+    assert.strictEqual(StringUtils.getPathElement('\\'), '');
+    assert.strictEqual(StringUtils.getPathElement('folder'), 'folder');
+    assert.strictEqual(StringUtils.getPathElement('//folder'), 'folder');
+    assert.strictEqual(StringUtils.getPathElement('C:\\Program Files\\CCleaner\\CCleaner64.exe'), 'CCleaner64.exe');
+    assert.strictEqual(StringUtils.getPathElement('\\Files/CCleaner/CCleaner64.exe'), 'CCleaner64.exe');
+    assert.strictEqual(StringUtils.getPathElement('//folder/folder2/folder3/file.txt'), 'file.txt');
+    assert.strictEqual(StringUtils.getPathElement('CCleaner64.exe'), 'CCleaner64.exe');
+    assert.strictEqual(StringUtils.getPathElement('\\\\\\CCleaner64.exe'), 'CCleaner64.exe');
+    assert.strictEqual(StringUtils.getPathElement('\\some long path containing lots of spaces\\///CCleaner64.exe'), 'CCleaner64.exe');
+    assert.strictEqual(StringUtils.getPathElement("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe"), 'CCleaner64.exe');
+    assert.strictEqual(StringUtils.getPathElement("folder1\\\\folder2//folder3///\\\\folder4"), 'folder4');
+    assert.strictEqual(StringUtils.getPathElement('//folder/folder2/folder3/'), 'folder3');
+    assert.strictEqual(StringUtils.getPathElement('https://www.google.es'), 'www.google.es');
+    assert.strictEqual(StringUtils.getPathElement('https://www.google.es//////'), 'www.google.es');
+    assert.strictEqual(StringUtils.getPathElement('https://www.youtube.com/watch?v=bvOGIDiLzMk'), 'watch?v=bvOGIDiLzMk');
+    assert.strictEqual(StringUtils.getPathElement('https://www.google.es/search?q=zero+latency'), 'search?q=zero+latency');
+
+    assert.strictEqual(StringUtils.getPathElement("folder1\\\\folder2//folder3///\\\\folder4", 0), 'folder1');
+    assert.strictEqual(StringUtils.getPathElement("folder1\\\\folder2//folder3///\\\\folder4", 1), 'folder2');
+    assert.strictEqual(StringUtils.getPathElement("folder1\\\\folder2//folder3///\\\\folder4", 2), 'folder3');
+    assert.strictEqual(StringUtils.getPathElement("folder1\\\\folder2//folder3///\\\\folder4", 3), 'folder4');
+    assert.strictEqual(StringUtils.getPathElement('//folder/folder2/folder3/file.txt', 0), 'folder');
+    assert.strictEqual(StringUtils.getPathElement('//folder/folder2/folder3/file.txt', 1), 'folder2');
+    assert.strictEqual(StringUtils.getPathElement('//folder/folder2/folder3/file.txt', 2), 'folder3');
+    assert.strictEqual(StringUtils.getPathElement('//folder/folder2/folder3/file.txt', 3), 'file.txt');
+    assert.strictEqual(StringUtils.getPathElement('https://www.google.es/search?q=zero+latency', 0), 'https:');
+    assert.strictEqual(StringUtils.getPathElement('https://www.google.es/search?q=zero+latency', 1), 'www.google.es');
+    assert.strictEqual(StringUtils.getPathElement('https://www.google.es/search?q=zero+latency', 2), 'search?q=zero+latency');
+    assert.strictEqual(StringUtils.getPathElement('https:\\www.google.es/search?q=zero\\+latency', 0), 'https:');
+    assert.strictEqual(StringUtils.getPathElement('https:\\www.google.es/search?q=zero\\+latency', 1), 'www.google.es');
+    assert.strictEqual(StringUtils.getPathElement('https:\\www.google.es/search?q=zero\\+latency', 2), 'search?q=zero');
+    assert.strictEqual(StringUtils.getPathElement('https:\\www.google.es/search?q=zero\\+latency', 3), '+latency');
+
+    // Test wrong values
+    assert.throws(function() {
+        StringUtils.getPathElement('//folder/folder2/folder3/file.txt', 4);
+    }, /Invalid position specified/);
+
+    assert.throws(function() {
+        StringUtils.getPathElement('//folder/folder2/folder3/file.txt', 100);
+    }, /Invalid position specified/);
+
+    assert.throws(function() {
+        StringUtils.getPathElement('//folder/folder2/folder3/file.txt', -10);
+    }, /Invalid position specified/);
+
+    // Test exceptions
+    assert.throws(function() {
+        StringUtils.getPathElement(['//folder/folder2/folder3/file.txt']);
+    }, /value is not a string/);
+
+    assert.throws(function() {
+        StringUtils.getPathElement(125);
+    }, /value is not a string/);
+
+    assert.throws(function() {
+        StringUtils.getPathElement({});
+    }, /value is not a string/);
 });
 
 
 /**
- * getFileNameWithoutExtension
+ * getPathElementWithoutExt
  */
-QUnit.test("getFileNameWithoutExtension", function(assert) {
+QUnit.test("getPathElementWithoutExt", function(assert) {
 
-    assert.ok(StringUtils.getFileNameWithoutExtension(null) === '');
-    assert.ok(StringUtils.getFileNameWithoutExtension('') === '');
-    assert.ok(StringUtils.getFileNameWithoutExtension('       ') === '');
-    assert.ok(StringUtils.getFileNameWithoutExtension('C:\\Program Files\\CCleaner\\CCleaner64.exe') === 'CCleaner64');
-    assert.ok(StringUtils.getFileNameWithoutExtension('\\Files/CCleaner/CCleaner64.exe') === 'CCleaner64');
-    assert.ok(StringUtils.getFileNameWithoutExtension('//folder/folder2/folder3/file.txt') === 'file');
-    assert.ok(StringUtils.getFileNameWithoutExtension('CCleaner64.exe') === 'CCleaner64');
-    assert.ok(StringUtils.getFileNameWithoutExtension('\\\\\\CCleaner64.exe') === 'CCleaner64');
-    assert.ok(StringUtils.getFileNameWithoutExtension('\\some long path containing lots of spaces\\///CCleaner64.exe') === 'CCleaner64');
-    assert.ok(StringUtils.getFileNameWithoutExtension("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe") === 'CCleaner64');
+    // Test empty values
+    assert.ok(StringUtils.getPathElementWithoutExt(null) === '');
+    assert.ok(StringUtils.getPathElementWithoutExt('') === '');
+    assert.ok(StringUtils.getPathElementWithoutExt('       ') === '');
+    assert.ok(StringUtils.getPathElementWithoutExt([]) === '');
+
+    // Test ok values
+    assert.ok(StringUtils.getPathElementWithoutExt('C:\\Program Files\\CCleaner\\CCleaner64.exe') == 'CCleaner64');
+    assert.ok(StringUtils.getPathElementWithoutExt('\\Files/CCleaner/CCleaner64.exe') == 'CCleaner64');
+    assert.ok(StringUtils.getPathElementWithoutExt('//folder/folder2/folder3/file.txt') == 'file');
+    assert.ok(StringUtils.getPathElementWithoutExt('CCleaner64.exe') == 'CCleaner64');
+    assert.ok(StringUtils.getPathElementWithoutExt('\\\\\\CCleaner64.exe') == 'CCleaner64');
+    assert.ok(StringUtils.getPathElementWithoutExt('\\some long path containing lots of spaces\\///CCleaner64.exe') == 'CCleaner64');
+    assert.ok(StringUtils.getPathElementWithoutExt("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe") == 'CCleaner64');
+    assert.ok(StringUtils.getPathElementWithoutExt('//folder/folder2/folder3/file.extension.txt') == 'file.extension');
+    assert.ok(StringUtils.getPathElementWithoutExt('//folder/folder2.txt/folder3/file.extension.txt') == 'file.extension');
+
+    assert.strictEqual(StringUtils.getPathElementWithoutExt("folder1.a.b.txt\\\\folder2//folder3///\\\\folder4", 0), 'folder1.a.b');
+    assert.strictEqual(StringUtils.getPathElementWithoutExt("folder1\\\\folder2.jpg//folder3///\\\\folder4", 1), 'folder2');
+    assert.strictEqual(StringUtils.getPathElementWithoutExt("folder1\\\\folder2//folder3///\\\\folder4", 2), 'folder3');
+    assert.strictEqual(StringUtils.getPathElementWithoutExt("folder1\\\\folder2//folder3///\\\\folder4.txt", 3), 'folder4');
+    assert.strictEqual(StringUtils.getPathElementWithoutExt("folder1\\\\folder2//folder3///\\\\folder4", 3), 'folder4');
+    assert.strictEqual(StringUtils.getPathElementWithoutExt('//folder/folder2/folder3/file.txt', 0), 'folder');
+    assert.strictEqual(StringUtils.getPathElementWithoutExt('//folder/folder2/folder3/file.txt', 3), 'file');
+    assert.strictEqual(StringUtils.getPathElementWithoutExt('https://www.google.es/search?q=zero+latency', 0), 'https:');
+    assert.strictEqual(StringUtils.getPathElementWithoutExt('https://www.google.es/search?q=zero+latency', 2), 'search?q=zero+latency');
+    assert.strictEqual(StringUtils.getPathElementWithoutExt('https:\\www.google.es/search?q=zero\\+latency', 0), 'https:');
+    assert.strictEqual(StringUtils.getPathElementWithoutExt('https:\\www.google.es/search?q=zero.html', 2), 'search?q=zero');
+
+    assert.ok(StringUtils.getPathElementWithoutExt('//folder/folder2.txt/folder3/file-extension.txt', -1, '-') == 'file');
+    assert.ok(StringUtils.getPathElementWithoutExt('//folder/folder2.txt/folder3/file-extension.txt', 1, '-') == 'folder2.txt');
+    assert.ok(StringUtils.getPathElementWithoutExt('//folder/folder2.txt/folder3/file-extension.txt', 0, 'd') == 'fol');
+
+    // Test wrong values
+    assert.throws(function() {
+        StringUtils.getPathElementWithoutExt('//folder/folder2/folder3/file.txt', 4);
+    }, /Invalid position specified/);
+
+    assert.throws(function() {
+        StringUtils.getPathElementWithoutExt('//folder/folder2/folder3/file.txt', 100);
+    }, /Invalid position specified/);
+
+    assert.throws(function() {
+        StringUtils.getPathElementWithoutExt('//folder/folder2/folder3/file.txt', -10);
+    }, /Invalid position specified/);
+
+    // Test exceptions
+    assert.throws(function() {
+        StringUtils.getPathElementWithoutExt(['//folder/folder2/folder3/file.txt']);
+    }, /value is not a string/);
+
+    assert.throws(function() {
+        StringUtils.getPathElementWithoutExt(125);
+    }, /value is not a string/);
+
+    assert.throws(function() {
+        StringUtils.getPathElementWithoutExt({});
+    }, /value is not a string/);
 });
 
 
 /**
- * getFileExtension
+ * getPathExtension
  */
-QUnit.test("getFileExtension", function(assert) {
+QUnit.test("getPathExtension", function(assert) {
 
-    assert.ok(StringUtils.getFileExtension(null) === '');
-    assert.ok(StringUtils.getFileExtension('') === '');
-    assert.ok(StringUtils.getFileExtension('       ') === '');
-    assert.ok(StringUtils.getFileExtension('C:\\Program Files\\CCleaner\\CCleaner64.exe') === 'exe');
-    assert.ok(StringUtils.getFileExtension('\\Files/CCleaner/CCleaner64.exe') === 'exe');
-    assert.ok(StringUtils.getFileExtension('//folder/folder2/folder3/file.txt') === 'txt');
-    assert.ok(StringUtils.getFileExtension('CCleaner64.exe') === 'exe');
-    assert.ok(StringUtils.getFileExtension('\\\\\\CCleaner64.exe') === 'exe');
-    assert.ok(StringUtils.getFileExtension('\\some long path containing lots of spaces\\///CCleaner64.exe') === 'exe');
-    assert.ok(StringUtils.getFileExtension('CCleaner64.EXE') === 'EXE');
-    assert.ok(StringUtils.getFileExtension('\\\\\\CCleaner64.eXEfile') === 'eXEfile');
-    assert.ok(StringUtils.getFileExtension("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe") === 'exe');
+    // Test empty values
+    assert.ok(StringUtils.getPathExtension(null) === '');
+    assert.ok(StringUtils.getPathExtension('') === '');
+    assert.ok(StringUtils.getPathExtension('       ') === '');
+    assert.ok(StringUtils.getPathExtension([]) === '');
+
+    // Test ok values
+    assert.ok(StringUtils.getPathExtension('C:\Program Files\\CCleaner') == '');
+    assert.ok(StringUtils.getPathExtension('C:\Program Files\\CCleaner\\CCleaner64.exe') == 'exe');
+    assert.ok(StringUtils.getPathExtension('\\Files/CCleaner/CCleaner64.exe') == 'exe');
+    assert.ok(StringUtils.getPathExtension('//folder/folder2/folder3/file.txt') == 'txt');
+    assert.ok(StringUtils.getPathExtension('CCleaner64.exe') == 'exe');
+    assert.ok(StringUtils.getPathExtension('\\\\\\CCleaner64.exe') == 'exe');
+    assert.ok(StringUtils.getPathExtension('\\some long path containing lots of spaces\\///CCleaner64.exe') == 'exe');
+    assert.ok(StringUtils.getPathExtension('CCleaner64.EXE') == 'EXE');
+    assert.ok(StringUtils.getPathExtension('\\\\\\CCleaner64.eXEfile') == 'eXEfile');
+    assert.ok(StringUtils.getPathExtension("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe") == 'exe');
+    assert.ok(StringUtils.getPathExtension("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64") == '');
+
+    assert.strictEqual(StringUtils.getPathExtension("folder1.a.b.txt\\\\folder2//folder3///\\\\folder4", 0), 'txt');
+    assert.strictEqual(StringUtils.getPathExtension("folder1\\\\folder2.jpg//folder3///\\\\folder4", 1), 'jpg');
+    assert.strictEqual(StringUtils.getPathExtension("folder1\\\\folder2//folder3///\\\\folder4", 2), '');
+    assert.strictEqual(StringUtils.getPathExtension("folder1\\\\folder2//folder3///\\\\folder4.txt", 3), 'txt');
+    assert.strictEqual(StringUtils.getPathExtension("folder1\\\\folder2//folder3///\\\\folder4", 3), '');
+    assert.strictEqual(StringUtils.getPathExtension('//folder/folder2/folder3/file.txt', 0), '');
+    assert.strictEqual(StringUtils.getPathExtension('//folder/folder2/folder3/file.txt', 3), 'txt');
+    assert.strictEqual(StringUtils.getPathExtension('https://www.google.es/search?q=zero+latency', 0), '');
+    assert.strictEqual(StringUtils.getPathExtension('https://www.google.es/search?q=zero+latency', 2), '');
+    assert.strictEqual(StringUtils.getPathExtension('https:\\www.google.es/search?q=zero\\+latency', 0), '');
+    assert.strictEqual(StringUtils.getPathExtension('https:\\www.google.es/search?q=zero.html', 2), 'html');
+
+    assert.ok(StringUtils.getPathExtension('//folder/folder2.txt/folder3/file-extension.txt', -1, '-') == 'extension.txt');
+    assert.ok(StringUtils.getPathExtension('//folder/folder2.txt/folder3/file-extension.txt', 1, '-') == '');
+    assert.ok(StringUtils.getPathExtension('//folder/folder2.txt/folder3/file-extension.txt', 0, 'd') == 'er');
+
+    // Test wrong values
+    assert.throws(function() {
+        StringUtils.getPathExtension('//folder/folder2/folder3/file.txt', 4);
+    }, /Invalid position specified/);
+
+    assert.throws(function() {
+        StringUtils.getPathExtension('//folder/folder2/folder3/file.txt', 100);
+    }, /Invalid position specified/);
+
+    assert.throws(function() {
+        StringUtils.getPathExtension('//folder/folder2/folder3/file.txt', -10);
+    }, /Invalid position specified/);
+
+    // Test exceptions
+    assert.throws(function() {
+        StringUtils.getPathExtension(['//folder/folder2/folder3/file.txt']);
+    }, /value is not a string/);
+
+    assert.throws(function() {
+        StringUtils.getPathExtension(125);
+    }, /value is not a string/);
+
+    assert.throws(function() {
+        StringUtils.getPathExtension({});
+    }, /value is not a string/);
 });
 
 

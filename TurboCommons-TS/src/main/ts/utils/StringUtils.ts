@@ -534,76 +534,99 @@ export class StringUtils {
     
     
     /**
-     * Given a filesystem path which contains some file, this method extracts the filename plus its extension.
-     * Example: "//folder/folder2/folder3/file.txt" -> results in "file.txt"
-     * 
-     * @param path An OS system path containing some file
+     * Given a string with a list of elements separated by '/' or '\' that represent some arbitrary path structure,
+     * this method will return the element that is located at the requested position. If no position is defined,
+     * the last element of the path will be returned (the most to the right one).
      *
-     * @returns The extracted filename and extension, like: finemane.txt
+     * This method can be used with Operating system file paths, urls, or any other string that uses the 'slash separated'
+     * format to encode a path.
+     *
+     * @example "//folder/folder2/folder3/file.txt" -> results in "file.txt" if no position is defined<br>
+     *          "//folder/folder2\folder3\file.txt" -> results in "folder3" if position 2 is defined
+     *
+     * @param path A string containing some arbitrary path.
+     * @param position The index for the element that we want to extract from the path. If not specified, the
+     *                 last one will be returned.
+     *
+     * @return The element at the specified path position or the last one if no position is defined
      */
-    public static getFileNameWithExtension(path:string){
-    
-        var osSeparator:string = '/';
-
-        if(StringUtils.isEmpty(path)){
-
-            return '';
-        }
-
-        path = StringUtils.formatPath(path);
-
-        if(path.indexOf(osSeparator) >= 0){
-
-            path = path.substr(path.lastIndexOf(osSeparator) + 1);
-        }
-
-        return path;
-    }
-    
-    
-    /**
-     * Given a filesystem path which contains some file, this method extracts the filename WITHOUT its extension.
-     * Example: "//folder/folder2/folder3/file.txt" -> results in "file"
-     *
-     * @param path An OS system path containing some file
-     *
-     * @returns The extracted filename WITHOUT extension, like: finemane
-     */
-    public static getFileNameWithoutExtension(path:string) {
+    public static getPathElement(path:string, position = -1){
     
         if(StringUtils.isEmpty(path)){
 
             return '';
         }
 
-        path = this.getFileNameWithExtension(path);
+        path = StringUtils.formatPath(path, '/');
 
-        if(path.indexOf('.') >= 0){
+        path = (path.indexOf('/') === 0) ? path.substr(1) : path;
 
-            path = path.substr(0, path.lastIndexOf('.'));
+        let elements = path.split('/');
+
+        if(position >= elements.length || position < -1){
+
+            throw new Error('Invalid position specified');
         }
-
-        return path;
+        
+        return position === -1 ? elements[elements.length - 1] : elements[position];
     }
     
     
     /**
-     * Given a filesystem path which contains some file, this method extracts only the file extension
-     * Example: "//folder/folder2/folder3/file.txt" -> results in "txt"
-     * 
-     * @param path An OS system path containing some file
+     * This method works in the same way as getPathElement but it also removes the extension part from the result
+     * if it has any.
      *
-     * @returns The file extension WITHOUT the dot character. For example: jpg, png, js, exe ...
+     * @example "//folder/folder2/folder3/file.txt" -> results in "file" if position = -1. Notice that ".txt" extension is removed<br>
+     *          "//folder/folder2\folder3\file.txt" -> results in "folder3" if position = 2. "folder3" has no extension so it does not get modified.
+     *
+     * @see StringUtils.getPathElement
+     *
+     * @param path A string containing some arbitrary path.
+     * @param position The index for the element that we want to extract from the path. If not specified, the
+     *                 last one will be returned.
+     * @param extensionSeparator The character to be used as the extension separator. The most commonly used is '.'
+     *
+     * @return The element at the specified path position with it's extension removed or the last one if no position is defined
      */
-    public static getFileExtension(path:string) {
+    public static getPathElementWithoutExt(path:string, position = -1, extensionSeparator = '.') {
     
-        if(StringUtils.isEmpty(path)){
+        let element = StringUtils.getPathElement(path, position);
+
+        if(element.indexOf(extensionSeparator) >= 0){
+
+            element = element.substr(0, element.lastIndexOf(extensionSeparator));
+        }
+
+        return element;
+    }
+    
+    
+    /**
+     * This method works in the same way as getPathElement but it only gives the element extension if it has any.
+     *
+     * @example "//folder/folder2/folder3/file.txt" -> results in "txt" if position = -1. Notice that extension without separator character is returned<br>
+     *          "//folder/folder2\folder3\file.txt" -> results in "folder3" if position = 2. "folder3" has no extension so it does not get modified.
+     *
+     * @see StringUtils.getPathElement
+     *
+     * @param path A string containing some arbitrary path.
+     * @param position The index for the element extension that we want to extract from the path. If not specified, the
+     *                 last one will be returned.
+     * @param extensionSeparator The character to be used as the extension separator. The most commonly used is '.'
+     *
+     * @return The extension from the element at the specified path position or the extension from the last one if no position is defined
+     */
+    public static getPathExtension(path:string, position = -1, extensionSeparator = '.') {
+    
+        let element = StringUtils.getPathElement(path, position);
+
+        if(element.indexOf(extensionSeparator) < 0){
 
             return '';
         }
 
         // Find the extension by getting the last position of the dot character
-        return path.substr(path.lastIndexOf('.') + 1);
+        return element.substr(element.lastIndexOf(extensionSeparator) + 1);
     }
     
     

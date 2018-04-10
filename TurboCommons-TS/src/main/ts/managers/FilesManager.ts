@@ -224,12 +224,12 @@ export class FilesManager{
         
         let i = 1;
         let result = (desiredName == '' ? i : desiredName);
-        let extension = StringUtils.getFileExtension(desiredName);
+        let extension = StringUtils.getPathExtension(desiredName);
 
         while(this.isDirectory(path + this.dirSep() + result) ||
               this.isFile(path + this.dirSep() + result)){
 
-            result = this._generateUniqueNameAux(i, StringUtils.getFileNameWithoutExtension(desiredName), text, separator, isPrefix);
+            result = this._generateUniqueNameAux(i, StringUtils.getPathElementWithoutExt(desiredName), text, separator, isPrefix);
 
             if(extension != ''){
 

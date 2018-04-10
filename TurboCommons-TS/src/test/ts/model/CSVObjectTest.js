@@ -39,13 +39,13 @@ QUnit.module("CSVObjectTest", {
                 
                     var file = filesList[i];
                     
-                    if(StringUtils.getFileExtension(file) === 'csv'){
+                    if(StringUtils.getPathExtension(file) === 'csv'){
     
                         window.csvFiles.push(file);
                         window.csvFilesData.push(filesData[i]);
                     }
                     
-                    if(StringUtils.getFileExtension(file) === 'properties'){
+                    if(StringUtils.getPathExtension(file) === 'properties'){
                         
                         window.propertiesFiles.push(file);
                         window.propertiesFilesData.push(filesData[i]);
@@ -255,7 +255,7 @@ QUnit.test("testConstruct", function(assert){
 
         sut = new CSVObject(csvFileData, StringUtils.countStringOccurences(csvFileName, 'WithHeader') === 1);
 
-        var propertiesFileName = StringUtils.getFileNameWithoutExtension(csvFileName) + '.properties';
+        var propertiesFileName = StringUtils.getPathElementWithoutExt(csvFileName) + '.properties';
         var csvFileAssertions = new JavaPropertiesObject(propertiesFilesData[propertiesFiles.indexOf(propertiesFileName)]);
 
         assert.strictEqual(Number(csvFileAssertions.get('rows')), sut.countRows(), 'File: ' + csvFileName);
