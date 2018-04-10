@@ -530,8 +530,10 @@ class FilesManager extends BaseStrictClass{
 
 
     /**
-     * Copy all the contents from a source directory to a destination one.
-     * Both source and destination paths must exist.
+     * Copy all the contents from a source directory to a destination one (Both source and destination paths must exist).
+     *
+     * Any source files that exist on destination will be overwritten without warning.
+     * Files that exist on destination but not on source won't be modified, removed or altered in any way.
      *
      * @param string $sourcePath The full path to the source directory where files and folders to copy exist
      * @param string $destPath The full path to the destination directory where files and folders will be copied

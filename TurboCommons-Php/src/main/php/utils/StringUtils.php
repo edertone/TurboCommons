@@ -595,8 +595,14 @@ class StringUtils {
         $path = (strpos($path, '/') === 0) ? substr($path, 1) : $path;
 
         $elements = explode('/', $path);
+        $elementsCount = count($elements);
 
-        return $position === -1 ? $elements[count($elements) - 1] : $elements[$position];
+        if($position >= $elementsCount || $position < -1){
+
+            throw new InvalidArgumentException('Invalid position specified');
+        }
+
+        return $position === -1 ? $elements[$elementsCount - 1] : $elements[$position];
     }
 
 
