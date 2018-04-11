@@ -312,6 +312,11 @@ class FilesManagerTest extends TestCase {
 	    // Test ok values
 	    $this->assertTrue($this->sut->isDirectory($this->tempFolder));
 
+	    for ($i = 0, $l = StringUtils::countPathElements($this->tempFolder); $i < $l; $i++) {
+
+	        $this->assertTrue($this->sut->isDirectory(StringUtils::getPathToElement($this->tempFolder, $i)));
+	    }
+
 	    $averageDirectory = $this->tempFolder.DIRECTORY_SEPARATOR.'some folder';
 	    $this->sut->createDirectory($averageDirectory, true);
 	    $this->assertTrue($this->sut->isDirectory($averageDirectory));
