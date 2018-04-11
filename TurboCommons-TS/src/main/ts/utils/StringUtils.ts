@@ -389,6 +389,27 @@ export class StringUtils {
     
     
     /**
+     * Given a string with a list of elements separated by '/' or '\' that represent some arbitrary path structure,
+     * this method will return the number of elements that are listed on the path.
+     *
+     * @example "c:\\" -> results in 1
+     *          "//folder/folder2/folder3/file.txt" -> results in 4
+     *
+     * @param path A string containing some arbitrary path.
+     *
+     * @return The number of elements that are listed on the provided path
+     */
+    public static countPathElements(path: string){
+
+        path = StringUtils.formatPath(path, '/');
+
+        path = (path.indexOf('/') === 0) ? path.substr(1) : path;
+
+        return path == '' ? 0 : path.split('/').length;
+    }
+    
+    
+    /**
      * Method that limits the length of a string and optionally appends informative characters like ' ...'
      * to inform that the original string was longer.
      * 
@@ -751,7 +772,7 @@ export class StringUtils {
      */
     public static formatPath(path:any, separator = '/'):string {
     
-        if(path == null || path == undefined){
+        if(path === null || path === undefined){
 
             return '';
         }

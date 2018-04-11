@@ -521,6 +521,60 @@ QUnit.test("countWords", function(assert) {
 
 
 /**
+ * testCountPathElements
+ */
+QUnit.test("testCountPathElements", function(assert) {
+
+    // Test empty values
+    assert.strictEqual(StringUtils.countPathElements(null), 0);
+    assert.strictEqual(StringUtils.countPathElements(''), 0);
+    assert.strictEqual(StringUtils.countPathElements('       '), 1);
+    
+    assert.throws(function() {
+        StringUtils.countPathElements([]);
+    }, /path must be a string/);
+
+    // Test ok values
+    assert.strictEqual(StringUtils.countPathElements('/'), 0);
+    assert.strictEqual(StringUtils.countPathElements('///////'), 0);
+    assert.strictEqual(StringUtils.countPathElements('\\'), 0);
+    assert.strictEqual(StringUtils.countPathElements('c:/'), 1);
+    assert.strictEqual(StringUtils.countPathElements('c:\\'), 1);
+    assert.strictEqual(StringUtils.countPathElements('folder'), 1);
+    assert.strictEqual(StringUtils.countPathElements('//folder'), 1);
+    assert.strictEqual(StringUtils.countPathElements('C:\\Program Files\\CCleaner\\CCleaner64.exe'), 4);
+    assert.strictEqual(StringUtils.countPathElements('\\Files/CCleaner/CCleaner64.exe'), 3);
+    assert.strictEqual(StringUtils.countPathElements('//folder/folder2/folder3/file.txt'), 4);
+    assert.strictEqual(StringUtils.countPathElements('CCleaner64.exe'), 1);
+    assert.strictEqual(StringUtils.countPathElements('\\\\\\CCleaner64.exe'), 1);
+    assert.strictEqual(StringUtils.countPathElements('\\some long path containing lots of spaces\\///CCleaner64.exe'), 2);
+    assert.strictEqual(StringUtils.countPathElements("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe"), 2);
+    assert.strictEqual(StringUtils.countPathElements("folder1\\\\folder2//folder3///\\\\folder4"), 4);
+    assert.strictEqual(StringUtils.countPathElements('//folder/folder2/folder3/'), 3);
+    assert.strictEqual(StringUtils.countPathElements('https://www.google.es'), 2);
+    assert.strictEqual(StringUtils.countPathElements('https://www.google.es//////'), 2);
+    assert.strictEqual(StringUtils.countPathElements('https://www.youtube.com/watch?v=bvOGIDiLzMk'), 3);
+    assert.strictEqual(StringUtils.countPathElements('https://www.google.es/search?q=zero+latency'), 3);
+
+    // Test wrong values
+    // Not necessary
+
+    // Test exceptions
+    assert.throws(function() {
+        StringUtils.countPathElements(['//folder/folder2/folder3/file.txt']);
+    }, /path must be a string/);
+
+    assert.throws(function() {
+        StringUtils.countPathElements(125);
+    }, /path must be a string/);
+
+    assert.throws(function() {
+        StringUtils.countPathElements({});
+    }, /path must be a string/);
+});
+
+
+/**
  * limitLen
  */
 QUnit.test("limitLen", function(assert) {
@@ -662,6 +716,8 @@ QUnit.test("getPathElement", function(assert) {
     assert.strictEqual(StringUtils.getPathElement('/'), '');
     assert.strictEqual(StringUtils.getPathElement('///////'), '');
     assert.strictEqual(StringUtils.getPathElement('\\'), '');
+    assert.strictEqual(StringUtils.getPathElement('c:/'), 'c:');
+    assert.strictEqual(StringUtils.getPathElement('c:\\'), 'c:');
     assert.strictEqual(StringUtils.getPathElement('folder'), 'folder');
     assert.strictEqual(StringUtils.getPathElement('//folder'), 'folder');
     assert.strictEqual(StringUtils.getPathElement('C:\\Program Files\\CCleaner\\CCleaner64.exe'), 'CCleaner64.exe');
@@ -1010,7 +1066,11 @@ QUnit.test("formatPath", function(assert) {
     assert.strictEqual(StringUtils.formatPath(''), '');
     assert.strictEqual(StringUtils.formatPath('       '), '       ');
     assert.strictEqual(StringUtils.formatPath("\n\n\n\n"), "\n\n\n\n");
-
+    
+    assert.throws(function() {
+        StringUtils.formatPath([]);
+    }, /path must be a string/);
+    
     assert.throws(function() {
         StringUtils.formatPath('somepath', null);
     }, /separator must be a slash or backslash/);
