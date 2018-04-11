@@ -628,46 +628,6 @@ class StringUtils {
 
 
     /**
-     * This method works in the same way as getPathElement but giving the whole path to the requested element.
-     *
-     * @example "//folder/folder2/folder3/file.txt" -> results in "/folder" if position = 0<br>
-     *          "//folder/folder2\folder3\file.txt" -> results in "//folder/folder2\folder3" if position = 2<br>
-     *          "//folder/folder2\folder3\file.txt" -> results in "//folder/folder2" if position = 2 and includeElementItself = false
-     *
-     * @see StringUtils::getPathElement
-     *
-     * @param string $path A string containing some arbitrary path.
-     * @param integer $position The index for the element that we want to extract from the path. If not specified, the
-     *                          last one will be returned.
-     * @param bool $includeElementItself If set to true the requested element will be included into the result. If set to false only the path to it will be returned.
-     *
-     * @return string The full path to the requested element either including it or not depending on includeElementItself value
-     */
-    public static function getPathToElement($path, int $position, bool $includeElementItself = true){
-
-        if($position < 0){
-
-            throw new InvalidArgumentException('Invalid position specified');
-        }
-
-        $path = self::formatPath($path);
-
-        $element = self::getPathElement($path, $position);
-
-        if($element === ''){
-
-            return '';
-        }
-
-        $elementPosition = strpos($path, $element) + ($includeElementItself ? strlen($element) : 0);
-
-        $result = substr($path, 0, $elementPosition);
-
-        return strlen($result) === 1 ? $result : self::formatPath($result);
-    }
-
-
-    /**
      * This method works in the same way as getPathElement but it also removes the extension part from the result
      * if it has any.
      *
