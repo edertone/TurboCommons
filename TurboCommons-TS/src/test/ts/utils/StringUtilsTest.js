@@ -779,6 +779,133 @@ QUnit.test("getPathElement", function(assert) {
 
 
 /**
+ * testGetPathToElement
+ */
+QUnit.test("testGetPathToElement", function(assert) {
+
+    var osSeparator = '/';
+    
+    // Test empty values
+    assert.strictEqual(StringUtils.getPathToElement(null, 0), '');
+    assert.strictEqual(StringUtils.getPathToElement('', 0), '');
+    assert.strictEqual(StringUtils.getPathToElement('       ', 0), '');
+
+    assert.throws(function() {
+        StringUtils.getPathElement(StringUtils.getPathToElement([], 0));
+    }, /path must be a string/);
+
+    // Test ok values
+
+    // includeElementItself - Root element
+    assert.strictEqual(StringUtils.getPathToElement('/', 0), '');
+    assert.strictEqual(StringUtils.getPathToElement('///////', 0), '');
+    assert.strictEqual(StringUtils.getPathToElement('\\', 0), '');
+    assert.strictEqual(StringUtils.getPathToElement('c:/', 0), 'c:');
+    assert.strictEqual(StringUtils.getPathToElement('c:\\', 0), 'c:');
+    assert.strictEqual(StringUtils.getPathToElement('folder', 0), 'folder');
+    assert.strictEqual(StringUtils.getPathToElement('//folder', 0), osSeparator + 'folder');
+    assert.strictEqual(StringUtils.getPathToElement('C:\\Program Files\\CCleaner\\CCleaner64.exe', 0), 'C:');
+    assert.strictEqual(StringUtils.getPathToElement('\\Files/CCleaner/CCleaner64.exe', 0), osSeparator + 'Files');
+    assert.strictEqual(StringUtils.getPathToElement('//folder/folder2/folder3/file.txt', 0), osSeparator + 'folder');
+    assert.strictEqual(StringUtils.getPathToElement('CCleaner64.exe', 0), 'CCleaner64.exe');
+    assert.strictEqual(StringUtils.getPathToElement('\\\\\\CCleaner64.exe', 0), osSeparator + 'CCleaner64.exe');
+    assert.strictEqual(StringUtils.getPathToElement('\\some long path containing lots of spaces\\///CCleaner64.exe', 0), osSeparator + 'some long path containing lots of spaces');
+    assert.strictEqual(StringUtils.getPathToElement("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe", 0), "MultiLine\n\n\r\n   and strange &%·Characters");
+    assert.strictEqual(StringUtils.getPathToElement("folder1\\\\folder2//folder3///\\\\folder4", 0), 'folder1');
+    assert.strictEqual(StringUtils.getPathToElement('https://www.google.es', 0), 'https:');
+    assert.strictEqual(StringUtils.getPathToElement('https://www.google.es//////', 0), 'https:');
+
+    // includeElementItself - Last element
+    assert.strictEqual(StringUtils.getPathToElement('C:\\Program Files\\CCleaner\\CCleaner64.exe', 3), 'C:' + osSeparator + 'Program Files' + osSeparator + 'CCleaner' + osSeparator + 'CCleaner64.exe');
+    assert.strictEqual(StringUtils.getPathToElement('\\Files/CCleaner/CCleaner64.exe', 2), osSeparator + 'Files' + osSeparator + 'CCleaner' + osSeparator + 'CCleaner64.exe');
+    assert.strictEqual(StringUtils.getPathToElement('//folder/folder2/folder3/file.txt', 3), osSeparator + 'folder' + osSeparator + 'folder2' + osSeparator + 'folder3' + osSeparator + 'file.txt');
+    assert.strictEqual(StringUtils.getPathToElement('\\some long path containing lots of spaces\\///CCleaner64.exe', 1), osSeparator + 'some long path containing lots of spaces' + osSeparator + 'CCleaner64.exe');
+    assert.strictEqual(StringUtils.getPathToElement("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe", 1), "MultiLine\n\n\r\n   and strange &%·Characters" + osSeparator + "CCleaner64.exe");
+    assert.strictEqual(StringUtils.getPathToElement("folder1\\\\folder2//folder3///\\\\folder4", 3), "folder1" + osSeparator + "folder2" + osSeparator + "folder3" + osSeparator + "folder4");
+    assert.strictEqual(StringUtils.getPathToElement('https://www.google.es', 1), 'https:' + osSeparator + 'www.google.es');
+    assert.strictEqual(StringUtils.getPathToElement('https://www.google.es//////', 1), 'https:' + osSeparator + 'www.google.es');
+
+    // includeElementItself - Intermediate elements
+    assert.strictEqual(StringUtils.getPathToElement('C:\\Program Files\\CCleaner\\CCleaner64.exe', 2), 'C:' + osSeparator + 'Program Files' + osSeparator + 'CCleaner');
+    assert.strictEqual(StringUtils.getPathToElement('\\Files/CCleaner/CCleaner64.exe', 1), osSeparator + 'Files' + osSeparator + 'CCleaner');
+    assert.strictEqual(StringUtils.getPathToElement('//folder/folder2/folder3/file.txt', 2), osSeparator + 'folder' + osSeparator + 'folder2' + osSeparator + 'folder3');
+    assert.strictEqual(StringUtils.getPathToElement('\\a\\b\\c\\d///\\e\\f\\g//', 4), osSeparator + 'a' + osSeparator + 'b' + osSeparator + 'c' + osSeparator + 'd' + osSeparator + 'e');
+    assert.strictEqual(StringUtils.getPathToElement('folder1\\\\folder2//folder3///\\\\folder4', 1), 'folder1' + osSeparator + 'folder2');
+
+    // NOT includeElementItself - Root element
+    assert.strictEqual(StringUtils.getPathToElement('/', 0, false), '');
+    assert.strictEqual(StringUtils.getPathToElement('///////', 0, false), '');
+    assert.strictEqual(StringUtils.getPathToElement('\\', 0, false), '');
+    assert.strictEqual(StringUtils.getPathToElement('c:/', 0, false), '');
+    assert.strictEqual(StringUtils.getPathToElement('c:\\', 0, false), '');
+    assert.strictEqual(StringUtils.getPathToElement('folder', 0, false), '');
+    assert.strictEqual(StringUtils.getPathToElement('//folder', 0, false), osSeparator);
+    assert.strictEqual(StringUtils.getPathToElement('C:\\Program Files\\CCleaner\\CCleaner64.exe', 0, false), '');
+    assert.strictEqual(StringUtils.getPathToElement('\\Files/CCleaner/CCleaner64.exe', 0, false), osSeparator);
+    assert.strictEqual(StringUtils.getPathToElement('//folder/folder2/folder3/file.txt', 0, false), osSeparator);
+    assert.strictEqual(StringUtils.getPathToElement('CCleaner64.exe', 0, false), '');
+    assert.strictEqual(StringUtils.getPathToElement('\\\\\\CCleaner64.exe', 0, false), osSeparator);
+    assert.strictEqual(StringUtils.getPathToElement('\\some long path containing lots of spaces\\///CCleaner64.exe', 0, false), osSeparator);
+    assert.strictEqual(StringUtils.getPathToElement("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe", 0, false), '');
+    assert.strictEqual(StringUtils.getPathToElement("folder1\\\\folder2//folder3///\\\\folder4", 0, false), '');
+    assert.strictEqual(StringUtils.getPathToElement('https://www.google.es', 0, false), '');
+    assert.strictEqual(StringUtils.getPathToElement('https://www.google.es//////', 0, false), '');
+
+
+    // NOT includeElementItself - Last element
+    assert.strictEqual(StringUtils.getPathToElement('C:\\Program Files\\CCleaner\\CCleaner64.exe', 3, false), 'C:' + osSeparator + 'Program Files' + osSeparator + 'CCleaner');
+    assert.strictEqual(StringUtils.getPathToElement('\\Files/CCleaner/CCleaner64.exe', 2, false), osSeparator + 'Files' + osSeparator + 'CCleaner');
+    assert.strictEqual(StringUtils.getPathToElement('//folder/folder2/folder3/file.txt', 3, false), osSeparator + 'folder' + osSeparator + 'folder2' + osSeparator + 'folder3');
+    assert.strictEqual(StringUtils.getPathToElement('\\some long path containing lots of spaces\\///CCleaner64.exe', 1, false), osSeparator + 'some long path containing lots of spaces');
+    assert.strictEqual(StringUtils.getPathToElement("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe", 1, false), "MultiLine\n\n\r\n   and strange &%·Characters");
+    assert.strictEqual(StringUtils.getPathToElement("folder1\\\\folder2//folder3///\\\\folder4", 3, false), "folder1" + osSeparator + "folder2" + osSeparator + "folder3");
+    assert.strictEqual(StringUtils.getPathToElement('https://www.google.es', 1, false), 'https:');
+    assert.strictEqual(StringUtils.getPathToElement('https://www.google.es//////', 1, false), 'https:');
+
+    // NOT includeElementItself - Intermediate elements
+    assert.strictEqual(StringUtils.getPathToElement('C:\\Program Files\\CCleaner\\CCleaner64.exe', 2, false), 'C:' + osSeparator + 'Program Files');
+    assert.strictEqual(StringUtils.getPathToElement('\\Files/CCleaner/CCleaner64.exe', 1, false), osSeparator + 'Files');
+    assert.strictEqual(StringUtils.getPathToElement('//folder/folder2/folder3/file.txt', 2, false), osSeparator + 'folder' + osSeparator + 'folder2');
+    assert.strictEqual(StringUtils.getPathToElement('\\a\\b\\c\\d///\\e\\f\\g//', 4, false), osSeparator + 'a' + osSeparator + 'b' + osSeparator + 'c' + osSeparator + 'd');
+    assert.strictEqual(StringUtils.getPathToElement('folder1\\\\folder2//folder3///\\\\folder4', 1, false), 'folder1');
+
+    // Test wrong values
+    assert.throws(function() {
+        StringUtils.getPathToElement('//folder/folder2/folder3/file.txt');
+    }, /Invalid position specified/);
+
+    assert.throws(function() {
+        StringUtils.getPathToElement('//folder/folder2/folder3/file.txt', -1);
+    }, /Invalid position specified/);
+
+    assert.throws(function() {
+        StringUtils.getPathToElement('//folder/folder2/folder3/file.txt', -5);
+    }, /Invalid position specified/);
+
+    assert.throws(function() {
+        StringUtils.getPathToElement('//folder/folder2/folder3/file.txt', 4);
+    }, /Invalid position specified/);
+
+    assert.throws(function() {
+        StringUtils.getPathToElement('//folder/folder2/folder3/file.txt', 25);
+    }, /Invalid position specified/);
+
+    // Test exceptions
+    assert.throws(function() {
+        StringUtils.getPathToElement(['//folder/folder2/folder3/file.txt'], 0);
+    }, /path must be a string/);
+
+    assert.throws(function() {
+        StringUtils.getPathToElement(125, 0);
+    }, /path must be a string/);
+
+    assert.throws(function() {
+        StringUtils.getPathToElement({}, 0);
+    }, /path must be a string/);
+});
+
+    
+/**
  * getPathElementWithoutExt
  */
 QUnit.test("getPathElementWithoutExt", function(assert) {

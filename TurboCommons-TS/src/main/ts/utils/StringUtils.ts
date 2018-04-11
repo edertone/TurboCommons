@@ -594,6 +594,46 @@ export class StringUtils {
     
     
     /**
+     * This method works in the same way as getPathElement but giving the whole path to the requested element.
+     *
+     * @example "//folder/folder2/folder3/file.txt" -> results in "/folder" if position = 0<br>
+     *          "//folder/folder2\folder3\file.txt" -> results in "//folder/folder2\folder3" if position = 2<br>
+     *          "//folder/folder2\folder3\file.txt" -> results in "//folder/folder2" if position = 2 and includeElementItself = false
+     *
+     * @see StringUtils.getPathElement
+     *
+     * @param path A string containing some arbitrary path.
+     * @param position The index for the element that we want to extract from the path. If not specified, the
+     *                          last one will be returned.
+     * @param includeElementItself If set to true the requested element will be included into the result. If set to false only the path to it will be returned.
+     *
+     * @return The full path to the requested element either including it or not depending on includeElementItself value
+     */
+    public static getPathToElement(path:string, position: number, includeElementItself = true){
+
+        if(position < 0 || position == null){
+
+            throw new Error('Invalid position specified');
+        }
+
+        path = StringUtils.formatPath(path);
+
+        let element = StringUtils.getPathElement(path, position);
+
+        if(element === ''){
+
+            return '';
+        }
+
+        let elementPosition = path.indexOf(element) + (includeElementItself ? element.length : 0);
+
+        let result = path.substr(0, elementPosition);
+
+        return result.length === 1 ? result : StringUtils.formatPath(result);
+    }
+    
+    
+    /**
      * This method works in the same way as getPathElement but it also removes the extension part from the result
      * if it has any.
      *
