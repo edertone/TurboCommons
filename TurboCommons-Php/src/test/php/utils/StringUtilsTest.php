@@ -628,6 +628,74 @@ class StringUtilsTest extends TestCase {
 
 
 	/**
+	 * testCountPathElements
+	 *
+	 * @return void
+	 */
+	public function testCountPathElements(){
+
+    	// Test empty values
+	    $this->assertSame(StringUtils::countPathElements(null), 0);
+	    $this->assertSame(StringUtils::countPathElements(''), 0);
+	    $this->assertSame(StringUtils::countPathElements('       '), 1);
+
+	    try {
+	        StringUtils::countPathElements([]);
+	        $this->exceptionMessage = '[] did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+    	// Test ok values
+	    $this->assertSame(StringUtils::countPathElements('/'), 0);
+	    $this->assertSame(StringUtils::countPathElements('///////'), 0);
+	    $this->assertSame(StringUtils::countPathElements('\\'), 0);
+	    $this->assertSame(StringUtils::countPathElements('c:/'), 1);
+	    $this->assertSame(StringUtils::countPathElements('c:\\'), 1);
+	    $this->assertSame(StringUtils::countPathElements('folder'), 1);
+	    $this->assertSame(StringUtils::countPathElements('//folder'), 1);
+	    $this->assertSame(StringUtils::countPathElements('C:\\Program Files\\CCleaner\\CCleaner64.exe'), 4);
+	    $this->assertSame(StringUtils::countPathElements('\\Files/CCleaner/CCleaner64.exe'), 3);
+	    $this->assertSame(StringUtils::countPathElements('//folder/folder2/folder3/file.txt'), 4);
+	    $this->assertSame(StringUtils::countPathElements('CCleaner64.exe'), 1);
+	    $this->assertSame(StringUtils::countPathElements('\\\\\\CCleaner64.exe'), 1);
+	    $this->assertSame(StringUtils::countPathElements('\\some long path containing lots of spaces\\///CCleaner64.exe'), 2);
+	    $this->assertSame(StringUtils::countPathElements("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe"), 2);
+	    $this->assertSame(StringUtils::countPathElements("folder1\\\\folder2//folder3///\\\\folder4"), 4);
+	    $this->assertSame(StringUtils::countPathElements('//folder/folder2/folder3/'), 3);
+	    $this->assertSame(StringUtils::countPathElements('https://www.google.es'), 2);
+	    $this->assertSame(StringUtils::countPathElements('https://www.google.es//////'), 2);
+	    $this->assertSame(StringUtils::countPathElements('https://www.youtube.com/watch?v=bvOGIDiLzMk'), 3);
+	    $this->assertSame(StringUtils::countPathElements('https://www.google.es/search?q=zero+latency'), 3);
+
+	    // Test wrong values
+	    // Not necessary
+
+	    // Test exceptions
+	    try {
+	        StringUtils::countPathElements(['//folder/folder2/folder3/file.txt']);
+	        $this->exceptionMessage = 'array did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::countPathElements(125);
+	        $this->exceptionMessage = '125 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::countPathElements(new stdClass());
+	        $this->exceptionMessage = 'new stdClass() did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+	}
+
+
+	/**
 	 * testLimitLen
 	 *
 	 * @return void
@@ -759,6 +827,8 @@ class StringUtilsTest extends TestCase {
 	    $this->assertSame(StringUtils::getPathElement('/'), '');
 	    $this->assertSame(StringUtils::getPathElement('///////'), '');
 	    $this->assertSame(StringUtils::getPathElement('\\'), '');
+	    $this->assertSame(StringUtils::getPathElement('c:/'), 'c:');
+	    $this->assertSame(StringUtils::getPathElement('c:\\'), 'c:');
 	    $this->assertSame(StringUtils::getPathElement('folder'), 'folder');
 	    $this->assertSame(StringUtils::getPathElement('//folder'), 'folder');
 	    $this->assertSame(StringUtils::getPathElement('C:\\Program Files\\CCleaner\\CCleaner64.exe'), 'CCleaner64.exe');
@@ -1280,6 +1350,13 @@ class StringUtilsTest extends TestCase {
 	    $this->assertSame(StringUtils::formatPath(''), '');
 	    $this->assertSame(StringUtils::formatPath('       '), '       ');
 	    $this->assertSame(StringUtils::formatPath("\n\n\n\n"), "\n\n\n\n");
+
+	    try {
+	        StringUtils::formatPath([]);
+	        $this->exceptionMessage = '[] did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
 	    try {
 	        StringUtils::formatPath('somepath', null);

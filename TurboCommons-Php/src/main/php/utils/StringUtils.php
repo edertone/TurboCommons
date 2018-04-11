@@ -411,6 +411,27 @@ class StringUtils {
 
 
     /**
+     * Given a string with a list of elements separated by '/' or '\' that represent some arbitrary path structure,
+     * this method will return the number of elements that are listed on the path.
+     *
+     * @example "c:\\" -> results in 1
+     *          "//folder/folder2/folder3/file.txt" -> results in 4
+     *
+     * @param string $path A string containing some arbitrary path.
+     *
+     * @return number The number of elements that are listed on the provided path
+     */
+    public static function countPathElements($path){
+
+        $path = self::formatPath($path, '/');
+
+        $path = (strpos($path, '/') === 0) ? substr($path, 1) : $path;
+
+        return $path == '' ? 0 : count(explode('/', $path));
+    }
+
+
+    /**
      * Method that limits the length of a string and optionally appends informative characters like ' ...'
      * to inform that the original string was longer.
      *
@@ -836,7 +857,7 @@ class StringUtils {
      */
     public static function formatPath($path, string $separator = DIRECTORY_SEPARATOR){
 
-        if($path == null){
+        if($path === null){
 
             return '';
         }
