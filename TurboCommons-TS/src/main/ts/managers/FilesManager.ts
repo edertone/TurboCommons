@@ -383,9 +383,25 @@ export class FilesManager{
         // Create the requested folder
         try{
 
-            // TODO - recursive option is currently not working
-            this.fs.mkdirSync(path);
-
+            if(!recursive){
+            
+                this.fs.mkdirSync(path);
+            
+            }else{
+            
+                let reconstructedPath = '';
+                    
+                for (let i = 0; i < StringUtils.countPathElements(path); i++) {
+                    
+                    reconstructedPath += StringUtils.getPathElement(path, i) + this.dirSep();
+                    
+                    if(!this.isDirectory(reconstructedPath)){
+                        
+                        this.fs.mkdirSync(reconstructedPath);
+                    }
+                }
+            }
+            
         }catch(e){
 
             // It is possible that multiple concurrent calls create the same folder at the same time.

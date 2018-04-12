@@ -367,7 +367,24 @@ class FilesManager extends BaseStrictClass{
         // Create the requested folder
         try{
 
-            mkdir($path, null, $recursive);
+            if(!$recursive){
+
+                mkdir($path, null, false);
+
+            }else{
+
+                $reconstructedPath = '';
+
+                for ($i = 0, $l = StringUtils::countPathElements($path); $i < $l; $i++) {
+
+                    $reconstructedPath .= StringUtils::getPathElement($path, $i).$this->dirSep();
+
+                    if(!is_dir($reconstructedPath)){
+
+                        mkdir($reconstructedPath, null, false);
+                    }
+                }
+            }
 
         }catch(Exception $e){
 

@@ -312,9 +312,13 @@ class FilesManagerTest extends TestCase {
 	    // Test ok values
 	    $this->assertTrue($this->sut->isDirectory($this->tempFolder));
 
+	    $reconstructedPath = '';
+
 	    for ($i = 0, $l = StringUtils::countPathElements($this->tempFolder); $i < $l; $i++) {
 
-	        $this->assertTrue($this->sut->isDirectory(StringUtils::getPathToElement($this->tempFolder, $i)));
+	        $reconstructedPath .= StringUtils::getPathElement($this->tempFolder, $i).DIRECTORY_SEPARATOR;
+
+	        $this->assertTrue($this->sut->isDirectory($reconstructedPath));
 	    }
 
 	    $averageDirectory = $this->tempFolder.DIRECTORY_SEPARATOR.'some folder';
@@ -907,15 +911,29 @@ class FilesManagerTest extends TestCase {
 	    }
 
 	    // Test creating recursive folders
+	    $recursive1 = $this->tempFolder.DIRECTORY_SEPARATOR.'test55'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'tes5'.DIRECTORY_SEPARATOR.'t5';
 	    try {
-	        $this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'test55'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'tes5'.DIRECTORY_SEPARATOR.'t5');
-	        $this->exceptionMessage = 'test55 did not cause exception';
+	        $this->sut->createDirectory($recursive1);
+	        $this->exceptionMessage = 'recursive1 did not cause exception';
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
 
-	    $this->assertTrue($this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'test55'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'tes5'.DIRECTORY_SEPARATOR.'t5', true));
-	    $this->assertTrue($this->sut->isDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'test55'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'tes5'.DIRECTORY_SEPARATOR.'t5'));
+	    $this->assertFalse($this->sut->isDirectory($recursive1));
+	    $this->assertTrue($this->sut->createDirectory($recursive1, true));
+	    $this->assertTrue($this->sut->isDirectory($recursive1));
+
+	    $recursive2 = $this->tempFolder.DIRECTORY_SEPARATOR.'a'.DIRECTORY_SEPARATOR.'a'.DIRECTORY_SEPARATOR.'a'.DIRECTORY_SEPARATOR.'a';
+	    try {
+	        $this->sut->createDirectory($recursive2);
+	        $this->exceptionMessage = 'recursive2 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    $this->assertFalse($this->sut->isDirectory($recursive2));
+	    $this->assertTrue($this->sut->createDirectory($recursive2, true));
+	    $this->assertTrue($this->sut->isDirectory($recursive2));
 
 	    // Test wrong values
 	    // not necessary
