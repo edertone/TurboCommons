@@ -200,20 +200,20 @@ export class FilesManager{
      *
      * @param searchRegexp A regular expression that files or folders must match to be included
      *        into the results. Here are some useful patterns:<br>
-     *        '/.*\.txt$/i'   - Match all items which name ends with '.txt' (case insensitive)<br>
-     *        '/^some.*./'   - Match all items which name starts with 'some'<br>
-     *        '/text/'       - Match all items which name contains 'text'<br>
-     *        '/^file\.txt$/' - Match all items which name is exactly 'file.txt'
-     *        '/^.*\.(jpg|jpeg|png|gif)$/i' - Match all items which name ends with .jpg,.jpeg,.png or .gif (case insensitive)
-     *        '/^(?!.*\.(jpg|png|gif)$)/i' - Match all items that do NOT end with .jpg, .png or .gif (case insensitive)
+     *        /.*\.txt$/i   - Match all items which name ends with '.txt' (case insensitive)<br>
+     *        /^some.*./   - Match all items which name starts with 'some'<br>
+     *        /text/       - Match all items which name contains 'text'<br>
+     *        /^file\.txt$/ - Match all items which name is exactly 'file.txt'
+     *        /^.*\.(jpg|jpeg|png|gif)$/i - Match all items which name ends with .jpg,.jpeg,.png or .gif (case insensitive)
+     *        /^(?!.*\.(jpg|png|gif)$)/i - Match all items that do NOT end with .jpg, .png or .gif (case insensitive)
      *
      * @param returnFormat Defines how will be returned the array of results. Three values are possible:<br>
      *        - If set to 'name' each result element will contain its file (with extension) or folder name<br>
      *        - If set to 'relative' each result element will contain its file (with extension) or folder name plus its path relative to the search root<br>
      *        - If set to 'absolute' each result element will contain its file (with extension) or folder name plus its full OS absolute path
      *
-     * @param searchItemsType Defines the type for the directory elements to search: 'FILES' to search only files, 'FOLDERS'
-     *        to search only folders, 'BOTH' to search on all the directory contents
+     * @param searchItemsType Defines the type for the directory elements to search: 'files' to search only files, 'folders'
+     *        to search only folders, 'both' to search on all the directory contents
      *
      * @param depth Defines the maximum number of subfolders where the search will be performed:<br>
      *        - If set to -1 the search will be performed on the whole folder contents<br>
@@ -225,7 +225,7 @@ export class FilesManager{
     findDirectoryItems(path: string,
                        searchRegexp: string,
                        returnFormat = 'relative',
-                       searchItemsType = 'BOTH',
+                       searchItemsType = 'both',
                        depth = -1): string[]{
 
         let result: string[] = [];
@@ -237,14 +237,14 @@ export class FilesManager{
             let isItemADir = this.isDirectory(itemPath);
             let isItemAFile = this.isFile(itemPath);
 
-            if(searchItemsType === 'FOLDERS' && isItemAFile){
+            if(searchItemsType === 'folders' && isItemAFile){
 
                 continue;
             }
 
             if((new RegExp(searchRegexp)).test(item)){
 
-                if(!(searchItemsType === 'FILES' && isItemADir)){
+                if(!(searchItemsType === 'files' && isItemADir)){
 
                     result.push(itemPath);
                 }

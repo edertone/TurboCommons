@@ -196,8 +196,8 @@ class FilesManager extends BaseStrictClass{
      *        - If set to 'relative' each result element will contain its file (with extension) or folder name plus its path relative to the search root<br>
      *        - If set to 'absolute' each result element will contain its file (with extension) or folder name plus its full OS absolute path
      *
-     * @param string $searchItemsType Defines the type for the directory elements to search: 'FILES' to search only files, 'FOLDERS'
-     *        to search only folders, 'BOTH' to search on all the directory contents
+     * @param string $searchItemsType Defines the type for the directory elements to search: 'files' to search only files, 'folders'
+     *        to search only folders, 'both' to search on all the directory contents
      *
      * @param int $depth Defines the maximum number of subfolders where the search will be performed:<br>
      *        - If set to -1 the search will be performed on the whole folder contents<br>
@@ -209,7 +209,7 @@ class FilesManager extends BaseStrictClass{
     public function findDirectoryItems($path,
                                        string $searchRegexp,
                                        string $returnFormat = 'relative',
-                                       string $searchItemsType = 'BOTH',
+                                       string $searchItemsType = 'both',
                                        int $depth = -1){
 
         $result = [];
@@ -221,14 +221,14 @@ class FilesManager extends BaseStrictClass{
             $isItemADir = is_dir($itemPath);
             $isItemAFile = is_file($itemPath);
 
-            if($searchItemsType === 'FOLDERS' && $isItemAFile){
+            if($searchItemsType === 'folders' && $isItemAFile){
 
                 continue;
             }
 
             if(preg_match($searchRegexp, $item)){
 
-                if(!($searchItemsType === 'FILES' && $isItemADir)){
+                if(!($searchItemsType === 'files' && $isItemADir)){
 
                     $result[] = $itemPath;
                 }
