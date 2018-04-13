@@ -184,15 +184,20 @@ class FilesManager extends BaseStrictClass{
      *
      * @param string $searchRegexp A regular expression that files or folders must match to be included
      *        into the results. Here are some useful patterns:<br>
-     *        /.*\.txt$/   - Match all files or folders which name ends with '.txt'<br>
-     *        /^some.*./   - Match all files or folders which name starts with 'some'<br>
-     *        /text/       - Match all files or folders which name contains 'text'<br>
-     *        /^file\.txt$/ - Match all files or folders which name is exactly 'file.txt'
+     *        '/.*\.txt$/i'   - Match all items which name ends with '.txt' (case insensitive)<br>
+     *        '/^some.*./'   - Match all items which name starts with 'some'<br>
+     *        '/text/'       - Match all items which name contains 'text'<br>
+     *        '/^file\.txt$/' - Match all items which name is exactly 'file.txt'
+     *        '/^.*\.(jpg|jpeg|png|gif)$/i' - Match all items which name ends with .jpg,.jpeg,.png or .gif (case insensitive)
+     *        '/^(?!.*\.(jpg|png|gif)$)/i' - Match all items that do NOT end with .jpg, .png or .gif (case insensitive)
      *
      * @param string $returnFormat Defines how will be returned the array of results. Three values are possible:<br>
      *        - If set to 'name' each result element will contain its file (with extension) or folder name<br>
      *        - If set to 'relative' each result element will contain its file (with extension) or folder name plus its path relative to the search root<br>
      *        - If set to 'absolute' each result element will contain its file (with extension) or folder name plus its full OS absolute path
+     *
+     * @param string $searchItemsType Defines the type for the directory elements to search: 'FILES' to search only files, 'FOLDERS'
+     *        to search only folders, 'BOTH' to search on all the directory contents
      *
      * @param int $depth Defines the maximum number of subfolders where the search will be performed:<br>
      *        - If set to -1 the search will be performed on the whole folder contents<br>
@@ -201,23 +206,37 @@ class FilesManager extends BaseStrictClass{
      *
      * @return array A list formatted as defined in returnFormat, with all the elements that meet the search criteria
      */
-    public function findDirectoryItems($path, string $searchRegexp, string $returnFormat = 'relative', int $depth = -1){
+    public function findDirectoryItems($path,
+                                       string $searchRegexp,
+                                       string $returnFormat = 'relative',
+                                       string $searchItemsType = 'BOTH',
+                                       int $depth = -1){
 
         $result = [];
         $path = StringUtils::formatPath($path, DIRECTORY_SEPARATOR);
 
-        foreach ($this->getDirectoryList($path) as $fileOrDir){
+        foreach ($this->getDirectoryList($path) as $item){
 
-            $fileOrDirPath = $path.DIRECTORY_SEPARATOR.$fileOrDir;
+            $itemPath = $path.DIRECTORY_SEPARATOR.$item;
+            $isItemADir = is_dir($itemPath);
+            $isItemAFile = is_file($itemPath);
 
-            if(preg_match($searchRegexp, $fileOrDir)){
+            if($searchItemsType === 'FOLDERS' && $isItemAFile){
 
-                $result[] = $fileOrDirPath;
+                continue;
             }
 
-            if($depth !== 0 && is_dir($fileOrDirPath)){
+            if(preg_match($searchRegexp, $item)){
 
-                $result = array_merge($result, $this->findDirectoryItems($fileOrDirPath, $searchRegexp, 'absolute', $depth - 1));
+                if(!($searchItemsType === 'FILES' && $isItemADir)){
+
+                    $result[] = $itemPath;
+                }
+            }
+
+            if($depth !== 0 && $isItemADir){
+
+                $result = array_merge($result, $this->findDirectoryItems($itemPath, $searchRegexp, 'absolute', $searchItemsType, $depth - 1));
             }
         }
 

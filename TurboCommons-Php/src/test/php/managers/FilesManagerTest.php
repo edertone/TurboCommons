@@ -574,107 +574,180 @@ class FilesManagerTest extends TestCase {
 	    $this->assertTrue(ArrayUtils::isEqualTo($this->sut->findDirectoryItems($this->tempFolder, '/.*/'), []));
 	    $this->assertTrue(ArrayUtils::isEqualTo($this->sut->findDirectoryItems($this->tempFolder, '/^name$/'), []));
 
+	    $this->assertTrue(ArrayUtils::isEqualTo($this->sut->findDirectoryItems($this->tempFolder, '/file/', 'relative', 'FILES'), []));
+	    $this->assertTrue(ArrayUtils::isEqualTo($this->sut->findDirectoryItems($this->tempFolder, '/.*/', 'relative', 'FILES'), []));
+	    $this->assertTrue(ArrayUtils::isEqualTo($this->sut->findDirectoryItems($this->tempFolder, '/^name$/', 'relative', 'FILES'), []));
+
+	    $this->assertTrue(ArrayUtils::isEqualTo($this->sut->findDirectoryItems($this->tempFolder, '/file/', 'relative', 'FOLDERS'), []));
+	    $this->assertTrue(ArrayUtils::isEqualTo($this->sut->findDirectoryItems($this->tempFolder, '/.*/', 'relative', 'FOLDERS'), []));
+	    $this->assertTrue(ArrayUtils::isEqualTo($this->sut->findDirectoryItems($this->tempFolder, '/^name$/', 'relative', 'FOLDERS'), []));
+
 	    // Create a structure of folders and files
 	    $this->createDummyDirectoryStucture($this->tempFolder, 4, 4, 'somefile', 5, 'file content');
 
 	    // Test resultFormat = 'name'
 
 	    // Test finding all *.txt files on the folder
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'name')) === 4 * 4 * 5);
+	    $this->assertSame(4 * 4 * 5, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'name')));
+	    $this->assertSame(4 * 4 * 5, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'name', 'FILES')));
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'name', 'FOLDERS')));
 
 	    // Test finding all files or folders on the 1st folder depth
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*$/', 'name', 0)) === 4);
+	    $this->assertSame(4, count($this->sut->findDirectoryItems($this->tempFolder, '/.*$/', 'name', 'BOTH', 0)));
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/.*$/', 'name', 'FILES', 0)));
+	    $this->assertSame(4, count($this->sut->findDirectoryItems($this->tempFolder, '/.*$/', 'name', 'FOLDERS', 0)));
 
 	    // Test finding all *.txt files on the 1st 2d and 3d folder depth
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'name', 0)) === 0);
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'name', 1)) === 20);
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'name', 2)) === 40);
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'name', 'BOTH', 0)));
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'name', 'FILES', 0)));
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'name', 'FOLDERS', 0)));
+	    $this->assertSame(20, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'name', 'BOTH', 1)));
+	    $this->assertSame(20, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'name', 'FILES', 1)));
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'name', 'FOLDERS', 1)));
+	    $this->assertSame(40, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'name', 'BOTH', 2)));
+	    $this->assertSame(40, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'name', 'FILES', 2)));
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'name', 'FOLDERS', 2)));
 
 	    // Test finding all files starting with somefile on the folder
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^somefile.*/', 'name')) === 4 * 4 * 5);
+	    $this->assertSame(4 * 4 * 5, count($this->sut->findDirectoryItems($this->tempFolder, '/^somefile.*/', 'name')));
+	    $this->assertSame(4 * 4 * 5, count($this->sut->findDirectoryItems($this->tempFolder, '/^somefile.*/', 'name', 'FILES')));
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/^somefile.*/', 'name', 'FOLDERS')));
 
 	    // Test finding all files starting with samefile on the folder
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^samefile.*/', 'name')) === 0);
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/^samefile.*/', 'name')));
 
-	    // Test finding all files named somefile-2.txt on the folder
-	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^somefile-0-0-2.txt$/', 'name') === ['somefile-0-0-2.txt']);
-	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^somefile-0-1-2.txt$/', 'name') === ['somefile-0-1-2.txt']);
-	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^somefile-2-2-2.txt$/', 'name') === ['somefile-2-2-2.txt']);
+	    // Test finding all files with an exact name on the folder
+	    $this->assertSame(['somefile-0-0-2.txt'], $this->sut->findDirectoryItems($this->tempFolder, '/^somefile-0-0-2.txt$/', 'name'));
+	    $this->assertSame(['somefile-0-1-2.txt'], $this->sut->findDirectoryItems($this->tempFolder, '/^somefile-0-1-2.txt$/', 'name'));
+	    $this->assertSame(['somefile-2-2-2.txt'], $this->sut->findDirectoryItems($this->tempFolder, '/^somefile-2-2-2.txt$/', 'name'));
 
 	    // Test finding all files named *-4.txt on the folder
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^.*-4.txt$/', 'name')) === 16);
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^.*-4.txt$/', 'name', 0)) === 0);
+	    $this->assertSame(16, count($this->sut->findDirectoryItems($this->tempFolder, '/^.*-4.txt$/', 'name')));
+	    $this->assertSame(16, count($this->sut->findDirectoryItems($this->tempFolder, '/^.*-4.txt$/', 'name', 'FILES')));
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/^.*-4.txt$/', 'name', 'FOLDERS')));
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/^.*-4.txt$/', 'name', 'BOTH', 0)));
 
-	    // Test finding all folders named folder-3-3 on the folder
-	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^folder-3-3$/', 'name') === ['folder-3-3']);
-	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^folder-1-2$/', 'name') === ['folder-1-2']);
-	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^folder-1-2$/', 'name', 0) === []);
+	    // Test finding all folders with an exact name on the folder
+	    $this->assertSame(['folder-3-3'], $this->sut->findDirectoryItems($this->tempFolder, '/^folder-3-3$/', 'name'));
+	    $this->assertSame([], $this->sut->findDirectoryItems($this->tempFolder, '/^folder-3-3$/', 'name', 'FILES'));
+	    $this->assertSame(['folder-3-3'], $this->sut->findDirectoryItems($this->tempFolder, '/^folder-3-3$/', 'name', 'FOLDERS'));
+	    $this->assertSame(['folder-1-2'], $this->sut->findDirectoryItems($this->tempFolder, '/^folder-1-2$/', 'name'));
+	    $this->assertSame([], $this->sut->findDirectoryItems($this->tempFolder, '/^folder-1-2$/', 'name', 'FILES'));
+	    $this->assertSame(['folder-1-2'], $this->sut->findDirectoryItems($this->tempFolder, '/^folder-1-2$/', 'name', 'FOLDERS'));
+	    $this->assertSame([], $this->sut->findDirectoryItems($this->tempFolder, '/^folder-1-2$/', 'name', 'BOTH', 0));
+	    $this->assertSame([], $this->sut->findDirectoryItems($this->tempFolder, '/^folder-1-2$/', 'name', 'FILES', 0));
+	    $this->assertSame([], $this->sut->findDirectoryItems($this->tempFolder, '/^folder-1-2$/', 'name', 'FOLDERS', 0));
+
+	    // Test finding all folders ending with 0-3 or 0-2
+	    $this->assertSame(['folder-0-2', 'folder-0-3'], $this->sut->findDirectoryItems($this->tempFolder, '/^.*(0-3|0-2)$/i', 'name'));
+	    $this->assertSame([], $this->sut->findDirectoryItems($this->tempFolder, '/^.*(0-3|0-2)$/i', 'name', 'FILES'));
+	    $this->assertSame(['folder-0-2', 'folder-0-3'], $this->sut->findDirectoryItems($this->tempFolder, '/^.*(0-3|0-2)$/i', 'name', 'FOLDERS'));
+
+	    // Create a folder with some dummy image files
+	    $temp2Folder = $this->sut->createTempDirectory('TurboCommons-FilesManagerTest-2');
+
+	    for ($k = 0; $k < 2; $k++) {
+
+	        $this->sut->createFile($temp2Folder.DIRECTORY_SEPARATOR.$k.'.jpg', 'fake image data');
+	        $this->sut->createFile($temp2Folder.DIRECTORY_SEPARATOR.$k.'.png', 'fake image data');
+	        $this->sut->createFile($temp2Folder.DIRECTORY_SEPARATOR.$k.'.gif', 'fake image data');
+	    }
+
+	    // Test finding all files ending with .jpg or .png
+	    $this->assertSame(['0.jpg', '0.png', '1.jpg', '1.png'], $this->sut->findDirectoryItems($temp2Folder, '/^.*\.(jpg|png)$/i', 'name'));
+	    $this->assertSame(['0.jpg', '0.png', '1.jpg', '1.png'], $this->sut->findDirectoryItems($temp2Folder, '/^.*\.(jpg|png)$/i', 'name', 'FILES'));
+	    $this->assertSame([], $this->sut->findDirectoryItems($temp2Folder, '/^.*\.(jpg|png)$/i', 'name', 'FOLDERS'));
+
+	    // Test finding all files that NOT end with .jpg
+	    $this->assertSame(['0.gif', '0.png', '1.gif', '1.png'], $this->sut->findDirectoryItems($temp2Folder, '/^(?!.*\.(jpg)$)/i', 'name'));
+	    $this->assertSame(['0.gif', '0.png', '1.gif', '1.png'], $this->sut->findDirectoryItems($temp2Folder, '/^(?!.*\.(jpg)$)/i', 'name', 'FILES'));
+	    $this->assertSame([], $this->sut->findDirectoryItems($temp2Folder, '/^(?!.*\.(jpg)$)/i', 'name', 'FOLDERS'));
+
+	    // Test finding all files that NOT end with .jpg and NOT end with .png
+	    $this->assertSame(['0.gif', '1.gif'], $this->sut->findDirectoryItems($temp2Folder, '/^(?!.*\.(jpg|png)$)/i', 'name'));
+	    $this->assertSame(['0.gif', '1.gif'], $this->sut->findDirectoryItems($temp2Folder, '/^(?!.*\.(jpg|png)$)/i', 'name', 'FILES'));
+	    $this->assertSame([], $this->sut->findDirectoryItems($temp2Folder, '/^(?!.*\.(jpg|png)$)/i', 'name', 'FOLDERS'));
+
+	    // Test finding all files that NOT end with .jpg and NOT end with .png and NOT end with gif
+	    $this->assertSame($this->sut->findDirectoryItems($temp2Folder, '/^(?!.*\.(jpg|png|gif)$)/i', 'name'), []);
 
 	    // Test resultFormat = 'relative'
 
 	    // Test finding all *.txt files on the folder
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'relative')) === 4 * 4 * 5);
+	    $this->assertSame(4 * 4 * 5, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'relative')));
+	    $this->assertSame(4 * 4 * 5, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'relative', 'FILES')));
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'relative', 'FOLDERS')));
 
 	    // Test finding all files or folders on the 1st folder depth
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*$/', 'relative', 0)) === 4);
+	    $this->assertSame(4, count($this->sut->findDirectoryItems($this->tempFolder, '/.*$/', 'relative', 'BOTH', 0)));
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/.*$/', 'relative', 'FILES', 0)));
+	    $this->assertSame(4, count($this->sut->findDirectoryItems($this->tempFolder, '/.*$/', 'relative', 'FOLDERS', 0)));
 
 	    // Test finding all *.txt files on the 1st 2d and 3d folder depth
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'relative', 0)) === 0);
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'relative', 1)) === 20);
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'relative', 2)) === 40);
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'relative', 'BOTH', 0)));
+	    $this->assertSame(20, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'relative', 'BOTH', 1)));
+	    $this->assertSame(40, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'relative', 'BOTH', 2)));
 
 	    // Test finding all files starting with somefile on the folder
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^somefile.*/', 'relative')) === 4 * 4 * 5);
+	    $this->assertSame(4 * 4 * 5, count($this->sut->findDirectoryItems($this->tempFolder, '/^somefile.*/', 'relative')));
+	    $this->assertSame(4 * 4 * 5, count($this->sut->findDirectoryItems($this->tempFolder, '/^somefile.*/', 'relative', 'FILES')));
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/^somefile.*/', 'relative', 'FOLDERS')));
 
 	    // Test finding all files starting with samefile on the folder
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^samefile.*/', 'relative')) === 0);
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/^samefile.*/', 'relative')));
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/^samefile.*/', 'relative', 'FILES')));
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/^samefile.*/', 'relative', 'FOLDERS')));
 
 	    // Test finding all files named somefile-2.txt on the folder
-	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^somefile-0-0-2.txt$/', 'relative') === ['folder-0-0'.DIRECTORY_SEPARATOR.'somefile-0-0-2.txt']);
-	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^somefile-0-1-2.txt$/', 'relative') === ['folder-0-0'.DIRECTORY_SEPARATOR.'folder-0-1'.DIRECTORY_SEPARATOR.'somefile-0-1-2.txt']);
-	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^somefile-2-2-2.txt$/', 'relative') === ['folder-2-0'.DIRECTORY_SEPARATOR.'folder-2-1'.DIRECTORY_SEPARATOR.'folder-2-2'.DIRECTORY_SEPARATOR.'somefile-2-2-2.txt']);
+	    $this->assertSame($this->sut->findDirectoryItems($this->tempFolder, '/^somefile-0-0-2.txt$/', 'relative'), ['folder-0-0'.DIRECTORY_SEPARATOR.'somefile-0-0-2.txt']);
+	    $this->assertSame($this->sut->findDirectoryItems($this->tempFolder, '/^somefile-0-1-2.txt$/', 'relative'), ['folder-0-0'.DIRECTORY_SEPARATOR.'folder-0-1'.DIRECTORY_SEPARATOR.'somefile-0-1-2.txt']);
+	    $this->assertSame($this->sut->findDirectoryItems($this->tempFolder, '/^somefile-2-2-2.txt$/', 'relative'), ['folder-2-0'.DIRECTORY_SEPARATOR.'folder-2-1'.DIRECTORY_SEPARATOR.'folder-2-2'.DIRECTORY_SEPARATOR.'somefile-2-2-2.txt']);
 
 	    // Test finding all files named *-4.txt on the folder
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^.*-4.txt$/', 'relative')) === 16);
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^.*-4.txt$/', 'relative', 0)) === 0);
+	    $this->assertSame(16, count($this->sut->findDirectoryItems($this->tempFolder, '/^.*-4.txt$/', 'relative')));
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/^.*-4.txt$/', 'relative', 'BOTH', 0)));
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/^.*-4.txt$/', 'relative', 'FILES', 0)));
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/^.*-4.txt$/', 'relative', 'FOLDERS', 0)));
 
 	    // Test finding all folders named folder-3-3 on the folder
-	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^folder-3-3$/', 'relative') === ['folder-3-0'.DIRECTORY_SEPARATOR.'folder-3-1'.DIRECTORY_SEPARATOR.'folder-3-2'.DIRECTORY_SEPARATOR.'folder-3-3']);
-	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^folder-1-2$/', 'relative') === ['folder-1-0'.DIRECTORY_SEPARATOR.'folder-1-1'.DIRECTORY_SEPARATOR.'folder-1-2']);
-	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^folder-1-2$/', 'relative', 0) === []);
+	    $this->assertSame(['folder-3-0'.DIRECTORY_SEPARATOR.'folder-3-1'.DIRECTORY_SEPARATOR.'folder-3-2'.DIRECTORY_SEPARATOR.'folder-3-3'], $this->sut->findDirectoryItems($this->tempFolder, '/^folder-3-3$/', 'relative'));
+	    $this->assertSame(['folder-1-0'.DIRECTORY_SEPARATOR.'folder-1-1'.DIRECTORY_SEPARATOR.'folder-1-2'], $this->sut->findDirectoryItems($this->tempFolder, '/^folder-1-2$/', 'relative'));
+	    $this->assertSame([], $this->sut->findDirectoryItems($this->tempFolder, '/^folder-1-2$/', 'relative', 'BOTH', 0));
 
 	    // Test resultFormat = 'absolute'
 
 	    // Test finding all *.txt files on the folder
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'absolute')) === 4 * 4 * 5);
+	    $this->assertSame(4 * 4 * 5, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'absolute')));
+	    $this->assertSame(4 * 4 * 5, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'absolute', 'FILES')));
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'absolute', 'FOLDERS')));
 
 	    // Test finding all files or folders on the 1st folder depth
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*$/', 'absolute', 0)) === 4);
+	    $this->assertSame(4, count($this->sut->findDirectoryItems($this->tempFolder, '/.*$/', 'absolute', 'BOTH', 0)));
 
 	    // Test finding all *.txt files on the 1st 2d and 3d folder depth
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'absolute', 0)) === 0);
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'absolute', 1)) === 20);
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'absolute', 2)) === 40);
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'absolute', 'BOTH', 0)));
+	    $this->assertSame(20, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'absolute', 'BOTH', 1)));
+	    $this->assertSame(40, count($this->sut->findDirectoryItems($this->tempFolder, '/.*\.txt$/', 'absolute', 'BOTH', 2)));
 
 	    // Test finding all files starting with somefile on the folder
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^somefile.*/', 'absolute')) === 4 * 4 * 5);
+	    $this->assertSame(4 * 4 * 5, count($this->sut->findDirectoryItems($this->tempFolder, '/^somefile.*/', 'absolute')));
 
 	    // Test finding all files starting with samefile on the folder
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^samefile.*/', 'absolute')) === 0);
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/^samefile.*/', 'absolute')));
 
 	    // Test finding all files named somefile-2.txt on the folder
-	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^somefile-0-0-2.txt$/', 'absolute') === [$this->tempFolder.DIRECTORY_SEPARATOR.'folder-0-0'.DIRECTORY_SEPARATOR.'somefile-0-0-2.txt']);
-	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^somefile-0-1-2.txt$/', 'absolute') === [$this->tempFolder.DIRECTORY_SEPARATOR.'folder-0-0'.DIRECTORY_SEPARATOR.'folder-0-1'.DIRECTORY_SEPARATOR.'somefile-0-1-2.txt']);
-	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^somefile-2-2-2.txt$/', 'absolute') === [$this->tempFolder.DIRECTORY_SEPARATOR.'folder-2-0'.DIRECTORY_SEPARATOR.'folder-2-1'.DIRECTORY_SEPARATOR.'folder-2-2'.DIRECTORY_SEPARATOR.'somefile-2-2-2.txt']);
+	    $this->assertSame([$this->tempFolder.DIRECTORY_SEPARATOR.'folder-0-0'.DIRECTORY_SEPARATOR.'somefile-0-0-2.txt'], $this->sut->findDirectoryItems($this->tempFolder, '/^somefile-0-0-2.txt$/', 'absolute'));
+	    $this->assertSame([$this->tempFolder.DIRECTORY_SEPARATOR.'folder-0-0'.DIRECTORY_SEPARATOR.'folder-0-1'.DIRECTORY_SEPARATOR.'somefile-0-1-2.txt'], $this->sut->findDirectoryItems($this->tempFolder, '/^somefile-0-1-2.txt$/', 'absolute'));
+	    $this->assertSame([$this->tempFolder.DIRECTORY_SEPARATOR.'folder-2-0'.DIRECTORY_SEPARATOR.'folder-2-1'.DIRECTORY_SEPARATOR.'folder-2-2'.DIRECTORY_SEPARATOR.'somefile-2-2-2.txt'], $this->sut->findDirectoryItems($this->tempFolder, '/^somefile-2-2-2.txt$/', 'absolute'));
 
 	    // Test finding all files named *-4.txt on the folder
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^.*-4.txt$/', 'absolute')) === 16);
-	    $this->assertTrue(count($this->sut->findDirectoryItems($this->tempFolder, '/^.*-4.txt$/', 'absolute', 0)) === 0);
+	    $this->assertSame(16, count($this->sut->findDirectoryItems($this->tempFolder, '/^.*-4.txt$/', 'absolute')));
+	    $this->assertSame(0, count($this->sut->findDirectoryItems($this->tempFolder, '/^.*-4.txt$/', 'absolute', 'BOTH', 0)));
 
 	    // Test finding all folders named folder-3-3 on the folder
-	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^folder-3-3$/', 'absolute') === [$this->tempFolder.DIRECTORY_SEPARATOR.'folder-3-0'.DIRECTORY_SEPARATOR.'folder-3-1'.DIRECTORY_SEPARATOR.'folder-3-2'.DIRECTORY_SEPARATOR.'folder-3-3']);
-	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^folder-1-2$/', 'absolute') === [$this->tempFolder.DIRECTORY_SEPARATOR.'folder-1-0'.DIRECTORY_SEPARATOR.'folder-1-1'.DIRECTORY_SEPARATOR.'folder-1-2']);
-	    $this->assertTrue($this->sut->findDirectoryItems($this->tempFolder, '/^folder-1-2$/', 'absolute', 0) === []);
+	    $this->assertSame([$this->tempFolder.DIRECTORY_SEPARATOR.'folder-3-0'.DIRECTORY_SEPARATOR.'folder-3-1'.DIRECTORY_SEPARATOR.'folder-3-2'.DIRECTORY_SEPARATOR.'folder-3-3'], $this->sut->findDirectoryItems($this->tempFolder, '/^folder-3-3$/', 'absolute'));
+	    $this->assertSame([$this->tempFolder.DIRECTORY_SEPARATOR.'folder-1-0'.DIRECTORY_SEPARATOR.'folder-1-1'.DIRECTORY_SEPARATOR.'folder-1-2'], $this->sut->findDirectoryItems($this->tempFolder, '/^folder-1-2$/', 'absolute'));
+	    $this->assertSame([], $this->sut->findDirectoryItems($this->tempFolder, '/^folder-1-2$/', 'absolute', 'BOTH', 0));
 
 	    // Test wrong values
 	    // Not necessary
