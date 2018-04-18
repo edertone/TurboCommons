@@ -271,7 +271,7 @@ QUnit.test("testIsJavaProperties", function(assert){
         var file = propertiesFiles[i];
         var fileData = propertiesFilesData[i];
 
-        sut = new JavaPropertiesObject(fileData);
+        var sut = new JavaPropertiesObject(fileData);
         assert.ok(JavaPropertiesObject.isJavaProperties(fileData));
         assert.ok(JavaPropertiesObject.isJavaProperties(sut));
     }

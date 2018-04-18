@@ -276,7 +276,7 @@ QUnit.test("testSetColumnNames", function(assert){
 QUnit.test("testGetColumnNames", function(assert){
 
     // Test empty values
-    test = new TableObject();
+    var test = new TableObject();
     assert.ok(ArrayUtils.isEqualTo(test.getColumnNames(), []));
 
     // Test ok values
@@ -324,7 +324,7 @@ QUnit.test("testGetColumnNames", function(assert){
 QUnit.test("testGetColumnName", function(assert){
 
     // Test empty values
-    test = new TableObject();
+    var test = new TableObject();
 
     assert.throws(function() {
         test.getColumnName(0);

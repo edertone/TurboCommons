@@ -647,7 +647,7 @@ QUnit.test("testShift", function(assert){
     // Not necessary
 
     // Test exceptions
-    h = new HashMapObject();
+    var h = new HashMapObject();
 
     assert.throws(function() {
         h.shift();
