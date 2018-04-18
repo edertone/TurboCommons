@@ -1352,6 +1352,187 @@ class FilesManagerTest extends TestCase {
 	}
 
 
+	/**
+	 * testDeleteDirectory
+	 *
+	 * @return void
+	 */
+	public function testDeleteDirectory(){
+
+	    // Test empty values
+	    // TODO
+
+	    // Test ok values
+	    // TODO
+
+	    // Test wrong values
+	    // TODO
+
+	    // Test exceptions
+	    // TODO
+	}
+
+
+	/**
+	 * testCreateFile
+	 *
+	 * @return void
+	 */
+	public function testCreateFile(){
+
+	    // Test empty values
+	    // TODO
+
+	    // Test ok values
+	    // TODO
+
+	    // Test wrong values
+	    // TODO
+
+	    // Test exceptions
+	    // TODO
+	}
+
+
+	/**
+	 * testCreateTempFile
+	 *
+	 * @return void
+	 */
+	public function testCreateTempFile(){
+
+	    // Test empty values
+	    // TODO
+
+	    // Test ok values
+	    // TODO
+
+	    // Test wrong values
+	    // TODO
+
+	    // Test exceptions
+	    // TODO
+	}
+
+
+	/**
+	 * testMergeFiles
+	 *
+	 * @return void
+	 */
+	public function testMergeFiles(){
+
+	    // Test empty values
+	    try {
+	        $this->sut->mergeFiles(null, null);
+	        $this->exceptionMessage = 'null did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->sut->mergeFiles('', '');
+	        $this->exceptionMessage = '"" did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->sut->mergeFiles('       ', '       ');
+	        $this->exceptionMessage = '"      " did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    // Test ok values
+
+	    // Create some dummy text files
+	    for ($i = 0; $i < 3; $i++) {
+
+	        $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'empty-'.$i.'.txt', '');
+	        $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'a-'.$i.'.txt', 'text a-'.$i);
+	        $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'b-'.$i.'.txt', 'text b-'.$i);
+	        $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'c-'.$i.'.txt', 'text c-'.$i);
+	    }
+
+	    // Test merging empty files
+	    $files = [
+	        $this->tempFolder.DIRECTORY_SEPARATOR.'empty-0.txt',
+	        $this->tempFolder.DIRECTORY_SEPARATOR.'empty-1.txt',
+	        $this->tempFolder.DIRECTORY_SEPARATOR.'empty-2.txt'
+	    ];
+
+	    $destFile = $this->tempFolder.DIRECTORY_SEPARATOR.'merged-file.txt';
+
+	    $this->sut->mergeFiles($files, $destFile);
+	    $this->assertTrue($this->sut->readFile($destFile) === '');
+
+	    $this->sut->mergeFiles($files, $destFile, "\n\n");
+	    $this->assertTrue($this->sut->readFile($destFile) === "\n\n\n\n");
+
+	    $this->sut->mergeFiles($files, $destFile, '---');
+	    $this->assertTrue($this->sut->readFile($destFile) === '------');
+
+	    // Test merging non empty files
+	    $files = [
+	        $this->tempFolder.DIRECTORY_SEPARATOR.'a-0.txt',
+	        $this->tempFolder.DIRECTORY_SEPARATOR.'a-1.txt',
+	        $this->tempFolder.DIRECTORY_SEPARATOR.'a-2.txt'
+	    ];
+
+	    $this->sut->mergeFiles($files, $destFile);
+	    $this->assertTrue($this->sut->readFile($destFile) === 'text a-0text a-1text a-2');
+
+	    $this->sut->mergeFiles($files, $destFile, ' ');
+	    $this->assertTrue($this->sut->readFile($destFile) === 'text a-0 text a-1 text a-2');
+
+	    $this->sut->mergeFiles($files, $destFile, "\n\n");
+	    $this->assertTrue($this->sut->readFile($destFile) === "text a-0\n\ntext a-1\n\ntext a-2");
+
+	    $files = [
+	        $this->tempFolder.DIRECTORY_SEPARATOR.'a-0.txt',
+	        $this->tempFolder.DIRECTORY_SEPARATOR.'b-1.txt',
+	        $this->tempFolder.DIRECTORY_SEPARATOR.'c-2.txt'
+	    ];
+
+	    $this->sut->mergeFiles($files, $destFile);
+	    $this->assertTrue($this->sut->readFile($destFile) === 'text a-0text b-1text c-2');
+
+	    $this->sut->mergeFiles($files, $destFile, '||');
+	    $this->assertTrue($this->sut->readFile($destFile) === 'text a-0||text b-1||text c-2');
+
+	    // Test wrong values
+	    // Test exceptions
+	    try {
+	        $this->sut->mergeFiles(1, $destFile);
+	        $this->exceptionMessage = '1 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->sut->mergeFiles(false, $destFile);
+	        $this->exceptionMessage = 'false did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->sut->mergeFiles([1,2,3,4], $destFile);
+	        $this->exceptionMessage = '[1,2,3,4] did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->sut->mergeFiles($files, $this->tempFolder.DIRECTORY_SEPARATOR.'nonexistant'.DIRECTORY_SEPARATOR.'nonexistant');
+	        $this->exceptionMessage = 'non existant folder did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+	}
+
+
 	// TODO - Add all missing tests
 }
 

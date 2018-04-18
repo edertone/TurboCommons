@@ -712,7 +712,18 @@ export class FilesManager{
      */
     createFile(path: string, fileData = '', permisions = ''){
 
-        // TODO - translate from php
+        // TODO - Php part must be reviewed, update this code after php version is finished
+        
+        try {
+	
+            this.fs.writeFileSync(path, fileData);
+            
+            return true;
+            
+        } catch (e) {
+
+            return false;
+        }
     }
 
 
@@ -724,7 +735,36 @@ export class FilesManager{
         // TODO - translate from php
     }
 
+    
+    /**
+     * Concatenate all the provided files, one after the other, into a single destination file.
+     *
+     * @param sourcePaths A list with the full paths to the files we want to join. The result will be generated in the same order.
+     * @param destFile The full path where the merged file will be stored, including the full file name (will be overwitten if exists).
+     * @param separator An optional string that will be concatenated between each file content. We can for example use "\n\n" to
+     *        create some empty space between each file content
+     *
+     * @return True on success or false on failure.
+     */
+    mergeFiles(sourcePaths: string[], destFile: string, separator = ''){
 
+        let mergedData = '';
+
+        for (var i = 0; i < sourcePaths.length; i++) {
+
+            mergedData += this.readFile(sourcePaths[i]);
+
+            // Place separator string on all files except the last one
+            if(i < sourcePaths.length - 1 && separator !== ''){
+
+                mergedData += separator;
+            }
+        }
+
+        return this.createFile(destFile, mergedData);
+    }
+    
+    
     /**
      * Get the size from a file
      *

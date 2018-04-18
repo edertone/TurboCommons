@@ -694,6 +694,8 @@ class FilesManager extends BaseStrictClass{
      */
     public function createFile(string $path, string $fileData = '', string $permisions = ''){
 
+        // TODO - this method should be reviewed and improved
+
         $fp = fopen($path, 'wb');
 
         if($fp === false){
@@ -724,6 +726,35 @@ class FilesManager extends BaseStrictClass{
     /** TODO */
     public function createTempFile(){
 
+    }
+
+
+    /**
+     * Concatenate all the provided files, one after the other, into a single destination file.
+     *
+     * @param array $sourcePaths A list with the full paths to the files we want to join. The result will be generated in the same order.
+     * @param string $destFile The full path where the merged file will be stored, including the full file name (will be overwitten if exists).
+     * @param string $separator An optional string that will be concatenated between each file content. We can for example use "\n\n" to
+     *        create some empty space between each file content
+     *
+     * @return bool True on success or false on failure.
+     */
+    public function mergeFiles(array $sourcePaths, string $destFile, $separator = ''){
+
+        $mergedData = '';
+
+        for ($i = 0, $l = count($sourcePaths); $i < $l; $i++) {
+
+            $mergedData .= $this->readFile($sourcePaths[$i]);
+
+            // Place separator string on all files except the last one
+            if($i < $l - 1 && $separator !== ''){
+
+                $mergedData .= $separator;
+            }
+        }
+
+        return $this->createFile($destFile, $mergedData);
     }
 
 
