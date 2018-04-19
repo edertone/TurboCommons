@@ -123,7 +123,7 @@ class FilesManagerTest extends TestCase {
 
                     $fileToCreate = $pathToCreate.$s.$fileBaseName.'-'.$i.'-'.$j.'-'.$k.'.txt';
 
-                    $this->sut->createFile($fileToCreate, $filesContent);
+                    $this->sut->saveFile($fileToCreate, $filesContent);
 
                     $this->assertTrue($this->sut->isFile($fileToCreate));
                 }
@@ -179,12 +179,12 @@ class FilesManagerTest extends TestCase {
 	    $this->assertFalse($this->sut->isFile("\n\n\n"));
 
 	    // Test ok values
-	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'File.txt', '');
+	    $this->sut->saveFile($this->tempFolder.DIRECTORY_SEPARATOR.'File.txt', '');
 	    $this->assertTrue($this->sut->isFile($this->tempFolder.DIRECTORY_SEPARATOR.'File.txt'));
 	    $this->sut->deleteFile($this->tempFolder.DIRECTORY_SEPARATOR.'File.txt');
 	    $this->assertFalse($this->sut->isFile($this->tempFolder.DIRECTORY_SEPARATOR.'File.txt'));
 
-	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'File2.txt', 'Hello baby');
+	    $this->sut->saveFile($this->tempFolder.DIRECTORY_SEPARATOR.'File2.txt', 'Hello baby');
 	    $this->assertTrue($this->sut->isFile($this->tempFolder.DIRECTORY_SEPARATOR.'File2.txt'));
         $this->sut->deleteFile($this->tempFolder.DIRECTORY_SEPARATOR.'File2.txt');
 	    $this->assertFalse($this->sut->isFile($this->tempFolder.DIRECTORY_SEPARATOR.'File2.txt'));
@@ -240,10 +240,10 @@ class FilesManagerTest extends TestCase {
 	    $file2 = $this->tempFolder.DIRECTORY_SEPARATOR.'file2';
 	    $file3 = $this->tempFolder.DIRECTORY_SEPARATOR.'file3';
 	    $file4 = $this->tempFolder.DIRECTORY_SEPARATOR.'file4';
-	    $this->assertTrue($this->sut->createFile($file1, 'file 1'));
-	    $this->assertTrue($this->sut->createFile($file2, 'file 2'));
-	    $this->assertTrue($this->sut->createFile($file3, 'file 3'));
-	    $this->assertTrue($this->sut->createFile($file4, 'file 1'));
+	    $this->assertTrue($this->sut->saveFile($file1, 'file 1'));
+	    $this->assertTrue($this->sut->saveFile($file2, 'file 2'));
+	    $this->assertTrue($this->sut->saveFile($file3, 'file 3'));
+	    $this->assertTrue($this->sut->saveFile($file4, 'file 1'));
 
 	    $this->assertTrue($this->sut->isFileEqualTo($file1, $file1));
 	    $this->assertFalse($this->sut->isFileEqualTo($file1, $file2));
@@ -343,10 +343,10 @@ class FilesManagerTest extends TestCase {
 	    $this->assertFalse($this->sut->isDirectory('https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'));
 	    $this->assertFalse($this->sut->isDirectory('http://www.facebook.com'));
 
-	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'File.txt', '');
+	    $this->sut->saveFile($this->tempFolder.DIRECTORY_SEPARATOR.'File.txt', '');
 	    $this->assertFalse($this->sut->isDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'File.txt'));
 
-	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'File2.txt', 'Hello baby');
+	    $this->sut->saveFile($this->tempFolder.DIRECTORY_SEPARATOR.'File2.txt', 'Hello baby');
 	    $this->assertFalse($this->sut->isDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'File2.txt'));
 	}
 
@@ -502,11 +502,11 @@ class FilesManagerTest extends TestCase {
 	    $averageDirectory = $this->tempFolder.DIRECTORY_SEPARATOR.'some folder';
 	    $this->sut->createDirectory($averageDirectory);
 	    $this->assertTrue($this->sut->isDirectoryEmpty($averageDirectory));
-	    $this->sut->createFile($averageDirectory.DIRECTORY_SEPARATOR.'File.txt', 'Hello baby');
+	    $this->sut->saveFile($averageDirectory.DIRECTORY_SEPARATOR.'File.txt', 'Hello baby');
 	    $this->assertFalse($this->sut->isDirectoryEmpty($averageDirectory));
 
 	    // Test wrong values
-	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'File.txt', 'Hello baby');
+	    $this->sut->saveFile($this->tempFolder.DIRECTORY_SEPARATOR.'File.txt', 'Hello baby');
 	    $this->assertFalse($this->sut->isDirectoryEmpty($this->tempFolder));
 
 	    // Test exceptions
@@ -648,9 +648,9 @@ class FilesManagerTest extends TestCase {
 
 	    for ($k = 0; $k < 2; $k++) {
 
-	        $this->sut->createFile($temp2Folder.DIRECTORY_SEPARATOR.$k.'.jpg', 'fake image data');
-	        $this->sut->createFile($temp2Folder.DIRECTORY_SEPARATOR.$k.'.png', 'fake image data');
-	        $this->sut->createFile($temp2Folder.DIRECTORY_SEPARATOR.$k.'.gif', 'fake image data');
+	        $this->sut->saveFile($temp2Folder.DIRECTORY_SEPARATOR.$k.'.jpg', 'fake image data');
+	        $this->sut->saveFile($temp2Folder.DIRECTORY_SEPARATOR.$k.'.png', 'fake image data');
+	        $this->sut->saveFile($temp2Folder.DIRECTORY_SEPARATOR.$k.'.gif', 'fake image data');
 	    }
 
 	    // Test finding all files ending with .jpg or .png
@@ -807,7 +807,7 @@ class FilesManagerTest extends TestCase {
 	    $this->assertTrue($this->sut->isDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'NewFolder'));
 
 	    // Create a file that is named like a directory (without extension)
-	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'2', 'test file');
+	    $this->sut->saveFile($this->tempFolder.DIRECTORY_SEPARATOR.'2', 'test file');
 	    $this->assertTrue($this->sut->isFile($this->tempFolder.DIRECTORY_SEPARATOR.'2'));
 
 	    // Verify generated dir names when folders already exist at destination path
@@ -884,9 +884,9 @@ class FilesManagerTest extends TestCase {
 	    $this->assertTrue($this->sut->findUniqueFileName($this->tempFolder, 'NewFile.txt', '-', true) == 'NewFile.txt');
 
 	    // Create some files
-	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'1', 'hello baby');
+	    $this->sut->saveFile($this->tempFolder.DIRECTORY_SEPARATOR.'1', 'hello baby');
 	    $this->assertTrue($this->sut->isFile($this->tempFolder.DIRECTORY_SEPARATOR.'1'));
-	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'NewFile.txt', 'hello baby');
+	    $this->sut->saveFile($this->tempFolder.DIRECTORY_SEPARATOR.'NewFile.txt', 'hello baby');
 	    $this->assertTrue($this->sut->isFile($this->tempFolder.DIRECTORY_SEPARATOR.'NewFile.txt'));
 
 	    // Create a folder that is named like a possible file
@@ -901,11 +901,11 @@ class FilesManagerTest extends TestCase {
 	    $this->assertTrue($this->sut->findUniqueFileName($this->tempFolder, 'NewFile.txt', 'copy', '-', true) == 'copy-1-NewFile.txt');
 
 	    // Create some more files
-	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'3', 'hello baby');
+	    $this->sut->saveFile($this->tempFolder.DIRECTORY_SEPARATOR.'3', 'hello baby');
 	    $this->assertTrue($this->sut->isFile($this->tempFolder.DIRECTORY_SEPARATOR.'3'));
-	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'NewFile-1.txt', 'hello baby');
+	    $this->sut->saveFile($this->tempFolder.DIRECTORY_SEPARATOR.'NewFile-1.txt', 'hello baby');
 	    $this->assertTrue($this->sut->isFile($this->tempFolder.DIRECTORY_SEPARATOR.'NewFile-1.txt'));
-	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'NewFile-copy-1.txt', 'hello baby');
+	    $this->sut->saveFile($this->tempFolder.DIRECTORY_SEPARATOR.'NewFile-copy-1.txt', 'hello baby');
 	    $this->assertTrue($this->sut->isFile($this->tempFolder.DIRECTORY_SEPARATOR.'NewFile-copy-1.txt'));
 
 	    // Verify generated names again
@@ -975,7 +975,7 @@ class FilesManagerTest extends TestCase {
 	    $this->assertTrue(!$this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'-go-'));
 
 	    // Test already existing files
-	    $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'3', 'hello baby');
+	    $this->sut->saveFile($this->tempFolder.DIRECTORY_SEPARATOR.'3', 'hello baby');
 	    try {
 	        $this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'3');
 	        $this->exceptionMessage = 'basepath did not cause exception';
@@ -1124,7 +1124,7 @@ class FilesManagerTest extends TestCase {
 	    // Test ok values
 
 	    // Create some folders and files
-	    $this->assertTrue($this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'file.txt', 'hello baby'));
+	    $this->assertTrue($this->sut->saveFile($this->tempFolder.DIRECTORY_SEPARATOR.'file.txt', 'hello baby'));
 	    $this->assertTrue($this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'test1'));
 	    $this->assertTrue($this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'1234'));
 	    $this->assertTrue($this->sut->createDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'-go-'));
@@ -1374,11 +1374,11 @@ class FilesManagerTest extends TestCase {
 
 
 	/**
-	 * testCreateFile
+	 * testSaveFile
 	 *
 	 * @return void
 	 */
-	public function testCreateFile(){
+	public function testSaveFile(){
 
 	    // Test empty values
 	    // TODO
@@ -1449,10 +1449,10 @@ class FilesManagerTest extends TestCase {
 	    // Create some dummy text files
 	    for ($i = 0; $i < 3; $i++) {
 
-	        $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'empty-'.$i.'.txt', '');
-	        $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'a-'.$i.'.txt', 'text a-'.$i);
-	        $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'b-'.$i.'.txt', 'text b-'.$i);
-	        $this->sut->createFile($this->tempFolder.DIRECTORY_SEPARATOR.'c-'.$i.'.txt', 'text c-'.$i);
+	        $this->sut->saveFile($this->tempFolder.DIRECTORY_SEPARATOR.'empty-'.$i.'.txt', '');
+	        $this->sut->saveFile($this->tempFolder.DIRECTORY_SEPARATOR.'a-'.$i.'.txt', 'text a-'.$i);
+	        $this->sut->saveFile($this->tempFolder.DIRECTORY_SEPARATOR.'b-'.$i.'.txt', 'text b-'.$i);
+	        $this->sut->saveFile($this->tempFolder.DIRECTORY_SEPARATOR.'c-'.$i.'.txt', 'text c-'.$i);
 	    }
 
 	    // Test merging empty files

@@ -684,42 +684,25 @@ class FilesManager extends BaseStrictClass{
 
 
     /**
-     * Create a file to the specified filesystem path and write the specified data to it.
+     * Writes the specified data to a physical file, which will be created (if it does not exist) or overwritten without warning.
+     * This method can be used to create a new empty file, a new file with any contents or to overwrite an existing one.
      *
-     * @param string $path The full path where the file will be stored, including the full file name
-     * @param string $fileData Information to store on the file (a string, a block of bytes, etc...)
-     * @param int $permisions The file permisions. If not specified, the default system one will be used, (normally 0644)
+     * We must check for file existence before executing this method if we don't want to inadvertently replace existing files.
      *
-     * @return bool Returns true on success or false on failure.
+     * @see FilesManager::isFile
+     *
+     * @param string $pathToFile The path including full filename where data will be saved. File will be created or overwritten without warning.
+     * @param string $data Any information to save on the file.
+     * @param string $append Set it to true to append the data to the end of the file instead of overwritting it. File will be created if it does
+     *        not exist, even with append set to true.
+     *
+     * @return True on success or false on failure.
      */
-    public function createFile(string $path, string $fileData = '', string $permisions = ''){
+    public function saveFile(string $pathToFile, string $data = '', bool $append = false){
 
-        // TODO - this method should be reviewed and improved
+        $flags = $append ? FILE_APPEND : null;
 
-        $fp = fopen($path, 'wb');
-
-        if($fp === false){
-            return false;
-        }
-
-        $fw = fwrite($fp, $fileData);
-
-        if($fw === false){
-            return false;
-        }
-
-        if(!fclose($fp)){
-            return false;
-        }
-
-        // Modify the file permisions if required
-        if($permisions != '' && !chmod($path, $permisions)){
-
-            return false;
-        }
-
-        return true;
-
+        return file_put_contents($pathToFile, $data, $flags) !== false;
     }
 
 
@@ -754,7 +737,7 @@ class FilesManager extends BaseStrictClass{
             }
         }
 
-        return $this->createFile($destFile, $mergedData);
+        return $this->saveFile($destFile, $mergedData);
     }
 
 

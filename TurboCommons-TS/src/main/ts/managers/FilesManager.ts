@@ -702,21 +702,32 @@ export class FilesManager{
 
 
     /**
-     * Create a file to the specified filesystem path and write the specified data to it.
+     * Writes the specified data to a physical file, which will be created (if it does not exist) or overwritten without warning.
+     * This method can be used to create a new empty file, a new file with any contents or to overwrite an existing one.
      *
-     * @param path The full path where the file will be stored, including the full file name
-     * @param fileData Information to store on the file (a string, a block of bytes, etc...)
-     * @param permisions The file permisions. If not specified, the default system one will be used, (normally 0644)
+     * We must check for file existence before executing this method if we don't want to inadvertently replace existing files.
      *
-     * @return Returns true on success or false on failure.
+     * @see FilesManager.isFile
+     *
+     * @param pathToFile The path including full filename where data will be saved. File will be created or overwritten without warning.
+     * @param data Any information to save on the file.
+     * @param append Set it to true to append the data to the end of the file instead of overwritting it. File will be created if it does
+     *        not exist, even with append set to true.
+     *
+     * @return True on success or false on failure.
      */
-    createFile(path: string, fileData = '', permisions = ''){
+    saveFile(pathToFile: string, data = '', append = false){
 
-        // TODO - Php part must be reviewed, update this code after php version is finished
-        
         try {
 	
-            this.fs.writeFileSync(path, fileData);
+            if(append){
+                
+                this.fs.appendFileSync(pathToFile, data);
+                
+            }else{
+                
+                this.fs.writeFileSync(pathToFile, data);
+            }
             
             return true;
             
@@ -761,7 +772,7 @@ export class FilesManager{
             }
         }
 
-        return this.createFile(destFile, mergedData);
+        return this.saveFile(destFile, mergedData);
     }
     
     
