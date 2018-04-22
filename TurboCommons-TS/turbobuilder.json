@@ -1,0 +1,93 @@
+{
+	"metadata": {
+		"name": "turbocommons-ts",
+		"description": "General purpose library that implements frequently used and generic software development tasks"
+	},
+	
+	"validate": {
+		"runBeforeBuild": true,
+		"projectStructure" : {
+	        "enabled": true,
+	        "forceExtrasFolder": true,
+	        "forceReadmeFile": true,
+	        "forceTODOFile": true,
+	        "resourcesStructure": true,
+	        "phpStructure": true,
+	        "jsStructure": true,
+	        "tsStructure": true,
+	        "tsConfigFile": true,
+	        "javaStructure": true,
+	        "cssStructure": true,
+	        "checkGitIgnore": true
+	    },
+	    "copyrightHeaders": [
+	    	{
+	    		"path": "extras/copyrightHeaders/TsFiles-Header.txt",
+	    		"appliesTo": "src",
+	    		"filterRegexp": "*.ts"
+	    	},
+	    	{
+	    		"path": "extras/copyrightHeaders/JsFiles-Header.txt",
+	    		"appliesTo": "src",
+	    		"filterRegexp": "*.js"
+	    	}
+	    ]
+    },
+    
+    "build": {
+    
+	    "keepUnpackedSrcFiles" : false,
+	    
+	    "php" : {
+	    	"enabled": false,
+	    	"createPhar": false
+	    },
+	    
+	    "js" : {
+	    	"enabled": false,
+	    	"createMergedJs": false
+	    },
+	    
+	    "java" : {
+	    	"enabled": false,
+	    	"createJar": false
+	    },
+	    
+	    "ts" : {
+	        "enabled": true,
+	        "compilerDeclarationFile": true,
+	        "compilerStrict": true,
+	        "compilerSourceMap": true,
+	        "compilerTargets": [
+	            {"target": "ES5", "mergedFileName": "TurboCommons-ES5", "globalVar": "org_turbocommons"},
+	            {"target": "ES6", "mergedFileName": "TurboCommons-ES6", "globalVar": "org_turbocommons"}
+	        ]
+	    }
+    },
+    
+    "release": {
+	    "gitChangeLog": true,
+	    "gitChangeLogCount": 5,
+	    "optimizeCss": true,
+	    "optimizeHtml": true,
+	    "optimizeJs": true,
+	    "optimizePhp": false,
+	    "optimizePictures": true,
+	    "generateCodeDocumentation": true
+    },
+    
+    "test": {
+	    "php": {
+	        "enabled": false
+	    },	    
+	    "js": {
+	        "enabled": false
+	    },	    
+	    "ts": {
+	        "enabled": true,
+	        "httpServerPort": "8185",
+	        "browsers": {"chrome": true, "firefox": false, "iexplore": false},
+	        "testingLibrary": "qunit"
+	    }
+    }
+}
