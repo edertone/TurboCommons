@@ -59,8 +59,8 @@
 	        "compilerStrict": true,
 	        "compilerSourceMap": true,
 	        "compilerTargets": [
-	            {"target": "ES5", "mergedFileName": "TurboCommons-ES5", "globalVar": "org_turbocommons"},
-	            {"target": "ES6", "mergedFileName": "TurboCommons-ES6", "globalVar": "org_turbocommons"}
+	            {"target": "ES5", "mergedFileName": "turbocommons-es5", "globalVar": "org_turbocommons"},
+	            {"target": "ES6", "mergedFileName": "turbocommons-es6", "globalVar": "org_turbocommons"}
 	        ]
 	    }
     },

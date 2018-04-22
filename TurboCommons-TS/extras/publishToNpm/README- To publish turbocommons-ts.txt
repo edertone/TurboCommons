@@ -20,7 +20,7 @@ To publish the library to npm:
 7 - Open a command line inside the created desktop folder and run:
 	npm publish
 
-8 - Commit the new build number to the git repository
+8 - Make sure the git tag is updated with the new project version that's been published to npm
 
 9 - Generate online html docs:
 	- Open a cmd at the root of the project

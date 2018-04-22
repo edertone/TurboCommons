@@ -46,14 +46,14 @@ let n = StringUtils.countWords("word1 word2 word3");
 - Javascript 5:
 ```
 npm install turbocommons-es5
-<script src="turbocommons-es5/TurboCommons-ES5-X.X.X.js"></script>
+<script src="turbocommons-es5/turbocommons-es5.js"></script>
 var StringUtils = org_turbocommons.StringUtils;
 var n = StringUtils.countWords("word1 word2 word3");
 ```
 - Javascript 6:
 ```
 npm install turbocommons-es6
-<script src="turbocommons-es6/TurboCommons-ES6-X.X.X.js"></script>
+<script src="turbocommons-es6/turbocommons-es6.js"></script>
 var StringUtils = org_turbocommons.StringUtils;
 var n = StringUtils.countWords("word1 word2 word3");
 ```
