@@ -96,20 +96,6 @@ class SerializationManager{
 
         return new JavaPropertiesObject($string);
     }
-
-
-    // TODO
-    public function stringToXmlObject(){
-
-        // TODO - review from TS
-    }
-
-
-    // TODO
-    public function xmlObjectToString(){
-
-        // TODO - review from TS
-    }
 }
 
 ?>

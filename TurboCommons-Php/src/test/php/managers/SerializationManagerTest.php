@@ -238,54 +238,6 @@ class SerializationManagerTest extends TestCase {
         // TODO
         $this->markTestIncomplete('This test has not been implemented yet.');
     }
-
-
-    /**
-     * testStringToXmlObject
-     *
-     * @return void
-     */
-    public function testStringToXmlObject(){
-
-        // Test empty values
-        // TODO
-
-        // Test ok values
-        // TODO
-
-        // Test wrong values
-        // TODO
-
-        // Test exceptions
-        // TODO
-
-        // TODO
-        $this->markTestIncomplete('This test has not been implemented yet.');
-    }
-
-
-    /**
-     * testXmlObjectToString
-     *
-     * @return void
-     */
-    public function testXmlObjectToString(){
-
-        // Test empty values
-        // TODO
-
-        // Test ok values
-        // TODO
-
-        // Test wrong values
-        // TODO
-
-        // Test exceptions
-        // TODO
-
-        // TODO
-        $this->markTestIncomplete('This test has not been implemented yet.');
-    }
 }
 
 ?>
