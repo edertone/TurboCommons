@@ -11,7 +11,6 @@
 import { NumericUtils } from '../utils/NumericUtils';
 import { ValidationManager } from "./ValidationManager";
 import { HashMapObject } from '../model/HashMapObject';
-import { XMLObject } from '../model/XMLObject';
 import { JavaPropertiesObject } from '../model/JavaPropertiesObject';
 import { StringUtils } from '../utils/StringUtils';
 import { ArrayUtils } from '../utils/ArrayUtils';
@@ -244,37 +243,5 @@ export class SerializationManager {
     stringToJavaPropertiesObject(string: string){
 
         return new JavaPropertiesObject(string);
-    }
-    
-    
-    /**
-     * Convert a string containing a well formed XML structure to an XMLObject instance
-     *
-     * @param string A string containing xml data
-     *
-     * @return The representation of the given string as an XmlObject instance
-     */
-    stringToXmlObject(string : string){
-
-        if(StringUtils.isEmpty(string)){
-
-            throw new Error('Empty string is not a valid xml value');
-        }
-        
-        // TODO - implement this and translate it to PHP
-        //        return new XMLObject(string);
-    }
-
-
-    /**
-     * Convert an XMLObject to its string representation
-     *
-     * @param xml An XMLObject instance
-     *
-     * @return The textual valid representation of the given XMLObject
-     */
-    xmlObjectToString(xmlObject: XMLObject){
-
-        // TODO
     }
 }

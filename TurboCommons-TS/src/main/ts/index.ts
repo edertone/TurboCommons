@@ -23,7 +23,6 @@ export { CSVObject } from './model/CSVObject';
 export { HashMapObject } from './model/HashMapObject';
 export { JavaPropertiesObject } from './model/JavaPropertiesObject';
 export { TableObject } from './model/TableObject';
-export { XMLObject } from './model/XMLObject';
 
 // Utils package
 export { ArrayUtils } from './utils/ArrayUtils';

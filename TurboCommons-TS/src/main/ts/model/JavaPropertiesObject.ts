@@ -141,7 +141,7 @@ export class JavaPropertiesObject extends HashMapObject {
 
             try {
 
-                return (value != null) && ((value.constructor as any).name === 'JavaPropertiesObject');
+                return (value != null) && (value instanceof JavaPropertiesObject);
 
             } catch (e) {
 
@@ -172,7 +172,7 @@ export class JavaPropertiesObject extends HashMapObject {
 
             try {
                 
-                if((properties.constructor as any).name === 'JavaPropertiesObject'){
+                if(properties instanceof JavaPropertiesObject){
 
                     objectToCompare = properties;
                 }
