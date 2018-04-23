@@ -38,21 +38,6 @@
     
 	    "keepUnpackedSrcFiles" : false,
 	    
-	    "php" : {
-	    	"enabled": false,
-	    	"createPhar": false
-	    },
-	    
-	    "js" : {
-	    	"enabled": false,
-	    	"createMergedJs": false
-	    },
-	    
-	    "java" : {
-	    	"enabled": false,
-	    	"createJar": false
-	    },
-	    
 	    "ts" : {
 	        "enabled": true,
 	        "declaration": true,
@@ -78,12 +63,6 @@
     },
     
     "test": {
-	    "php": {
-	        "enabled": false
-	    },	    
-	    "js": {
-	        "enabled": false
-	    },	    
 	    "ts": {
 	        "enabled": true,
 	        "httpServerPort": "8185",
