@@ -55,12 +55,13 @@
 	    
 	    "ts" : {
 	        "enabled": true,
-	        "compilerDeclarationFile": true,
-	        "compilerStrict": true,
-	        "compilerSourceMap": true,
-	        "compilerTargets": [
-	            {"target": "ES5", "mergedFileName": "turbocommons-es5", "globalVar": "org_turbocommons"},
-	            {"target": "ES6", "mergedFileName": "turbocommons-es6", "globalVar": "org_turbocommons"}
+	        "declaration": true,
+	        "strict": true,
+	        "sourceMap": true,
+	        "targets": [
+	            {"folder": "ts", "jsTarget": "ES5"},
+	            {"folder": "es5", "jsTarget": "ES5", "mergedFile": "turbocommons-es5", "globalVar": "org_turbocommons"},
+	            {"folder": "es6", "jsTarget": "ES6", "mergedFile": "turbocommons-es6", "globalVar": "org_turbocommons"}
 	        ]
 	    }
     },
@@ -86,6 +87,7 @@
 	    "ts": {
 	        "enabled": true,
 	        "httpServerPort": "8185",
+	        "targets": ["es5", "es6"],
 	        "browsers": {"chrome": true, "firefox": false, "iexplore": false},
 	        "testingLibrary": "qunit"
 	    }
