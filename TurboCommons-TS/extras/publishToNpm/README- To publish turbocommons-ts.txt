@@ -22,11 +22,9 @@ To publish the library to npm:
 
 8 - Make sure the git tag is updated with the new project version that's been published to npm
 
-9 - Generate online html docs:
-	- Open a cmd at the root of the project
-	- Install typedoc if necessary
-	- tsconfig.json must be present at the same folder. Coy it to the project root temporarily
-	- typedoc --name turbocommons --module commonjs --mode modules --out target/docs/ src/main/ts
-	- remove temporary tsconfig.json
+9 - Get the downloadable zip files for each target and update the files inside with the new versions
+	- docs, readme, compiled code, etc...
 	
-10 - Upload the new version to turbocommons website for direct download
+10 - Upload the new zip versions to turbocommons website for direct download
+
+11 - Upload the new generated docs to the turbocommons website
