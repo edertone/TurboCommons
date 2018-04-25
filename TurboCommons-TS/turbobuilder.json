@@ -22,11 +22,13 @@
 	    },
 	    "copyrightHeaders": [
 	    	{
+	    		"enabled": true,
 	    		"path": "extras/copyrightHeaders/TsFiles-Header.txt",
 	    		"appliesTo": "src",
 	    		"filterRegexp": "*.ts"
 	    	},
 	    	{
+	    		"enabled": true,
 	    		"path": "extras/copyrightHeaders/JsFiles-Header.txt",
 	    		"appliesTo": "src",
 	    		"filterRegexp": "*.js"
