@@ -25,13 +25,15 @@
 	    		"enabled": true,
 	    		"path": "extras/copyrightHeaders/TsFiles-Header.txt",
 	    		"appliesTo": "src",
-	    		"filterRegexp": "*.ts"
+	    		"includes": ["ts"],
+	    		"excludes": []
 	    	},
 	    	{
 	    		"enabled": true,
 	    		"path": "extras/copyrightHeaders/JsFiles-Header.txt",
 	    		"appliesTo": "src",
-	    		"filterRegexp": "*.js"
+	    		"includes": ["js"],
+	    		"excludes": []
 	    	}
 	    ]
     },
