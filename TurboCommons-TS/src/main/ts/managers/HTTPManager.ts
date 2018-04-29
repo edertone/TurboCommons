@@ -351,7 +351,8 @@ export class HTTPManager{
      * After a list of urls is provided, this method will secuentially execute each one of them as a GET
      * request, one after the other and in the same order as they are provided. Once all have 
      * finished correctly, the result data will be available as an array of strings stored with the same
-     * order as the provided source urls.
+     * order as the provided source urls. If an error happens on any of the requests, the process will stop
+     * and the error callback will be executed.
      * 
      * This method can be used to load multiple resource files at once, process batch requests, etc..
      *

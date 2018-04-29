@@ -19,16 +19,7 @@ This library tries to cover the following development areas:
 - Validation: Mails, Urls, postal codes, ...
 - Remote operations: Sending emails, http requests, ftp operations ...
 
-### How many languages does it support
-
-- Php
-- Typescript
-- Javascript 5
-- Javascript 6
-
-We want to increase this list. So! if you want to translate the library to your language of choice, please contact us and help us build the most standard cross language development library in the world! We're starting so we need your help to port this library to as many languages as possible, and more important, we need to code the SAME unit tests across all the implemented languages. This is the only way to guarantee that TurboCommons delivers exactly the same behaviour everywhere.
-
-### Install
+### How to use it
 
 - Php:
 ```
@@ -71,6 +62,15 @@ If you don't want to use a package manager like npm or composer, latest compiled
 - Javascript 5: http://turbocommons.org/resources/shared/zip/TurboCommons-ES5.zip
 - Javascript 6: http://turbocommons.org/resources/shared/zip/TurboCommons-ES6.zip
 - Php: http://turbocommons.org/resources/shared/zip/TurboCommons-Php.zip
+
+### How many languages does it support
+
+- Php
+- Typescript
+- Javascript 5
+- Javascript 6
+
+We want to increase this list. So! if you want to translate the library to your language of choice, please contact us and help us build the most standard cross language development library in the world! We're starting so we need your help to port this library to as many languages as possible, and more important, we need to code the SAME unit tests across all the implemented languages. This is the only way to guarantee that TurboCommons delivers exactly the same behaviour everywhere.
 
 ### Dependencies
 The main goal for this library is to have zero dependencies. We are building a true standalone general purpose library.
