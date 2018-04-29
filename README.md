@@ -19,6 +19,10 @@ This library tries to cover the following development areas:
 - Validation: Mails, Urls, postal codes, ...
 - Remote operations: Sending emails, http requests, ftp operations ...
 
+### Documentation
+- Typescript / Javascript: http://turbocommons.org/resources/shared/html/doc-ts/globals.html
+- Php: http://turbocommons.org/resources/shared/html/doc-php/namespaces/org.html
+
 ### How to use it
 
 - Php:
@@ -74,10 +78,6 @@ We want to increase this list. So! if you want to translate the library to your 
 
 ### Dependencies
 The main goal for this library is to have zero dependencies. We are building a true standalone general purpose library.
-
-### Documentation
-- Typescript / Javascript: http://turbocommons.org/resources/shared/html/doc-ts/globals.html
-- Php: http://turbocommons.org/resources/shared/html/doc-php/namespaces/org.html
 
 ### Official website
 The official site http://turbocommons.org is under development. Here you'll find examples, tutorials, and tons of documentation for all the library classes and methods. Stay tuned!
