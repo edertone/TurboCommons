@@ -391,54 +391,47 @@ QUnit.test("multiGetRequest", function(assert){
                      basePath + '/file2.xml',
                      basePath + '/file3.json'];
     
-    sut.multiGetRequest(resources, function(results){
+    sut.multiGetRequest(resources, function(results, anyError){
 
+        assert.strictEqual(false, anyError);
+        
         assert.strictEqual(results.length, 3);
-        assert.strictEqual(results[0], 'text1');
-        assert.strictEqual(results[1], "<test>\r\n    hello\r\n</test>");
-        assert.strictEqual(results[2], '{\r\n"a": "1",\r\n"b": 2\r\n}');
-        done();
-        
-    }, function(errorUrl, errorMsg, errorCode){
-        
-        assert.ok(false, errorUrl + ' ' + errorMsg + ' ' + errorCode);
-        done();
+        assert.strictEqual(results[0].response, 'text1');
+        assert.strictEqual(results[1].response, "<test>\r\n    hello\r\n</test>");
+        assert.strictEqual(results[2].response, '{\r\n"a": "1",\r\n"b": 2\r\n}');
+        done();        
     });
     
     // test ok values with resourceLoadedCallback
     var progressCalls = 0;
     
-    sut.multiGetRequest(resources, function(results){
+    sut.multiGetRequest(resources, function(results, anyError){
 
+        assert.strictEqual(false, anyError);
+        
         assert.strictEqual(results.length, 3);
-        assert.strictEqual(results[0], 'text1');
-        assert.strictEqual(results[1], "<test>\r\n    hello\r\n</test>");
-        assert.strictEqual(results[2], '{\r\n"a": "1",\r\n"b": 2\r\n}');
+        assert.strictEqual(results[0].response, 'text1');
+        assert.strictEqual(results[1].response, "<test>\r\n    hello\r\n</test>");
+        assert.strictEqual(results[2].response, '{\r\n"a": "1",\r\n"b": 2\r\n}');
         assert.strictEqual(progressCalls, 3);        
         done();
         
-    }, function(errorUrl, errorMsg, errorCode){
+    }, null, function(completedUrl, totalUrls){
         
-        assert.ok(false, errorUrl + ' ' + errorMsg + ' ' + errorCode);
-        done();
-        
-    }, null, function(){
-        
+        assert.strictEqual(3, totalUrls);
         progressCalls ++;
     });
 
     // Test wrong values
-    sut.multiGetRequest([nonExistantUrl], function(result){
+    sut.multiGetRequest([nonExistantUrl], function(results, anyError){
 
-        assert.ok(false);
-        done();
+        assert.strictEqual(true, anyError);
         
-    }, function(errorUrl, errorMsg, errorCode){
-        
-        assert.strictEqual(errorUrl, nonExistantUrl);
-        assert.ok(StringUtils.isString(errorMsg));
-        assert.ok(errorMsg.length > 5);
-        assert.strictEqual(errorCode, 404);
+        assert.strictEqual(results[0].path, nonExistantUrl);
+        assert.strictEqual(results[0].response, '');
+        assert.strictEqual(results[0].isError, true);
+        assert.strictEqual(results[0].errorCode, 404);
+        assert.ok(results[0].errorMsg.length > 5);
         done();
     });
 
@@ -545,4 +538,27 @@ QUnit.test("loadResourcesFromList", function(assert){
 
     // Test exceptions
     // not necessary
+});
+
+
+/**
+ * loadResourcesFromList
+ */
+QUnit.test("loadResourcesFromList-one-resource-is-missing", function(assert){
+    
+    var done = assert.async(1);
+    
+    sut.loadResourcesFromList(basePath + '/files-list-with-one-missing.txt', basePath, function(result){
+
+        assert.ok(false);
+        done();
+        
+    }, function(errorUrl, errorMsg, errorCode){
+        
+        assert.strictEqual(errorUrl, basePath + '/this-is-missing.txt');
+        assert.ok(StringUtils.isString(errorMsg));
+        assert.ok(errorMsg.length > 5);
+        assert.strictEqual(errorCode, 404);
+        done();
+    });
 });

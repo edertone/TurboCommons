@@ -28,3 +28,4 @@ To publish the library to npm:
 10 - Upload the new zip versions to turbocommons website for direct download
 
 11 - Upload the new generated docs to the turbocommons website
+	- review that links to docs still work

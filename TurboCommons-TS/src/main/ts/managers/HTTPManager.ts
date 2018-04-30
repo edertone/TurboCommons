@@ -350,37 +350,36 @@ export class HTTPManager{
      * 
      * After a list of urls is provided, this method will secuentially execute each one of them as a GET
      * request, one after the other and in the same order as they are provided. Once all have 
-     * finished correctly, the result data will be available as an array of strings stored with the same
-     * order as the provided source urls. If an error happens on any of the requests, the process will stop
-     * and the error callback will be executed.
+     * finished correctly, the result data will be available as an array of objects stored with the same
+     * order as the provided source urls.
      * 
      * This method can be used to load multiple resource files at once, process batch requests, etc..
      *
      * @param paths List with all the urls that we want to execute as http GET requests
-     * @param successCallback Executed once all the urls have been called. An array of strings containing all
-     *                        the loaded data will be passed to this method.
-     * @param errorCallback Executed if a failure happens on any of the requests. The url that caused the error,
-     *                      the error description and the error code will be passed to this method.
+     * @param finishedCallback Executed once all the urls have been called and responses received. An array of
+     *        objects containing the results information of each request and a boolean variable telling if any
+     *        error happened will be passed to this method 
      * @param parameters TODO - implement this feature after this.get implements it
-     * @param progressCallback Executed after each one of the urls is correctly executed. A string with the correctly
-     *                         requested url will be passed to this method.
+     * @param progressCallback Executed after each one of the urls is executed. A string with the requested url and
+     *        the total requests to perform will be passed to this method.
      * 
      * @returns void
      */
     multiGetRequest(paths: string[],
-                    successCallback: (responses: string[]) => void,
-                    errorCallback: (errorUrl:string, errorMsg:string, errorCode:number) => void,
+                    finishedCallback: (results: {path:string, response:string, isError:boolean, errorMsg:string, errorCode:number}[], anyError:boolean) => void,
                     parameters: [{[s: string]: string}] | [HashMapObject] | null = null,
-                    progressCallback: null | ((completedUrl: string) => void) = null){
+                    progressCallback: null | ((completedUrl: string, totalUrls: number) => void) = null){
     
         if(!ArrayUtils.isArray(paths) || paths.length <= 0){
             
             throw new Error('paths must be a non empty array');
         }
 
-        // Recursive method that will perform the loading of the specified resources, store
-        // the results inside an array and call the success method
-        let perform = (paths: string[], results: string[]) => {
+        // Recursive method that will perform the calls to the specified requests
+        let perform = (paths: string[],
+                       results: {path:string, response:string, isError:boolean, errorMsg:string, errorCode:number}[],
+                       anyError: boolean,
+                       totalCount: number) => {
             
             if(paths.length > 0){
                 
@@ -388,36 +387,46 @@ export class HTTPManager{
                 
                 this.get(url, (response: string) => {
                     
-                    results.push(response);
+                    results.push({
+                        path: url,
+                        response: response,
+                        isError: false,
+                        errorMsg: '',
+                        errorCode: 0
+                    });
                     
                     if(progressCallback !== null){
                     
-                        progressCallback(url);
+                        progressCallback(url, totalCount);
                     }
                     
-                    perform(paths, results);
+                    perform(paths, results, anyError ? true : false, totalCount);
                     
                 }, (errorMsg:string, errorCode:number) => {
                     
-                    errorCallback(url, errorMsg, errorCode);
+                    results.push({
+                        path: url,
+                        response: '',
+                        isError: true,
+                        errorMsg: errorMsg,
+                        errorCode: errorCode
+                    });
+
+                    perform(paths, results, true, totalCount);                    
                 });
             
             }else{
             
-                successCallback(results);
+                finishedCallback(results, anyError);
             }
         };
         
-        perform(ObjectUtils.clone(paths), []);
+        perform(ObjectUtils.clone(paths), [], false, paths.length);
     }
     
     
     // TODO
-    multiPostRequest(paths: string[],
-                     successCallback: (results: string[]) => void,
-                     errorCallback: (errorUrl:string, errorMsg:string, errorCode:number) => void,
-                     parameters: [{[s: string]: string}] | [HashMapObject] | null = null,
-                     progressCallback: null | ((completedUrl: string) => void) = null){
+    multiPostRequest(){
                 
         // Implement this method
     }
@@ -447,34 +456,46 @@ export class HTTPManager{
      * @returns void
      */
     loadResourcesFromList(urlToResourcesList: string,
-                             basePath: string,
-                             successCallback: (resourcesList: string[], resourcesData: string[]) => void,
-                             errorCallback: (errorUrl:string, errorMsg:string, errorCode:number) => void,
-                             progressCallback: null | ((completedUrl: string) => void) = null){
+                          basePath: string,
+                          successCallback: (resourcesList: string[], resourcesData: string[]) => void,
+                          errorCallback: (errorUrl:string, errorMsg:string, errorCode:number) => void,
+                          progressCallback: ((completedUrl: string) => void) | null = null){
         
         if(!StringUtils.isString(basePath) || StringUtils.isEmpty(basePath)){
             
             throw new Error('basePath must be a non empty string');
         }
 
-        let basePathFormatted = basePath + ((basePath.charAt(basePath.length - 1) === '/') ? '' : '/');
-        
         this.get(urlToResourcesList, (response) => {
         
             let resourcesFullUrls: string[] = [];
-            
+            let basePathWithSlash = basePath + ((basePath.charAt(basePath.length - 1) === '/') ? '' : '/');
+        
             var resourcesList = StringUtils.getLines(response);
             
             for (var resource of resourcesList){
                 
-                resourcesFullUrls.push(basePathFormatted + resource);  
+                resourcesFullUrls.push(StringUtils.formatPath(basePathWithSlash + resource, '/'));  
             }
             
-            this.multiGetRequest(resourcesFullUrls, (resourcesData) => {
+            this.multiGetRequest(resourcesFullUrls,
+                    (results: {path:string, response:string, isError:boolean, errorMsg:string, errorCode:number}[], anyError:boolean) => {
 
-                successCallback(resourcesList, resourcesData);
+                let resultsData: string[] = [];
                 
-            }, errorCallback, null, progressCallback);
+                for (let result of results) {
+
+                    if(result.isError){
+                
+                        return errorCallback(result.path, result.errorMsg, result.errorCode);
+                    }
+                    
+                    resultsData.push(result.response);
+                }
+                    
+                successCallback(resourcesList, resultsData);
+                
+            }, null, progressCallback);
             
         }, (errorMsg, errorCode) => {
             
