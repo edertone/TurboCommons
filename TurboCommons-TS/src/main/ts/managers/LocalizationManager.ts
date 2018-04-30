@@ -16,50 +16,16 @@ import { HTTPManager } from './HTTPManager';
 
 
 /**
- * A class that is used to manage the application texts internationalization<br>
- * Main features in brief:<br><br>
- * TODO
+ * Fully featured translation manager to be used with any application that requires text internationalization.
  */
 export class LocalizationManager {
 
 
     /**
-     * A list of languages that will be used by this class to translate the given keys, sorted by preference.
-     * When a key and bundle are requested for translation, the class will check on the first language of this
-     * list for a translated text. If missing, the next one will be used, and so.
-     *
-     * For example: Setting this property to ['en_US', 'es_ES', 'fr_FR'] and calling
-     * localizationManager.get('HELLO', 'Greetings') will try to locate the en_US value for the
-     * HELLO tag on the Greetings bundle. If the tag is not found for the specified locale and bundle, the same
-     * search will be performed for the es_ES locale, and so, till a value is found or no more locales are defined.
+     * Enable this flag to load all the specified paths as urls instead of file system paths
      */
-    locales: string[] = [];
-
-
-    /**
-     * List of filesystem paths (relative or absolute) where our resourcebundles are located.
-     *
-     * Each path must contain wildcards to define how locales and bundles are structured:
-     * - $locale wildcard will be replaced by each specific locale when trying to reach a path
-     * - $bundle wildcard will be replaced by each specific bundle name when trying to reach a path
-     *
-     * Example1: ['myFolder/$locale/$bundle.txt'] will resolve to
-     * 'myFolder/en_US/Customers.txt' when trying to load the Customers bundle for US english locale.
-     *
-     * Example2: ['myFolder/$bundle_$locale.properties'] will resolve to
-     * 'myFolder/Customers_en_US.properties' when trying to load the Customers bundle for US english locale.
-     *
-     * The class will try to load the data from the paths in order of preference. If a bundle name is duplicated
-     * on different paths, the bundle located on the first path of the list will be always used.<br><br>
-     *
-     * For example, if $paths = ['path1', 'path2'] and we have the same bundle named 'Customers' on both paths, the translation
-     * for a key called 'NAME' will be always retrieved from path1. In case path1 does not contain the key,
-     * path2 will NOT be used to find a bundle.
-     *
-     * Example: ['../locales/$locale/$bundle.json', 'src/resources/shared/locales/$bundle_$locale.properties']
-     */
-    paths: string[] = [];
-
+    pathsAreUrls = true;
+    
 
     /**
      * Defines the behaviour for get(), getStartCase(), etc... methods when a key is not found on
@@ -75,15 +41,17 @@ export class LocalizationManager {
 
     
     /**
-     * Enable this flag to load all specified paths as urls instead of file system paths
+     * Tells if the class has been initialized or not
      */
-    pathsAreUrls = true;
+    private _initialized = false;
     
-
+    
     /**
-     * Stores all the loaded localization data
+     * The list of languages that are used by this class to translate the given keys, sorted by preference.
+     * 
+     * @see this.locales()
      */
-    protected _loadedData: any = {};
+    private _locales: string[] = [];
 
 
     /**
@@ -93,107 +61,284 @@ export class LocalizationManager {
     
     
     /**
-     * Load the specified bundle
-     *
-     * @param bundle The name of the bundle to load
-     * @param successCallback A method that will be executed after the bundle's been correctly loaded
-     * @param errorCallback A method that will be executed if any error happens. If this is not provided, an exception will be thrown
-     * @param pathIndex Define the position on the paths array that will be used to lookup for the bundle. 0 by default
-     *
-     * @returns void
+     * Stores the latest path that's been used to read a localized value
      */
-    loadBundle(bundle: string,
-               successCallback: (() => void) | null = null,
-               errorCallback: ((path: string) => void) | null = null,
-               pathIndex = 0) {
+    private _lastPath = '';
+    
+    
+    /**
+     * Stores all the loaded localization data by path, bundle and locales
+     */
+    protected _loadedData: {[path:string]: {[bundle: string]: {[locale: string]: {[key:string]: string}}}} = {};
 
-        if(!StringUtils.isString(bundle) || StringUtils.isEmpty(bundle)){
+
+    /**
+     * An http manager instance used to load the data when paths are urls
+     */
+    private _httpManager = new HTTPManager();
+    
+    
+    /**
+     * Performs the initial data load by looking for resource bundles on all the specified paths.
+     * All the translations will be loaded for each of the specified locales.
+     * 
+     * Calling this method is mandatory before starting to use this class.
+     * 
+     * @param locales List of languages for which we want to load the translations. The list also defines the preferred
+     *        translation order when a specified key is not found for a locale.
+     * @param bundles A structure containing a list with the association between paths and their respective bundles.
+     *        Each path is a relative or absolute string that defines a location where resourcebundles reside and must contain
+     *        wildcards to define how locales and bundles are structured:
+     *          - $locale wildcard will be replaced by each specific locale when trying to reach a path
+     *          - $bundle wildcard will be replaced by each specific bundle name when trying to reach a path
+     *
+     *          Example1: 'myFolder/$locale/$bundle.txt' will resolve to
+     *                    'myFolder/en_US/Customers.txt' when trying to load the Customers bundle for US english locale.
+     *
+     *          Example2: 'myFolder/$bundle_$locale.properties' will resolve to
+     *                    'myFolder/Customers_en_US.properties' when trying to load the Customers bundle for US english locale.
+     * @param finishedCallback A method that will be executed once the initialization ends. An errors variable will be passed
+     *        to this method containing an array with information on errors that may have happened while loading the data.
+     * @param progressCallback A method that can be used to track the loading progress when lots of bundles and locales are used.
+     * 
+     * @return void
+     */
+    initialize(locales: string[],
+               bundles: {path: string, bundles: string[]}[],
+               finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void),
+               progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null) {
+
+        this._locales = [];
+        this._lastBundle = '';
+        this._lastPath = '';
+        this._loadedData = {};
+        
+        this._loadData(locales, bundles, (errors) => {
             
-            throw new Error('bundle must be a non empty string');
+            this._initialized = true;
+            
+            finishedCallback(errors);
+            
+        }, progressCallback);
+    }
+    
+    
+    /**
+     * Adds extra languages to the list of currently loaded translation data.
+     * 
+     * This method can only be called after the class has been initialized in case we need to add more translations.
+     * 
+     * @param locales List of languages for which we want to load the translations. The list will be appended to any previously
+     *        loaded locales and included in the preferred translation order.
+     * @param finishedCallback A method that will be executed once the load ends. An errors variable will be passed
+     *        to this method containing an array with information on errors that may have happened while loading the data.
+     * @param progressCallback A method that can be used to track the loading progress when lots of bundles and locales are used.
+     * 
+     * @return void
+     */
+    loadLocales(locales: string[],
+                finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void),
+                progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null){
+        
+        if(!this._initialized){
+            
+            throw new Error('LocalizationManager not initialized. Call initialize() before loading more locales');
         }
         
-        if(this.locales.length <= 0){
+        let bundles:any[] = [];
+        
+        for (let path of ObjectUtils.getKeys(this._loadedData)) {
+	
+            bundles.push({path: path, bundles: ObjectUtils.getKeys(this._loadedData[path])});
+        }
+        
+        this._loadData(locales, bundles, finishedCallback, progressCallback);   
+    }
+    
+    
+    /**
+     * Adds extra bundles to the currently loaded translation data
+     * 
+     * This method can only be called after the class has been initialized in case we need to add more bundles to the loaded translations.
+     * 
+     * @param path The path where the extra bundles to load are located. See initialize method for information about the path format.
+     * @param bundles List of bundles to load from the specified path
+     * @param finishedCallback A method that will be executed once the load ends. An errors variable will be passed
+     *        to this method containing an array with information on errors that may have happened while loading the data.
+     * @param progressCallback A method that can be used to track the loading progress when lots of bundles and locales are used.
+     * 
+     * @see this.initialize()
+     * 
+     * @return void
+     */
+    loadBundles(path: string,
+                bundles: string[],
+                finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void),
+                progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null){
+        
+        if(!this._initialized){
+            
+            throw new Error('LocalizationManager not initialized. Call initialize() before loading more bundles');
+        }
+
+        this._loadData(this._locales, [{path: path, bundles: bundles}], finishedCallback, progressCallback);   
+    }
+    
+    
+    /**
+     * Auxiliary method used by the initialize and load methods to perform the data load for the locales and bundles
+     * 
+     * @see this.initialize()
+     * 
+     * @param locales List of locales to load
+     * @param bundles Information relative to paths and the bundles they contain
+     * @param finishedCallback A method that will be executed once the load ends. An errors variable will be passed
+     *        to this method containing an array with information on errors that may have happened while loading the data.
+     * @param progressCallback Executed after each request is performed
+     */
+    private _loadData(locales: string[],
+                      bundles: {path: string, bundles: string[]}[],
+                      finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void),
+                      progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null){
+        
+        if(!ArrayUtils.isArray(locales) || locales.length <= 0){
             
             throw new Error('no locales defined');
         }
         
-        if(this.paths.length <= 0){
+        if(!ArrayUtils.isArray(bundles) || bundles.length <= 0){
             
-            throw new Error('no paths defined');
+            throw new Error('bundles must be an array of objects');
         }
         
-        if(pathIndex >= this.paths.length){
-            
-            throw new Error('invalid pathIndex');
-        }
+        // Generate the list of paths to be loaded
+        let pathsToLoad: string[] = [];
+        let pathsToLoadInfo: any[] = [];
+        
+        for (let data of bundles) {
     
-        // Generate the correct paths to the resource bundles
-        let paths: string[] = [];
-        
-        for (let i = 0; i < this.locales.length; i++) {
-        
-            // TODO - if pathsAreUrls is false, we must try to load the path as a file system path 
-            paths.push(this.paths[pathIndex].replace('$locale', this.locales[i]).replace('$bundle', bundle));
+            for (let bundle of data.bundles){
+                
+                for (let locale of locales) {
+                    
+                    // TODO if pathsAreUrls is false, we must try to load the path as a file system path 
+                    
+                    pathsToLoadInfo.push({locale: locale, bundle: bundle, path: data.path});
+                    
+                    pathsToLoad.push(data.path.replace('$locale', locale).replace('$bundle', bundle));
+                }
+            }
         }
         
-        // Request all the bundle files
-        let http = new HTTPManager();
-        
-        http.multiGetRequest(paths, (result: string[]) =>{
+        // Execute all the requests
+        this._httpManager.multiGetRequest(pathsToLoad, (results, anyError) =>{
             
-            if (!this._loadedData.hasOwnProperty(bundle)) {
-
-                this._loadedData[bundle] = {};
-            }
+            let errors: {path:string, errorMsg:string, errorCode:number}[] = [];
             
-            for (let i = 0; i < paths.length; i++) {
-	
-                switch (StringUtils.getPathExtension(paths[i])) {
+            for (let i = 0; i < results.length; i++) {
+                
+                if(results[i].isError){
+                    
+                    errors.push({
+                        path: results[i].path,
+                        errorMsg: results[i].errorMsg,
+                        errorCode: results[i].errorCode 
+                    });
+                    
+                }else{
+                    
+                    let locale = pathsToLoadInfo[i].locale;
+                    let bundle = pathsToLoadInfo[i].bundle;
+                    let path = pathsToLoadInfo[i].path;
+                    
+                    if (!this._loadedData.hasOwnProperty(path)) {
 
-                    case 'json':
-                        this._loadedData[bundle][this.locales[i]] = this.parseJson(JSON.parse(result[i]));
-                        break;
+                        this._loadedData[path] = {};
+                    }
+                    
+                    if (!this._loadedData[path].hasOwnProperty(bundle)) {
 
-                    case 'properties':
-                        // TODO
-                        this._loadedData[bundle][this.locales[i]] = this.parseProperties(result[i]);
-                        break;
+                        this._loadedData[path][bundle] = {};
+                    }
+                    
+                    switch (StringUtils.getPathExtension(pathsToLoad[i])) {
+
+                        case 'json':
+                            this._loadedData[path][bundle][locale] = this.parseJson(results[i].response);
+                            break;
+
+                        case 'properties':
+                            this._loadedData[path][bundle][locale] = this.parseProperties(results[i].response);
+                            break;
+                    }
                 }
             }
             
-            this._lastBundle = bundle;
+            this._locales = ArrayUtils.removeDuplicateElements(this._locales.concat(locales));
+            this._lastBundle = pathsToLoadInfo[pathsToLoadInfo.length - 1].bundle;
+            this._lastPath = pathsToLoadInfo[pathsToLoadInfo.length - 1].path;
 
-            if (successCallback !== null) {
-
-                successCallback();
-            }
-                        
-        }, (path: string, msg: string, code: number) => {
-        
-            if (errorCallback !== null) {
-
-                errorCallback(path);
+            finishedCallback(errors);
             
-            } else {
-                
-                // If no error handler defined, an exception is thrown
-                throw new Error('Failed loading locale: ' + path);
+        }, null, (completedUrl, totalUrls) => {
+            
+            if (progressCallback !== null) {
+
+                progressCallback(completedUrl, totalUrls);
             }
         });
+    }  
+    
+    
+    /**
+     * The list of languages (sorted by preference) that are currently available by this class to translate the given keys.
+     * When a key and bundle are requested for translation, the class will check on the first language of this
+     * list for a translated text. If missing, the next one will be used, and so. This list is constructed after the initialize
+     * and loadLocales methods are called.
+     * 
+     * @example: After loading the following list of locales ['en_US', 'es_ES', 'fr_FR'] if we call localizationManager.get('HELLO', 'Greetings')
+     * the localization manager will try to locate the en_US value for the HELLO tag on the Greetings bundle. If the tag is not found for the
+     * specified locale and bundle, the same search will be performed for the es_ES locale, and so, till a value is found or no more locales 
+     * are defined.
+     */
+    locales(){
+    
+        return this._locales as ReadonlyArray<string>;
     }
-
+    
+    
+    // TODO
+    setCurrentLocale(){
+        
+    }
+    
 
     /**
-     * Get the translation for the given key and bundle
+     * Get the translation for the given key, bundle and path
      *
-     * @param key The key we want to read from the specified resource bundle
+     * @param key The key we want to read from the specified resource bundle and path
      * @param bundle The name for the resource bundle file. If not specified, the value
-     * that was used on the inmediate previous call of this method will be used. This can save us lots of typing
-     * if we are reading multiple consecutive keys from the same bundle.
+     *        that was used on the inmediate previous call of this method will be used. This can save us lots of typing
+     *        if we are reading multiple consecutive keys from the same bundle.
+     * @param path In case we have multiple bundles with the same name on different paths, we can set this parameter with
+     *        the path value to uniquely reference the bundle and resolve the conflict. If all of our bundles have different
+     *        names, this parameter can be ignored. Just like the bundle parameter, this one is remembered between get() calls.
      * 
      * @returns The localized text
      */
-    get(key: string, bundle = '') {
+    get(key: string, bundle = '', path = '') {
+
+        if(!this._initialized){
+            
+            throw new Error('LocalizationManager not initialized. Call initialize() before requesting translated texts');
+        }
+        
+        // If no path specified, autodetect it or use the last one
+        if (path === '') {
+
+            // TODO find path by bundle
+            path = this._lastPath;
+        }
 
         // If no bundle is specified, the last one will be used
         if (bundle === '') {
@@ -201,7 +346,7 @@ export class LocalizationManager {
             bundle = this._lastBundle;
         }
 
-        if (Object.keys(this._loadedData).indexOf(bundle) === -1) {
+        if (Object.keys(this._loadedData[path]).indexOf(bundle) === -1) {
 
             if(this.missingKeyFormat.indexOf('$exception') >= 0){
             
@@ -213,13 +358,14 @@ export class LocalizationManager {
             }
         }
 
-        // Store the specified bundle name as the last that's been used till now
+        // Store the specified bundle name and path as the lasts that have been used till now
         this._lastBundle = bundle;
+        this._lastPath = path;
 
-        const bundleData = this._loadedData[bundle];
+        const bundleData = this._loadedData[path][bundle];
 
         // Loop all the locales to find the first one with a value for the specified key
-        for (const locale of this.locales) {
+        for (const locale of this._locales) {
 
             if (Object.keys(bundleData).indexOf(locale) >= 0 &&
                     Object.keys(bundleData[locale]).indexOf(key) >= 0) {
@@ -246,9 +392,9 @@ export class LocalizationManager {
      *
      * @returns The localized and case formatted text
      */
-    getStartCase(key: string, bundle = '') {
+    getStartCase(key: string, bundle = '', path = '') {
 
-        return StringUtils.formatCase(this.get(key, bundle), StringUtils.FORMAT_START_CASE);
+        return StringUtils.formatCase(this.get(key, bundle, path), StringUtils.FORMAT_START_CASE);
     }
 
 
@@ -260,9 +406,9 @@ export class LocalizationManager {
      *
      * @returns The localized and case formatted text
      */
-    getAllUpperCase(key: string, bundle = '') {
+    getAllUpperCase(key: string, bundle = '', path = '') {
 
-        return StringUtils.formatCase(this.get(key, bundle), StringUtils.FORMAT_ALL_UPPER_CASE);
+        return StringUtils.formatCase(this.get(key, bundle, path), StringUtils.FORMAT_ALL_UPPER_CASE);
     }
 
 
@@ -274,9 +420,9 @@ export class LocalizationManager {
      *
      * @returns The localized and case formatted text
      */
-    getAllLowerCase(key: string, bundle = '') {
+    getAllLowerCase(key: string, bundle = '', path = '') {
 
-        return StringUtils.formatCase(this.get(key, bundle), StringUtils.FORMAT_ALL_LOWER_CASE);
+        return StringUtils.formatCase(this.get(key, bundle, path), StringUtils.FORMAT_ALL_LOWER_CASE);
     }
     
     
@@ -289,9 +435,9 @@ export class LocalizationManager {
      *
      * @returns The localized and case formatted text
      */
-    getFirstUpperRestLower(key: string, bundle = ''){
+    getFirstUpperRestLower(key: string, bundle = '', path = ''){
         
-        return StringUtils.formatCase(this.get(key, bundle), StringUtils.FORMAT_FIRST_UPPER_REST_LOWER);
+        return StringUtils.formatCase(this.get(key, bundle, path), StringUtils.FORMAT_FIRST_UPPER_REST_LOWER);
     }
 
 
@@ -299,11 +445,11 @@ export class LocalizationManager {
      * Auxiliary method that can be overriden when extending this class to customize the parsing of Json formatted
      * resource bundles
      * 
-     * @param data An object resulting the JSON.parse of the resourcebundle read
+     * @param data An object with the read resourcebundle data after being parsed by JSON.parse
      */
-    protected parseJson(data: Object): Object {
+    protected parseJson(data: string): {[key: string]: string} {
 
-        return data;
+        return JSON.parse(data);
     }
 
 
@@ -313,8 +459,17 @@ export class LocalizationManager {
      * 
      * @param data A string containing the read resourcebundle
      */
-    protected parseProperties(data: string): JavaPropertiesObject {
+    protected parseProperties(data: string): {[key: string]: string} {
 
-        return new JavaPropertiesObject(data);
-    }
+        let result: {[key: string]: string} = {};
+        
+        let javaPropertiesObject = new JavaPropertiesObject(data);
+        
+        for (let key of javaPropertiesObject.getKeys()) {
+	
+            result[key] = javaPropertiesObject.get(key);
+        }
+        
+        return result;
+    } 
 }
