@@ -635,26 +635,33 @@ QUnit.test("get-initialized-values-for-multiple-locales", function(assert){
  */
 QUnit.test("get-initialized-keys-from-multiple-paths-bundles-and-locales", function(assert){
     
-var done = assert.async(1);
-    // TODO - un bon pollastre
+    var done = assert.async(1);
+    
     var bundles = [{
-        path: window.basePath + '/test-getStartCase/$locale/$bundle.json',
-        bundles: ['Locales']
+        path: window.basePath + '/test-multiple-paths/path-1/$locale/$bundle.properties',
+        bundles: ['bundle1']
     },{
-        path: window.basePath + '/test-json/$locale/$bundle.json',
-        bundles: ['Locales']
+        path: window.basePath + '/test-multiple-paths/path-2/$locale/$bundle.properties',
+        bundles: ['bundle1']
     },{
-        path: window.basePath + '/test-loadBundles/$locale/$bundle.json',
-        bundles: ['Locales', 'MoreLocales']
+        path: window.basePath + '/test-multiple-paths/path-3/$locale/$bundle.properties',
+        bundles: ['bundle1']
     }];
     
     sut.initialize(['es_ES', 'en_US'], bundles, function(errors){
 
-        assert.strictEqual(sut.get('LOGIN'), 'Login');
-        
+        assert.strictEqual(sut.get('PATH_NAME'), 'ruta3');
+        assert.strictEqual(sut.get('PATH_NAME', 'bundle1'), 'ruta3');
+        assert.strictEqual(sut.get('PATH_NAME', '', window.basePath + '/test-multiple-paths/path-2/$locale/$bundle.properties'), 'ruta2');
+        assert.strictEqual(sut.get('PATH_NAME', 'bundle1', window.basePath + '/test-multiple-paths/path-2/$locale/$bundle.properties'), 'ruta2');
+        assert.strictEqual(sut.get('PATH_NAME'), 'ruta2');
+
+        assert.strictEqual(sut.get('NOT_ON_ES'), 'not on es 2');
+        assert.strictEqual(sut.get('NOT_ON_ES', 'bundle1'), 'not on es 2');
+        assert.strictEqual(sut.get('NOT_ON_ES', '', window.basePath + '/test-multiple-paths/path-1/$locale/$bundle.properties'), 'not on es 1');
+        assert.strictEqual(sut.get('NOT_ON_ES', 'bundle1'), 'not on es 1');
         done();
     });
- // TODO
 });
 
 
