@@ -287,29 +287,6 @@ export class LocalizationManager {
                 progressCallback(completedUrl, totalUrls);
             }
         });
-    }  
-    
-    
-    /**
-     * The list of languages (sorted by preference) that are currently available by this class to translate the given keys.
-     * When a key and bundle are requested for translation, the class will check on the first language of this
-     * list for a translated text. If missing, the next one will be used, and so. This list is constructed after the initialize
-     * and loadLocales methods are called.
-     * 
-     * @example: After loading the following list of locales ['en_US', 'es_ES', 'fr_FR'] if we call localizationManager.get('HELLO', 'Greetings')
-     * the localization manager will try to locate the en_US value for the HELLO tag on the Greetings bundle. If the tag is not found for the
-     * specified locale and bundle, the same search will be performed for the es_ES locale, and so, till a value is found or no more locales 
-     * are defined.
-     */
-    locales(){
-    
-        return this._locales as ReadonlyArray<string>;
-    }
-    
-    
-    // TODO
-    setCurrentLocale(){
-        
     }
     
 
@@ -345,17 +322,15 @@ export class LocalizationManager {
 
             bundle = this._lastBundle;
         }
+        
+        if (Object.keys(this._loadedData).indexOf(path) === -1) {
 
+            throw new Error('Path <' + path + '> not loaded');
+        }
+        
         if (Object.keys(this._loadedData[path]).indexOf(bundle) === -1) {
 
-            if(this.missingKeyFormat.indexOf('$exception') >= 0){
-            
-                throw new Error('Bundle <' + bundle + '> does not exist');
-            
-            }else{
-            
-                return this.missingKeyFormat.replace('$key', key);
-            }
+            throw new Error('Bundle <' + bundle + '> not loaded');
         }
 
         // Store the specified bundle name and path as the lasts that have been used till now
@@ -376,10 +351,33 @@ export class LocalizationManager {
 
         if (this.missingKeyFormat.indexOf('$exception') >= 0) {
 
-            throw new Error('key <' + key + '> not found');
+            throw new Error('key <' + key + '> not found on ' + bundle + ' - ' + path);
         }
 
         return this.missingKeyFormat.replace('$key', key);
+    }
+    
+    
+    /**
+     * The list of languages (sorted by preference) that are currently available by this class to translate the given keys.
+     * When a key and bundle are requested for translation, the class will check on the first language of this
+     * list for a translated text. If missing, the next one will be used, and so. This list is constructed after the initialize
+     * and loadLocales methods are called.
+     * 
+     * @example: After loading the following list of locales ['en_US', 'es_ES', 'fr_FR'] if we call localizationManager.get('HELLO', 'Greetings')
+     * the localization manager will try to locate the en_US value for the HELLO tag on the Greetings bundle. If the tag is not found for the
+     * specified locale and bundle, the same search will be performed for the es_ES locale, and so, till a value is found or no more locales 
+     * are defined.
+     */
+    locales(){
+    
+        return this._locales as ReadonlyArray<string>;
+    }
+    
+    
+    // TODO
+    setCurrentLocale(){
+        
     }
     
     
