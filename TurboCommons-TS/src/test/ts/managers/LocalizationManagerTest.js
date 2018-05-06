@@ -36,6 +36,33 @@ QUnit.module("LocalizationManagerTest", {
 
 
 /**
+ * isLocaleLoaded
+ */
+QUnit.test("isLocaleLoaded", function(assert){
+
+    assert.notOk(sut.isLocaleLoaded('en_US'));
+    assert.notOk(sut.isLocaleLoaded('es_ES'));
+    assert.notOk(sut.isLocaleLoaded('fr_FR'));
+    assert.notOk(sut.isLocaleLoaded('en_GB'));
+    
+    var done = assert.async(1);
+    
+    var bundles = [{
+        path: window.basePath + '/test-locales/$locale/$bundle.json',
+        bundles: ['Locales']
+    }];
+    
+    sut.initialize(['es_ES', 'en_US', 'fr_FR'], bundles, function(errors){
+
+        assert.ok(sut.isLocaleLoaded('en_US'));
+        assert.ok(sut.isLocaleLoaded('es_ES'));
+        assert.ok(sut.isLocaleLoaded('fr_FR'));
+        done();
+    });
+});
+
+
+/**
  * initialize
  */
 QUnit.test("initialize-empty-values", function(assert){
@@ -670,6 +697,62 @@ QUnit.test("get-initialized-keys-from-multiple-paths-bundles-and-locales", funct
  */
 QUnit.test("locales", function(assert){
 
+    var done = assert.async(1);
+    
+    var bundles = [{
+        path: window.basePath + '/test-locales/$locale/$bundle.json',
+        bundles: ['Locales']
+    }];
+    
+    sut.initialize(['es_ES', 'en_US', 'fr_FR'], bundles, function(errors){
+
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['es_ES', 'en_US', 'fr_FR']));
+        
+        sut.setLocalesOrder(['en_US', 'fr_FR', 'es_ES']);
+        
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['en_US', 'fr_FR', 'es_ES']));
+        
+        done();
+    });
+});
+
+
+/**
+ * setPrimaryLocale
+ */
+QUnit.test("setPrimaryLocale", function(assert){
+    
+    var done = assert.async(1);
+    
+    var bundles = [{
+        path: window.basePath + '/test-locales/$locale/$bundle.json',
+        bundles: ['Locales']
+    }];
+    
+    sut.initialize(['es_ES', 'en_US', 'fr_FR'], bundles, function(errors){
+
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['es_ES', 'en_US', 'fr_FR']));
+        
+        sut.setLocalesOrder(['en_US', 'es_ES', 'fr_FR']);
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['en_US', 'es_ES', 'fr_FR']));
+        
+        sut.setLocalesOrder(['fr_FR', 'en_US', 'es_ES']);
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['fr_FR', 'en_US', 'es_ES']));
+
+        assert.throws(function() {
+            sut.setLocalesOrder(['fr_FR']);
+        }, /locales must contain all the currently loaded locales/);
+        
+        assert.throws(function() {
+            sut.setLocalesOrder(['fr_FR', 'en_US', 'es_ES', 'en_GB']);
+        }, /locales must contain all the currently loaded locales/);
+        
+        assert.throws(function() {
+            sut.setLocalesOrder(['fr_FR', 'en_US', 'en_GB']);
+        }, /en_GB not loaded/);
+        
+        done();
+    });
 });
 
 
@@ -678,26 +761,33 @@ QUnit.test("locales", function(assert){
  */
 QUnit.test("getStartCase", function(assert){
 
-    // Test empty values
-    // TODO
-
-    // Test ok values
-    // TODO
-
-    // Test wrong values
-    // TODO
-
-    // Test exceptions
-    // TODO
+    var done = assert.async(1);
     
-//    assert.ok(sut.getStartCase('h', StringUtils::FORMAT_START_CASE) === 'H');
-//    assert.ok(StringUtils::formatCase('HI', StringUtils::FORMAT_START_CASE) === 'Hi');
-//    assert.ok(StringUtils::formatCase('hello', StringUtils::FORMAT_START_CASE) === 'Hello');
-//    assert.ok(StringUtils::formatCase('helló. únder Ü??', StringUtils::FORMAT_START_CASE) === 'Helló. Únder Ü??');
-//    assert.ok(StringUtils::formatCase('óyeà!!! üst??', StringUtils::FORMAT_START_CASE) === 'Óyeà!!! Üst??');
-//    assert.ok(StringUtils::formatCase('Hello pEOPLE', StringUtils::FORMAT_START_CASE) === 'Hello People');
-//    assert.ok(StringUtils::formatCase("över! còmpléx.   \n\n\n\t\t   ís test!is?for!?!? you.!  ", StringUtils::FORMAT_START_CASE) === "Över! Còmpléx.   \n\n\n\t\t   Ís Test!is?for!?!? You.!  ");
+    var bundles = [{
+        path: window.basePath + '/test-cases/$locale/$bundle.properties',
+        bundles: ['Locales']
+    }];
+    
+    sut.initialize(['en_US'], bundles, function(errors){
 
+        // Test empty values
+        for (var i = 0; i < emptyValuesCount; i++) {
+            
+            assert.throws(function() {
+                sut.getStartCase(emptyValues[i]);
+            }, /not found on Locales/);
+        }
+
+        // Test ok values
+        assert.strictEqual(sut.getStartCase('H'), 'H');
+        assert.strictEqual(sut.getStartCase('HELLO'), 'Hello');
+        assert.strictEqual(sut.getStartCase('HELLO_UNDER'), 'Helló. Únder Ü??');
+        assert.strictEqual(sut.getStartCase('MIXED_CASE'), 'Hello People');
+        assert.strictEqual(sut.getStartCase('MULTIPLE_WORDS'), 'Word1 Word2 Word3 Word4 Word5');
+        assert.strictEqual(sut.getStartCase('SOME_ACCENTS'), 'Óyeà!!! Üst??');
+        
+        done();
+    });
 });
 
 
@@ -706,17 +796,33 @@ QUnit.test("getStartCase", function(assert){
  */
 QUnit.test("getAllUpperCase", function(assert){
 
-    // Test empty values
-    // TODO
+    var done = assert.async(1);
+    
+    var bundles = [{
+        path: window.basePath + '/test-cases/$locale/$bundle.properties',
+        bundles: ['Locales']
+    }];
+    
+    sut.initialize(['en_US'], bundles, function(errors){
 
-    // Test ok values
-    // TODO
+        // Test empty values
+        for (var i = 0; i < emptyValuesCount; i++) {
+            
+            assert.throws(function() {
+                sut.getAllUpperCase(emptyValues[i]);
+            }, /not found on Locales/);
+        }
 
-    // Test wrong values
-    // TODO
-
-    // Test exceptions
-    // TODO
+        // Test ok values
+        assert.strictEqual(sut.getAllUpperCase('H'), 'H');
+        assert.strictEqual(sut.getAllUpperCase('HELLO'), 'HELLO');
+        assert.strictEqual(sut.getAllUpperCase('HELLO_UNDER'), 'HELLÓ. ÚNDER Ü??');
+        assert.strictEqual(sut.getAllUpperCase('MIXED_CASE'), 'HELLO PEOPLE');
+        assert.strictEqual(sut.getAllUpperCase('MULTIPLE_WORDS'), 'WORD1 WORD2 WORD3 WORD4 WORD5');
+        assert.strictEqual(sut.getAllUpperCase('SOME_ACCENTS'), 'ÓYEÀ!!! ÜST??');
+        
+        done();
+    });
 });
 
 
@@ -725,17 +831,33 @@ QUnit.test("getAllUpperCase", function(assert){
  */
 QUnit.test("getAllLowerCase", function(assert){
 
-    // Test empty values
-    // TODO
+    var done = assert.async(1);
+    
+    var bundles = [{
+        path: window.basePath + '/test-cases/$locale/$bundle.properties',
+        bundles: ['Locales']
+    }];
+    
+    sut.initialize(['en_US'], bundles, function(errors){
 
-    // Test ok values
-    // TODO
+        // Test empty values
+        for (var i = 0; i < emptyValuesCount; i++) {
+            
+            assert.throws(function() {
+                sut.getAllLowerCase(emptyValues[i]);
+            }, /not found on Locales/);
+        }
 
-    // Test wrong values
-    // TODO
-
-    // Test exceptions
-    // TODO
+        // Test ok values
+        assert.strictEqual(sut.getAllLowerCase('H'), 'h');
+        assert.strictEqual(sut.getAllLowerCase('HELLO'), 'hello');
+        assert.strictEqual(sut.getAllLowerCase('HELLO_UNDER'), 'helló. únder ü??');
+        assert.strictEqual(sut.getAllLowerCase('MIXED_CASE'), 'hello people');
+        assert.strictEqual(sut.getAllLowerCase('MULTIPLE_WORDS'), 'word1 word2 word3 word4 word5');
+        assert.strictEqual(sut.getAllLowerCase('SOME_ACCENTS'), 'óyeà!!! üst??');
+        
+        done();
+    });
 });
 
 
@@ -744,17 +866,33 @@ QUnit.test("getAllLowerCase", function(assert){
  */
 QUnit.test("getFirstUpperRestLower", function(assert){
 
-    // Test empty values
-    // TODO
+    var done = assert.async(1);
+    
+    var bundles = [{
+        path: window.basePath + '/test-cases/$locale/$bundle.properties',
+        bundles: ['Locales']
+    }];
+    
+    sut.initialize(['en_US'], bundles, function(errors){
 
-    // Test ok values
-    // TODO
+        // Test empty values
+        for (var i = 0; i < emptyValuesCount; i++) {
+            
+            assert.throws(function() {
+                sut.getFirstUpperRestLower(emptyValues[i]);
+            }, /not found on Locales/);
+        }
 
-    // Test wrong values
-    // TODO
-
-    // Test exceptions
-    // TODO
+        // Test ok values
+        assert.strictEqual(sut.getFirstUpperRestLower('H'), 'H');
+        assert.strictEqual(sut.getFirstUpperRestLower('HELLO'), 'Hello');
+        assert.strictEqual(sut.getFirstUpperRestLower('HELLO_UNDER'), 'Helló. únder ü??');
+        assert.strictEqual(sut.getFirstUpperRestLower('MIXED_CASE'), 'Hello people');
+        assert.strictEqual(sut.getFirstUpperRestLower('MULTIPLE_WORDS'), 'Word1 word2 word3 word4 word5');
+        assert.strictEqual(sut.getFirstUpperRestLower('SOME_ACCENTS'), 'Óyeà!!! üst??');
+        
+        done();
+    });
 });
 
 
@@ -762,80 +900,63 @@ QUnit.test("getFirstUpperRestLower", function(assert){
  * test-json
  */
 QUnit.test("test-json", function(assert){
-
-    // Test ok values
-    sut.locales = ['en_US', 'es_ES'];
-    sut.paths = [window.basePath + '/test-json/$locale/$bundle.json'];
-
-    var done = assert.async(2);
-
-    sut.loadBundle('Locales', function(){
+    
+    var done = assert.async(1);
+    
+    var bundles = [{
+        path: window.basePath + '/test-json/$locale/$bundle.json',
+        bundles: ['Locales']
+    }];
+    
+    sut.initialize(['en_US', 'es_ES'], bundles, function(errors){
 
         // Test EN_US
         assert.strictEqual(sut.get('PASSWORD'), 'Password');
-        assert.strictEqual(sut.get('MISSING_TAG'), 'Missing tag');
+        assert.strictEqual(sut.get('TAG_NOT_EXISTING_ON_ES_ES'), 'Missing tag');
         assert.strictEqual(sut.get('USER', 'Locales'), 'User');
         assert.strictEqual(sut.get('LOGIN', 'Locales'), 'Login');
 
         // Verify defined attributes are still the same
-        assert.ok(ArrayUtils.isEqualTo(sut.locales, ['en_US', 'es_ES']));
-        assert.ok(ArrayUtils.isEqualTo(sut.paths, [window.basePath + '/test-json/$locale/$bundle.json']));
-
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['en_US', 'es_ES']));
+        
         // Test ES_ES
-        sut.locales = ['es_ES', 'en_US'];
-
+        sut.setLocalesOrder(['es_ES', 'en_US']);
+        
         assert.strictEqual(sut.get('PASSWORD'), 'Contraseña');
         assert.strictEqual(sut.get('USER'), 'Usuario');
         assert.strictEqual(sut.get('LOGIN', 'Locales'), 'Login');
 
         // Test tag that is missing on es_ES but found on en_US
-        assert.strictEqual(sut.get('MISSING_TAG'), 'Missing tag');
-
+        assert.strictEqual(sut.get('TAG_NOT_EXISTING_ON_ES_ES'), 'Missing tag');
+        
         // Verify defined attributes are still the same
-        assert.ok(ArrayUtils.isEqualTo(sut.locales, ['es_ES', 'en_US']));
-        assert.ok(ArrayUtils.isEqualTo(sut.paths, [window.basePath + '/test-json/$locale/$bundle.json']));
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['es_ES', 'en_US']));  
 
         // Test tag that is missing everywhere
         assert.throws(function() {
+            sut.get('NOT_TO_BE_FOUND');
+        }, /key <NOT_TO_BE_FOUND> not found on Locales/);
+        
+        assert.throws(function() {
             sut.get('NOT_TO_BE_FOUND', 'Locales');
-        }, /key <NOT_TO_BE_FOUND> not found/);
+        }, /key <NOT_TO_BE_FOUND> not found on Locales/);
+        
+        assert.throws(function() {
+            sut.get('NOT_TO_BE_FOUND', 'Locales', window.basePath + '/test-json/$locale/$bundle.json');
+        }, /key <NOT_TO_BE_FOUND> not found on Locales - /);
         
         sut.missingKeyFormat = '--$key--';        
         assert.strictEqual(sut.get('NOT_TO_BE_FOUND'), '--NOT_TO_BE_FOUND--');
+        assert.strictEqual(sut.get('NOT_TO_BE_FOUND', 'Locales'), '--NOT_TO_BE_FOUND--');
+        assert.strictEqual(sut.get('NOT_TO_BE_FOUND', 'Locales', window.basePath + '/test-json/$locale/$bundle.json'), '--NOT_TO_BE_FOUND--');
         
         sut.missingKeyFormat = '';        
         assert.strictEqual(sut.get('NOT_TO_BE_FOUND'), '');
+        assert.strictEqual(sut.get('NOT_TO_BE_FOUND', 'Locales'), '');
+        assert.strictEqual(sut.get('NOT_TO_BE_FOUND', 'Locales', window.basePath + '/test-json/$locale/$bundle.json'), '');
         
-        done();
-        
-    }, function(){
-        
-        assert.ok(false);
         done();
     });
-
-    // Test wrong values
-    // Already tested
-
-    // Test exceptions
-    sut.loadBundle('nonexistant', function(){
-        
-        assert.ok(false);
-        done();
-        
-    }, function(path){
-        
-        assert.strictEqual(path, window.basePath + '/test-json/en_US/nonexistant.json'); 
-        done();
-    }, 0);
-    
-    assert.throws(function() {
-        sut.loadBundle('Locales', null, null, 2);
-    }, /invalid pathIndex/);
-    
-    assert.throws(function() {
-        sut.loadBundle('Locales', null, null, 10);
-    }, /invalid pathIndex/);
 });
 
 
@@ -844,15 +965,60 @@ QUnit.test("test-json", function(assert){
  */
 QUnit.test("test-properties", function(assert){
 
-    // Test empty values
-    // TODO
+    var done = assert.async(1);
+    
+    var bundles = [{
+        path: window.basePath + '/test-properties/$locale/$bundle.properties',
+        bundles: ['Locales']
+    }];
+    
+    sut.initialize(['en_US', 'es_ES'], bundles, function(errors){
 
-    // Test ok values
-    // TODO
+        // Test EN_US
+        assert.strictEqual(sut.get('PASSWORD'), 'Password');
+        assert.strictEqual(sut.get('TAG_NOT_EXISTING_ON_ES_ES'), 'Missing tag');
+        assert.strictEqual(sut.get('USER', 'Locales'), 'User');
+        assert.strictEqual(sut.get('LOGIN', 'Locales'), 'Login');
 
-    // Test wrong values
-    // TODO
+        // Verify defined attributes are still the same
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['en_US', 'es_ES']));
+        
+        // Test ES_ES
+        sut.setLocalesOrder(['es_ES', 'en_US']);
+        
+        assert.strictEqual(sut.get('PASSWORD'), 'Contraseña');
+        assert.strictEqual(sut.get('USER'), 'Usuario');
+        assert.strictEqual(sut.get('LOGIN', 'Locales'), 'Login');
 
-    // Test exceptions
-    // TODO
+        // Test tag that is missing on es_ES but found on en_US
+        assert.strictEqual(sut.get('TAG_NOT_EXISTING_ON_ES_ES'), 'Missing tag');
+        
+        // Verify defined attributes are still the same
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['es_ES', 'en_US']));  
+
+        // Test tag that is missing everywhere
+        assert.throws(function() {
+            sut.get('NOT_TO_BE_FOUND');
+        }, /key <NOT_TO_BE_FOUND> not found on Locales/);
+        
+        assert.throws(function() {
+            sut.get('NOT_TO_BE_FOUND', 'Locales');
+        }, /key <NOT_TO_BE_FOUND> not found on Locales/);
+        
+        assert.throws(function() {
+            sut.get('NOT_TO_BE_FOUND', 'Locales', window.basePath + '/test-properties/$locale/$bundle.properties');
+        }, /key <NOT_TO_BE_FOUND> not found on Locales - /);
+        
+        sut.missingKeyFormat = '--$key--';        
+        assert.strictEqual(sut.get('NOT_TO_BE_FOUND'), '--NOT_TO_BE_FOUND--');
+        assert.strictEqual(sut.get('NOT_TO_BE_FOUND', 'Locales'), '--NOT_TO_BE_FOUND--');
+        assert.strictEqual(sut.get('NOT_TO_BE_FOUND', 'Locales', window.basePath + '/test-properties/$locale/$bundle.properties'), '--NOT_TO_BE_FOUND--');
+        
+        sut.missingKeyFormat = '';        
+        assert.strictEqual(sut.get('NOT_TO_BE_FOUND'), '');
+        assert.strictEqual(sut.get('NOT_TO_BE_FOUND', 'Locales'), '');
+        assert.strictEqual(sut.get('NOT_TO_BE_FOUND', 'Locales', window.basePath + '/test-properties/$locale/$bundle.properties'), '');
+        
+        done();
+    });
 });

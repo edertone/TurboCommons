@@ -79,6 +79,19 @@ export class LocalizationManager {
     
     
     /**
+     * Checks if the specified locale is currently loaded for the currently defined bundles and paths.
+     * 
+     * @param locale A locale to check. For example 'en_US'
+     * 
+     * @return True if the locale is currently loaded on the class, false if not.
+     */
+    isLocaleLoaded(locale: string){
+        
+        return (this._locales.indexOf(locale) >= 0);
+    }
+    
+    
+    /**
      * Performs the initial data load by looking for resource bundles on all the specified paths.
      * All the translations will be loaded for each of the specified locales.
      * 
@@ -313,7 +326,6 @@ export class LocalizationManager {
         // If no path specified, autodetect it or use the last one
         if (path === '') {
 
-            // TODO find path by bundle
             path = this._lastPath;
         }
 
@@ -362,7 +374,7 @@ export class LocalizationManager {
      * The list of languages (sorted by preference) that are currently available by this class to translate the given keys.
      * When a key and bundle are requested for translation, the class will check on the first language of this
      * list for a translated text. If missing, the next one will be used, and so. This list is constructed after the initialize
-     * and loadLocales methods are called.
+     * or loadLocales methods are called.
      * 
      * @example: After loading the following list of locales ['en_US', 'es_ES', 'fr_FR'] if we call localizationManager.get('HELLO', 'Greetings')
      * the localization manager will try to locate the en_US value for the HELLO tag on the Greetings bundle. If the tag is not found for the
@@ -375,9 +387,61 @@ export class LocalizationManager {
     }
     
     
-    // TODO
-    setCurrentLocale(){
+    /**
+     * Define the locale that will be placed at the front of the currently loaded locales list.
+     * 
+     * This will be the first locale to use when trying to get a translation.
+     *
+     * @param locale A currently loaded locale that will be moved to the first position of the loaded locales list. If the specified locale
+     *        is not currently loaded, an exception will happen.
+     *  
+     * @return void
+     */
+    setPrimaryLocale(locale: string){
         
+        if(!this.isLocaleLoaded(locale)){
+            
+            throw new Error(locale + ' not loaded');                
+        }
+        
+        let result = [locale];
+        
+        for (let l of this._locales) {
+	
+            if(l !== locale){
+                
+                result.push(l);
+            }
+        }
+        
+        this._locales = result;
+    }
+    
+    
+    /**
+     * Change the loaded locales translation preference order. The same locales that are currently loaded must be passed
+     * but with a different order to change the translation priority.
+     *
+     * @param locales A list with the new locales translation priority
+     *  
+     * @return void
+     */
+    setLocalesOrder(locales: string[]){
+        
+        if(locales.length !== this._locales.length){
+            
+            throw new Error('locales must contain all the currently loaded locales');
+        }
+        
+        for (let locale of locales) {
+	
+            if(!this.isLocaleLoaded(locale)){
+                
+                throw new Error(locale + ' not loaded');                
+            }                
+        }
+        
+        this._locales = locales;
     }
     
     
