@@ -29,7 +29,7 @@ export class StringUtils {
 
     /** 
      * Defines the start case format (The first character in all words capitalised and all the rest
-     * of the word lower case)
+     * of the word lower case). It is also called Title Case
      */
     static readonly FORMAT_START_CASE = 'FORMAT_START_CASE';
 
@@ -723,7 +723,12 @@ export class StringUtils {
         // TODO - translate from PHP
      
         // Generate the title case output
-        // TODO - translate from PHP
+        if(format === StringUtils.FORMAT_START_CASE){
+
+            return string.split(' ')
+                .map(s => (s.length > 0 ? s[0].toUpperCase() : '') + (s.length > 1 ? s.substr(1).toLowerCase() : ''))
+                    .join(' ');
+        }
 
         // Generate the all upper case output
         if(format === StringUtils.FORMAT_ALL_UPPER_CASE){

@@ -30,7 +30,7 @@ class StringUtils {
 
     /**
      * Defines the start case format (The first character in all words capitalised and all the rest
-     * of the word lower case)
+     * of the word lower case). It is also called Title Case
      */
     const FORMAT_START_CASE = 'FORMAT_START_CASE';
 
