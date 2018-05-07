@@ -388,6 +388,22 @@ export class LocalizationManager {
     
     
     /**
+     * Get the first locale from the list of loaded locales, which is the currently used to search for translated texts.
+     * 
+     * @return The locale that is defined as the primary one. For example: en_US, es_ES, ..
+     */
+    primaryLocale(){
+
+        if(!this._initialized){
+            
+            throw new Error('LocalizationManager not initialized');
+        }
+
+        return this._locales[0];
+    }
+
+
+    /**
      * Define the locale that will be placed at the front of the currently loaded locales list.
      * 
      * This will be the first locale to use when trying to get a translation.
@@ -398,6 +414,11 @@ export class LocalizationManager {
      * @return void
      */
     setPrimaryLocale(locale: string){
+        
+        if(!StringUtils.isString(locale)){
+            
+            throw new Error('Invalid locale value');
+        }
         
         if(!this.isLocaleLoaded(locale)){
             
@@ -427,6 +448,11 @@ export class LocalizationManager {
      * @return void
      */
     setLocalesOrder(locales: string[]){
+        
+        if(!ArrayUtils.isArray(locales)){
+        
+            throw new Error('locales must be an array');
+        }
         
         if(locales.length !== this._locales.length){
             
@@ -507,11 +533,11 @@ export class LocalizationManager {
      * Auxiliary method that can be overriden when extending this class to customize the parsing of Json formatted
      * resource bundles
      * 
-     * @param data An object with the read resourcebundle data after being parsed by JSON.parse
+     * @param jsonString An object with the read resourcebundle json string
      */
-    protected parseJson(data: string): {[key: string]: string} {
+    protected parseJson(jsonString: string): {[key: string]: string} {
 
-        return JSON.parse(data);
+        return JSON.parse(jsonString);
     }
 
 
@@ -519,13 +545,13 @@ export class LocalizationManager {
      * Auxiliary method that can be overriden when extending this class to customize the parsing of Java properties
      * formatted resource bundles
      * 
-     * @param data A string containing the read resourcebundle
+     * @param propertiesString A string containing the read resourcebundle java properties format string
      */
-    protected parseProperties(data: string): {[key: string]: string} {
+    protected parseProperties(propertiesString: string): {[key: string]: string} {
 
         let result: {[key: string]: string} = {};
         
-        let javaPropertiesObject = new JavaPropertiesObject(data);
+        let javaPropertiesObject = new JavaPropertiesObject(propertiesString);
         
         for (let key of javaPropertiesObject.getKeys()) {
 	

@@ -718,9 +718,42 @@ QUnit.test("locales", function(assert){
 
 
 /**
+ * primaryLocale
+ */
+QUnit.test("primaryLocale", function(assert){
+    
+    assert.throws(function() {
+        sut.primaryLocale();
+    }, /LocalizationManager not initialized/);
+
+    var done = assert.async(1);
+    
+    var bundles = [{
+        path: window.basePath + '/test-locales/$locale/$bundle.json',
+        bundles: ['Locales']
+    }];
+    
+    sut.initialize(['es_ES', 'en_US', 'fr_FR'], bundles, function(errors){
+
+        assert.strictEqual(sut.primaryLocale(), 'es_ES');
+        
+        sut.setLocalesOrder(['en_US', 'es_ES', 'fr_FR']);
+        
+        assert.strictEqual(sut.primaryLocale(), 'en_US');
+        
+        done();
+    });
+});
+
+
+/**
  * setPrimaryLocale
  */
 QUnit.test("setPrimaryLocale", function(assert){
+    
+    assert.throws(function() {
+        sut.setPrimaryLocale('en_US');
+    }, /en_US not loaded/);
     
     var done = assert.async(1);
     
@@ -733,12 +766,59 @@ QUnit.test("setPrimaryLocale", function(assert){
 
         assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['es_ES', 'en_US', 'fr_FR']));
         
+        sut.setPrimaryLocale('en_US');
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['en_US', 'es_ES', 'fr_FR']));
+        
+        sut.setPrimaryLocale('fr_FR');
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['fr_FR', 'en_US', 'es_ES']));
+
+        sut.setPrimaryLocale('es_ES');
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['es_ES', 'fr_FR', 'en_US']));
+
+        // Test exceptions
+        assert.throws(function() {
+            sut.setPrimaryLocale(123);
+        }, /Invalid locale value/);
+        
+        assert.throws(function() {
+            sut.setPrimaryLocale(["LOGIN"]);
+        }, /Invalid locale value/);
+        
+        assert.throws(function() {
+            sut.setPrimaryLocale({});
+        }, /Invalid locale value/);
+        
+        done();
+    });
+});
+
+
+/**
+ * setLocalesOrder
+ */
+QUnit.test("setLocalesOrder", function(assert){
+    
+    var done = assert.async(1);
+    
+    var bundles = [{
+        path: window.basePath + '/test-locales/$locale/$bundle.json',
+        bundles: ['Locales']
+    }];
+    
+    sut.initialize(['es_ES', 'en_US', 'fr_FR'], bundles, function(errors){
+
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['es_ES', 'en_US', 'fr_FR']));
+        assert.strictEqual(sut.get('LOGIN'), 'acceder');
+        
         sut.setLocalesOrder(['en_US', 'es_ES', 'fr_FR']);
         assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['en_US', 'es_ES', 'fr_FR']));
+        assert.strictEqual(sut.get('LOGIN'), 'Login');
         
         sut.setLocalesOrder(['fr_FR', 'en_US', 'es_ES']);
         assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['fr_FR', 'en_US', 'es_ES']));
-
+        assert.strictEqual(sut.get('LOGIN'), 'loguele');
+        
+        // Test exceptions
         assert.throws(function() {
             sut.setLocalesOrder(['fr_FR']);
         }, /locales must contain all the currently loaded locales/);
@@ -750,6 +830,18 @@ QUnit.test("setPrimaryLocale", function(assert){
         assert.throws(function() {
             sut.setLocalesOrder(['fr_FR', 'en_US', 'en_GB']);
         }, /en_GB not loaded/);
+        
+        assert.throws(function() {
+            sut.setLocalesOrder(123);
+        }, /locales must be an array/);
+        
+        assert.throws(function() {
+            sut.setLocalesOrder(["LOGIN"]);
+        }, /locales must contain all the currently loaded locales/);
+        
+        assert.throws(function() {
+            sut.setLocalesOrder({});
+        }, /locales must be an array/);
         
         done();
     });
