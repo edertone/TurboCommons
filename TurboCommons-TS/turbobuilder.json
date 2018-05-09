@@ -23,14 +23,14 @@
 	    "copyrightHeaders": [
 	    	{
 	    		"enabled": true,
-	    		"path": "extras/copyrightHeaders/TsFiles-Header.txt",
+	    		"path": "extras/copyright headers/TsFiles-Header.txt",
 	    		"appliesTo": "src",
 	    		"includes": ["ts"],
 	    		"excludes": []
 	    	},
 	    	{
 	    		"enabled": true,
-	    		"path": "extras/copyrightHeaders/JsFiles-Header.txt",
+	    		"path": "extras/copyright headers/JsFiles-Header.txt",
 	    		"appliesTo": "src",
 	    		"includes": ["js"],
 	    		"excludes": []
