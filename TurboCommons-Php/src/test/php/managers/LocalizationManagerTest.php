@@ -12,8 +12,6 @@
 namespace org\turbocommons\src\test\php\managers;
 
 use PHPUnit\Framework\TestCase;
-use Throwable;
-use org\turbocommons\src\main\php\managers\LocalizationManager;
 
 
 /**
@@ -24,7 +22,64 @@ use org\turbocommons\src\main\php\managers\LocalizationManager;
 class LocalizationManagerTest extends TestCase {
 
 
-    // TODO - translate from ts
+    /**
+     * @see TestCase::setUpBeforeClass()
+     *
+     * @return void
+     */
+    public static function setUpBeforeClass(){
+
+        // Nothing necessary here
+    }
+
+
+    /**
+     * @see TestCase::setUp()
+     *
+     * @return void
+     */
+    protected function setUp(){
+
+        $this->exceptionMessage = '';
+
+        // $this->sut = new LocalizationManager();
+    }
+
+
+    /**
+     * @see TestCase::tearDown()
+     *
+     * @return void
+     */
+    protected function tearDown(){
+
+        if($this->exceptionMessage != ''){
+
+            $this->fail($this->exceptionMessage);
+        }
+    }
+
+
+    /**
+     * @see TestCase::tearDownAfterClass()
+     *
+     * @return void
+     */
+    public static function tearDownAfterClass(){
+
+        // Nothing necessary here
+    }
+
+
+    /**
+     * testIsLocaleLoaded
+     *
+     * @return void
+     */
+    public function testIsLocaleLoaded(){
+
+        $this->markTestIncomplete('Tests not implemented');
+    }
 }
 
 ?>
