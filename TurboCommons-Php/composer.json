@@ -4,7 +4,7 @@
 	"type" : "library",
 	"license" : "Apache-2.0",
 	"minimum-stability" : "stable",
-	"homepage" : "turbocommons.org",
+	"homepage" : "https://turbocommons.org",
 	"keywords" : [
 		"general",
 		"purpose",
