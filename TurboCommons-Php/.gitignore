@@ -15,6 +15,7 @@ thumbs.db
 
 # dependencies
 /node_modules
+/vendor
 
 
 # IDEs and editors

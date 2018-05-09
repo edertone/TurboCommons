@@ -1,0 +1,18 @@
+{
+	"name" : "edertone/turbocommons-php",
+	"description" : "General purpose library that implements frequently used and generic software development tasks",
+	"type" : "library",
+	"license" : "Apache-2.0",
+	"minimum-stability" : "stable",
+	"homepage" : "turbocommons.org",
+	"keywords" : [
+		"general",
+		"purpose",
+		"development",
+		"library"
+	],
+	"support" : {
+		"email" : "comercial@edertone.com",
+		"source" : "https://github.com/edertone/TurboCommons"
+	}
+}
