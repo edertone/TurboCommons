@@ -27,8 +27,8 @@ This library tries to cover the following development areas:
 
 - Php:
 ```
-Currently only available via .Phar download. (Composer package coming soon)
-require 'TurboCommons-Php/TurboCommons-Php-X.X.XX.phar';
+Currently available only as a .phar file (download it from this site)
+require 'TurboCommons-Php/TurboCommons-Php-X.X.X.phar';
 use org\turbocommons\src\main\php\utils\StringUtils;
 $n = StringUtils::countWords("word1 word2 word3");
 ```
@@ -69,7 +69,7 @@ If you don't want to use a package manager like npm or composer, latest compiled
 
 ### How many languages does it support
 
-- Php
+- Php (7 or more recommended)
 - Typescript
 - Javascript 5
 - Javascript 6
@@ -80,7 +80,7 @@ We want to increase this list. So! if you want to translate the library to your 
 The main goal for this library is to have zero dependencies. We are building a true standalone general purpose library.
 
 ### Official website
-The official site http://turbocommons.org is under development. Here you'll find examples, tutorials, and tons of documentation for all the library classes and methods. Stay tuned!
+The official site https://turbocommons.org is under development. Here you'll find examples, tutorials, and tons of documentation for all the library classes and methods. Stay tuned!
 
 ### Implementation details
 If we want to create a library that does this magic, we must be really strict. There are some rules that must be followed to make sure our goal is reached:
