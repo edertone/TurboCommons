@@ -1,5 +1,5 @@
 {
-	"name" : "edertone/turbocommons-php",
+	"name" : "turbocommons/turbocommons-php",
 	"description" : "General purpose library that implements frequently used and generic software development tasks",
 	"type" : "library",
 	"license" : "Apache-2.0",
