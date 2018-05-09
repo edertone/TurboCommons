@@ -1,6 +1,6 @@
 # How to make the library available to the public:
 
-1 - Make sure the git tag is updated with the new project version that's been published to npm
+1 - Make sure the git tag is updated with the new project version we want to publish
 
 2 - Generate a release build
 
