@@ -21,6 +21,7 @@ thumbs.db
 /.idea
 .project
 .classpath
+.buildpath
 .c9/
 *.launch
 .settings/
