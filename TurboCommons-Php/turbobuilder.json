@@ -23,8 +23,7 @@
     },
     
     "build": {
-	    "php" : {
-	    	"enabled": true,
+	    "lib_php" : {
 	    	"createPhar": true
 	    }
     },

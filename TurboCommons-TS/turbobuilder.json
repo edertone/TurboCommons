@@ -5,21 +5,6 @@
 	},
 	
 	"validate": {
-		"runBeforeBuild": true,
-		"projectStructure" : {
-	        "enabled": true,
-	        "forceExtrasFolder": true,
-	        "forceReadmeFile": true,
-	        "forceTODOFile": true,
-	        "resourcesStructure": true,
-	        "phpStructure": true,
-	        "jsStructure": true,
-	        "tsStructure": true,
-	        "tsConfigFile": true,
-	        "javaStructure": true,
-	        "cssStructure": true,
-	        "checkGitIgnore": true
-	    },
 	    "copyrightHeaders": [
 	    	{
 	    		"enabled": true,
@@ -40,10 +25,7 @@
     
     "build": {
     
-	    "keepUnpackedSrcFiles" : false,
-	    
-	    "ts" : {
-	        "enabled": true,
+	    "lib_ts" : {
 	        "declaration": true,
 	        "strict": true,
 	        "sourceMap": true,
@@ -56,14 +38,6 @@
     },
     
     "release": {
-	    "gitChangeLog": true,
-	    "gitChangeLogCount": 5,
-	    "optimizeCss": true,
-	    "optimizeHtml": true,
-	    "optimizeJs": true,
-	    "optimizePhp": false,
-	    "optimizePictures": true,
-	    "generateCodeDocumentation": true
     },
     
     "test": {
