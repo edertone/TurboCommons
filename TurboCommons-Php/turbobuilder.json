@@ -1,7 +1,8 @@
 {
 	"metadata": {
 		"name": "turbocommons-php",
-		"description": "General purpose library that implements frequently used and generic software development tasks"
+		"description": "General purpose library that implements frequently used and generic software development tasks",
+		"builderVersion": "0.0.4"		
 	},
 	
 	"validate": {
