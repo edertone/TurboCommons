@@ -15,7 +15,7 @@
 	    "copyrightHeaders": [
 	    	{
 	    		"enabled": true,
-	    		"path": "extras/copyrightHeaders/TurboCommons-Php.txt",
+	    		"path": "extras/copyright headers/TurboCommons-Php.txt",
 	    		"appliesTo": "src",
 	    		"includes": ["php"],
 	    		"excludes": []
