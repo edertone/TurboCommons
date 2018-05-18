@@ -467,14 +467,28 @@ export class FilesManager{
         // Add a shutdown function to try to delete the file when the current script execution ends
         if(deleteOnExecutionEnd){
 
-            this.process.on('exit', () => {
-                
-                this.deleteDirectory(tempDirectory);
-            });
+            this._tempDirectoriesToDelete.push(tempDirectory);
+            
+            if(this._tempDirectoriesToDelete.length < 2){
+              
+                this.process.once('exit', () => {
+                    
+                    for (let temp of this._tempDirectoriesToDelete) {
+	
+                        this.deleteDirectory(temp);
+                    }                
+                });
+            }
         }
 
         return tempDirectory;
     }
+    
+    
+    /**
+     * Stores a list of paths to temporary folders that must be removed on application execution end.
+     */
+    private _tempDirectoriesToDelete: string[] = [];
 
 
     /**

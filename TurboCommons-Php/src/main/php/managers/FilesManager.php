@@ -451,14 +451,28 @@ class FilesManager extends BaseStrictClass{
         // Add a shutdown function to try to delete the file when the current script execution ends
         if($deleteOnExecutionEnd){
 
-            register_shutdown_function(function () use ($tempDirectory) {
+            $this->_tempDirectoriesToDelete[] = $tempDirectory;
 
-                $this->deleteDirectory($tempDirectory);
-            });
+            if(count($this->_tempDirectoriesToDelete) < 2){
+
+                register_shutdown_function(function () {
+
+                    foreach ($this->_tempDirectoriesToDelete as $temp) {
+
+                        $this->deleteDirectory($temp);
+                    }
+                });
+            }
         }
 
         return $tempDirectory;
     }
+
+
+    /**
+     * Stores a list of paths to temporary folders that must be removed on application execution end.
+     */
+    private $_tempDirectoriesToDelete = [];
 
 
     /**
