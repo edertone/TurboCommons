@@ -8,14 +8,12 @@
 	"validate": {
 	    "copyrightHeaders": [
 	    	{
-	    		"enabled": true,
 	    		"path": "extras/copyright headers/TsFiles-Header.txt",
 	    		"appliesTo": "src",
 	    		"includes": ["ts"],
 	    		"excludes": []
 	    	},
 	    	{
-	    		"enabled": true,
 	    		"path": "extras/copyright headers/JsFiles-Header.txt",
 	    		"appliesTo": "src",
 	    		"includes": ["js"],
@@ -40,14 +38,17 @@
     
     "release": {
     },
+        
+    "sync": [
+    ],
     
-    "test": {
-	    "ts": {
-	        "enabled": true,
+    "test": [
+    	{
+	    	"type": "qunit",
+	    	"testsRoot": "src/test/ts",
 	        "httpServerPort": "8185",
 	        "targets": ["es5", "es6"],
-	        "browsers": {"chrome": true, "firefox": false, "iexplore": false},
-	        "testingLibrary": "qunit"
+	        "browsers": {"chrome": true, "firefox": false, "iexplore": false}
 	    }
-    }
+    ]
 }

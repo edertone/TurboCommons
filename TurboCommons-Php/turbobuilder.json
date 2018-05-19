@@ -14,7 +14,6 @@
 	    },
 	    "copyrightHeaders": [
 	    	{
-	    		"enabled": true,
 	    		"path": "extras/copyright headers/TurboCommons-Php.txt",
 	    		"appliesTo": "src",
 	    		"includes": ["php"],
@@ -25,18 +24,21 @@
     
     "build": {
 	    "lib_php" : {
-	    	"createPhar": true
 	    }
     },
     
     "release": {
     },
-    
-    "test": {
-	    "php": {
-	        "enabled": true,
+        
+    "sync": [
+    ],
+
+    "test": [
+	    {
+	    	"type": "phpUnit",
+	    	"testsRoot": "src/test/php",
 	        "coverageReport": true,
 	        "coverageReportOpenAfterTests": true
 	    }
-    }
+    ]
 }
