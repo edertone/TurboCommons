@@ -10,7 +10,7 @@
 	        "enabled": true,
 	        "mandatory": true,
 	        "mustContain": ["org\\turbocommons\\src\\$path"],
-	        "excludes": ["AutoLoader.php", "index.php"]
+	        "excludes": ["autoloader.php", "index.php"]
 	    },
 	    "copyrightHeaders": [
 	    	{

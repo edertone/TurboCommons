@@ -10,7 +10,7 @@
  */
 
 
-require_once __DIR__.'/../../main/php/AutoLoader.php';
+require_once __DIR__.'/../../main/php/autoloader.php';
 
 if(!class_exists('PHPUnit\Framework\TestCase')){
 
