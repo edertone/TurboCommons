@@ -128,7 +128,7 @@ export class FilesManager{
         
         try {
             
-            return this.fs.lstatSync(path).isDirectory();
+            return this.fs.lstatSync(this.fs.realpathSync(path)).isDirectory();
             
         } catch (e) {
 
