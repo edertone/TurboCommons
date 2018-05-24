@@ -507,6 +507,7 @@ class StringUtilsTest extends TestCase {
 	public function testReplace(){
 
 	    // TODO - translate from TS
+	    $this->markTestIncomplete('This test has not been implemented yet.');
 	}
 
 
@@ -518,6 +519,7 @@ class StringUtilsTest extends TestCase {
 	public function testTrim(){
 
 	    // TODO - translate from TS
+	    $this->markTestIncomplete('This test has not been implemented yet.');
 	}
 
 
@@ -529,6 +531,7 @@ class StringUtilsTest extends TestCase {
 	public function testTrimLeft(){
 
 	    // TODO - translate from TS
+	    $this->markTestIncomplete('This test has not been implemented yet.');
 	}
 
 
@@ -540,6 +543,7 @@ class StringUtilsTest extends TestCase {
 	public function testTrimRight(){
 
 	    // TODO - translate from TS
+	    $this->markTestIncomplete('This test has not been implemented yet.');
 	}
 
 
@@ -748,6 +752,7 @@ class StringUtilsTest extends TestCase {
 	public function testGetDomainFromUrl(){
 
 		// TODO - copy tests from js
+	    $this->markTestIncomplete('This test has not been implemented yet.');
 	}
 
 
@@ -759,6 +764,7 @@ class StringUtilsTest extends TestCase {
 	public function testGetHostNameFromUrl(){
 
 		// TODO - copy tests from js
+	    $this->markTestIncomplete('This test has not been implemented yet.');
 	}
 
 
@@ -807,6 +813,7 @@ class StringUtilsTest extends TestCase {
 		$this->assertTrue(StringUtils::getKeyWords('hello') === ['hello']);
 
 		// TODO: add lot more tests
+		$this->markTestIncomplete('This test has not been implemented yet.');
 	}
 
 
@@ -1089,6 +1096,7 @@ class StringUtilsTest extends TestCase {
 	public function testGetSchemeFromUrl(){
 
 		// TODO - copy from js!!
+	    $this->markTestIncomplete('This test has not been implemented yet.');
 
 	}
 
@@ -1450,6 +1458,7 @@ class StringUtilsTest extends TestCase {
 	public function testFormatUrl(){
 
 		// TODO copy from js
+	    $this->markTestIncomplete('This test has not been implemented yet.');
 	}
 
 
@@ -1464,6 +1473,7 @@ class StringUtilsTest extends TestCase {
 		$this->assertTrue(StringUtils::formatForFullTextSearch('') === '');
 
 		// TODO!!
+		$this->markTestIncomplete('This test has not been implemented yet.');
 
 	}
 
@@ -1775,6 +1785,7 @@ class StringUtilsTest extends TestCase {
 	public function testRemoveUrls(){
 
 	    // TODO!!
+	    $this->markTestIncomplete('This test has not been implemented yet.');
 	}
 
 
@@ -1786,6 +1797,7 @@ class StringUtilsTest extends TestCase {
 	public function testRemoveHtmlCode(){
 
 	    // TODO!!
+	    $this->markTestIncomplete('This test has not been implemented yet.');
 	}
 
 
@@ -1797,6 +1809,7 @@ class StringUtilsTest extends TestCase {
 	public function testRemoveMultipleSpaces(){
 
 	    // TODO!!
+	    $this->markTestIncomplete('This test has not been implemented yet.');
 	}
 }
 

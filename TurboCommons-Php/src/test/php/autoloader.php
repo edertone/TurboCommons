@@ -12,11 +12,6 @@
 
 require_once __DIR__.'/../../main/php/autoloader.php';
 
-if(!class_exists('PHPUnit\Framework\TestCase')){
-
-    require_once __DIR__.'/libs/phpunit-6.2.3.phar';
-}
-
 
 // Register the autoload method that will locate and automatically load the library classes
 spl_autoload_register(function($className){

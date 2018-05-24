@@ -137,6 +137,8 @@ class BaseDependantClassTest extends TestCase {
 
 		// Set multiple dependencies on a single call
 		$dependantClass->setDependencies(['_property1' => new DependantClass(), '_property2' => new DependantClass2()]);
+
+		$this->markTestIncomplete('This test has not been implemented yet.');
 	}
 }
 

@@ -273,6 +273,7 @@ class ObjectUtilsTest extends TestCase {
 
 	    // Test exceptions
 	    // TODO - translate from ts
+	    $this->markTestIncomplete('This test has not been implemented yet.');
 	}
 }
 

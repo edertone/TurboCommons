@@ -12,8 +12,6 @@
 namespace org\turbocommons\src\main\php\model;
 
 
-use phpDocumentor\Reflection\Types\This;
-
 /**
  * A base class that implements the singleton pattern for PHP and can be extended to convert a class to a singleton object
  */
