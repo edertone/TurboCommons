@@ -188,12 +188,19 @@ QUnit.test("snapshots", function(assert){
     
     sut.undo();
     assert.ok(ObjectUtils.isEqualTo(sut.get, {a:4, b:2}));
-    assert.ok(sut.snapshots.length === 1);
+    assert.ok(sut.snapshots.length === 2);
     
     sut.get.b = 6;
     assert.ok(ObjectUtils.isEqualTo(sut.get, {a:4, b:6}));
     sut.saveSnapshot();
     assert.ok(ObjectUtils.isEqualTo(sut.get, {a:4, b:6}));
+    assert.ok(sut.snapshots.length === 3);
+    
+    sut.get.b = 7;
+    sut.undo();
+    assert.ok(sut.snapshots.length === 3);
+    
+    sut.undo();
     assert.ok(sut.snapshots.length === 2);
     
     sut.undoAll();
@@ -241,6 +248,7 @@ QUnit.test("getSnapshotsByTag", function(assert){
     
     sut.get.b = 3;
     sut.saveSnapshot();
+    assert.strictEqual(sut.getSnapshotsByTag(['']).length, 1);
     
     sut.get.b = 4;
     sut.saveSnapshot('4-2');
@@ -255,17 +263,24 @@ QUnit.test("getSnapshotsByTag", function(assert){
     sut.saveSnapshot('X-2');
     
     sut.get.b = 9;
+    assert.strictEqual(sut.snapshots.length, 6);
+    assert.strictEqual(sut.getSnapshotsByTag(['']).length, 1);
+    assert.strictEqual(sut.getSnapshotsByTag(['X-2']).length, 1);
+    assert.strictEqual(sut.getSnapshotsByTag(['4-2']).length, 3);
+    assert.strictEqual(sut.getSnapshotsByTag(['5-2']).length, 1);
+    
+    sut.undo();
+    assert.strictEqual(sut.snapshots.length, 6);
+    assert.strictEqual(sut.getSnapshotsByTag(['']).length, 1);
+    assert.strictEqual(sut.getSnapshotsByTag(['X-2']).length, 1);
+    assert.strictEqual(sut.getSnapshotsByTag(['4-2']).length, 3);
+    assert.strictEqual(sut.getSnapshotsByTag(['5-2']).length, 1);
+    
+    sut.undo();
     assert.strictEqual(sut.snapshots.length, 4);
     assert.strictEqual(sut.getSnapshotsByTag(['']).length, 1);
     assert.strictEqual(sut.getSnapshotsByTag(['X-2']).length, 0);
     assert.strictEqual(sut.getSnapshotsByTag(['4-2']).length, 2);
-    assert.strictEqual(sut.getSnapshotsByTag(['5-2']).length, 1);
-    
-    sut.undo();
-    assert.strictEqual(sut.snapshots.length, 3);
-    assert.strictEqual(sut.getSnapshotsByTag(['']).length, 1);
-    assert.strictEqual(sut.getSnapshotsByTag(['X-2']).length, 0);
-    assert.strictEqual(sut.getSnapshotsByTag(['4-2']).length, 1);
     assert.strictEqual(sut.getSnapshotsByTag(['5-2']).length, 1);
     
     sut.undo();
@@ -278,13 +293,6 @@ QUnit.test("getSnapshotsByTag", function(assert){
     sut.undo();
     assert.strictEqual(sut.snapshots.length, 1);
     assert.strictEqual(sut.getSnapshotsByTag(['']).length, 1);
-    assert.strictEqual(sut.getSnapshotsByTag(['X-2']).length, 0);
-    assert.strictEqual(sut.getSnapshotsByTag(['4-2']).length, 0);
-    assert.strictEqual(sut.getSnapshotsByTag(['5-2']).length, 0);
-    
-    sut.undo();
-    assert.strictEqual(sut.snapshots.length, 0);
-    assert.strictEqual(sut.getSnapshotsByTag(['']).length, 0);
     assert.strictEqual(sut.getSnapshotsByTag(['X-2']).length, 0);
     assert.strictEqual(sut.getSnapshotsByTag(['4-2']).length, 0);
     assert.strictEqual(sut.getSnapshotsByTag(['5-2']).length, 0);
@@ -348,14 +356,18 @@ QUnit.test("saveSnapShot", function(assert){
     sut.get.a = 5;
     sut.get.b = 6;
     assert.ok(sut.saveSnapshot('snap1'));
+    assert.notOk(sut.saveSnapshot('snap1'));
+    assert.ok(sut.saveSnapshot('snap2'));
     assert.notOk(sut.saveSnapshot('snap2'));
     
     sut.get.a = 7;
     sut.get.b = 8;
     assert.ok(sut.saveSnapshot('snap2'));
+    assert.notOk(sut.saveSnapshot('snap2'));
+    assert.notOk(sut.saveSnapshot('snap2'));
     
     assert.strictEqual(sut.getSnapshotsByTag(['snap1']).length, 2);
-    assert.strictEqual(sut.getSnapshotsByTag(['snap2']).length, 1);
+    assert.strictEqual(sut.getSnapshotsByTag(['snap2']).length, 2);
     
     // Test wrong values
     // Not necessary
@@ -480,7 +492,45 @@ QUnit.test("undo", function(assert){
     assert.strictEqual(sut.get.b, 2);
     
     assert.notOk(sut.undo());
-
+    assert.notOk(sut.undoAll());
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:1, b:2}));
+    
+    sut.get.b = 3;
+    sut.saveSnapshot('a');
+    
+    sut.get.b = 4;
+    sut.saveSnapshot('b');
+    
+    sut.get.b = 5;
+    sut.saveSnapshot('a');
+    
+    sut.get.b = 6;
+    sut.saveSnapshot('a');
+    
+    assert.ok(sut.undo(['b']));
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:1, b:4}));
+    
+    assert.ok(sut.undo(['a']));
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:1, b:3}));
+    
+    assert.ok(sut.undoAll());
+    assert.notOk(sut.undo(['b']));
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:1, b:2}));
+    
+    sut.get.b = 3;
+    sut.saveSnapshot('a');
+    
+    sut.get.b = 4;
+    sut.saveSnapshot('b');
+    
+    sut.get.b = 5;
+    sut.saveSnapshot('a');
+    
+    // A non existing tag will lead us to a total undo
+    assert.ok(sut.undo(['c']));
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:1, b:2}));
+    assert.ok(sut.snapshots.length === 0);
+    
     // Test wrong values
     // Not necessary
 

@@ -48,16 +48,11 @@ export class ModelHistoryManager<T> {
 
 
     /**
-     * A list with all the model instances that have been saved as snapshots
+     * A list with all the model instances that have been saved as snapshots and the tag that was
+     * used to save them
      */
-    private _snapshots: T[] = [];
-
-
-    /**
-     * List with all the tags that have been applied to all the saved snapshots
-     */
-    private _snapshotTags: string[] = [];
-
+    private _snapshots: {state: T, tag: string}[] = [];
+    
 
     /**
      * This is a fully featured undo / redo manager.
@@ -65,7 +60,7 @@ export class ModelHistoryManager<T> {
      * 
      * The first thing we need to do is to create a ModelHistoryManager and pass a model class instance which will be
      * used as the starting point of the history management. We can redefine the starting point at any time by calling
-     * setInitialState() so if we need to perform some changes to the instance values, we can do it an fix it later as the
+     * setInitialState() so if we need to perform some changes to the instance values, we can do it an mark it later as the
      * initial state.
      *
      * After defining the initial state, we will be able to save snapshots to track the changes on the instance,
@@ -89,13 +84,12 @@ export class ModelHistoryManager<T> {
      * undo operation will leave the model state as it was just when this method was called.
      * 
      * Note that calling this method also cleans any possible saved snapshots or history. We can define it as a
-     * 'reset to the current moment' method.
+     * 'reset to the current moment' method and set it as the starting point.
      */
      setInitialState() {
 
          this._initialState = ObjectUtils.clone(this._currentState);
-        
-         this._snapshotTags = [];      
+             
          this._snapshots = [];
     }
 
@@ -110,7 +104,7 @@ export class ModelHistoryManager<T> {
 
 
     /**
-     * Array containing all the snapshots that have been saved till the current
+     * Array containing all the snapshot states that have been saved to the current
      * moment. Each one of the array elements is a model class instance containing all
      * the information that was available at the moment of taking the snapshot
      * 
@@ -119,7 +113,14 @@ export class ModelHistoryManager<T> {
      */
     get snapshots() {
 
-        return this._snapshots;
+        let result = [];
+        
+        for (let snapshot of this._snapshots) {
+	
+            result.push(snapshot.state);
+        }
+        
+        return result;
     }
     
     
@@ -135,7 +136,7 @@ export class ModelHistoryManager<T> {
      * WARNING !! - This value must be used only to read data. Any direct modification of
      * the returned array will result in unwanted behaviours 
      * 
-     * @param tags A list of strings with all the tags for which we want to obtain their related snapshots
+     * @param tags A list with all the tags for which we want to obtain the related snapshots
      */
     getSnapshotsByTag(tags:string[]) {
 
@@ -155,11 +156,11 @@ export class ModelHistoryManager<T> {
          
         for (var i = 0; i < this._snapshots.length; i++) {
     
-            if(tags.indexOf(this._snapshotTags[i]) >= 0){
+            if(tags.indexOf(this._snapshots[i].tag) >= 0){
                 
-                result.push(this._snapshots[i]);
+                result.push(this._snapshots[i].state);
             }
-         }
+        }
         
         return result;
     }
@@ -180,13 +181,16 @@ export class ModelHistoryManager<T> {
             throw new Error('tag must be a string');
         }
         
-        // Check if the snapshot needs to be saved or not
+        // If current model state is the same as the latest snapshot and the tag we want to store
+        // is the same, a new copy won't be created
         if(this._snapshots.length > 0 &&
-                ObjectUtils.isEqualTo(this._currentState, this._snapshots[this._snapshots.length - 1])){
+           this._snapshots[this._snapshots.length - 1].tag === tag &&
+           ObjectUtils.isEqualTo(this._currentState, this._snapshots[this._snapshots.length - 1].state)){
         
             return false;
         }
         
+        // If we are at the initial state, snapshot won't also be saved
         if(this._snapshots.length <= 0 &&
                 ObjectUtils.isEqualTo(this._currentState, this._initialState)){
         
@@ -194,16 +198,20 @@ export class ModelHistoryManager<T> {
         }
 
         // If max undo limit is reached, remove first snapshot and set it as the initial state
-        if(this.maxSnapshots > 0 && this._snapshots.length >= this.maxSnapshots){
+        if(this.maxSnapshots > 0 &&
+           this._snapshots.length >= this.maxSnapshots){
             
-            this._snapshotTags.shift();
-            this._initialState = (this._snapshots.shift() as T);
+            let firstSnapshot = this._snapshots.shift() as {state: T, tag: string};
+            
+            this._initialState = (firstSnapshot.state as T);
         }
         
-        this._snapshotTags.push(tag);
-        this._snapshots.push(ObjectUtils.clone(this._currentState));
-        
-        return true;
+        this._snapshots.push({
+            state: ObjectUtils.clone(this._currentState),
+            tag: tag
+        });
+
+		return true;
     }
 
 
@@ -213,7 +221,7 @@ export class ModelHistoryManager<T> {
     get isUndoPossible() {
 
         if(this._snapshots.length > 0 ||
-                !ObjectUtils.isEqualTo(this._currentState, this._initialState)){
+           !ObjectUtils.isEqualTo(this._currentState, this._initialState)){
         
             return true;
         }
@@ -228,35 +236,44 @@ export class ModelHistoryManager<T> {
      * 
      * If current state is the same as the initial state, undo will do nothing
      * 
+     * @param tagsFilter Defines which tags we are looking for. If enpty list (default) , undo will be performed to the latest snapshot.
+     *        If a list of strings (tags) is provided, undo will be performed to the youngest snapshot that was saved with any
+     *        of the specified tags
+     * 
      * @returns True if the undo operation resulted in a current state change, false otherwise
      */
-    undo(): boolean {
+    undo(tagsFilter:string[] = []): boolean {
+        
+        // If there are no snapshots left and the current model state is different
+        // than the initial state, we will restore the initial state
+        if(this._snapshots.length === 0 &&
+           !ObjectUtils.isEqualTo(this._currentState, this._initialState)){
+            
+            this._currentState = ObjectUtils.clone(this._initialState);
+            
+            return true;
+        }
 
+        // If any snapshot is available, check if we should restore it
         if (this._snapshots.length > 0) {
+
+            let latestSnapshot = this._snapshots[this._snapshots.length - 1];
             
-            this._snapshotTags.pop();
-            let snapshot = (this._snapshots.pop() as T);
-            
-            // If current state has not changed from previous snapshot, we will call another undo
-            if(ObjectUtils.isEqualTo(this._currentState, snapshot)){
+            // If the current state is identical to the latest snapshot, or the latest
+            // snapshot tag is not on the tags filter list, we will discard the latest snapshot
+            // and call undo to check the next
+            if(ObjectUtils.isEqualTo(this._currentState, latestSnapshot.state) ||
+               (tagsFilter.length > 0 && tagsFilter.indexOf(latestSnapshot.tag) < 0)){
                 
-                return this.undo();
-            
-            }else{
+                this._snapshots.pop();
                 
-                this._currentState = snapshot;
-                
-                return true;
+                return this.undo(tagsFilter);
             }
-        
-        }else{
-        
-            if(!ObjectUtils.isEqualTo(this._currentState, this._initialState)){
-                
-                this._currentState = ObjectUtils.clone(this._initialState);
-                
-                return true;
-            }
+            
+            // Clone the latest snapshot to the current model state
+            this._currentState = ObjectUtils.clone(latestSnapshot.state);
+            
+            return true;
         }
         
         return false;
@@ -277,7 +294,6 @@ export class ModelHistoryManager<T> {
             
             this._currentState = ObjectUtils.clone(this._initialState);
             
-            this._snapshotTags = [];      
             this._snapshots = [];
             
             return true;
