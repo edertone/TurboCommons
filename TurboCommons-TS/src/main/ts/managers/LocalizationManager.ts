@@ -255,72 +255,110 @@ export class LocalizationManager {
         
         if(this._filesManager !== null){
             
-            // TODO
-            // Use the filesManager instance to load all the locales from the specified paths
-                
+            this._loadDataFromFiles(locales, pathsToLoad, pathsToLoadInfo, finishedCallback, progressCallback);
+             
         }else{
             
-            // Load all the specified paths as URLs
-            (this._httpManager as HTTPManager).multiGetRequest(pathsToLoad, (results, anyError) =>{
-                
-                let errors: {path:string, errorMsg:string, errorCode:number}[] = [];
-                
-                for (let i = 0; i < results.length; i++) {
-                    
-                    if(results[i].isError){
-                        
-                        errors.push({
-                            path: results[i].path,
-                            errorMsg: results[i].errorMsg,
-                            errorCode: results[i].errorCode 
-                        });
-                        
-                    }else{
-                        
-                        let locale = pathsToLoadInfo[i].locale;
-                        let bundle = pathsToLoadInfo[i].bundle;
-                        let path = pathsToLoadInfo[i].path;
-                        
-                        if (!this._loadedData.hasOwnProperty(path)) {
-
-                            this._loadedData[path] = {};
-                        }
-                        
-                        if (!this._loadedData[path].hasOwnProperty(bundle)) {
-
-                            this._loadedData[path][bundle] = {};
-                        }
-                        
-                        switch (StringUtils.getPathExtension(pathsToLoad[i])) {
-
-                            case 'json':
-                                this._loadedData[path][bundle][locale] = this.parseJson(results[i].response);
-                                break;
-
-                            case 'properties':
-                                this._loadedData[path][bundle][locale] = this.parseProperties(results[i].response);
-                                break;
-                        }
-                    }
-                }
-                
-                this._locales = ArrayUtils.removeDuplicateElements(this._locales.concat(locales));
-                this._lastBundle = pathsToLoadInfo[pathsToLoadInfo.length - 1].bundle;
-                this._lastPath = pathsToLoadInfo[pathsToLoadInfo.length - 1].path;
-
-                finishedCallback(errors);
-                
-            }, null, (completedUrl, totalUrls) => {
-                
-                if (progressCallback !== null) {
-
-                    progressCallback(completedUrl, totalUrls);
-                }
-            });
+            this._loadDataFromUrls(locales, pathsToLoad, pathsToLoadInfo, finishedCallback, progressCallback);
         }
     }
     
+    
+    /**
+     * Perform the paths load from file system
+     *
+     * @param locales List of locales to load
+     * @param pathsToLoad list of paths that need to be loaded
+     * @param pathsToLoadInfo original info about the paths to load
+     * @param finishedCallback method to execute once finished
+     * @param progressCallback method to execute after each path is loaded
+     */
+    private _loadDataFromFiles(locales: string[],
+                               pathsToLoad: string[],
+                               pathsToLoadInfo: any[],
+                               finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void),
+                               progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null){
+        
+        // TODO
+        // Use the filesManager instance to load all the locales from the specified paths
+    }
+    
+    
+    /**
+     * Perform the paths load from urls
+     *
+     * @param locales List of locales to load
+     * @param pathsToLoad list of paths that need to be loaded
+     * @param pathsToLoadInfo original info about the paths to load
+     * @param finishedCallback method to execute once finished
+     * @param progressCallback method to execute after each path is loaded
+     */
+    private _loadDataFromUrls(locales: string[],
+                              pathsToLoad: string[],
+                              pathsToLoadInfo: any[],
+                              finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void),
+                              progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null){
+        
+        // Load all the specified paths as URLs
+        (this._httpManager as HTTPManager).multiGetRequest(pathsToLoad, (results, anyError) =>{
+            
+            let errors: {path:string, errorMsg:string, errorCode:number}[] = [];
+            
+            for (let i = 0; i < results.length; i++) {
+                
+                if(results[i].isError){
+                    
+                    errors.push({
+                        path: results[i].path,
+                        errorMsg: results[i].errorMsg,
+                        errorCode: results[i].errorCode 
+                    });
+                    
+                }else{
+                    
+                    let locale = pathsToLoadInfo[i].locale;
+                    let bundle = pathsToLoadInfo[i].bundle;
+                    let path = pathsToLoadInfo[i].path;
+                    
+                    if (!this._loadedData.hasOwnProperty(path)) {
 
+                        this._loadedData[path] = {};
+                    }
+                    
+                    if (!this._loadedData[path].hasOwnProperty(bundle)) {
+
+                        this._loadedData[path][bundle] = {};
+                    }
+                    
+                    switch (StringUtils.getPathExtension(pathsToLoad[i])) {
+
+                        case 'json':
+                            this._loadedData[path][bundle][locale] = this.parseJson(results[i].response);
+                            break;
+
+                        case 'properties':
+                            this._loadedData[path][bundle][locale] = this.parseProperties(results[i].response);
+                            break;
+                    }
+                }
+            }
+            
+            this._locales = ArrayUtils.removeDuplicateElements(this._locales.concat(locales));
+            this._lastBundle = pathsToLoadInfo[pathsToLoadInfo.length - 1].bundle;
+            this._lastPath = pathsToLoadInfo[pathsToLoadInfo.length - 1].path;
+
+            finishedCallback(errors);
+            
+        }, null, (completedUrl, totalUrls) => {
+            
+            if (progressCallback !== null) {
+
+                progressCallback(completedUrl, totalUrls);
+            }
+        });
+    }
+
+    
     /**
      * Get the translation for the given key, bundle and path
      *
