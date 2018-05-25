@@ -22,12 +22,6 @@ export class LocalizationManager {
 
 
     /**
-     * Enable this flag to load all the specified paths as urls instead of file system paths
-     */
-    pathsAreUrls = true;
-    
-
-    /**
      * Defines the behaviour for get(), getStartCase(), etc... methods when a key is not found on
      * a bundle or the bundle does not exist 
      *
@@ -71,11 +65,17 @@ export class LocalizationManager {
      */
     protected _loadedData: {[path:string]: {[bundle: string]: {[locale: string]: {[key:string]: string}}}} = {};
 
+    
+    /**
+     * A files manager instance used to load the data when paths are from file system
+     */
+    private _filesManager:any = null;
+    
 
     /**
      * An http manager instance used to load the data when paths are urls
      */
-    private _httpManager = new HTTPManager();
+    private _httpManager:HTTPManager|null = null;
     
     
     /**
@@ -97,6 +97,8 @@ export class LocalizationManager {
      * 
      * Calling this method is mandatory before starting to use this class.
      * 
+     * @param pathsManager An instance of HTTPManager or FilesManager that will be used to load the provided paths. If we are working
+     *        with paths that are urls, we will pass here an HTTPManager. If we are working with file system paths, we will pass a FilesManager.
      * @param locales List of languages for which we want to load the translations. The list also defines the preferred
      *        translation order when a specified key is not found for a locale.
      * @param bundles A structure containing a list with the association between paths and their respective bundles.
@@ -116,11 +118,21 @@ export class LocalizationManager {
      * 
      * @return void
      */
-    initialize(locales: string[],
+    initialize(pathsManager:any,
+               locales: string[],
                bundles: {path: string, bundles: string[]}[],
                finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void),
                progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null) {
 
+        if(pathsManager as HTTPManager){
+            
+            this._httpManager = pathsManager;
+        
+        }else{
+            
+            this._filesManager = pathsManager;
+        }
+        
         this._locales = [];
         this._lastBundle = '';
         this._lastPath = '';
@@ -234,8 +246,6 @@ export class LocalizationManager {
                 
                 for (let locale of locales) {
                     
-                    // TODO if pathsAreUrls is false, we must try to load the path as a file system path 
-                    
                     pathsToLoadInfo.push({locale: locale, bundle: bundle, path: data.path});
                     
                     pathsToLoad.push(data.path.replace('$locale', locale).replace('$bundle', bundle));
@@ -243,63 +253,71 @@ export class LocalizationManager {
             }
         }
         
-        // Execute all the requests
-        this._httpManager.multiGetRequest(pathsToLoad, (results, anyError) =>{
+        if(this._filesManager !== null){
             
-            let errors: {path:string, errorMsg:string, errorCode:number}[] = [];
-            
-            for (let i = 0; i < results.length; i++) {
+            // TODO
+            // Use the filesManager instance to load all the locales from the specified paths
                 
-                if(results[i].isError){
+        }else{
+            
+            // Load all the specified paths as URLs
+            (this._httpManager as HTTPManager).multiGetRequest(pathsToLoad, (results, anyError) =>{
+                
+                let errors: {path:string, errorMsg:string, errorCode:number}[] = [];
+                
+                for (let i = 0; i < results.length; i++) {
                     
-                    errors.push({
-                        path: results[i].path,
-                        errorMsg: results[i].errorMsg,
-                        errorCode: results[i].errorCode 
-                    });
-                    
-                }else{
-                    
-                    let locale = pathsToLoadInfo[i].locale;
-                    let bundle = pathsToLoadInfo[i].bundle;
-                    let path = pathsToLoadInfo[i].path;
-                    
-                    if (!this._loadedData.hasOwnProperty(path)) {
+                    if(results[i].isError){
+                        
+                        errors.push({
+                            path: results[i].path,
+                            errorMsg: results[i].errorMsg,
+                            errorCode: results[i].errorCode 
+                        });
+                        
+                    }else{
+                        
+                        let locale = pathsToLoadInfo[i].locale;
+                        let bundle = pathsToLoadInfo[i].bundle;
+                        let path = pathsToLoadInfo[i].path;
+                        
+                        if (!this._loadedData.hasOwnProperty(path)) {
 
-                        this._loadedData[path] = {};
-                    }
-                    
-                    if (!this._loadedData[path].hasOwnProperty(bundle)) {
+                            this._loadedData[path] = {};
+                        }
+                        
+                        if (!this._loadedData[path].hasOwnProperty(bundle)) {
 
-                        this._loadedData[path][bundle] = {};
-                    }
-                    
-                    switch (StringUtils.getPathExtension(pathsToLoad[i])) {
+                            this._loadedData[path][bundle] = {};
+                        }
+                        
+                        switch (StringUtils.getPathExtension(pathsToLoad[i])) {
 
-                        case 'json':
-                            this._loadedData[path][bundle][locale] = this.parseJson(results[i].response);
-                            break;
+                            case 'json':
+                                this._loadedData[path][bundle][locale] = this.parseJson(results[i].response);
+                                break;
 
-                        case 'properties':
-                            this._loadedData[path][bundle][locale] = this.parseProperties(results[i].response);
-                            break;
+                            case 'properties':
+                                this._loadedData[path][bundle][locale] = this.parseProperties(results[i].response);
+                                break;
+                        }
                     }
                 }
-            }
-            
-            this._locales = ArrayUtils.removeDuplicateElements(this._locales.concat(locales));
-            this._lastBundle = pathsToLoadInfo[pathsToLoadInfo.length - 1].bundle;
-            this._lastPath = pathsToLoadInfo[pathsToLoadInfo.length - 1].path;
+                
+                this._locales = ArrayUtils.removeDuplicateElements(this._locales.concat(locales));
+                this._lastBundle = pathsToLoadInfo[pathsToLoadInfo.length - 1].bundle;
+                this._lastPath = pathsToLoadInfo[pathsToLoadInfo.length - 1].path;
 
-            finishedCallback(errors);
-            
-        }, null, (completedUrl, totalUrls) => {
-            
-            if (progressCallback !== null) {
+                finishedCallback(errors);
+                
+            }, null, (completedUrl, totalUrls) => {
+                
+                if (progressCallback !== null) {
 
-                progressCallback(completedUrl, totalUrls);
-            }
-        });
+                    progressCallback(completedUrl, totalUrls);
+                }
+            });
+        }
     }
     
 

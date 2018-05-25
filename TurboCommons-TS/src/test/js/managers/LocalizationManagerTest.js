@@ -19,6 +19,7 @@ QUnit.module("LocalizationManagerTest", {
         window.emptyValuesCount = window.emptyValues.length;
 
         window.ArrayUtils = org_turbocommons.ArrayUtils;
+        window.HTTPManager = org_turbocommons.HTTPManager;
         window.sut = new org_turbocommons.LocalizationManager();
     },
 
@@ -52,7 +53,7 @@ QUnit.test("isLocaleLoaded", function(assert){
         bundles: ['Locales']
     }];
     
-    sut.initialize(['es_ES', 'en_US', 'fr_FR'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['es_ES', 'en_US', 'fr_FR'], bundles, function(errors){
 
         assert.ok(sut.isLocaleLoaded('en_US'));
         assert.ok(sut.isLocaleLoaded('es_ES'));
@@ -73,11 +74,11 @@ QUnit.test("initialize-empty-values", function(assert){
     for (var i = 0; i < emptyValuesCount; i++) {
         
         assert.throws(function() {
-            sut.initialize(emptyValues[i], [{path: 'p', bundles: ['b']}]);
+            sut.initialize(new HTTPManager(), emptyValues[i], [{path: 'p', bundles: ['b']}]);
         }, /no locales defined/);
         
         assert.throws(function() {
-            sut.initialize(['es_ES'], emptyValues[i]);
+            sut.initialize(new HTTPManager(), ['es_ES'], emptyValues[i]);
         }, /bundles must be an array of objects/);
     } 
 
@@ -98,7 +99,7 @@ QUnit.test("initialize-secondth-time-resets-state", function(assert){
         bundles: ['Locales']
     }];
         
-    sut.initialize(['es_ES'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['es_ES'], bundles, function(errors){
 
         assert.strictEqual(errors.length, 0);
         assert.strictEqual(sut.locales().length, 1);
@@ -111,7 +112,7 @@ QUnit.test("initialize-secondth-time-resets-state", function(assert){
       
         completedUrlsCount = 0;
           
-        sut.initialize(['es_ES', 'en_US'], bundles, function(errors){
+        sut.initialize(new HTTPManager(), ['es_ES', 'en_US'], bundles, function(errors){
 
             assert.strictEqual(errors.length, 0);
             assert.strictEqual(sut.locales().length, 2);
@@ -140,11 +141,11 @@ QUnit.test("initialize-secondth-time-resets-state", function(assert){
 QUnit.test("initialize-wrong-values", function(assert){
 
     assert.throws(function() {
-        sut.initialize("Locales");
+        sut.initialize(new HTTPManager(), "Locales");
     }, /no locales defined/);
     
     assert.throws(function() {
-        sut.initialize(['es_ES'], 123);
+        sut.initialize(new HTTPManager(), ['es_ES'], 123);
     }, /bundles must be an array of objects/);
 });
 
@@ -156,11 +157,11 @@ QUnit.test("initialize-exceptions", function(assert){
 
     // Test exceptions    
     assert.throws(function() {
-        sut.initialize([1,2,3,4]);
+        sut.initialize(new HTTPManager(), [1,2,3,4]);
     }, /bundles must be an array of objects/);
     
     assert.throws(function() {
-        sut.initialize(150);
+        sut.initialize(new HTTPManager(), 150);
     }, /no locales defined/);
 });
 
@@ -179,7 +180,7 @@ QUnit.test("initialize-non-existing-bundle", function(assert){
         bundles: ['nonexistingbundle']
     }];
     
-    sut.initialize(['en_US'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
 
         assert.strictEqual(errors.length, 1);
         assert.strictEqual(sut.locales().length, 1);
@@ -204,7 +205,7 @@ QUnit.test("loadLocales-empty-values", function(assert){
         bundles: ['Locales']
     }];
     
-    sut.initialize(['en_US'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
 
         assert.strictEqual(errors.length, 0);
         assert.strictEqual(sut.locales().length, 1);
@@ -235,7 +236,7 @@ QUnit.test("loadLocales-ok-values", function(assert){
         bundles: ['Locales']
     }];
     
-    sut.initialize(['en_US'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
 
         assert.strictEqual(errors.length, 0);
         
@@ -265,7 +266,7 @@ QUnit.test("loadLocales-wrong-values", function(assert){
         bundles: ['Locales']
     }];
     
-    sut.initialize(['en_US'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
 
         assert.strictEqual(errors.length, 0);
         
@@ -292,7 +293,7 @@ QUnit.test("loadLocales-duplicate-locales", function(assert){
         bundles: ['Locales']
     }];
     
-    sut.initialize(['en_US'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
 
         assert.strictEqual(errors.length, 0);
         assert.strictEqual(sut.get("LOGIN"), "Login");
@@ -334,7 +335,7 @@ QUnit.test("loadBundles-empty-values", function(assert){
         sut.loadBundles(bundles.path, bundles.bundles);
     }, /LocalizationManager not initialized/);
     
-    sut.initialize(['en_US'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
 
         assert.strictEqual(errors.length, 0);
         assert.strictEqual(sut.locales().length, 1);
@@ -365,7 +366,7 @@ QUnit.test("loadBundles-ok-values", function(assert){
         bundles: ['Locales']
     }];
     
-    sut.initialize(['en_US'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
 
         sut.loadBundles(window.basePath + '/test-loadBundles/$locale/$bundle.json',
                 ['MoreLocales'], function(errors){
@@ -391,7 +392,7 @@ QUnit.test("loadBundles-nonexistant-bundles-or-pahts", function(assert){
         bundles: ['Locales']
     }];
     
-    sut.initialize(['en_US'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
 
         sut.loadBundles(window.basePath + '/test-loadBundles/$locale/$bundle.json',
                 ['nonexistant'], function(errors){
@@ -490,7 +491,7 @@ QUnit.test("get-initialized-missing-values", function(assert){
         bundles: ['Locales']
     }];
     
-    sut.initialize(['en_US'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
 
         // Test missingKeyFormat with $exception wildcard
         assert.strictEqual('$exception', sut.missingKeyFormat);
@@ -583,7 +584,7 @@ QUnit.test("get-initialized-correct-values-with-single-locale-loaded", function(
         bundles: ['Locales']
     }];
     
-    sut.initialize(['en_US'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
 
         assert.strictEqual(sut.get('TAG_NOT_EXISTING_ON_ES_ES'), 'Missing tag');
         assert.strictEqual(sut.get('PASSWORD'), 'Password');
@@ -594,7 +595,7 @@ QUnit.test("get-initialized-correct-values-with-single-locale-loaded", function(
             bundles: ['Locales', 'MoreLocales']
         }];
         
-        sut.initialize(['en_US'], bundles, function(errors){
+        sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
 
             assert.strictEqual(sut.get('LOGIN', 'Locales'), 'Login');
             assert.strictEqual(sut.get('PASSWORD'), 'Password');
@@ -621,7 +622,7 @@ QUnit.test("get-initialized-keys-from-another-bundle-fail", function(assert){
         bundles: ['Locales', 'MoreLocales']
     }];
     
-    sut.initialize(['en_US'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
 
         assert.throws(function() {
             sut.get("LOGIN", "MoreLocales");
@@ -647,7 +648,7 @@ QUnit.test("get-initialized-values-for-multiple-locales", function(assert){
         bundles: ['Locales']
     }];
     
-    sut.initialize(['es_ES', 'en_US'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['es_ES', 'en_US'], bundles, function(errors){
 
         assert.strictEqual(sut.get('PASSWORD'), 'Contraseña');
         assert.strictEqual(sut.get('TAG_NOT_EXISTING_ON_ES_ES'), 'Missing tag');
@@ -675,7 +676,7 @@ QUnit.test("get-initialized-keys-from-multiple-paths-bundles-and-locales", funct
         bundles: ['bundle1']
     }];
     
-    sut.initialize(['es_ES', 'en_US'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['es_ES', 'en_US'], bundles, function(errors){
 
         assert.strictEqual(sut.get('PATH_NAME'), 'ruta3');
         assert.strictEqual(sut.get('PATH_NAME', 'bundle1'), 'ruta3');
@@ -704,7 +705,7 @@ QUnit.test("locales", function(assert){
         bundles: ['Locales']
     }];
     
-    sut.initialize(['es_ES', 'en_US', 'fr_FR'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['es_ES', 'en_US', 'fr_FR'], bundles, function(errors){
 
         assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['es_ES', 'en_US', 'fr_FR']));
         
@@ -733,7 +734,7 @@ QUnit.test("primaryLocale", function(assert){
         bundles: ['Locales']
     }];
     
-    sut.initialize(['es_ES', 'en_US', 'fr_FR'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['es_ES', 'en_US', 'fr_FR'], bundles, function(errors){
 
         assert.strictEqual(sut.primaryLocale(), 'es_ES');
         
@@ -762,7 +763,7 @@ QUnit.test("setPrimaryLocale", function(assert){
         bundles: ['Locales']
     }];
     
-    sut.initialize(['es_ES', 'en_US', 'fr_FR'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['es_ES', 'en_US', 'fr_FR'], bundles, function(errors){
 
         assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['es_ES', 'en_US', 'fr_FR']));
         
@@ -805,7 +806,7 @@ QUnit.test("setLocalesOrder", function(assert){
         bundles: ['Locales']
     }];
     
-    sut.initialize(['es_ES', 'en_US', 'fr_FR'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['es_ES', 'en_US', 'fr_FR'], bundles, function(errors){
 
         assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['es_ES', 'en_US', 'fr_FR']));
         assert.strictEqual(sut.get('LOGIN'), 'acceder');
@@ -860,7 +861,7 @@ QUnit.test("getStartCase", function(assert){
         bundles: ['Locales']
     }];
     
-    sut.initialize(['en_US'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
 
         // Test empty values
         for (var i = 0; i < emptyValuesCount; i++) {
@@ -895,7 +896,7 @@ QUnit.test("getAllUpperCase", function(assert){
         bundles: ['Locales']
     }];
     
-    sut.initialize(['en_US'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
 
         // Test empty values
         for (var i = 0; i < emptyValuesCount; i++) {
@@ -930,7 +931,7 @@ QUnit.test("getAllLowerCase", function(assert){
         bundles: ['Locales']
     }];
     
-    sut.initialize(['en_US'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
 
         // Test empty values
         for (var i = 0; i < emptyValuesCount; i++) {
@@ -965,7 +966,7 @@ QUnit.test("getFirstUpperRestLower", function(assert){
         bundles: ['Locales']
     }];
     
-    sut.initialize(['en_US'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
 
         // Test empty values
         for (var i = 0; i < emptyValuesCount; i++) {
@@ -1000,7 +1001,7 @@ QUnit.test("test-json", function(assert){
         bundles: ['Locales']
     }];
     
-    sut.initialize(['en_US', 'es_ES'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['en_US', 'es_ES'], bundles, function(errors){
 
         // Test EN_US
         assert.strictEqual(sut.get('PASSWORD'), 'Password');
@@ -1064,7 +1065,7 @@ QUnit.test("test-properties", function(assert){
         bundles: ['Locales']
     }];
     
-    sut.initialize(['en_US', 'es_ES'], bundles, function(errors){
+    sut.initialize(new HTTPManager(), ['en_US', 'es_ES'], bundles, function(errors){
 
         // Test EN_US
         assert.strictEqual(sut.get('PASSWORD'), 'Password');
