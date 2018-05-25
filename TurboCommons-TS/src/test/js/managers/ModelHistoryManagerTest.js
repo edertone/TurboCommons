@@ -140,6 +140,76 @@ QUnit.test("get", function(assert){
 
 
 /**
+ * tags
+ */
+QUnit.test("tags", function(assert){
+
+    // Test empty values
+    assert.ok(ArrayUtils.isEqualTo(sut.tags, []));
+
+    // Test ok values
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:0, b:0}));
+    
+    sut.get.a = 1;
+    sut.get.b = 2;
+    sut.setInitialState();
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:1, b:2}));
+    
+    sut.saveSnapshot();
+    sut.saveSnapshot();
+    sut.saveSnapshot();
+    assert.ok(sut.tags.length === 0);
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:1, b:2}));
+    
+    sut.get.a = 3;
+    assert.ok(sut.tags.length === 0);
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:3, b:2}));
+    sut.saveSnapshot();
+    assert.ok(ArrayUtils.isEqualTo(sut.tags, ['']));
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:3, b:2}));
+    
+    sut.get.a = 4;
+    assert.ok(sut.tags.length === 1);
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:4, b:2}));
+    sut.saveSnapshot('tag-1');
+    sut.saveSnapshot();
+    assert.ok(ArrayUtils.isEqualTo(sut.tags, ['', 'tag-1', '']));
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:4, b:2}));
+    
+    sut.get.b = 5;
+    assert.ok(ArrayUtils.isEqualTo(sut.tags, ['', 'tag-1', '']));
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:4, b:5}));
+    sut.saveSnapshot('tag-2');
+    assert.ok(ArrayUtils.isEqualTo(sut.tags, ['', 'tag-1', '', 'tag-2']));
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:4, b:5}));
+    sut.saveSnapshot();
+    assert.ok(ArrayUtils.isEqualTo(sut.tags, ['', 'tag-1', '', 'tag-2', '']));
+    
+    sut.undo();
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:4, b:2}));
+    assert.ok(ArrayUtils.isEqualTo(sut.tags, ['', 'tag-1', '']));
+    sut.saveSnapshot();
+    assert.ok(ArrayUtils.isEqualTo(sut.tags, ['', 'tag-1', '']));
+    
+    sut.get.b = 6;
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:4, b:6}));
+    sut.saveSnapshot();
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:4, b:6}));
+    assert.ok(ArrayUtils.isEqualTo(sut.tags, ['', 'tag-1', '', '']));
+    
+    sut.undoAll();
+    assert.ok(ObjectUtils.isEqualTo(sut.get, {a:1, b:2}));
+    assert.ok(ArrayUtils.isEqualTo(sut.tags, []));
+
+    // Test wrong values
+    // Not necessary
+
+    // Test exceptions
+    // Not necessary
+});
+
+
+/**
  * snapshots
  */
 QUnit.test("snapshots", function(assert){

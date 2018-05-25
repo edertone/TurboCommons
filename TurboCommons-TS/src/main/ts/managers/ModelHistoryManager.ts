@@ -102,6 +102,17 @@ export class ModelHistoryManager<T> {
         return this._currentState;
     }
 
+    
+    /**
+     * Array containing all the snapshot tags that have been saved to the current
+     * moment. Each one of the array elements is a string containing the name that was assigned
+     * to the respective snapshot
+     */
+    get tags() {
+
+        return this._snapshots.map(snapshot => snapshot.tag);
+    }
+
 
     /**
      * Array containing all the snapshot states that have been saved to the current
@@ -113,14 +124,7 @@ export class ModelHistoryManager<T> {
      */
     get snapshots() {
 
-        let result = [];
-        
-        for (let snapshot of this._snapshots) {
-	
-            result.push(snapshot.state);
-        }
-        
-        return result;
+        return this._snapshots.map(snapshot => snapshot.state);
     }
     
     
