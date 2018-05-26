@@ -48,11 +48,15 @@ class LocalizationManager extends BaseStrictClass{
 
 
     /**
-     * The list of languages that are used by this class to translate the given keys, sorted by preference.
-     *
      * @see LocalizationManager::locales()
      */
     private $_locales = [];
+
+
+    /**
+     * @see LocalizationManager::languages()
+     */
+    private $_languages = [];
 
 
     /**
@@ -88,13 +92,31 @@ class LocalizationManager extends BaseStrictClass{
     /**
      * Checks if the specified locale is currently loaded for the currently defined bundles and paths.
      *
-     * @param $locale string A locale to check. For example 'en_US'
+     * @param string $locale A locale to check. For example 'en_US'
      *
      * @return boolean True if the locale is currently loaded on the class, false if not.
      */
     public function isLocaleLoaded(string $locale){
 
         return in_array($locale, $this->_locales);
+    }
+
+
+    /**
+     * Checks if the specified 2 digit language is currently loaded for the currently defined bundles and paths.
+     *
+     * @param string $language A language to check. For example 'en'
+     *
+     * @return boolean True if the language is currently loaded on the class, false if not.
+     */
+    public function isLanguageLoaded(string $language){
+
+        if(strlen($language) !== 2){
+
+            throw new UnexpectedValueException('language must be a valid 2 digit value');
+        }
+
+        return in_array($language, $this->_languages);
     }
 
 
@@ -128,7 +150,7 @@ class LocalizationManager extends BaseStrictClass{
     public function initialize($pathsManager,
                                array $locales,
                                array $bundles,
-                               callable $finishedCallback,
+                               callable $finishedCallback = null,
                                $progressCallback = null) {
 
         if(StringUtils::getPathElement(get_class($pathsManager)) === 'HTTPManager'){
@@ -141,6 +163,7 @@ class LocalizationManager extends BaseStrictClass{
         }
 
         $this->_locales = [];
+        $this->_languages = [];
         $this->_lastBundle = '';
         $this->_lastPath = '';
         $this->_loadedData = [];
@@ -149,7 +172,10 @@ class LocalizationManager extends BaseStrictClass{
 
             $this->_initialized = true;
 
-            $finishedCallback($errors);
+            if($finishedCallback !== null){
+
+                $finishedCallback($errors);
+            }
 
         }, $progressCallback);
     }
@@ -168,7 +194,7 @@ class LocalizationManager extends BaseStrictClass{
      *
      * @return void
      */
-    public function loadLocales(array $locales, callable $finishedCallback, callable $progressCallback = null){
+    public function loadLocales(array $locales, callable $finishedCallback = null, callable $progressCallback = null){
 
         if(!$this->_initialized){
 
@@ -201,7 +227,7 @@ class LocalizationManager extends BaseStrictClass{
      *
      * @return void
      */
-    public function loadBundles(string $path, array $bundles, callable $finishedCallback, callable $progressCallback = null){
+    public function loadBundles(string $path, array $bundles, callable $finishedCallback = null, callable $progressCallback = null){
 
         if(!$this->_initialized){
 
@@ -225,7 +251,7 @@ class LocalizationManager extends BaseStrictClass{
      */
     private function _loadData(array $locales,
                                array $bundles,
-                               callable $finishedCallback,
+                               callable $finishedCallback = null,
                                callable $progressCallback = null){
 
         if(!ArrayUtils::isArray($locales) || count($locales) <= 0){
@@ -278,7 +304,7 @@ class LocalizationManager extends BaseStrictClass{
     private function _loadDataFromFiles(array $locales,
                                         array $pathsToLoad,
                                         array $pathsToLoadInfo,
-                                        callable $finishedCallback,
+                                        callable $finishedCallback = null,
                                         callable $progressCallback = null){
 
         // Load all the specified paths as files
@@ -332,10 +358,14 @@ class LocalizationManager extends BaseStrictClass{
         }
 
         $this->_locales = ArrayUtils::removeDuplicateElements(array_merge($this->_locales, $locales));
+        $this->_languages = array_map(function ($l) {return substr($l, 0, 2);}, $this->_locales);
         $this->_lastBundle = $pathsToLoadInfo[count($pathsToLoadInfo) - 1]['bundle'];
         $this->_lastPath = $pathsToLoadInfo[count($pathsToLoadInfo) - 1]['path'];
 
-        $finishedCallback($errors);
+        if($finishedCallback !== null){
+
+            $finishedCallback($errors);
+        }
     }
 
 
@@ -351,7 +381,7 @@ class LocalizationManager extends BaseStrictClass{
     private function _loadDataFromUrls(array $locales,
                                        array $pathsToLoad,
                                        array $pathsToLoadInfo,
-                                       callable $finishedCallback,
+                                       callable $finishedCallback = null,
                                        callable $progressCallback = null){
 
         // TODO
@@ -427,7 +457,9 @@ class LocalizationManager extends BaseStrictClass{
 
 
     /**
-     * The list of languages (sorted by preference) that are currently available by this class to translate the given keys.
+     * A list of strings containing the locales that are used by this class to translate the given keys, sorted by preference.
+     * Each string is formatted as a standard locale code with language and country joined by an underscore, like: en_US, fr_FR
+     *
      * When a key and bundle are requested for translation, the class will check on the first language of this
      * list for a translated text. If missing, the next one will be used, and so. This list is constructed after the initialize
      * or loadLocales methods are called.
@@ -444,6 +476,18 @@ class LocalizationManager extends BaseStrictClass{
 
 
     /**
+     * A list of strings containing the languages that are used by this class to translate the given keys, sorted by preference.
+     * Each string is formatted as a 2 digit language code, like: en, fr
+     *
+     * @see LocalizationManager::locales()
+     */
+    public function languages(){
+
+        return $this->_languages;
+    }
+
+
+    /**
      * Get the first locale from the list of loaded locales, which is the currently used to search for translated texts.
      *
      * @return string The locale that is defined as the primary one. For example: en_US, es_ES, ..
@@ -456,6 +500,22 @@ class LocalizationManager extends BaseStrictClass{
         }
 
         return $this->_locales[0];
+    }
+
+
+    /**
+     * Get the first language from the list of loaded locales, which is the currently used to search for translated texts.
+     *
+     * @return string The 2 digit language code that is defined as the primary one. For example: en, es, ..
+     */
+    public function primaryLanguage(){
+
+        if(!$this->_initialized){
+
+            throw new UnexpectedValueException('LocalizationManager not initialized');
+        }
+
+        return $this->_languages[0];
     }
 
 
@@ -492,6 +552,7 @@ class LocalizationManager extends BaseStrictClass{
         }
 
         $this->_locales = $result;
+        $this->_languages = array_map(function ($l) {return substr($l, 0, 2);}, $this->_locales);
     }
 
 
@@ -524,6 +585,7 @@ class LocalizationManager extends BaseStrictClass{
         }
 
         $this->_locales = $locales;
+        $this->_languages = array_map(function ($l) {return substr($l, 0, 2);}, $this->_locales);
     }
 
 
