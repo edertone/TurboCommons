@@ -41,11 +41,15 @@ export class LocalizationManager {
     
     
     /**
-     * The list of languages that are used by this class to translate the given keys, sorted by preference.
-     * 
      * @see this.locales()
      */
     private _locales: string[] = [];
+    
+    
+    /**
+     * @see this.languages()
+     */
+    private _languages: string[] = [];
 
 
     /**
@@ -92,6 +96,24 @@ export class LocalizationManager {
     
     
     /**
+     * Checks if the specified 2 digit language is currently loaded for the currently defined bundles and paths.
+     *
+     * @param language A language to check. For example 'en'
+     *
+     * @return True if the language is currently loaded on the class, false if not.
+     */
+    isLanguageLoaded(language: string){
+        
+        if(language.length !== 2){
+
+            throw new Error('language must be a valid 2 digit value');
+        }
+        
+        return (this._languages.indexOf(language) >= 0);
+    }
+    
+    
+    /**
      * Performs the initial data load by looking for resource bundles on all the specified paths.
      * All the translations will be loaded for each of the specified locales.
      * 
@@ -121,7 +143,7 @@ export class LocalizationManager {
     initialize(pathsManager:any,
                locales: string[],
                bundles: {path: string, bundles: string[]}[],
-               finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void),
+               finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void) | null = null,
                progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null) {
 
         if(pathsManager as HTTPManager){
@@ -134,6 +156,7 @@ export class LocalizationManager {
         }
         
         this._locales = [];
+        this._languages = [];
         this._lastBundle = '';
         this._lastPath = '';
         this._loadedData = {};
@@ -142,7 +165,10 @@ export class LocalizationManager {
             
             this._initialized = true;
             
-            finishedCallback(errors);
+            if(finishedCallback !== null){
+
+                finishedCallback(errors);
+            }
             
         }, progressCallback);
     }
@@ -162,7 +188,7 @@ export class LocalizationManager {
      * @return void
      */
     loadLocales(locales: string[],
-                finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void),
+                finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void) | null = null,
                 progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null){
         
         if(!this._initialized){
@@ -198,7 +224,7 @@ export class LocalizationManager {
      */
     loadBundles(path: string,
                 bundles: string[],
-                finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void),
+                finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void) | null = null,
                 progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null){
         
         if(!this._initialized){
@@ -223,7 +249,7 @@ export class LocalizationManager {
      */
     private _loadData(locales: string[],
                       bundles: {path: string, bundles: string[]}[],
-                      finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void),
+                      finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void) | null = null,
                       progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null){
         
         if(!ArrayUtils.isArray(locales) || locales.length <= 0){
@@ -276,7 +302,7 @@ export class LocalizationManager {
     private _loadDataFromFiles(locales: string[],
                                pathsToLoad: string[],
                                pathsToLoadInfo: any[],
-                               finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void),
+                               finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void) | null = null,
                                progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null){
         
         // TODO
@@ -296,7 +322,7 @@ export class LocalizationManager {
     private _loadDataFromUrls(locales: string[],
                               pathsToLoad: string[],
                               pathsToLoadInfo: any[],
-                              finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void),
+                              finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void) | null = null,
                               progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null){
         
         // Load all the specified paths as URLs
@@ -344,10 +370,14 @@ export class LocalizationManager {
             }
             
             this._locales = ArrayUtils.removeDuplicateElements(this._locales.concat(locales));
+            this._languages = this._locales.map(l => l.substr(0, 2));
             this._lastBundle = pathsToLoadInfo[pathsToLoadInfo.length - 1].bundle;
             this._lastPath = pathsToLoadInfo[pathsToLoadInfo.length - 1].path;
 
-            finishedCallback(errors);
+            if(finishedCallback !== null){
+               
+                finishedCallback(errors);
+            }
             
         }, null, (completedUrl, totalUrls) => {
             
@@ -427,7 +457,9 @@ export class LocalizationManager {
     
     
     /**
-     * The list of languages (sorted by preference) that are currently available by this class to translate the given keys.
+     * A list of strings containing the locales that are used by this class to translate the given keys, sorted by preference.
+     * Each string is formatted as a standard locale code with language and country joined by an underscore, like: en_US, fr_FR
+     *
      * When a key and bundle are requested for translation, the class will check on the first language of this
      * list for a translated text. If missing, the next one will be used, and so. This list is constructed after the initialize
      * or loadLocales methods are called.
@@ -444,6 +476,18 @@ export class LocalizationManager {
     
     
     /**
+     * A list of strings containing the languages that are used by this class to translate the given keys, sorted by preference.
+     * Each string is formatted as a 2 digit language code, like: en, fr
+     *
+     * @see this.locales()
+     */
+    languages(){
+
+        return this._languages as ReadonlyArray<string>;
+    }
+    
+    
+    /**
      * Get the first locale from the list of loaded locales, which is the currently used to search for translated texts.
      * 
      * @return The locale that is defined as the primary one. For example: en_US, es_ES, ..
@@ -456,6 +500,22 @@ export class LocalizationManager {
         }
 
         return this._locales[0];
+    }
+    
+    
+    /**
+     * Get the first language from the list of loaded locales, which is the currently used to search for translated texts.
+     *
+     * @return The 2 digit language code that is defined as the primary one. For example: en, es, ..
+     */
+    primaryLanguage(){
+
+        if(!this._initialized){
+            
+            throw new Error('LocalizationManager not initialized');
+        }
+
+        return this._languages[0];
     }
 
 
@@ -492,6 +552,7 @@ export class LocalizationManager {
         }
         
         this._locales = result;
+        this._languages = this._locales.map(l => l.substr(0, 2));
     }
     
     
@@ -524,6 +585,7 @@ export class LocalizationManager {
         }
         
         this._locales = locales;
+        this._languages = this._locales.map(l => l.substr(0, 2));
     }
     
     
