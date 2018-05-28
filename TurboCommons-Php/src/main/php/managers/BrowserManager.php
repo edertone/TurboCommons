@@ -11,7 +11,10 @@
 
 namespace org\turbocommons\src\main\php\managers;
 
+use UnexpectedValueException;
 use org\turbocommons\src\main\php\model\BaseStrictClass;
+use org\turbocommons\src\main\php\utils\NumericUtils;
+use org\turbocommons\src\main\php\utils\StringUtils;
 
 
 /**
@@ -43,7 +46,7 @@ class BrowserManager extends BaseStrictClass{
      */
     public function isCookie(string $key){
 
-        // TODO
+        return isset($_COOKIE[$key]);
     }
 
 
@@ -63,7 +66,36 @@ class BrowserManager extends BaseStrictClass{
      */
     public function setCookie(string $key, string $value, $expires = '', $path = "/", $domain = '', $secure = false){
 
-        // TODO
+        // Empty key means an exception
+        if(!StringUtils::isString($key) || StringUtils::isEmpty($key)){
+
+            throw new UnexpectedValueException("key must be defined");
+        }
+
+        // Empty values mean cookie will be created empty
+        if($value === null){
+
+            $value = '';
+        }
+
+        // Reaching here, non string value means an exception
+        if(!StringUtils::isString($value)){
+
+            throw new UnexpectedValueException("value must be a string");
+        }
+
+        // If the expires parameter is numeric, we will generate the correct date value
+        if(NumericUtils::isNumeric($expires)){
+
+            $expires = time() + $expires * 86400;
+        }
+
+        // This is a trick to make sure the cookie value is inmediately available. When setting a cookie,
+        // we won't be able to read it till the next page reload, so if we want to get its defined value
+        // later on the current script we need to directly set it on the $_COOKIE global data.
+        $_COOKIE[$key] = $value;
+
+        return setcookie($key, $value, $expires, '/');
     }
 
 
@@ -76,7 +108,7 @@ class BrowserManager extends BaseStrictClass{
      */
     public function getCookie(string $key){
 
-        // TODO
+        return isset($_COOKIE[$key]) ? $_COOKIE[$key] : '';
     }
 
 
@@ -90,7 +122,13 @@ class BrowserManager extends BaseStrictClass{
      */
     public function deleteCookie(string $key, string $path){
 
-        // TODO
+        if(isset($_COOKIE[$key])){
+
+            setcookie($key, '', null, $path);
+            return true;
+        }
+
+        return false;
     }
 
 

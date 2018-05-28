@@ -79,7 +79,7 @@ export class BrowserManager{
         // Empty key means an exception
         if(!StringUtils.isString(key) || StringUtils.isEmpty(key)){
 
-            throw new Error("BrowserManager.setCookie: key must be defined");
+            throw new Error("key must be defined");
         }
 
         // Empty values mean cookie will be created empty
@@ -91,7 +91,7 @@ export class BrowserManager{
         // Reaching here, non string value means an exception
         if(!StringUtils.isString(value)){
 
-            throw new Error("BrowserManager.setCookie: value must be a string");
+            throw new Error("value must be a string");
         }
 
         // If the expires parameter is numeric, we will generate the correct date value
@@ -130,7 +130,7 @@ export class BrowserManager{
         // Empty key means an exception
         if(!StringUtils.isString(key) || StringUtils.isEmpty(key)){
 
-            throw new Error("BrowserManager.getCookie: key must be defined");
+            throw new Error("key must be defined");
         }
 
         // Get an array with all the page cookies
@@ -167,7 +167,7 @@ export class BrowserManager{
         // Empty key means an exception
         if(!StringUtils.isString(key) || StringUtils.isEmpty(key)){
 
-            throw new Error("BrowserManager.deleteCookie: key must be defined");
+            throw new Error("key must be defined");
         }
 
         if(this.getCookie(key) !== undefined){
