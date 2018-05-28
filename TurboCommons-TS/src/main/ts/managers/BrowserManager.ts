@@ -15,14 +15,15 @@ import { ArrayUtils } from '../utils/ArrayUtils';
 
 /**
  * An abstraction of the browser entity an all its related operations and properties
- * Browser entity is normally available only on client side or front end view applications.
- * (It makes no sense to have a BrowserManager object on a server side application)
- */ 
+ * Browser entity is normally available only on client side or front end view applications,
+ * but some of its features can also make sense on a server side app. So depending on the
+ * implementation language, this class may or may not have some of its methods implemented.
+ */
 export class BrowserManager{
 
     
     /**
-     * Get the current page full url, including 'http://', domain and any uri get parameters
+     * Get the current page full url, including 'https://', domain and any uri get parameters
      *
      * @return A well formed url
      */
