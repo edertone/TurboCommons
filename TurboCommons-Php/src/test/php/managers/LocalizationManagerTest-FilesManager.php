@@ -314,9 +314,6 @@ class LocalizationManagerTest extends TestCase {
      */
     public function testInitialize_non_existing_bundle(){
 
-        // Test ok values
-
-        // We load a non existing bundle and expect the errorCallback to be fired
         $bundles = [[
             'path' => $this->basePath.'/test-json/$locale/$bundle.json',
             'bundles' => ['nonexistingbundle']
@@ -325,7 +322,28 @@ class LocalizationManagerTest extends TestCase {
         $this->sut->initialize(new FilesManager(), ['en_US'], $bundles, function($errors){
 
             $this->assertSame(count($errors), 1);
-            $this->assertSame(count($this->sut->locales()), 1);
+            $this->assertSame(count($this->sut->locales()), 0);
+        });
+    }
+
+
+    /**
+     * testInitialize_non_existing_path
+     *
+     * @return void
+     */
+    public function testInitialize_non_existing_path(){
+
+        $bundles = [[
+            'path' => $this->basePath.'/thispathdoesnotexist/$locale/$bundle.json',
+            'bundles' => ['Locales']
+        ]];
+
+        $this->sut->initialize(new FilesManager(), ['en_US', 'es_ES'], $bundles, function($errors){
+
+            $this->assertSame(count($errors), 2);
+            $this->assertSame(count($this->sut->locales()), 0);
+            $this->assertSame(count($this->sut->languages()), 0);
         });
     }
 
@@ -436,12 +454,13 @@ class LocalizationManagerTest extends TestCase {
         $this->sut->initialize(new FilesManager(), ['en_US'], $bundles, function($errors){
 
             $this->assertSame(count($errors), 0);
+            $this->assertSame(count($this->sut->locales()), 1);
 
             // Test missing locale
             $this->sut->loadLocales(['fr_FR'], function($errors){
 
                 $this->assertSame(count($errors), 1);
-                $this->assertSame(count($this->sut->locales()), 2);
+                $this->assertSame(count($this->sut->locales()), 1);
             });
         });
     }
@@ -1121,6 +1140,107 @@ class LocalizationManagerTest extends TestCase {
             } catch (Throwable $e) {
                 // We expect an exception to happen
             }
+        });
+    }
+
+
+    /**
+     * testSetPrimaryLanguage
+     *
+     * @return void
+     */
+    public function testSetPrimaryLanguage(){
+
+        try {
+            $this->sut->setPrimaryLanguage('en');
+            $this->exceptionMessage = 'setPrimaryLanguage did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        $bundles = [[
+            'path' => $this->basePath.'/test-locales/$locale/$bundle.json',
+            'bundles' => ['Locales']
+        ]];
+
+        $this->sut->initialize(new FilesManager(), ['es_ES', 'en_US', 'fr_FR'], $bundles, function($errors){
+
+            $this->assertSame(count($errors), 0);
+
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->locales(), ['es_ES', 'en_US', 'fr_FR']));
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->languages(), ['es', 'en', 'fr']));
+
+            $this->sut->setPrimaryLanguage('en');
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->locales(), ['en_US', 'es_ES', 'fr_FR']));
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->languages(), ['en', 'es', 'fr']));
+
+            $this->sut->setPrimaryLanguage('fr');
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->locales(), ['fr_FR', 'en_US', 'es_ES']));
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->languages(), ['fr', 'en', 'es']));
+
+            $this->sut->setPrimaryLanguage('es');
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->locales(), ['es_ES', 'fr_FR', 'en_US']));
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->languages(), ['es', 'fr', 'en']));
+
+            // Test exceptions
+            try {
+                $this->sut->setPrimaryLanguage(123);
+                $this->exceptionMessage = '123 did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            try {
+                $this->sut->setPrimaryLanguage(["LOGIN"]);
+                $this->exceptionMessage = 'LOGIN did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            try {
+                $this->sut->setPrimaryLanguage(new stdClass());
+                $this->exceptionMessage = 'stdClass did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+        });
+    }
+
+
+    /**
+     * testSetPrimaryLanguage_repeated_languages
+     *
+     * @return void
+     */
+    public function testSetPrimaryLanguage_repeated_languages(){
+
+        $bundles = [[
+            'path' => $this->basePath.'/test-duplicate-languages/$locale/$bundle.json',
+            'bundles' => ['Locales']
+        ]];
+
+        $this->sut->initialize(new FilesManager(), ['es_ES', 'en_GB', 'en_US'], $bundles, function($errors){
+
+            $this->assertSame(count($errors), 0);
+
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->locales(), ['es_ES', 'en_GB', 'en_US']));
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->languages(), ['es', 'en', 'en']));
+            $this->assertSame($this->sut->get('LOGIN'), 'acceder');
+
+            $this->sut->setPrimaryLanguage('en');
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->locales(), ['en_GB', 'es_ES', 'en_US']));
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->languages(), ['en', 'es', 'en']));
+            $this->assertSame($this->sut->get('LOGIN'), 'login GB');
+
+            $this->sut->setPrimaryLocale('en_US');
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->locales(), ['en_US', 'en_GB', 'es_ES']));
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->languages(), ['en', 'en', 'es']));
+            $this->assertSame($this->sut->get('LOGIN'), 'login US');
+
+            $this->sut->setPrimaryLanguage('es');
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->locales(), ['es_ES', 'en_US', 'en_GB']));
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->languages(), ['es', 'en', 'en']));
+            $this->assertSame($this->sut->get('LOGIN'), 'acceder');
         });
     }
 

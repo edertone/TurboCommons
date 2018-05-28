@@ -281,11 +281,11 @@ export class LocalizationManager {
         
         if(this._filesManager !== null){
             
-            this._loadDataFromFiles(locales, pathsToLoad, pathsToLoadInfo, finishedCallback, progressCallback);
+            this._loadDataFromFiles(pathsToLoad, pathsToLoadInfo, finishedCallback, progressCallback);
              
         }else{
             
-            this._loadDataFromUrls(locales, pathsToLoad, pathsToLoadInfo, finishedCallback, progressCallback);
+            this._loadDataFromUrls(pathsToLoad, pathsToLoadInfo, finishedCallback, progressCallback);
         }
     }
     
@@ -293,14 +293,12 @@ export class LocalizationManager {
     /**
      * Perform the paths load from file system
      *
-     * @param locales List of locales to load
      * @param pathsToLoad list of paths that need to be loaded
      * @param pathsToLoadInfo original info about the paths to load
      * @param finishedCallback method to execute once finished
      * @param progressCallback method to execute after each path is loaded
      */
-    private _loadDataFromFiles(locales: string[],
-                               pathsToLoad: string[],
+    private _loadDataFromFiles(pathsToLoad: string[],
                                pathsToLoadInfo: any[],
                                finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void) | null = null,
                                progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null){
@@ -313,19 +311,16 @@ export class LocalizationManager {
     /**
      * Perform the paths load from urls
      *
-     * @param locales List of locales to load
      * @param pathsToLoad list of paths that need to be loaded
      * @param pathsToLoadInfo original info about the paths to load
      * @param finishedCallback method to execute once finished
      * @param progressCallback method to execute after each path is loaded
      */
-    private _loadDataFromUrls(locales: string[],
-                              pathsToLoad: string[],
+    private _loadDataFromUrls(pathsToLoad: string[],
                               pathsToLoadInfo: any[],
                               finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void) | null = null,
                               progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null){
         
-        // Load all the specified paths as URLs
         (this._httpManager as HTTPManager).multiGetRequest(pathsToLoad, (results, anyError) =>{
             
             let errors: {path:string, errorMsg:string, errorCode:number}[] = [];
@@ -345,7 +340,8 @@ export class LocalizationManager {
                     let locale = pathsToLoadInfo[i].locale;
                     let bundle = pathsToLoadInfo[i].bundle;
                     let path = pathsToLoadInfo[i].path;
-                    
+                    let bundleFormat = StringUtils.getPathExtension(pathsToLoad[i]);
+
                     if (!this._loadedData.hasOwnProperty(path)) {
 
                         this._loadedData[path] = {};
@@ -356,20 +352,15 @@ export class LocalizationManager {
                         this._loadedData[path][bundle] = {};
                     }
                     
-                    switch (StringUtils.getPathExtension(pathsToLoad[i])) {
-
-                        case 'json':
-                            this._loadedData[path][bundle][locale] = this.parseJson(results[i].response);
-                            break;
-
-                        case 'properties':
-                            this._loadedData[path][bundle][locale] = this.parseProperties(results[i].response);
-                            break;
-                    }
+                    this._loadedData[path][bundle][locale] = bundleFormat === 'json' ?
+                            this.parseJson(results[i].response) :
+                            this.parseProperties(results[i].response);
+                            
+                    this._locales.push(locale);
                 }
             }
             
-            this._locales = ArrayUtils.removeDuplicateElements(this._locales.concat(locales));
+            this._locales = ArrayUtils.removeDuplicateElements(this._locales);
             this._languages = this._locales.map(l => l.substr(0, 2));
             this._lastBundle = pathsToLoadInfo[pathsToLoadInfo.length - 1].bundle;
             this._lastPath = pathsToLoadInfo[pathsToLoadInfo.length - 1].path;
@@ -553,6 +544,31 @@ export class LocalizationManager {
         
         this._locales = result;
         this._languages = this._locales.map(l => l.substr(0, 2));
+    }
+    
+    
+    /**
+     * Define the 2 digit language that will be placed at the front of the currently loaded locales list.
+     *
+     * This will be the first language to use when trying to get a translation.
+     *
+     * @param language A 2 digit language code that matches with any of the currently loaded locales, which will
+     *        be moved to the first position of the loaded locales list. If the specified language does not match with
+     *        a locale that is not currently loaded, an exception will happen.
+     *
+     * @return void
+     */
+    setPrimaryLanguage(language: string){
+
+        for (let locale of this._locales) {
+
+            if(locale.substr(0, 2) === language){
+
+                return this.setPrimaryLocale(locale);
+            }
+        }
+
+        throw new Error(language + ' not loaded');
     }
     
     

@@ -283,11 +283,11 @@ class LocalizationManager extends BaseStrictClass{
 
         if($this->_filesManager !== null){
 
-            $this->_loadDataFromFiles($locales, $pathsToLoad, $pathsToLoadInfo, $finishedCallback, $progressCallback);
+            $this->_loadDataFromFiles($pathsToLoad, $pathsToLoadInfo, $finishedCallback, $progressCallback);
 
         }else{
 
-            $this->_loadDataFromUrls($locales, $pathsToLoad, $pathsToLoadInfo, $finishedCallback, $progressCallback);
+            $this->_loadDataFromUrls($pathsToLoad, $pathsToLoadInfo, $finishedCallback, $progressCallback);
         }
     }
 
@@ -295,27 +295,44 @@ class LocalizationManager extends BaseStrictClass{
     /**
      * Perform the paths load from file system
      *
-     * @param array $locales List of locales to load
      * @param array $pathsToLoad list of paths that need to be loaded
      * @param array $pathsToLoadInfo original info about the paths to load
      * @param callable $finishedCallback method to execute once finished
      * @param callable $progressCallback method to execute after each path is loaded
      */
-    private function _loadDataFromFiles(array $locales,
-                                        array $pathsToLoad,
+    private function _loadDataFromFiles(array $pathsToLoad,
                                         array $pathsToLoadInfo,
                                         callable $finishedCallback = null,
                                         callable $progressCallback = null){
 
-        // Load all the specified paths as files
         $errors = [];
 
         for ($i = 0, $l = count($pathsToLoad); $i < $l; $i++) {
 
             try {
 
-                $fileContents = '';
                 $fileContents = $this->_filesManager->readFile($pathsToLoad[$i]);
+
+                $locale = $pathsToLoadInfo[$i]['locale'];
+                $bundle = $pathsToLoadInfo[$i]['bundle'];
+                $path = $pathsToLoadInfo[$i]['path'];
+                $bundleFormat = StringUtils::getPathExtension($pathsToLoad[$i]);
+
+                if (!array_key_exists($path, $this->_loadedData)) {
+
+                    $this->_loadedData[$path] = [];
+                }
+
+                if (!array_key_exists($bundle, $this->_loadedData[$path])) {
+
+                    $this->_loadedData[$path][$bundle] = [];
+                }
+
+                $this->_loadedData[$path][$bundle][$locale] = $bundleFormat === 'json' ?
+                    $this->parseJson($fileContents) :
+                    $this->parseProperties($fileContents);
+
+                $this->_locales[] = $locale;
 
             } catch (Exception $e) {
 
@@ -326,38 +343,13 @@ class LocalizationManager extends BaseStrictClass{
                 ];
             }
 
-            $locale = $pathsToLoadInfo[$i]['locale'];
-            $bundle = $pathsToLoadInfo[$i]['bundle'];
-            $path = $pathsToLoadInfo[$i]['path'];
-
-            if (!array_key_exists($path, $this->_loadedData)) {
-
-                $this->_loadedData[$path] = [];
-            }
-
-            if (!array_key_exists($bundle, $this->_loadedData[$path])) {
-
-                $this->_loadedData[$path][$bundle] = [];
-            }
-
-            switch (StringUtils::getPathExtension($pathsToLoad[$i])) {
-
-                case 'json':
-                    $this->_loadedData[$path][$bundle][$locale] = $this->parseJson($fileContents);
-                    break;
-
-                case 'properties':
-                    $this->_loadedData[$path][$bundle][$locale] = $this->parseProperties($fileContents);
-                    break;
-            }
-
             if ($progressCallback !== null) {
 
                 $progressCallback($pathsToLoad[$i], $l);
             }
         }
 
-        $this->_locales = ArrayUtils::removeDuplicateElements(array_merge($this->_locales, $locales));
+        $this->_locales = ArrayUtils::removeDuplicateElements($this->_locales);
         $this->_languages = array_map(function ($l) {return substr($l, 0, 2);}, $this->_locales);
         $this->_lastBundle = $pathsToLoadInfo[count($pathsToLoadInfo) - 1]['bundle'];
         $this->_lastPath = $pathsToLoadInfo[count($pathsToLoadInfo) - 1]['path'];
@@ -372,14 +364,12 @@ class LocalizationManager extends BaseStrictClass{
     /**
      * Perform the paths load from urls
      *
-     * @param array $locales List of locales to load
      * @param array $pathsToLoad list of paths that need to be loaded
      * @param array $pathsToLoadInfo original info about the paths to load
      * @param callable $finishedCallback method to execute once finished
      * @param callable $progressCallback method to execute after each path is loaded
      */
-    private function _loadDataFromUrls(array $locales,
-                                       array $pathsToLoad,
+    private function _loadDataFromUrls(array $pathsToLoad,
                                        array $pathsToLoadInfo,
                                        callable $finishedCallback = null,
                                        callable $progressCallback = null){
@@ -553,6 +543,31 @@ class LocalizationManager extends BaseStrictClass{
 
         $this->_locales = $result;
         $this->_languages = array_map(function ($l) {return substr($l, 0, 2);}, $this->_locales);
+    }
+
+
+    /**
+     * Define the 2 digit language that will be placed at the front of the currently loaded locales list.
+     *
+     * This will be the first language to use when trying to get a translation.
+     *
+     * @param string $language A 2 digit language code that matches with any of the currently loaded locales, which will
+     *        be moved to the first position of the loaded locales list. If the specified language does not match with
+     *        a locale that is not currently loaded, an exception will happen.
+     *
+     * @return void
+     */
+    public function setPrimaryLanguage(string $language){
+
+        foreach ($this->_locales as $locale) {
+
+            if(substr($locale, 0, 2) === $language){
+
+                return $this->setPrimaryLocale($locale);
+            }
+        }
+
+        throw new UnexpectedValueException($language.' not loaded');
     }
 
 
