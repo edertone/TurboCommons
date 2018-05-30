@@ -270,6 +270,11 @@ class LocalizationManager extends BaseStrictClass{
 
         foreach ($bundles as $data) {
 
+            if(!ArrayUtils::isArray($data['bundles']) || count($data['bundles']) === 0){
+
+                throw new UnexpectedValueException('no bundles specified for path: '.$data['path']);
+            }
+
             foreach ($data['bundles'] as $bundle) {
 
                 foreach ($locales as $locale) {

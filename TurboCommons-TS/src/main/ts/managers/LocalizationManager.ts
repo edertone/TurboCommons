@@ -268,6 +268,11 @@ export class LocalizationManager {
         
         for (let data of bundles) {
     
+            if(!ArrayUtils.isArray(data.bundles) || data.bundles.length === 0){
+
+                throw new Error('no bundles specified for path: ' + data.path);
+            }
+            
             for (let bundle of data.bundles){
                 
                 for (let locale of locales) {
