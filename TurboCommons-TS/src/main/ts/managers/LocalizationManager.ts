@@ -67,7 +67,7 @@ export class LocalizationManager {
     /**
      * Stores all the loaded localization data by path, bundle and locales
      */
-    protected _loadedData: {[path:string]: {[bundle: string]: {[locale: string]: {[key:string]: string}}}} = {};
+    protected _loadedData: {[path:string]: {[locale: string]: {[bundle: string]: {[key:string]: string}}}} = {};
 
     
     /**
@@ -198,9 +198,16 @@ export class LocalizationManager {
         
         let bundles:any[] = [];
         
-        for (let path of ObjectUtils.getKeys(this._loadedData)) {
+        for (let path of Object.keys(this._loadedData)) {
 	
-            bundles.push({path: path, bundles: ObjectUtils.getKeys(this._loadedData[path])});
+            let bundleNames:string[] = [];
+
+            for (let locale of Object.keys(this._loadedData[path])) {
+            
+                bundleNames = bundleNames.concat(Object.keys(this._loadedData[path][locale]));
+            }
+
+            bundles.push({path: path, bundles: ArrayUtils.removeDuplicateElements(bundleNames)});
         }
         
         this._loadData(locales, bundles, finishedCallback, progressCallback);   
@@ -226,6 +233,11 @@ export class LocalizationManager {
                 bundles: string[],
                 finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void) | null = null,
                 progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null){
+        
+        if(!ArrayUtils.isArray(bundles) || bundles.length === 0){
+
+            throw new Error('no bundles specified for path: ' + path);
+        }
         
         if(!this._initialized){
             
@@ -268,11 +280,6 @@ export class LocalizationManager {
         
         for (let data of bundles) {
     
-            if(!ArrayUtils.isArray(data.bundles) || data.bundles.length === 0){
-
-                throw new Error('no bundles specified for path: ' + data.path);
-            }
-            
             for (let bundle of data.bundles){
                 
                 for (let locale of locales) {
@@ -283,6 +290,8 @@ export class LocalizationManager {
                 }
             }
         }
+        
+        this._locales = this._locales.concat(locales);
         
         if(this._filesManager !== null){
             
@@ -326,6 +335,30 @@ export class LocalizationManager {
                               finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void) | null = null,
                               progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null){
         
+        this._locales = ArrayUtils.removeDuplicateElements(this._locales);
+        this._languages = this._locales.map(l => l.substr(0, 2));
+        
+        // Aux method to execute when data load is done
+        let processWhenDone = (errors: {path:string, errorMsg:string, errorCode:number}[] = []) => {
+            
+            if(pathsToLoadInfo.length > 0){
+                
+                this._lastBundle = pathsToLoadInfo[pathsToLoadInfo.length - 1].bundle;
+                this._lastPath = pathsToLoadInfo[pathsToLoadInfo.length - 1].path;
+            }
+
+            if(finishedCallback !== null){
+               
+                finishedCallback(errors);
+            }            
+        }
+        
+        if(pathsToLoad.length <= 0){
+            
+            processWhenDone();
+            return;
+        }
+        
         (this._httpManager as HTTPManager).multiGetRequest(pathsToLoad, (results, anyError) =>{
             
             let errors: {path:string, errorMsg:string, errorCode:number}[] = [];
@@ -352,28 +385,18 @@ export class LocalizationManager {
                         this._loadedData[path] = {};
                     }
                     
-                    if (!this._loadedData[path].hasOwnProperty(bundle)) {
+                    if (!this._loadedData[path].hasOwnProperty(locale)) {
 
-                        this._loadedData[path][bundle] = {};
+                        this._loadedData[path][locale] = {};
                     }
                     
-                    this._loadedData[path][bundle][locale] = bundleFormat === 'json' ?
+                    this._loadedData[path][locale][bundle] = bundleFormat === 'json' ?
                             this.parseJson(results[i].response) :
                             this.parseProperties(results[i].response);
-                            
-                    this._locales.push(locale);
                 }
             }
             
-            this._locales = ArrayUtils.removeDuplicateElements(this._locales);
-            this._languages = this._locales.map(l => l.substr(0, 2));
-            this._lastBundle = pathsToLoadInfo[pathsToLoadInfo.length - 1].bundle;
-            this._lastPath = pathsToLoadInfo[pathsToLoadInfo.length - 1].path;
-
-            if(finishedCallback !== null){
-               
-                finishedCallback(errors);
-            }
+            processWhenDone(errors);
             
         }, null, (completedUrl, totalUrls) => {
             
@@ -422,24 +445,24 @@ export class LocalizationManager {
             throw new Error('Path <' + path + '> not loaded');
         }
         
-        if (Object.keys(this._loadedData[path]).indexOf(bundle) === -1) {
-
-            throw new Error('Bundle <' + bundle + '> not loaded');
-        }
-
-        // Store the specified bundle name and path as the lasts that have been used till now
-        this._lastBundle = bundle;
-        this._lastPath = path;
-
-        const bundleData = this._loadedData[path][bundle];
-
         // Loop all the locales to find the first one with a value for the specified key
         for (const locale of this._locales) {
 
-            if (Object.keys(bundleData).indexOf(locale) >= 0 &&
-                    Object.keys(bundleData[locale]).indexOf(key) >= 0) {
+            if (Object.keys(this._loadedData[path]).indexOf(locale) >= 0) {
 
-                return bundleData[locale][key];
+                if (Object.keys(this._loadedData[path][locale]).indexOf(bundle) === -1) {
+
+                    throw new Error('Bundle <' + bundle + '> not loaded');
+                }
+                
+                if(Object.keys(this._loadedData[path][locale][bundle]).indexOf(key) >= 0){
+
+                    // Store the specified bundle name and path as the lasts that have been used till now
+                    this._lastBundle = bundle;
+                    this._lastPath = path;
+
+                    return this._loadedData[path][locale][bundle][key];
+                }
             }
         }
 

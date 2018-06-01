@@ -127,6 +127,28 @@ QUnit.test("initialize-empty-values", function(assert){
 
 
 /**
+ * initialize-without-bundles
+ */
+QUnit.test("initialize-without-bundles", function(assert){
+
+    var done = assert.async(1);
+    
+    var bundles = [{
+        path: window.basePath + '/test-json/$locale/$bundle.json',
+        bundles: []
+    }];
+
+    sut.initialize(new HTTPManager(), ['es_ES', 'en_US', 'fr_FR'], bundles, function(errors){
+        
+        assert.strictEqual(errors.length, 0);
+        assert.strictEqual(sut.locales().length, 3);
+        assert.strictEqual(sut.languages().length, 3);
+        done();
+    });
+});
+
+
+/**
  * initialize-without-finish-callback
  */
 QUnit.test("initialize-without-finish-callback", function(assert){
@@ -176,7 +198,7 @@ QUnit.test("initialize-secondth-time-resets-state", function(assert){
             assert.strictEqual(totalUrls, 2);
         });
         
-        assert.strictEqual(sut.locales().length, 0);
+        assert.strictEqual(sut.locales().length, 2);
         
     }, function(completedUrl, totalUrls){
         
@@ -232,7 +254,7 @@ QUnit.test("initialize-non-existing-bundle", function(assert){
     sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
 
         assert.strictEqual(errors.length, 1);
-        assert.strictEqual(sut.locales().length, 0);
+        assert.strictEqual(sut.locales().length, 1);
         done();    
     });
 });
@@ -253,8 +275,8 @@ QUnit.test("initialize-non-existing-path", function(assert){
     sut.initialize(new HTTPManager(), ['en_US', 'es_ES'], bundles, function(errors){
 
         assert.strictEqual(errors.length, 2);
-        assert.strictEqual(sut.locales().length, 0);
-        assert.strictEqual(sut.languages().length, 0);
+        assert.strictEqual(sut.locales().length, 2);
+        assert.strictEqual(sut.languages().length, 2);
         done();    
     });
 });
@@ -356,7 +378,7 @@ QUnit.test("loadLocales-wrong-values", function(assert){
         sut.loadLocales(['fr_FR'], function(errors){
 
             assert.strictEqual(errors.length, 1);            
-            assert.strictEqual(sut.locales().length, 1);
+            assert.strictEqual(sut.locales().length, 2);
             done();
         });
     }); 
@@ -406,6 +428,10 @@ QUnit.test("loadLocales-duplicate-locales", function(assert){
  */
 QUnit.test("loadBundles-empty-values", function(assert){
 
+    assert.throws(function() {
+        sut.loadBundles('/test-loadBundles/$locale/$bundle.json', []);
+    }, /no bundles specified for path: /);
+    
     var done = assert.async(1);
     
     var bundles = [{
@@ -414,7 +440,7 @@ QUnit.test("loadBundles-empty-values", function(assert){
     }];
     
     assert.throws(function() {
-        sut.loadBundles(bundles.path, bundles.bundles);
+        sut.loadBundles(bundles[0].path, bundles[0].bundles);
     }, /LocalizationManager not initialized/);
     
     sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){

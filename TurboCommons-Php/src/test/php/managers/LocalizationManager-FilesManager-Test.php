@@ -190,6 +190,27 @@ class LocalizationManagerTest extends TestCase {
      *
      * @return void
      */
+    public function testInitialize_without_bundles(){
+
+        $bundles = [[
+            'path' => $this->basePath.'/test-json/$locale/$bundle.json',
+            'bundles' => []
+        ]];
+
+        $this->sut->initialize(new FilesManager(), ['es_ES', 'en_US', 'fr_FR'], $bundles, function($errors){
+
+            $this->assertSame(count($errors), 0);
+            $this->assertSame(count($this->sut->locales()), 3);
+            $this->assertSame(count($this->sut->languages()), 3);
+        });
+    }
+
+
+    /**
+     * initialize
+     *
+     * @return void
+     */
     public function testInitialize_without_finish_callback(){
 
         $bundles = [[
@@ -322,7 +343,7 @@ class LocalizationManagerTest extends TestCase {
         $this->sut->initialize(new FilesManager(), ['en_US'], $bundles, function($errors){
 
             $this->assertSame(count($errors), 1);
-            $this->assertSame(count($this->sut->locales()), 0);
+            $this->assertSame(count($this->sut->locales()), 1);
         });
     }
 
@@ -342,8 +363,8 @@ class LocalizationManagerTest extends TestCase {
         $this->sut->initialize(new FilesManager(), ['en_US', 'es_ES'], $bundles, function($errors){
 
             $this->assertSame(count($errors), 2);
-            $this->assertSame(count($this->sut->locales()), 0);
-            $this->assertSame(count($this->sut->languages()), 0);
+            $this->assertSame(count($this->sut->locales()), 2);
+            $this->assertSame(count($this->sut->languages()), 2);
         });
     }
 
@@ -460,7 +481,7 @@ class LocalizationManagerTest extends TestCase {
             $this->sut->loadLocales(['fr_FR'], function($errors){
 
                 $this->assertSame(count($errors), 1);
-                $this->assertSame(count($this->sut->locales()), 1);
+                $this->assertSame(count($this->sut->locales()), 2);
             });
         });
     }
@@ -509,13 +530,20 @@ class LocalizationManagerTest extends TestCase {
      */
     public function testLoadBundles_empty_values(){
 
+        try {
+            $this->sut->loadBundles('/test-loadBundles/$locale/$bundle.json', []);
+            $this->exceptionMessage = '[] did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
         $bundles = [[
             'path' => $this->basePath.'/test-loadBundles/$locale/$bundle.json',
             'bundles' => ['Locales']
         ]];
 
         try {
-            $this->sut->loadBundles($bundles['path'], $bundles['bundles']);
+            $this->sut->loadBundles($bundles[0]['path'], $bundles[0]['bundles']);
             $this->exceptionMessage = '$bundles.path did not cause exception';
         } catch (Throwable $e) {
             // We expect an exception to happen

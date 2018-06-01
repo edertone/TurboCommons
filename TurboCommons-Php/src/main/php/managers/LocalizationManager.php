@@ -205,7 +205,14 @@ class LocalizationManager extends BaseStrictClass{
 
         foreach (array_keys($this->_loadedData) as $path) {
 
-            $bundles[] = ['path' => $path, 'bundles' => array_keys($this->_loadedData[$path])];
+            $bundleNames = [];
+
+            foreach ($this->_loadedData[$path] as $localeData) {
+
+                $bundleNames = array_merge($bundleNames, array_keys($localeData));
+            }
+
+            $bundles[] = ['path' => $path, 'bundles' => ArrayUtils::removeDuplicateElements($bundleNames)];
         }
 
         $this->_loadData($locales, $bundles, $finishedCallback, $progressCallback);
@@ -228,6 +235,11 @@ class LocalizationManager extends BaseStrictClass{
      * @return void
      */
     public function loadBundles(string $path, array $bundles, callable $finishedCallback = null, callable $progressCallback = null){
+
+        if(!ArrayUtils::isArray($bundles) || count($bundles) === 0){
+
+            throw new UnexpectedValueException('no bundles specified for path: '.$path);
+        }
 
         if(!$this->_initialized){
 
@@ -270,11 +282,6 @@ class LocalizationManager extends BaseStrictClass{
 
         foreach ($bundles as $data) {
 
-            if(!ArrayUtils::isArray($data['bundles']) || count($data['bundles']) === 0){
-
-                throw new UnexpectedValueException('no bundles specified for path: '.$data['path']);
-            }
-
             foreach ($data['bundles'] as $bundle) {
 
                 foreach ($locales as $locale) {
@@ -285,6 +292,8 @@ class LocalizationManager extends BaseStrictClass{
                 }
             }
         }
+
+        $this->_locales = array_merge($this->_locales, $locales);
 
         if($this->_filesManager !== null){
 
@@ -310,6 +319,9 @@ class LocalizationManager extends BaseStrictClass{
                                         callable $finishedCallback = null,
                                         callable $progressCallback = null){
 
+        $this->_locales = ArrayUtils::removeDuplicateElements($this->_locales);
+        $this->_languages = array_map(function ($l) {return substr($l, 0, 2);}, $this->_locales);
+
         $errors = [];
 
         for ($i = 0, $l = count($pathsToLoad); $i < $l; $i++) {
@@ -328,16 +340,14 @@ class LocalizationManager extends BaseStrictClass{
                     $this->_loadedData[$path] = [];
                 }
 
-                if (!array_key_exists($bundle, $this->_loadedData[$path])) {
+                if (!array_key_exists($locale, $this->_loadedData[$path])) {
 
-                    $this->_loadedData[$path][$bundle] = [];
+                    $this->_loadedData[$path][$locale] = [];
                 }
 
-                $this->_loadedData[$path][$bundle][$locale] = $bundleFormat === 'json' ?
-                    $this->parseJson($fileContents) :
-                    $this->parseProperties($fileContents);
-
-                $this->_locales[] = $locale;
+                $this->_loadedData[$path][$locale][$bundle] = $bundleFormat === 'json' ?
+                $this->parseJson($fileContents) :
+                $this->parseProperties($fileContents);
 
             } catch (Exception $e) {
 
@@ -354,10 +364,11 @@ class LocalizationManager extends BaseStrictClass{
             }
         }
 
-        $this->_locales = ArrayUtils::removeDuplicateElements($this->_locales);
-        $this->_languages = array_map(function ($l) {return substr($l, 0, 2);}, $this->_locales);
-        $this->_lastBundle = $pathsToLoadInfo[count($pathsToLoadInfo) - 1]['bundle'];
-        $this->_lastPath = $pathsToLoadInfo[count($pathsToLoadInfo) - 1]['path'];
+        if(count($pathsToLoadInfo) > 0){
+
+            $this->_lastBundle = $pathsToLoadInfo[count($pathsToLoadInfo) - 1]['bundle'];
+            $this->_lastPath = $pathsToLoadInfo[count($pathsToLoadInfo) - 1]['path'];
+        }
 
         if($finishedCallback !== null){
 
@@ -421,24 +432,24 @@ class LocalizationManager extends BaseStrictClass{
             throw new UnexpectedValueException('Path <'.$path.'> not loaded');
         }
 
-        if (!in_array($bundle, array_keys($this->_loadedData[$path]))) {
-
-            throw new UnexpectedValueException('Bundle <'.bundle.'> not loaded');
-        }
-
-        // Store the specified bundle name and path as the lasts that have been used till now
-        $this->_lastBundle = $bundle;
-        $this->_lastPath = $path;
-
-        $bundleData = $this->_loadedData[$path][$bundle];
-
         // Loop all the locales to find the first one with a value for the specified key
         foreach ($this->_locales as $locale) {
 
-            if (in_array($locale, array_keys($bundleData)) &&
-                in_array($key, ObjectUtils::getKeys($bundleData[$locale]))) {
+            if (in_array($locale, array_keys($this->_loadedData[$path]))) {
 
-                return $bundleData[$locale]->$key;
+                if (!in_array($bundle, array_keys($this->_loadedData[$path][$locale]))) {
+
+                    throw new UnexpectedValueException('Bundle <'.$bundle.'> not loaded');
+                }
+
+                if(in_array($key, ObjectUtils::getKeys($this->_loadedData[$path][$locale][$bundle]))){
+
+                    // Store the specified bundle name and path as the lasts that have been used till now
+                    $this->_lastBundle = $bundle;
+                    $this->_lastPath = $path;
+
+                    return $this->_loadedData[$path][$locale][$bundle]->$key;
+                }
             }
         }
 
@@ -526,11 +537,6 @@ class LocalizationManager extends BaseStrictClass{
      */
     public function setPrimaryLocale(string $locale){
 
-        if(!StringUtils::isString($locale)){
-
-            throw new UnexpectedValueException('Invalid locale value');
-        }
-
         if(!$this->isLocaleLoaded($locale)){
 
             throw new UnexpectedValueException($locale.' not loaded');
@@ -585,11 +591,6 @@ class LocalizationManager extends BaseStrictClass{
      * @return void
      */
     public function setLocalesOrder(array $locales){
-
-        if(!ArrayUtils::isArray($locales)){
-
-            throw new UnexpectedValueException('locales must be an array');
-        }
 
         if(count($locales) !== count($this->_locales)){
 
