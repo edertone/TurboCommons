@@ -53,15 +53,17 @@ export class LocalizationManager {
 
 
     /**
-     * Stores the latest resource bundle that's been used to read a localized value
+     * Stores the latest resource bundle that's been used to read a localized value.
+     * This is used by default when calling get without a bundle value
      */
-    private _lastBundle = '';
+    private _activeBundle = '';
     
     
     /**
      * Stores the latest path that's been used to read a localized value
+     * This is used by default when calling get without a path value
      */
-    private _lastPath = '';
+    private _activePath = '';
     
     
     /**
@@ -157,8 +159,8 @@ export class LocalizationManager {
         
         this._locales = [];
         this._languages = [];
-        this._lastBundle = '';
-        this._lastPath = '';
+        this._activeBundle = '';
+        this._activePath = '';
         this._loadedData = {};
         
         this._loadData(locales, bundles, (errors) => {
@@ -343,8 +345,8 @@ export class LocalizationManager {
             
             if(pathsToLoadInfo.length > 0){
                 
-                this._lastBundle = pathsToLoadInfo[pathsToLoadInfo.length - 1].bundle;
-                this._lastPath = pathsToLoadInfo[pathsToLoadInfo.length - 1].path;
+                this._activeBundle = pathsToLoadInfo[pathsToLoadInfo.length - 1].bundle;
+                this._activePath = pathsToLoadInfo[pathsToLoadInfo.length - 1].path;
             }
 
             if(finishedCallback !== null){
@@ -431,13 +433,13 @@ export class LocalizationManager {
         // If no path specified, autodetect it or use the last one
         if (path === '') {
 
-            path = this._lastPath;
+            path = this._activePath;
         }
 
         // If no bundle is specified, the last one will be used
         if (bundle === '') {
 
-            bundle = this._lastBundle;
+            bundle = this._activeBundle;
         }
         
         if (Object.keys(this._loadedData).indexOf(path) === -1) {
@@ -458,8 +460,8 @@ export class LocalizationManager {
                 if(Object.keys(this._loadedData[path][locale][bundle]).indexOf(key) >= 0){
 
                     // Store the specified bundle name and path as the lasts that have been used till now
-                    this._lastBundle = bundle;
-                    this._lastPath = path;
+                    this._activeBundle = bundle;
+                    this._activePath = path;
 
                     return this._loadedData[path][locale][bundle][key];
                 }
@@ -507,6 +509,17 @@ export class LocalizationManager {
     
     
     /**
+     * Get the bundle that is currently being used by default when traslating texts
+     *
+     * @return The name for the currently active bundle
+     */
+    activeBundle(){
+
+        return this._activeBundle;
+    }
+    
+    
+    /**
      * Get the first locale from the list of loaded locales, which is the currently used to search for translated texts.
      * 
      * @return The locale that is defined as the primary one. For example: en_US, es_ES, ..
@@ -535,6 +548,32 @@ export class LocalizationManager {
         }
 
         return this._languages[0];
+    }
+    
+    
+    /**
+     * Define the bundle that is used by default when no bundle is specified on the get methods
+     *
+     * @param bundle A currently loaded bundle to be used as the active one
+     *
+     * @return void
+     */
+    setActiveBundle(bundle: string){
+
+        for (let path of Object.keys(this._loadedData)) {
+            
+            for (let locale of Object.keys(this._loadedData[path])) {
+            
+                if(Object.keys(this._loadedData[path][locale]).indexOf(bundle) >= 0){
+                    
+                    this._activeBundle = bundle;
+                    this._activePath = path;
+                    return;
+                }
+            }
+        }
+
+        throw new Error(bundle + ' bundle not loaded');
     }
 
 

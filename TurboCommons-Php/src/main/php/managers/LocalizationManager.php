@@ -60,15 +60,17 @@ class LocalizationManager extends BaseStrictClass{
 
 
     /**
-     * Stores the latest resource bundle that's been used to read a localized value
+     * Stores the latest resource bundle that's been used to read a localized value.
+     * This is used by default when calling get without a bundle value
      */
-    private $_lastBundle = '';
+    private $_activeBundle = '';
 
 
     /**
      * Stores the latest path that's been used to read a localized value
+     * This is used by default when calling get without a path value
      */
-    private $_lastPath = '';
+    private $_activePath = '';
 
 
     /**
@@ -164,8 +166,8 @@ class LocalizationManager extends BaseStrictClass{
 
         $this->_locales = [];
         $this->_languages = [];
-        $this->_lastBundle = '';
-        $this->_lastPath = '';
+        $this->_activeBundle = '';
+        $this->_activePath = '';
         $this->_loadedData = [];
 
         $this->_loadData($locales, $bundles, function ($errors) use ($finishedCallback) {
@@ -366,8 +368,8 @@ class LocalizationManager extends BaseStrictClass{
 
         if(count($pathsToLoadInfo) > 0){
 
-            $this->_lastBundle = $pathsToLoadInfo[count($pathsToLoadInfo) - 1]['bundle'];
-            $this->_lastPath = $pathsToLoadInfo[count($pathsToLoadInfo) - 1]['path'];
+            $this->_activeBundle = $pathsToLoadInfo[count($pathsToLoadInfo) - 1]['bundle'];
+            $this->_activePath = $pathsToLoadInfo[count($pathsToLoadInfo) - 1]['path'];
         }
 
         if($finishedCallback !== null){
@@ -418,13 +420,13 @@ class LocalizationManager extends BaseStrictClass{
         // If no path specified, autodetect it or use the last one
         if ($path === '') {
 
-            $path = $this->_lastPath;
+            $path = $this->_activePath;
         }
 
         // If no bundle is specified, the last one will be used
         if ($bundle === '') {
 
-            $bundle = $this->_lastBundle;
+            $bundle = $this->_activeBundle;
         }
 
         if (!in_array($path, array_keys($this->_loadedData))) {
@@ -445,8 +447,8 @@ class LocalizationManager extends BaseStrictClass{
                 if(in_array($key, ObjectUtils::getKeys($this->_loadedData[$path][$locale][$bundle]))){
 
                     // Store the specified bundle name and path as the lasts that have been used till now
-                    $this->_lastBundle = $bundle;
-                    $this->_lastPath = $path;
+                    $this->_activeBundle = $bundle;
+                    $this->_activePath = $path;
 
                     return $this->_loadedData[$path][$locale][$bundle]->$key;
                 }
@@ -494,6 +496,17 @@ class LocalizationManager extends BaseStrictClass{
 
 
     /**
+     * Get the bundle that is currently being used by default when traslating texts
+     *
+     * @return string The name for the currently active bundle
+     */
+    public function activeBundle(){
+
+        return $this->_activeBundle;
+    }
+
+
+    /**
      * Get the first locale from the list of loaded locales, which is the currently used to search for translated texts.
      *
      * @return string The locale that is defined as the primary one. For example: en_US, es_ES, ..
@@ -522,6 +535,32 @@ class LocalizationManager extends BaseStrictClass{
         }
 
         return $this->_languages[0];
+    }
+
+
+    /**
+     * Define the bundle that is used by default when no bundle is specified on the get methods
+     *
+     * @param string $bundle A currently loaded bundle to be used as the active one
+     *
+     * @return void
+     */
+    public function setActiveBundle(string $bundle){
+
+        foreach (array_keys($this->_loadedData) as $path) {
+
+            foreach ($this->_loadedData[$path] as $localeData) {
+
+                if(in_array($bundle, array_keys($localeData))){
+
+                    $this->_activeBundle = $bundle;
+                    $this->_activePath = $path;
+                    return;
+                }
+            }
+        }
+
+        throw new UnexpectedValueException($bundle.' bundle not loaded');
     }
 
 

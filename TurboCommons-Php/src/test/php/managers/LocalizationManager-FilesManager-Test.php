@@ -1053,6 +1053,28 @@ class LocalizationManagerTest extends TestCase {
 
 
     /**
+     * testActiveBundle
+     *
+     * @return void
+     */
+    public function testActiveBundle(){
+
+        $bundles = [[
+            'path' => $this->basePath.'/test-loadBundles/$locale/$bundle.json',
+            'bundles' => ['Locales', 'MoreLocales']
+        ]];
+
+        $this->sut->initialize(new FilesManager(), ['en_US'], $bundles, function($errors){
+
+            $this->assertSame($this->sut->activeBundle(), 'MoreLocales');
+
+            $this->sut->setActiveBundle('Locales');
+            $this->assertSame($this->sut->activeBundle(), 'Locales');
+        });
+    }
+
+
+    /**
      * testPrimaryLocale
      *
      * @return void
@@ -1108,6 +1130,50 @@ class LocalizationManagerTest extends TestCase {
         $this->sut->setLocalesOrder(['en_US', 'es_ES', 'fr_FR']);
 
         $this->assertSame($this->sut->primaryLanguage(), 'en');
+    }
+
+
+    /**
+     * testSetActiveBundle
+     *
+     * @return void
+     */
+    public function testSetActiveBundle(){
+
+        // Test empty values
+        for($i=0; $i < $this->emptyValuesCount; $i++){
+
+            try {
+                $this->sut->setActiveBundle($this->emptyValues[$i]);
+                $this->exceptionMessage = 'emptyValues did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+        }
+
+        $bundles = [[
+            'path' => $this->basePath.'/test-loadBundles/$locale/$bundle.json',
+            'bundles' => ['Locales', 'MoreLocales']
+        ]];
+
+        $this->sut->initialize(new FilesManager(), ['en_US'], $bundles, function($errors){
+
+            // Test ok values
+            $this->assertSame($this->sut->activeBundle(), 'MoreLocales');
+            $this->assertSame($this->sut->get('SOME_LOCALE'), 'Some locale');
+
+            $this->sut->setActiveBundle('Locales');
+            $this->assertSame($this->sut->activeBundle(), 'Locales');
+            $this->assertSame($this->sut->get('LOGIN'), 'Login');
+
+            // Test wrong values
+            try {
+                $this->sut->setActiveBundle('nonexisting');
+                $this->exceptionMessage = 'nonexisting did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+        });
     }
 
 

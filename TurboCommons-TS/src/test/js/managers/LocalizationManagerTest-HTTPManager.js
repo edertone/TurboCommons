@@ -863,6 +863,30 @@ QUnit.test("languages", function(assert){
 
 
 /**
+ * activeBundle
+ */
+QUnit.test("activeBundle", function(assert){
+    
+    var done = assert.async(1);
+    
+    var bundles = [{
+        path: window.basePath + '/test-loadBundles/$locale/$bundle.json',
+        bundles: ['Locales', 'MoreLocales']
+    }];
+    
+    sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
+
+        assert.strictEqual(sut.activeBundle(), 'MoreLocales');
+        
+        sut.setActiveBundle('Locales');
+        assert.strictEqual(sut.activeBundle(), 'Locales');
+        
+        done();
+    });
+});
+
+
+/**
  * primaryLocale
  */
 QUnit.test("primaryLocale", function(assert){
@@ -914,6 +938,46 @@ QUnit.test("primaryLanguage", function(assert){
         sut.setLocalesOrder(['en_US', 'es_ES', 'fr_FR']);
         
         assert.strictEqual(sut.primaryLanguage(), 'en');
+        
+        done();
+    });
+});
+
+
+/**
+ * setActiveBundle
+ */
+QUnit.test("setActiveBundle", function(assert){
+    
+    // Test empty values
+    for(var i=0; i < emptyValuesCount; i++){
+
+        assert.throws(function() {
+            sut.setActiveBundle(emptyValues[i]);
+        }, /bundle not loaded/);
+    }
+
+    var done = assert.async(1);
+    
+    var bundles = [{
+        path: window.basePath + '/test-loadBundles/$locale/$bundle.json',
+        bundles: ['Locales', 'MoreLocales']
+    }];
+
+    sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
+
+        // Test ok values
+        assert.strictEqual(sut.activeBundle(), 'MoreLocales');
+        assert.strictEqual(sut.get('SOME_LOCALE'), 'Some locale');
+
+        sut.setActiveBundle('Locales');
+        assert.strictEqual(sut.activeBundle(), 'Locales');
+        assert.strictEqual(sut.get('LOGIN'), 'Login');
+
+        // Test wrong values
+        assert.throws(function() {
+            sut.setActiveBundle('nonexisting');
+        }, /nonexisting bundle not loaded/);
         
         done();
     });
