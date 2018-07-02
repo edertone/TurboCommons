@@ -25,6 +25,82 @@ QUnit.module("ValidationManagerTest", {
 
 
 /**
+ * getStatus
+ */
+QUnit.todo("getStatus", function(assert) {
+
+    // Test empty values
+    // TODO
+
+    // Test ok values
+    // TODO
+
+    // Test wrong values
+    // TODO
+
+    // Test exceptions
+    // TODO
+});
+
+
+/**
+ * ok
+ */
+QUnit.todo("ok", function(assert) {
+
+    // Test empty values
+    // TODO
+
+    // Test ok values
+    // TODO
+
+    // Test wrong values
+    // TODO
+
+    // Test exceptions
+    // TODO
+});
+
+
+/**
+ * getFirstMessage
+ */
+QUnit.todo("getFirstMessage", function(assert) {
+
+    // Test empty values
+    // TODO
+
+    // Test ok values
+    // TODO
+
+    // Test wrong values
+    // TODO
+
+    // Test exceptions
+    // TODO
+});
+
+
+/**
+ * getLastMessage
+ */
+QUnit.todo("getLastMessage", function(assert) {
+
+    // Test empty values
+    // TODO
+
+    // Test ok values
+    // TODO
+
+    // Test wrong values
+    // TODO
+
+    // Test exceptions
+    // TODO
+});
+
+
+/**
  * isTrue
  */
 QUnit.test("isTrue", function(assert) {
@@ -33,32 +109,32 @@ QUnit.test("isTrue", function(assert) {
     assert.ok(!validationManager.isTrue(undefined));
     assert.ok(!validationManager.isTrue(null));
     assert.ok(!validationManager.isTrue([]));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_ERROR);
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
 
     validationManager.reset();
 
     // Test ok values
     assert.ok(validationManager.isTrue(true));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_OK);
+    assert.ok(validationManager.getStatus() === ValidationManager.OK);
 
     // Test wrong values
     assert.ok(!validationManager.isTrue(false));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_ERROR);
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
     assert.ok(!validationManager.isTrue('121212'));
     assert.ok(!validationManager.isTrue([1, 78]));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_ERROR);
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
 
     validationManager.reset();
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_OK);
+    assert.ok(validationManager.getStatus() === ValidationManager.OK);
 
     // Test mixed ok and wrong
-    assert.ok(!validationManager.isTrue(false, 'false error', true));
-    assert.ok(validationManager.lastMessage === 'false error');
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_WARNING);
+    assert.ok(!validationManager.isTrue(false, 'false error', '', true));
+    assert.ok(validationManager.getLastMessage() === 'false error');
+    assert.ok(validationManager.getStatus() === ValidationManager.WARNING);
     assert.ok(validationManager.isTrue(true, 'no error'));
     assert.ok(!validationManager.isTrue(false, 'false error 2'));
-    assert.ok(validationManager.lastMessage === 'false error 2');
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_ERROR);
+    assert.ok(validationManager.getLastMessage() === 'false error 2');
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
 });
 
 
@@ -72,36 +148,36 @@ QUnit.test("isBoolean", function(assert) {
     assert.ok(!validationManager.isBoolean(null));
     assert.ok(!validationManager.isBoolean(''));
     assert.ok(!validationManager.isBoolean([]));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_ERROR);
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
 
     validationManager.reset();
-    assert.ok(validationManager.lastMessage === '');
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_OK);
+    assert.ok(validationManager.getLastMessage() === '');
+    assert.ok(validationManager.getStatus() === ValidationManager.OK);
 
     // Test ok values
     assert.ok(validationManager.isBoolean(true));
     assert.ok(validationManager.isBoolean(false));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_OK);
+    assert.ok(validationManager.getStatus() === ValidationManager.OK);
 
     // Test wrong values
     assert.ok(!validationManager.isBoolean('hello'));
     assert.ok(!validationManager.isBoolean(['go', 12]));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_ERROR);
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
     assert.ok(!validationManager.isBoolean(45));
     assert.ok(!validationManager.isBoolean(new Error(), 'custom error'));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_ERROR);
-    assert.ok(validationManager.lastMessage === 'custom error');
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
+    assert.ok(validationManager.getLastMessage() === 'custom error');
 
     validationManager.reset();
 
     // Test mixed ok and wrong values
-    assert.ok(!validationManager.isBoolean([12], 'error', true));
-    assert.ok(validationManager.lastMessage === 'error');
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_WARNING);
+    assert.ok(!validationManager.isBoolean([12], 'error', '', true));
+    assert.ok(validationManager.getLastMessage() === 'error');
+    assert.ok(validationManager.getStatus() === ValidationManager.WARNING);
     assert.ok(validationManager.isBoolean(true, 'no error'));
     assert.ok(!validationManager.isBoolean('asdf', 'error 2'));
-    assert.ok(validationManager.lastMessage === 'error 2');
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_ERROR);
+    assert.ok(validationManager.getLastMessage() === 'error 2');
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
 });
 
 
@@ -118,8 +194,8 @@ QUnit.test("isNumeric", function(assert) {
     assert.ok(validationManager.isNumeric(0));
 
     validationManager.reset();
-    assert.ok(validationManager.lastMessage === '');
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_OK);
+    assert.ok(validationManager.getLastMessage() === '');
+    assert.ok(validationManager.getStatus() === ValidationManager.OK);
 
     // Test ok values
     assert.ok(validationManager.isNumeric(1));
@@ -134,31 +210,50 @@ QUnit.test("isNumeric", function(assert) {
     assert.ok(validationManager.isNumeric('-1.345'));
     assert.ok(validationManager.isNumeric('345341'));
     assert.ok(validationManager.isNumeric('-345341'));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_OK);
+    assert.ok(validationManager.getStatus() === ValidationManager.OK);
 
     // Test wrong values
     assert.notOk(validationManager.isNumeric([12, 'b']));
     assert.notOk(validationManager.isNumeric(new ValidationManager()));
-    assert.ok(validationManager.lastMessage === 'value is not a number');
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_ERROR);
+    assert.ok(validationManager.getLastMessage() === 'value is not a number');
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
     assert.notOk(validationManager.isNumeric('hello', 'numeric error'));
     assert.notOk(validationManager.isNumeric('1,4356', 'numeric error'));
-    assert.ok(validationManager.lastMessage === 'numeric error');
+    assert.ok(validationManager.getLastMessage() === 'numeric error');
     assert.notOk(validationManager.isNumeric('1,4.4545', 'numeric error'));
     assert.notOk(validationManager.isNumeric('--345', 'numeric error'));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_ERROR);
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
 
     validationManager.reset();
-    assert.ok(validationManager.lastMessage === '');
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_OK);
+    assert.ok(validationManager.getLastMessage() === '');
+    assert.ok(validationManager.getStatus() === ValidationManager.OK);
 
     // Test mixed ok and wrong values
-    assert.notOk(validationManager.isNumeric('hello', 'numeric error', true));
-    assert.ok(validationManager.lastMessage === 'numeric error');
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_WARNING);
+    assert.notOk(validationManager.isNumeric('hello', 'numeric error', '', true));
+    assert.ok(validationManager.getLastMessage() === 'numeric error');
+    assert.ok(validationManager.getStatus() === ValidationManager.WARNING);
     assert.notOk(validationManager.isNumeric('hello', 'numeric error 2'));
-    assert.ok(validationManager.lastMessage === 'numeric error 2');
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_ERROR);
+    assert.ok(validationManager.getLastMessage() === 'numeric error 2');
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
+});
+
+
+/**
+ * isNumericBetween
+ */
+QUnit.todo("isNumericBetween", function(assert) {
+
+    // Test empty values
+    // TODO
+
+    // Test ok values
+    // TODO
+
+    // Test wrong values
+    // TODO
+
+    // Test exceptions
+    // TODO
 });
 
 
@@ -173,19 +268,19 @@ QUnit.test("isString", function(assert) {
     assert.ok(validationManager.isString("\n\n$!"));
     assert.ok(validationManager.isString('hello baby how are you'));
     assert.ok(validationManager.isString("hello\n\nbably\r\ntest"));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_OK);
+    assert.ok(validationManager.getStatus() === ValidationManager.OK);
 
-    assert.ok(!validationManager.isString(null, '', true));
-    assert.ok(!validationManager.isString(123, '', true));
-    assert.ok(!validationManager.isString(4.879, '', true));
-    assert.ok(!validationManager.isString(new ValidationManager(), '', true));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_WARNING);
+    assert.ok(!validationManager.isString(null, '', '', true));
+    assert.ok(!validationManager.isString(123, '', '', true));
+    assert.ok(!validationManager.isString(4.879, '', '', true));
+    assert.ok(!validationManager.isString(new ValidationManager(), '', '', true));
+    assert.ok(validationManager.getStatus() === ValidationManager.WARNING);
     assert.ok(!validationManager.isString([]));
     assert.ok(!validationManager.isString(-978));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_ERROR);
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
 
     validationManager.reset();
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_OK);
+    assert.ok(validationManager.getStatus() === ValidationManager.OK);
 });
 
 
@@ -213,7 +308,7 @@ QUnit.test("isUrl", function(assert) {
     assert.ok(validationManager.isUrl('ftp://user:password@host.com:8080/path'));
 
     validationManager.reset();
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_OK);
+    assert.ok(validationManager.getStatus() === ValidationManager.OK);
 
     // Test non string values throw exceptions
     assert.throws(function() {
@@ -238,19 +333,19 @@ QUnit.test("isArray", function(assert) {
     assert.ok(validationManager.isArray(['1']));
     assert.ok(validationManager.isArray(['1', 5, []]));
     assert.ok(validationManager.isArray([null]));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_OK);
+    assert.ok(validationManager.getStatus() === ValidationManager.OK);
 
-    assert.ok(!validationManager.isArray(undefined, '', true));
-    assert.ok(!validationManager.isArray(null, '', true));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_WARNING);
+    assert.ok(!validationManager.isArray(undefined, '', '', true));
+    assert.ok(!validationManager.isArray(null, '', '', true));
+    assert.ok(validationManager.getStatus() === ValidationManager.WARNING);
     assert.ok(!validationManager.isArray(1));
     assert.ok(!validationManager.isArray(''));
     assert.ok(!validationManager.isArray(new ValidationManager()));
     assert.ok(!validationManager.isArray('hello'));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_ERROR);
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
 
     validationManager.reset();
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_OK);
+    assert.ok(validationManager.getStatus() === ValidationManager.OK);
 });
 
 
@@ -280,21 +375,21 @@ QUnit.test("isObject", function(assert) {
     }));
 
     assert.ok(validationManager.isObject(new ValidationManager()));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_OK);
+    assert.ok(validationManager.getStatus() === ValidationManager.OK);
 
-    assert.ok(!validationManager.isObject(null, '', true));
-    assert.ok(!validationManager.isObject(undefined, '', true));
-    assert.ok(!validationManager.isObject([], '', true));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_WARNING);
+    assert.ok(!validationManager.isObject(null, '', '', true));
+    assert.ok(!validationManager.isObject(undefined, '', '', true));
+    assert.ok(!validationManager.isObject([], '', '', true));
+    assert.ok(validationManager.getStatus() === ValidationManager.WARNING);
     
     assert.ok(!validationManager.isObject(1));
     assert.ok(!validationManager.isObject(''));
     assert.ok(!validationManager.isObject('hello'));
     assert.ok(!validationManager.isObject([1, 4, 5]));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_ERROR);
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
 
     validationManager.reset();
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_OK);
+    assert.ok(validationManager.getStatus() === ValidationManager.OK);
 });
 
 
@@ -307,8 +402,8 @@ QUnit.test("isFilledIn", function(assert) {
     assert.notOk(validationManager.isFilledIn(null));
     assert.notOk(validationManager.isFilledIn(''));
     assert.notOk(validationManager.isFilledIn([]));
-    assert.ok(!validationManager.isFilledIn(null, [], '', true));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_ERROR);
+    assert.ok(!validationManager.isFilledIn(null, [], '', '', true));
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
 
     validationManager.reset();
 
@@ -317,18 +412,18 @@ QUnit.test("isFilledIn", function(assert) {
     assert.ok(validationManager.isFilledIn('    sdfasdsf'));
     assert.ok(validationManager.isFilledIn('EMPTY'));
     assert.ok(validationManager.isFilledIn('EMPTY test', ['EMPTY']));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_OK);
+    assert.ok(validationManager.getStatus() === ValidationManager.OK);
 
     // Test wrong values
-    assert.notOk(validationManager.isFilledIn('      ', [], '', true));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_WARNING);
+    assert.notOk(validationManager.isFilledIn('      ', [], '', '', true));
+    assert.ok(validationManager.getStatus() === ValidationManager.WARNING);
     assert.notOk(validationManager.isFilledIn("\n\n  \n"));
     assert.notOk(validationManager.isFilledIn("\t   \n     \r\r"));
     assert.notOk(validationManager.isFilledIn('EMPTY', ['EMPTY']));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_ERROR);
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
     assert.notOk(validationManager.isFilledIn('EMPTY           ', ['EMPTY']));
     assert.notOk(validationManager.isFilledIn('EMPTY       void   hole    ', ['EMPTY', 'void', 'hole']));
-    assert.ok(validationManager.validationStatus === ValidationManager.VALIDATION_ERROR);
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
 
     // Test non string value gives exception
     assert.throws(function() {
@@ -353,6 +448,16 @@ QUnit.test("isFilledIn", function(assert) {
  */
 QUnit.todo("isDate", function(assert) {
 
+    // Test empty values
+    // TODO
+
+    // Test ok values
+    // TODO
+
+    // Test wrong values
+    // TODO
+
+    // Test exceptions
     // TODO
 });
 
@@ -362,8 +467,17 @@ QUnit.todo("isDate", function(assert) {
  */
 QUnit.todo("isMail", function(assert) {
 
+ // Test empty values
     // TODO
 
+    // Test ok values
+    // TODO
+
+    // Test wrong values
+    // TODO
+
+    // Test exceptions
+    // TODO
 });
 
 

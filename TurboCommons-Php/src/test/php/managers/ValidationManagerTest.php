@@ -77,6 +77,90 @@ class ValidationManagerTest extends TestCase {
     }
 
 
+    /**
+     * testGetStatus
+     *
+     * @return void
+     */
+    public function testGetStatus(){
+
+        // Test empty values
+        // TODO
+
+        // Test ok values
+        // TODO
+
+        // Test wrong values
+        // TODO
+
+        // Test exceptions
+        // TODO
+    }
+
+
+    /**
+     * testOk
+     *
+     * @return void
+     */
+    public function testOk(){
+
+        // Test empty values
+        // TODO
+
+        // Test ok values
+        // TODO
+
+        // Test wrong values
+        // TODO
+
+        // Test exceptions
+        // TODO
+    }
+
+
+    /**
+     * testGetFirstMessage
+     *
+     * @return void
+     */
+    public function testGetFirstMessage(){
+
+        // Test empty values
+        // TODO
+
+        // Test ok values
+        // TODO
+
+        // Test wrong values
+        // TODO
+
+        // Test exceptions
+        // TODO
+    }
+
+
+    /**
+     * testGetLastMessage
+     *
+     * @return void
+     */
+    public function testGetLastMessage(){
+
+        // Test empty values
+        // TODO
+
+        // Test ok values
+        // TODO
+
+        // Test wrong values
+        // TODO
+
+        // Test exceptions
+        // TODO
+    }
+
+
 	/**
 	 * testIsTrue
 	 *
@@ -87,32 +171,32 @@ class ValidationManagerTest extends TestCase {
 	    // Test empty values
 	    $this->assertTrue(!$this->validationManager->isTrue(null));
 	    $this->assertTrue(!$this->validationManager->isTrue([]));
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_ERROR);
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
 
 	    $this->validationManager->reset();
 
 	    // Test ok values
 	    $this->assertTrue($this->validationManager->isTrue(true));
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_OK);
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::OK);
 
 	    // Test wrong values
 	    $this->assertTrue(!$this->validationManager->isTrue(false));
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_ERROR);
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
 	    $this->assertTrue(!$this->validationManager->isTrue('121212'));
 	    $this->assertTrue(!$this->validationManager->isTrue([1, 78]));
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_ERROR);
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
 
 	    $this->validationManager->reset();
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_OK);
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::OK);
 
 	    // Test mixed ok and wrong
-	    $this->assertTrue(!$this->validationManager->isTrue(false, 'false error', true));
-	    $this->assertTrue($this->validationManager->lastMessage === 'false error');
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_WARNING);
+	    $this->assertTrue(!$this->validationManager->isTrue(false, 'false error', '', true));
+	    $this->assertTrue($this->validationManager->getLastMessage() === 'false error');
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::WARNING);
 	    $this->assertTrue($this->validationManager->isTrue(true, 'no error'));
 	    $this->assertTrue(!$this->validationManager->isTrue(false, 'false error 2'));
-	    $this->assertTrue($this->validationManager->lastMessage === 'false error 2');
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_ERROR);
+	    $this->assertTrue($this->validationManager->getLastMessage() === 'false error 2');
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
 	}
 
 
@@ -127,36 +211,36 @@ class ValidationManagerTest extends TestCase {
 	    $this->assertTrue(!$this->validationManager->isBoolean(null));
 	    $this->assertTrue(!$this->validationManager->isBoolean(''));
 	    $this->assertTrue(!$this->validationManager->isBoolean([]));
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_ERROR);
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
 
 	    $this->validationManager->reset();
-	    $this->assertTrue($this->validationManager->lastMessage === '');
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_OK);
+	    $this->assertTrue($this->validationManager->getLastMessage() === '');
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::OK);
 
 	    // Test ok values
 	    $this->assertTrue($this->validationManager->isBoolean(true));
 	    $this->assertTrue($this->validationManager->isBoolean(false));
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_OK);
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::OK);
 
 	    // Test wrong values
 	    $this->assertTrue(!$this->validationManager->isBoolean('hello'));
 	    $this->assertTrue(!$this->validationManager->isBoolean(['go', 12]));
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_ERROR);
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
 	    $this->assertTrue(!$this->validationManager->isBoolean(45));
 	    $this->assertTrue(!$this->validationManager->isBoolean(new Exception(), 'custom error'));
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_ERROR);
-	    $this->assertTrue($this->validationManager->lastMessage === 'custom error');
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
+	    $this->assertTrue($this->validationManager->getLastMessage() === 'custom error');
 
 	    $this->validationManager->reset();
 
 	    // Test mixed ok and wrong values
-	    $this->assertTrue(!$this->validationManager->isBoolean([12], 'error', true));
-	    $this->assertTrue($this->validationManager->lastMessage === 'error');
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_WARNING);
+	    $this->assertTrue(!$this->validationManager->isBoolean([12], 'error', '', true));
+	    $this->assertTrue($this->validationManager->getLastMessage() === 'error');
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::WARNING);
 	    $this->assertTrue($this->validationManager->isBoolean(true, 'no error'));
 	    $this->assertTrue(!$this->validationManager->isBoolean('asdf', 'error 2'));
-	    $this->assertTrue($this->validationManager->lastMessage === 'error 2');
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_ERROR);
+	    $this->assertTrue($this->validationManager->getLastMessage() === 'error 2');
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
 	}
 
 
@@ -174,8 +258,8 @@ class ValidationManagerTest extends TestCase {
 	    $this->assertTrue($this->validationManager->isNumeric(0));
 
 	    $this->validationManager->reset();
-	    $this->assertTrue($this->validationManager->lastMessage === '');
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_OK);
+	    $this->assertTrue($this->validationManager->getLastMessage() === '');
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::OK);
 
 	    // Test ok values
 	    $this->assertTrue($this->validationManager->isNumeric(1));
@@ -190,31 +274,52 @@ class ValidationManagerTest extends TestCase {
 	    $this->assertTrue($this->validationManager->isNumeric('-1.345'));
 	    $this->assertTrue($this->validationManager->isNumeric('345341'));
 	    $this->assertTrue($this->validationManager->isNumeric('-345341'));
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_OK);
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::OK);
 
 	    // Test wrong values
 	    $this->assertFalse($this->validationManager->isNumeric([12, 'b']));
 	    $this->assertFalse($this->validationManager->isNumeric(new ValidationManager()));
-	    $this->assertTrue($this->validationManager->lastMessage === 'value is not a number');
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_ERROR);
+	    $this->assertTrue($this->validationManager->getLastMessage() === 'value is not a number');
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
 	    $this->assertFalse($this->validationManager->isNumeric('hello', 'numeric error'));
 	    $this->assertFalse($this->validationManager->isNumeric('1,4356', 'numeric error'));
-	    $this->assertTrue($this->validationManager->lastMessage === 'numeric error');
+	    $this->assertTrue($this->validationManager->getLastMessage() === 'numeric error');
 	    $this->assertFalse($this->validationManager->isNumeric('1,4.4545', 'numeric error'));
 	    $this->assertFalse($this->validationManager->isNumeric('--345', 'numeric error'));
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_ERROR);
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
 
 	    $this->validationManager->reset();
-	    $this->assertTrue($this->validationManager->lastMessage === '');
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_OK);
+	    $this->assertTrue($this->validationManager->getLastMessage() === '');
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::OK);
 
 	    // Test mixed ok and wrong values
-	    $this->assertFalse($this->validationManager->isNumeric('hello', 'numeric error', true));
-	    $this->assertTrue($this->validationManager->lastMessage === 'numeric error');
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_WARNING);
+	    $this->assertFalse($this->validationManager->isNumeric('hello', 'numeric error', '', true));
+	    $this->assertTrue($this->validationManager->getLastMessage() === 'numeric error');
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::WARNING);
 	    $this->assertFalse($this->validationManager->isNumeric('hello', 'numeric error 2'));
-	    $this->assertTrue($this->validationManager->lastMessage === 'numeric error 2');
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_ERROR);
+	    $this->assertTrue($this->validationManager->getLastMessage() === 'numeric error 2');
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
+	}
+
+
+	/**
+	 * testIsNumericBetween
+	 *
+	 * @return void
+	 */
+	public function testIsNumericBetween(){
+
+	    // Test empty values
+	    // TODO
+
+	    // Test ok values
+	    // TODO
+
+	    // Test wrong values
+	    // TODO
+
+	    // Test exceptions
+	    // TODO
 	}
 
 
@@ -231,19 +336,19 @@ class ValidationManagerTest extends TestCase {
 		$this->assertTrue($this->validationManager->isString("\n\n$!"));
 		$this->assertTrue($this->validationManager->isString('hello baby how are you'));
 		$this->assertTrue($this->validationManager->isString("hello\n\nbably\r\ntest"));
-		$this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_OK);
+		$this->assertTrue($this->validationManager->getStatus() === ValidationManager::OK);
 
-		$this->assertTrue(!$this->validationManager->isString(null, '', true));
-		$this->assertTrue(!$this->validationManager->isString(123, '', true));
-		$this->assertTrue(!$this->validationManager->isString(4.879, '', true));
-		$this->assertTrue(!$this->validationManager->isString(new ValidationManager(), '', true));
-		$this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_WARNING);
+		$this->assertTrue(!$this->validationManager->isString(null, '', '', true));
+		$this->assertTrue(!$this->validationManager->isString(123, '', '', true));
+		$this->assertTrue(!$this->validationManager->isString(4.879, '', '', true));
+		$this->assertTrue(!$this->validationManager->isString(new ValidationManager(), '', '', true));
+		$this->assertTrue($this->validationManager->getStatus() === ValidationManager::WARNING);
 		$this->assertTrue(!$this->validationManager->isString([]));
 		$this->assertTrue(!$this->validationManager->isString(-978));
-		$this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_ERROR);
+		$this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
 
 		$this->validationManager->reset();
-		$this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_OK);
+		$this->assertTrue($this->validationManager->getStatus() === ValidationManager::OK);
 	}
 
 
@@ -273,7 +378,7 @@ class ValidationManagerTest extends TestCase {
 		$this->assertTrue($this->validationManager->isUrl('ftp://user:password@host.com:8080/path'));
 
 		$this->validationManager->reset();
-		$this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_OK);
+		$this->assertTrue($this->validationManager->getStatus() === ValidationManager::OK);
 
 		// Test non string values throw exceptions
 		try {
@@ -304,18 +409,18 @@ class ValidationManagerTest extends TestCase {
 		$this->assertTrue($this->validationManager->isArray(['1']));
 		$this->assertTrue($this->validationManager->isArray(['1', 5, []]));
 		$this->assertTrue($this->validationManager->isArray([null]));
-		$this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_OK);
+		$this->assertTrue($this->validationManager->getStatus() === ValidationManager::OK);
 
-		$this->assertTrue(!$this->validationManager->isArray(null, '', true));
-		$this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_WARNING);
+		$this->assertTrue(!$this->validationManager->isArray(null, '', '', true));
+		$this->assertTrue($this->validationManager->getStatus() === ValidationManager::WARNING);
 		$this->assertTrue(!$this->validationManager->isArray(1));
 		$this->assertTrue(!$this->validationManager->isArray(''));
 		$this->assertTrue(!$this->validationManager->isArray(new ValidationManager()));
 		$this->assertTrue(!$this->validationManager->isArray('hello'));
-		$this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_ERROR);
+		$this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
 
 		$this->validationManager->reset();
-		$this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_OK);
+		$this->assertTrue($this->validationManager->getStatus() === ValidationManager::OK);
 	}
 
 
@@ -347,21 +452,21 @@ class ValidationManagerTest extends TestCase {
 		]));
 
 		$this->assertTrue($this->validationManager->isObject(new ValidationManager()));
-		$this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_OK);
+		$this->assertTrue($this->validationManager->getStatus() === ValidationManager::OK);
 
 
-		$this->assertTrue(!$this->validationManager->isObject(null, '', true));
-		$this->assertTrue(!$this->validationManager->isObject([], '', true));
-		$this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_WARNING);
+		$this->assertTrue(!$this->validationManager->isObject(null, '', '', true));
+		$this->assertTrue(!$this->validationManager->isObject([], '', '', true));
+		$this->assertTrue($this->validationManager->getStatus() === ValidationManager::WARNING);
 
 		$this->assertTrue(!$this->validationManager->isObject(1));
 		$this->assertTrue(!$this->validationManager->isObject(''));
 		$this->assertTrue(!$this->validationManager->isObject('hello'));
 		$this->assertTrue(!$this->validationManager->isObject([1, 4, 5]));
-		$this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_ERROR);
+		$this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
 
 		$this->validationManager->reset();
-		$this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_OK);
+		$this->assertTrue($this->validationManager->getStatus() === ValidationManager::OK);
 	}
 
 
@@ -376,8 +481,8 @@ class ValidationManagerTest extends TestCase {
 	    $this->assertFalse($this->validationManager->isFilledIn(null));
 	    $this->assertFalse($this->validationManager->isFilledIn(''));
 	    $this->assertFalse($this->validationManager->isFilledIn([]));
-	    $this->assertTrue(!$this->validationManager->isFilledIn(null, [], '', true));
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_ERROR);
+	    $this->assertTrue(!$this->validationManager->isFilledIn(null, [], '', '', true));
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
 
 	    $this->validationManager->reset();
 
@@ -386,18 +491,18 @@ class ValidationManagerTest extends TestCase {
 	    $this->assertTrue($this->validationManager->isFilledIn('    sdfasdsf'));
 	    $this->assertTrue($this->validationManager->isFilledIn('EMPTY'));
 	    $this->assertTrue($this->validationManager->isFilledIn('EMPTY test', ['EMPTY']));
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_OK);
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::OK);
 
 	    // Test wrong values
-	    $this->assertFalse($this->validationManager->isFilledIn('      ', [], '', true));
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_WARNING);
+	    $this->assertFalse($this->validationManager->isFilledIn('      ', [], '', '', true));
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::WARNING);
 	    $this->assertFalse($this->validationManager->isFilledIn("\n\n  \n"));
 	    $this->assertFalse($this->validationManager->isFilledIn("\t   \n     \r\r"));
 	    $this->assertFalse($this->validationManager->isFilledIn('EMPTY', ['EMPTY']));
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_ERROR);
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
 	    $this->assertFalse($this->validationManager->isFilledIn('EMPTY           ', ['EMPTY']));
 	    $this->assertFalse($this->validationManager->isFilledIn('EMPTY       void   hole    ', ['EMPTY', 'void', 'hole']));
-	    $this->assertTrue($this->validationManager->validationStatus === ValidationManager::VALIDATION_ERROR);
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
 
 	    // Test exceptions
 	    try {
