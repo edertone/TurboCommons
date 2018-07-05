@@ -33,6 +33,21 @@ export class LocalizationManager {
      */
     missingKeyFormat = '$exception';
 
+
+    /** 
+     * Wildcards are string fragments that are placed inside the translated texts. Their main purpose is to be replaced at
+     * runtime by custom values like for example a user name, a date, a numeric value, etc..
+     * 
+     * This class helps with this process by including a parameter called 'toReplace' on all .get methods which allows us
+     * to specify a string or list of strings that will replace the respective wildcards on the translated text. Each wildcard
+     * must follow the format specified here, and contain a numeric digit that will be used to find the replacement text at the
+     * 'toReplace' list. For example, if we define $N as the wildcard format, and we have a translation that contains $0, $1, $2,
+     * $0 will be replaced with the first element on toReplace, $1 with the second and so.
+     *      
+     * Note that N is mandayory on the wildcards format and the first index value is 0.
+     */
+    wildCardsFormat = '{N}';
+
     
     /**
      * Tells if the class has been initialized or not
@@ -411,73 +426,6 @@ export class LocalizationManager {
 
     
     /**
-     * Get the translation for the given key, bundle and path
-     *
-     * @param key The key we want to read from the specified resource bundle and path
-     * @param bundle The name for the resource bundle file. If not specified, the value
-     *        that was used on the inmediate previous call of this method will be used. This can save us lots of typing
-     *        if we are reading multiple consecutive keys from the same bundle.
-     * @param path In case we have multiple bundles with the same name on different paths, we can set this parameter with
-     *        the path value to uniquely reference the bundle and resolve the conflict. If all of our bundles have different
-     *        names, this parameter can be ignored. Just like the bundle parameter, this one is remembered between get() calls.
-     * 
-     * @returns The localized text
-     */
-    get(key: string, bundle = '', path = '') {
-
-        if(!this._initialized){
-            
-            throw new Error('LocalizationManager not initialized. Call initialize() before requesting translated texts');
-        }
-        
-        // If no path specified, autodetect it or use the last one
-        if (path === '') {
-
-            path = this._activePath;
-        }
-
-        // If no bundle is specified, the last one will be used
-        if (bundle === '') {
-
-            bundle = this._activeBundle;
-        }
-        
-        if (Object.keys(this._loadedData).indexOf(path) === -1) {
-
-            throw new Error('Path <' + path + '> not loaded');
-        }
-        
-        // Loop all the locales to find the first one with a value for the specified key
-        for (const locale of this._locales) {
-
-            if (Object.keys(this._loadedData[path]).indexOf(locale) >= 0) {
-
-                if (Object.keys(this._loadedData[path][locale]).indexOf(bundle) === -1) {
-
-                    throw new Error('Bundle <' + bundle + '> not loaded');
-                }
-                
-                if(Object.keys(this._loadedData[path][locale][bundle]).indexOf(key) >= 0){
-
-                    // Store the specified bundle name and path as the lasts that have been used till now
-                    this._activeBundle = bundle;
-                    this._activePath = path;
-
-                    return this._loadedData[path][locale][bundle][key];
-                }
-            }
-        }
-
-        if (this.missingKeyFormat.indexOf('$exception') >= 0) {
-
-            throw new Error('key <' + key + '> not found on ' + bundle + ' - ' + path);
-        }
-
-        return this.missingKeyFormat.replace('$key', key);
-    }
-    
-    
-    /**
      * A list of strings containing the locales that are used by this class to translate the given keys, sorted by preference.
      * Each string is formatted as a standard locale code with language and country joined by an underscore, like: en_US, fr_FR
      *
@@ -673,6 +621,88 @@ export class LocalizationManager {
     
     
     /**
+     * Get the translation for the given key, bundle and path
+     *
+     * @param key The key we want to read from the specified resource bundle and path
+     * @param bundle The name for the resource bundle file. If not specified, the value
+     *        that was used on the inmediate previous call of this method will be used. This can save us lots of typing
+     *        if we are reading multiple consecutive keys from the same bundle.
+     * @param path In case we have multiple bundles with the same name on different paths, we can set this parameter with
+     *        the path value to uniquely reference the bundle and resolve the conflict. If all of our bundles have different
+     *        names, this parameter can be ignored. Just like the bundle parameter, this one is remembered between get() calls.
+     * @param toReplace A list of values that will replace the wildcards that are found on the translated text. Each wildcard
+     *        will be replaced with the element whose index on the list matches it. Check the documentation for this.wildCardsFormat
+     *        property to know more about how to setup wildcards.
+     * 
+     * @returns The localized text
+     */
+    get(key: string, bundle = '', path = '', toReplace: string|string[] = []) {
+
+        if(!this._initialized){
+            
+            throw new Error('LocalizationManager not initialized. Call initialize() before requesting translated texts');
+        }
+        
+        // If no path specified, autodetect it or use the last one
+        if (path === '') {
+
+            path = this._activePath;
+        }
+
+        // If no bundle is specified, the last one will be used
+        if (bundle === '') {
+
+            bundle = this._activeBundle;
+        }
+        
+        if (Object.keys(this._loadedData).indexOf(path) === -1) {
+
+            throw new Error('Path <' + path + '> not loaded');
+        }
+        
+        // Loop all the locales to find the first one with a value for the specified key
+        for (const locale of this._locales) {
+
+            if (Object.keys(this._loadedData[path]).indexOf(locale) >= 0) {
+
+                if (Object.keys(this._loadedData[path][locale]).indexOf(bundle) === -1) {
+
+                    throw new Error('Bundle <' + bundle + '> not loaded');
+                }
+                
+                if(Object.keys(this._loadedData[path][locale][bundle]).indexOf(key) >= 0){
+
+                    // Store the specified bundle name and path as the lasts that have been used till now
+                    this._activeBundle = bundle;
+                    this._activePath = path;
+                    
+                    let result = this._loadedData[path][locale][bundle][key];
+                    
+                    // Replace all wildcards on the text with the specified replacements if any
+                    let replacements = StringUtils.isString(toReplace) ? [String(toReplace)] : toReplace;
+
+                    for (let i = 0; i < replacements.length; i++) {
+	
+                        result = StringUtils.replace(result,
+                                    StringUtils.replace(this.wildCardsFormat, 'N', String(i)),
+                                    replacements[i]);
+                    }
+                    
+                    return result;
+                }
+            }
+        }
+
+        if (this.missingKeyFormat.indexOf('$exception') >= 0) {
+
+            throw new Error('key <' + key + '> not found on ' + bundle + ' - ' + path);
+        }
+
+        return this.missingKeyFormat.replace('$key', key);
+    }
+    
+    
+    /**
      * Get the translation for the given key and bundle as a string with all words first character capitalized 
      * and all the rest of the word with lower case
      *
@@ -681,9 +711,9 @@ export class LocalizationManager {
      *
      * @returns The localized and case formatted text
      */
-    getStartCase(key: string, bundle = '', path = '') {
+    getStartCase(key: string, bundle = '', path = '', toReplace: string|string[] = []) {
 
-        return StringUtils.formatCase(this.get(key, bundle, path), StringUtils.FORMAT_START_CASE);
+        return StringUtils.formatCase(this.get(key, bundle, path, toReplace), StringUtils.FORMAT_START_CASE);
     }
 
 
@@ -695,9 +725,9 @@ export class LocalizationManager {
      *
      * @returns The localized and case formatted text
      */
-    getAllUpperCase(key: string, bundle = '', path = '') {
+    getAllUpperCase(key: string, bundle = '', path = '', toReplace: string|string[] = []) {
 
-        return StringUtils.formatCase(this.get(key, bundle, path), StringUtils.FORMAT_ALL_UPPER_CASE);
+        return StringUtils.formatCase(this.get(key, bundle, path, toReplace), StringUtils.FORMAT_ALL_UPPER_CASE);
     }
 
 
@@ -709,9 +739,9 @@ export class LocalizationManager {
      *
      * @returns The localized and case formatted text
      */
-    getAllLowerCase(key: string, bundle = '', path = '') {
+    getAllLowerCase(key: string, bundle = '', path = '', toReplace: string|string[] = []) {
 
-        return StringUtils.formatCase(this.get(key, bundle, path), StringUtils.FORMAT_ALL_LOWER_CASE);
+        return StringUtils.formatCase(this.get(key, bundle, path, toReplace), StringUtils.FORMAT_ALL_LOWER_CASE);
     }
     
     
@@ -724,9 +754,9 @@ export class LocalizationManager {
      *
      * @returns The localized and case formatted text
      */
-    getFirstUpperRestLower(key: string, bundle = '', path = ''){
+    getFirstUpperRestLower(key: string, bundle = '', path = '', toReplace: string|string[] = []){
         
-        return StringUtils.formatCase(this.get(key, bundle, path), StringUtils.FORMAT_FIRST_UPPER_REST_LOWER);
+        return StringUtils.formatCase(this.get(key, bundle, path, toReplace), StringUtils.FORMAT_FIRST_UPPER_REST_LOWER);
     }
 
 

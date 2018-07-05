@@ -42,6 +42,21 @@ class LocalizationManager extends BaseStrictClass{
 
 
     /**
+     * Wildcards are string fragments that are placed inside the translated texts. Their main purpose is to be replaced at
+     * runtime by custom values like for example a user name, a date, a numeric value, etc..
+     *
+     * This class helps with this process by including a parameter called 'toReplace' on all .get methods which allows us
+     * to specify a string or list of strings that will replace the respective wildcards on the translated text. Each wildcard
+     * must follow the format specified here, and contain a numeric digit that will be used to find the replacement text at the
+     * 'toReplace' list. For example, if we define $N as the wildcard format, and we have a translation that contains $0, $1, $2,
+     * $0 will be replaced with the first element on toReplace, $1 with the second and so.
+     *
+     * Note that N is mandayory on the wildcards format and the first index value is 0.
+     */
+    public $wildCardsFormat = '{N}';
+
+
+    /**
      * Tells if the class has been initialized or not
      */
     private $_initialized = false;
@@ -398,73 +413,6 @@ class LocalizationManager extends BaseStrictClass{
 
 
     /**
-     * Get the translation for the given key, bundle and path
-     *
-     * @param string $key The key we want to read from the specified resource bundle and path
-     * @param string $bundle The name for the resource bundle file. If not specified, the value
-     *        that was used on the inmediate previous call of this method will be used. This can save us lots of typing
-     *        if we are reading multiple consecutive keys from the same bundle.
-     * @param string $path In case we have multiple bundles with the same name on different paths, we can set this parameter with
-     *        the path value to uniquely reference the bundle and resolve the conflict. If all of our bundles have different
-     *        names, this parameter can be ignored. Just like the bundle parameter, this one is remembered between get() calls.
-     *
-     * @return string The localized text
-     */
-    public function get(string $key, string $bundle = '', string $path = '') {
-
-        if(!$this->_initialized){
-
-            throw new UnexpectedValueException('LocalizationManager not initialized. Call initialize() before requesting translated texts');
-        }
-
-        // If no path specified, autodetect it or use the last one
-        if ($path === '') {
-
-            $path = $this->_activePath;
-        }
-
-        // If no bundle is specified, the last one will be used
-        if ($bundle === '') {
-
-            $bundle = $this->_activeBundle;
-        }
-
-        if (!in_array($path, array_keys($this->_loadedData))) {
-
-            throw new UnexpectedValueException('Path <'.$path.'> not loaded');
-        }
-
-        // Loop all the locales to find the first one with a value for the specified key
-        foreach ($this->_locales as $locale) {
-
-            if (in_array($locale, array_keys($this->_loadedData[$path]))) {
-
-                if (!in_array($bundle, array_keys($this->_loadedData[$path][$locale]))) {
-
-                    throw new UnexpectedValueException('Bundle <'.$bundle.'> not loaded');
-                }
-
-                if(in_array($key, ObjectUtils::getKeys($this->_loadedData[$path][$locale][$bundle]))){
-
-                    // Store the specified bundle name and path as the lasts that have been used till now
-                    $this->_activeBundle = $bundle;
-                    $this->_activePath = $path;
-
-                    return $this->_loadedData[$path][$locale][$bundle]->$key;
-                }
-            }
-        }
-
-        if (strpos($this->missingKeyFormat, '$exception') !== false) {
-
-            throw new UnexpectedValueException('key <'.$key.'> not found on '.$bundle.' - '.$path);
-        }
-
-        return StringUtils::replace($this->missingKeyFormat, '$key', $key);
-    }
-
-
-    /**
      * A list of strings containing the locales that are used by this class to translate the given keys, sorted by preference.
      * Each string is formatted as a standard locale code with language and country joined by an underscore, like: en_US, fr_FR
      *
@@ -650,6 +598,88 @@ class LocalizationManager extends BaseStrictClass{
 
 
     /**
+     * Get the translation for the given key, bundle and path
+     *
+     * @param string $key The key we want to read from the specified resource bundle and path
+     * @param string $bundle The name for the resource bundle file. If not specified, the value
+     *        that was used on the inmediate previous call of this method will be used. This can save us lots of typing
+     *        if we are reading multiple consecutive keys from the same bundle.
+     * @param string $path In case we have multiple bundles with the same name on different paths, we can set this parameter with
+     *        the path value to uniquely reference the bundle and resolve the conflict. If all of our bundles have different
+     *        names, this parameter can be ignored. Just like the bundle parameter, this one is remembered between get() calls.
+     * @param mixed $toReplace A list of values that will replace the wildcards that are found on the translated text. Each wildcard
+     *        will be replaced with the element whose index on the list matches it. Check the documentation for this.wildCardsFormat
+     *        property to know more about how to setup wildcards.
+     *
+     * @return string The localized text
+     */
+    public function get(string $key, string $bundle = '', string $path = '', $toReplace = []) {
+
+        if(!$this->_initialized){
+
+            throw new UnexpectedValueException('LocalizationManager not initialized. Call initialize() before requesting translated texts');
+        }
+
+        // If no path specified, autodetect it or use the last one
+        if ($path === '') {
+
+            $path = $this->_activePath;
+        }
+
+        // If no bundle is specified, the last one will be used
+        if ($bundle === '') {
+
+            $bundle = $this->_activeBundle;
+        }
+
+        if (!in_array($path, array_keys($this->_loadedData))) {
+
+            throw new UnexpectedValueException('Path <'.$path.'> not loaded');
+        }
+
+        // Loop all the locales to find the first one with a value for the specified key
+        foreach ($this->_locales as $locale) {
+
+            if (in_array($locale, array_keys($this->_loadedData[$path]))) {
+
+                if (!in_array($bundle, array_keys($this->_loadedData[$path][$locale]))) {
+
+                    throw new UnexpectedValueException('Bundle <'.$bundle.'> not loaded');
+                }
+
+                if(in_array($key, ObjectUtils::getKeys($this->_loadedData[$path][$locale][$bundle]))){
+
+                    // Store the specified bundle name and path as the lasts that have been used till now
+                    $this->_activeBundle = $bundle;
+                    $this->_activePath = $path;
+
+                    $result = $this->_loadedData[$path][$locale][$bundle]->$key;
+
+                    // Replace all wildcards on the text with the specified replacements if any
+                    $replacements = is_String($toReplace) ? [$toReplace] : $toReplace;
+
+                    for ($i = 0, $l = count($replacements); $i < $l; $i++) {
+
+                        $result = StringUtils::replace($result,
+                            StringUtils::replace($this->wildCardsFormat, 'N', $i),
+                            $replacements[$i]);
+                    }
+
+                    return $result;
+                }
+            }
+        }
+
+        if (strpos($this->missingKeyFormat, '$exception') !== false) {
+
+            throw new UnexpectedValueException('key <'.$key.'> not found on '.$bundle.' - '.$path);
+        }
+
+        return StringUtils::replace($this->missingKeyFormat, '$key', $key);
+    }
+
+
+    /**
      * Get the translation for the given key and bundle as a string with all words first character capitalized
      * and all the rest of the word with lower case
      *
@@ -658,9 +688,9 @@ class LocalizationManager extends BaseStrictClass{
      *
      * @returns string The localized and case formatted text
      */
-    public function getStartCase(string $key, string $bundle = '', string $path = '') {
+    public function getStartCase(string $key, string $bundle = '', string $path = '', $toReplace = []) {
 
-        return StringUtils::formatCase($this->get($key, $bundle, $path), StringUtils::FORMAT_START_CASE);
+        return StringUtils::formatCase($this->get($key, $bundle, $path, $toReplace), StringUtils::FORMAT_START_CASE);
     }
 
 
@@ -672,9 +702,9 @@ class LocalizationManager extends BaseStrictClass{
      *
      * @returns string The localized and case formatted text
      */
-    public function getAllUpperCase(string $key, string $bundle = '', string $path = '') {
+    public function getAllUpperCase(string $key, string $bundle = '', string $path = '', $toReplace = []) {
 
-        return StringUtils::formatCase($this->get($key, $bundle, $path), StringUtils::FORMAT_ALL_UPPER_CASE);
+        return StringUtils::formatCase($this->get($key, $bundle, $path, $toReplace), StringUtils::FORMAT_ALL_UPPER_CASE);
     }
 
 
@@ -686,9 +716,9 @@ class LocalizationManager extends BaseStrictClass{
      *
      * @returns string The localized and case formatted text
      */
-    public function getAllLowerCase(string $key, string $bundle = '', string $path = '') {
+    public function getAllLowerCase(string $key, string $bundle = '', string $path = '', $toReplace = []) {
 
-        return StringUtils::formatCase($this->get($key, $bundle, $path), StringUtils::FORMAT_ALL_LOWER_CASE);
+        return StringUtils::formatCase($this->get($key, $bundle, $path, $toReplace), StringUtils::FORMAT_ALL_LOWER_CASE);
     }
 
 
@@ -701,9 +731,9 @@ class LocalizationManager extends BaseStrictClass{
      *
      * @returns string The localized and case formatted text
      */
-    public function getFirstUpperRestLower(string $key, string $bundle = '', string $path = ''){
+    public function getFirstUpperRestLower(string $key, string $bundle = '', string $path = '', $toReplace = []){
 
-        return StringUtils::formatCase($this->get($key, $bundle, $path), StringUtils::FORMAT_FIRST_UPPER_REST_LOWER);
+        return StringUtils::formatCase($this->get($key, $bundle, $path, $toReplace), StringUtils::FORMAT_FIRST_UPPER_REST_LOWER);
     }
 
 

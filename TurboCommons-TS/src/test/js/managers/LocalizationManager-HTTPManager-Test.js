@@ -531,288 +531,6 @@ QUnit.test("loadBundles-nonexistant-bundles-or-pahts", function(assert){
 
 
 /**
- * get
- */
-QUnit.test("get-non-initialized", function(assert){
-
-    assert.strictEqual('$exception', sut.missingKeyFormat);
-    
-    // Test empty values
-    for (var i = 0; i < emptyValuesCount; i++) {
-        
-        assert.throws(function() {
-            sut.get(emptyValues[i]);
-        }, /LocalizationManager not initialized/);
-    }
-    
-    assert.throws(function() {
-        sut.get("KEY");
-    }, /LocalizationManager not initialized/);
-    
-    assert.throws(function() {
-        sut.get("KEY", "Locales");
-    }, /LocalizationManager not initialized/);
-    
-    assert.throws(function() {
-        sut.get("KEY", "Locales", "Some/path");
-    }, /LocalizationManager not initialized/);
-
-    sut.missingKeyFormat = '';
-    assert.throws(function() {
-        sut.get("KEY");
-    }, /LocalizationManager not initialized/);
-    
-    assert.throws(function() {
-        sut.get("KEY", "Locales");
-    }, /LocalizationManager not initialized/);
-    
-    assert.throws(function() {
-        sut.get("KEY", "Locales", "Some/path");
-    }, /LocalizationManager not initialized/);
-    
-    sut.missingKeyFormat = '--$key--';
-    assert.throws(function() {
-        sut.get("KEY");
-    }, /LocalizationManager not initialized/);
-
-    assert.throws(function() {
-        sut.get("KEY", "Locales");
-    }, /LocalizationManager not initialized/);
-    
-    assert.throws(function() {
-        sut.get("KEY", "Locales", "Some/path");
-    }, /LocalizationManager not initialized/);
-    
-    sut.missingKeyFormat = '<$key>';
-    assert.throws(function() {
-        sut.get("NON_EXISTANT");
-    }, /LocalizationManager not initialized/);
-    
-    assert.throws(function() {
-        sut.get("NON_EXISTANT", "Nonexistant");
-    }, /LocalizationManager not initialized/);
-    
-    assert.throws(function() {
-        sut.get("NON_EXISTANT", "Nonexistant", "Nonexistant/path");
-    }, /LocalizationManager not initialized/);
-});
-
-
-/**
- * get
- */
-QUnit.test("get-initialized-missing-values", function(assert){
-
-    var done = assert.async(1);
-    
-    var bundles = [{
-        path: window.basePath + '/test-json/$locale/$bundle.json',
-        bundles: ['Locales']
-    }];
-    
-    sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
-
-        // Test missingKeyFormat with $exception wildcard
-        assert.strictEqual('$exception', sut.missingKeyFormat);
-        
-        assert.throws(function() {
-            sut.get("MISSINGKEY");
-        }, /key <MISSINGKEY> not found/);
-        
-        assert.throws(function() {
-            sut.get("MISSINGKEY", "Locales");
-        }, /key <MISSINGKEY> not found/);
-        
-        assert.throws(function() {
-            sut.get("MISSINGKEY", "MissingBundle");
-        }, /Bundle <MissingBundle> not loaded/);
-        
-        assert.throws(function() {
-            sut.get("MISSINGKEY", "Locales", "Some/path");
-        }, /Path <Some\/path> not loaded/);
-        
-        // Test empty missingKeyFormat
-        sut.missingKeyFormat = '';
-        assert.strictEqual(sut.get("MISSINGKEY"), '');
-        assert.strictEqual(sut.get("MISSINGKEY", "Locales"), '');
-        assert.strictEqual(sut.get("MISSINGKEY", "Locales", window.basePath + '/test-json/$locale/$bundle.json'), '');
-        
-        assert.throws(function() {
-            sut.get("MISSINGKEY", "MissingBundle");
-        }, /Bundle <MissingBundle> not loaded/);
-        
-        assert.throws(function() {
-            sut.get("MISSINGKEY", "Locales", "Some/path");
-        }, /Path <Some\/path> not loaded/);
-        
-        // Test missingKeyFormat with some text
-        sut.missingKeyFormat = 'sometext';
-        assert.strictEqual(sut.get("MISSINGKEY"), 'sometext');
-        assert.strictEqual(sut.get("MISSINGKEY", "Locales"), 'sometext');
-        assert.strictEqual(sut.get("MISSINGKEY", "Locales", window.basePath + '/test-json/$locale/$bundle.json'), 'sometext');
-        
-        assert.throws(function() {
-            sut.get("MISSINGKEY", "MissingBundle");
-        }, /Bundle <MissingBundle> not loaded/);
-        
-        assert.throws(function() {
-            sut.get("MISSINGKEY", "Locales", "Some/path");
-        }, /Path <Some\/path> not loaded/);
-
-        // Test missingKeyFormat with $key wildcard
-        sut.missingKeyFormat = '--$key--';
-        assert.strictEqual(sut.get("MISSINGKEY"), '--MISSINGKEY--');
-        assert.strictEqual(sut.get("MISSINGKEY", "Locales"), '--MISSINGKEY--');
-        assert.strictEqual(sut.get("MISSINGKEY", "Locales", window.basePath + '/test-json/$locale/$bundle.json'), '--MISSINGKEY--');
-        
-        assert.throws(function() {
-            sut.get("MISSINGKEY", "MissingBundle");
-        }, /Bundle <MissingBundle> not loaded/);
-        
-        assert.throws(function() {
-            sut.get("MISSINGKEY", "Locales", "Some/path");
-        }, /Path <Some\/path> not loaded/);
-        
-        sut.missingKeyFormat = '<$key>';
-        assert.strictEqual(sut.get("MISSINGKEY"), '<MISSINGKEY>');
-        assert.strictEqual(sut.get("MISSINGKEY", "Locales"), '<MISSINGKEY>');
-        assert.strictEqual(sut.get("MISSINGKEY", "Locales", window.basePath + '/test-json/$locale/$bundle.json'), '<MISSINGKEY>');
-        
-        assert.throws(function() {
-            sut.get("MISSINGKEY", "MissingBundle");
-        }, /Bundle <MissingBundle> not loaded/);
-        
-        assert.throws(function() {
-            sut.get("MISSINGKEY", "Locales", "Some/path");
-        }, /Path <Some\/path> not loaded/);
-        
-        done();
-    }); 
-});
-
-
-/**
- * get
- */
-QUnit.test("get-initialized-correct-values-with-single-locale-loaded", function(assert){
-
-    var done = assert.async(1);
-    
-    var bundles = [{
-        path: window.basePath + '/test-json/$locale/$bundle.json',
-        bundles: ['Locales']
-    }];
-    
-    sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
-
-        assert.strictEqual(sut.get('TAG_NOT_EXISTING_ON_ES_ES'), 'Missing tag');
-        assert.strictEqual(sut.get('PASSWORD'), 'Password');
-        assert.strictEqual(sut.get('USER'), 'User');
-        
-        var bundles = [{
-            path: window.basePath + '/test-loadBundles/$locale/$bundle.json',
-            bundles: ['Locales', 'MoreLocales']
-        }];
-        
-        sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
-
-            assert.strictEqual(sut.get('LOGIN', 'Locales'), 'Login');
-            assert.strictEqual(sut.get('PASSWORD'), 'Password');
-            assert.strictEqual(sut.get('USER'), 'User');
-            
-            assert.strictEqual(sut.get('SOME_LOCALE', 'MoreLocales'), 'Some locale');
-            assert.strictEqual(sut.get('SOME_OTHER'), 'Some other');
-
-            done();
-        }); 
-    }); 
-});
-
-
-/**
- * get
- */
-QUnit.test("get-initialized-keys-from-another-bundle-fail", function(assert){
-
-    var done = assert.async(1);
-    
-    var bundles = [{
-        path: window.basePath + '/test-loadBundles/$locale/$bundle.json',
-        bundles: ['Locales', 'MoreLocales']
-    }];
-    
-    sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
-
-        assert.throws(function() {
-            sut.get("LOGIN", "MoreLocales");
-        }, /key <LOGIN> not found on MoreLocales/);
-        
-        assert.throws(function() {
-            sut.get("SOME_OTHER", "Locales");
-        }, /key <SOME_OTHER> not found on Locales/);
-        done();
-    });
-});
-
-
-/**
- * get
- */
-QUnit.test("get-initialized-values-for-multiple-locales", function(assert){
-
-    var done = assert.async(1);
-    
-    var bundles = [{
-        path: window.basePath + '/test-json/$locale/$bundle.json',
-        bundles: ['Locales']
-    }];
-    
-    sut.initialize(new HTTPManager(), ['es_ES', 'en_US'], bundles, function(errors){
-
-        assert.strictEqual(sut.get('PASSWORD'), 'Contraseña');
-        assert.strictEqual(sut.get('TAG_NOT_EXISTING_ON_ES_ES'), 'Missing tag');
-        
-        done();
-    });
-});
-
-
-/**
- * get
- */
-QUnit.test("get-initialized-keys-from-multiple-paths-bundles-and-locales", function(assert){
-    
-    var done = assert.async(1);
-    
-    var bundles = [{
-        path: window.basePath + '/test-multiple-paths/path-1/$locale/$bundle.properties',
-        bundles: ['bundle1']
-    },{
-        path: window.basePath + '/test-multiple-paths/path-2/$locale/$bundle.properties',
-        bundles: ['bundle1']
-    },{
-        path: window.basePath + '/test-multiple-paths/path-3/$locale/$bundle.properties',
-        bundles: ['bundle1']
-    }];
-    
-    sut.initialize(new HTTPManager(), ['es_ES', 'en_US'], bundles, function(errors){
-
-        assert.strictEqual(sut.get('PATH_NAME'), 'ruta3');
-        assert.strictEqual(sut.get('PATH_NAME', 'bundle1'), 'ruta3');
-        assert.strictEqual(sut.get('PATH_NAME', '', window.basePath + '/test-multiple-paths/path-2/$locale/$bundle.properties'), 'ruta2');
-        assert.strictEqual(sut.get('PATH_NAME', 'bundle1', window.basePath + '/test-multiple-paths/path-2/$locale/$bundle.properties'), 'ruta2');
-        assert.strictEqual(sut.get('PATH_NAME'), 'ruta2');
-
-        assert.strictEqual(sut.get('NOT_ON_ES'), 'not on es 2');
-        assert.strictEqual(sut.get('NOT_ON_ES', 'bundle1'), 'not on es 2');
-        assert.strictEqual(sut.get('NOT_ON_ES', '', window.basePath + '/test-multiple-paths/path-1/$locale/$bundle.properties'), 'not on es 1');
-        assert.strictEqual(sut.get('NOT_ON_ES', 'bundle1'), 'not on es 1');
-        done();
-    });
-});
-
-
-/**
  * locales
  */
 QUnit.test("locales", function(assert){
@@ -1187,6 +905,288 @@ QUnit.test("setLocalesOrder", function(assert){
 
 
 /**
+ * get
+ */
+QUnit.test("get-non-initialized", function(assert){
+
+    assert.strictEqual('$exception', sut.missingKeyFormat);
+    
+    // Test empty values
+    for (var i = 0; i < emptyValuesCount; i++) {
+        
+        assert.throws(function() {
+            sut.get(emptyValues[i]);
+        }, /LocalizationManager not initialized/);
+    }
+    
+    assert.throws(function() {
+        sut.get("KEY");
+    }, /LocalizationManager not initialized/);
+    
+    assert.throws(function() {
+        sut.get("KEY", "Locales");
+    }, /LocalizationManager not initialized/);
+    
+    assert.throws(function() {
+        sut.get("KEY", "Locales", "Some/path");
+    }, /LocalizationManager not initialized/);
+
+    sut.missingKeyFormat = '';
+    assert.throws(function() {
+        sut.get("KEY");
+    }, /LocalizationManager not initialized/);
+    
+    assert.throws(function() {
+        sut.get("KEY", "Locales");
+    }, /LocalizationManager not initialized/);
+    
+    assert.throws(function() {
+        sut.get("KEY", "Locales", "Some/path");
+    }, /LocalizationManager not initialized/);
+    
+    sut.missingKeyFormat = '--$key--';
+    assert.throws(function() {
+        sut.get("KEY");
+    }, /LocalizationManager not initialized/);
+
+    assert.throws(function() {
+        sut.get("KEY", "Locales");
+    }, /LocalizationManager not initialized/);
+    
+    assert.throws(function() {
+        sut.get("KEY", "Locales", "Some/path");
+    }, /LocalizationManager not initialized/);
+    
+    sut.missingKeyFormat = '<$key>';
+    assert.throws(function() {
+        sut.get("NON_EXISTANT");
+    }, /LocalizationManager not initialized/);
+    
+    assert.throws(function() {
+        sut.get("NON_EXISTANT", "Nonexistant");
+    }, /LocalizationManager not initialized/);
+    
+    assert.throws(function() {
+        sut.get("NON_EXISTANT", "Nonexistant", "Nonexistant/path");
+    }, /LocalizationManager not initialized/);
+});
+
+
+/**
+ * get
+ */
+QUnit.test("get-initialized-missing-values", function(assert){
+
+    var done = assert.async(1);
+    
+    var bundles = [{
+        path: window.basePath + '/test-json/$locale/$bundle.json',
+        bundles: ['Locales']
+    }];
+    
+    sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
+
+        // Test missingKeyFormat with $exception wildcard
+        assert.strictEqual('$exception', sut.missingKeyFormat);
+        
+        assert.throws(function() {
+            sut.get("MISSINGKEY");
+        }, /key <MISSINGKEY> not found/);
+        
+        assert.throws(function() {
+            sut.get("MISSINGKEY", "Locales");
+        }, /key <MISSINGKEY> not found/);
+        
+        assert.throws(function() {
+            sut.get("MISSINGKEY", "MissingBundle");
+        }, /Bundle <MissingBundle> not loaded/);
+        
+        assert.throws(function() {
+            sut.get("MISSINGKEY", "Locales", "Some/path");
+        }, /Path <Some\/path> not loaded/);
+        
+        // Test empty missingKeyFormat
+        sut.missingKeyFormat = '';
+        assert.strictEqual(sut.get("MISSINGKEY"), '');
+        assert.strictEqual(sut.get("MISSINGKEY", "Locales"), '');
+        assert.strictEqual(sut.get("MISSINGKEY", "Locales", window.basePath + '/test-json/$locale/$bundle.json'), '');
+        
+        assert.throws(function() {
+            sut.get("MISSINGKEY", "MissingBundle");
+        }, /Bundle <MissingBundle> not loaded/);
+        
+        assert.throws(function() {
+            sut.get("MISSINGKEY", "Locales", "Some/path");
+        }, /Path <Some\/path> not loaded/);
+        
+        // Test missingKeyFormat with some text
+        sut.missingKeyFormat = 'sometext';
+        assert.strictEqual(sut.get("MISSINGKEY"), 'sometext');
+        assert.strictEqual(sut.get("MISSINGKEY", "Locales"), 'sometext');
+        assert.strictEqual(sut.get("MISSINGKEY", "Locales", window.basePath + '/test-json/$locale/$bundle.json'), 'sometext');
+        
+        assert.throws(function() {
+            sut.get("MISSINGKEY", "MissingBundle");
+        }, /Bundle <MissingBundle> not loaded/);
+        
+        assert.throws(function() {
+            sut.get("MISSINGKEY", "Locales", "Some/path");
+        }, /Path <Some\/path> not loaded/);
+
+        // Test missingKeyFormat with $key wildcard
+        sut.missingKeyFormat = '--$key--';
+        assert.strictEqual(sut.get("MISSINGKEY"), '--MISSINGKEY--');
+        assert.strictEqual(sut.get("MISSINGKEY", "Locales"), '--MISSINGKEY--');
+        assert.strictEqual(sut.get("MISSINGKEY", "Locales", window.basePath + '/test-json/$locale/$bundle.json'), '--MISSINGKEY--');
+        
+        assert.throws(function() {
+            sut.get("MISSINGKEY", "MissingBundle");
+        }, /Bundle <MissingBundle> not loaded/);
+        
+        assert.throws(function() {
+            sut.get("MISSINGKEY", "Locales", "Some/path");
+        }, /Path <Some\/path> not loaded/);
+        
+        sut.missingKeyFormat = '<$key>';
+        assert.strictEqual(sut.get("MISSINGKEY"), '<MISSINGKEY>');
+        assert.strictEqual(sut.get("MISSINGKEY", "Locales"), '<MISSINGKEY>');
+        assert.strictEqual(sut.get("MISSINGKEY", "Locales", window.basePath + '/test-json/$locale/$bundle.json'), '<MISSINGKEY>');
+        
+        assert.throws(function() {
+            sut.get("MISSINGKEY", "MissingBundle");
+        }, /Bundle <MissingBundle> not loaded/);
+        
+        assert.throws(function() {
+            sut.get("MISSINGKEY", "Locales", "Some/path");
+        }, /Path <Some\/path> not loaded/);
+        
+        done();
+    }); 
+});
+
+
+/**
+ * get
+ */
+QUnit.test("get-initialized-correct-values-with-single-locale-loaded", function(assert){
+
+    var done = assert.async(1);
+    
+    var bundles = [{
+        path: window.basePath + '/test-json/$locale/$bundle.json',
+        bundles: ['Locales']
+    }];
+    
+    sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
+
+        assert.strictEqual(sut.get('TAG_NOT_EXISTING_ON_ES_ES'), 'Missing tag');
+        assert.strictEqual(sut.get('PASSWORD'), 'Password');
+        assert.strictEqual(sut.get('USER'), 'User');
+        
+        var bundles = [{
+            path: window.basePath + '/test-loadBundles/$locale/$bundle.json',
+            bundles: ['Locales', 'MoreLocales']
+        }];
+        
+        sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
+
+            assert.strictEqual(sut.get('LOGIN', 'Locales'), 'Login');
+            assert.strictEqual(sut.get('PASSWORD'), 'Password');
+            assert.strictEqual(sut.get('USER'), 'User');
+            
+            assert.strictEqual(sut.get('SOME_LOCALE', 'MoreLocales'), 'Some locale');
+            assert.strictEqual(sut.get('SOME_OTHER'), 'Some other');
+
+            done();
+        }); 
+    }); 
+});
+
+
+/**
+ * get
+ */
+QUnit.test("get-initialized-keys-from-another-bundle-fail", function(assert){
+
+    var done = assert.async(1);
+    
+    var bundles = [{
+        path: window.basePath + '/test-loadBundles/$locale/$bundle.json',
+        bundles: ['Locales', 'MoreLocales']
+    }];
+    
+    sut.initialize(new HTTPManager(), ['en_US'], bundles, function(errors){
+
+        assert.throws(function() {
+            sut.get("LOGIN", "MoreLocales");
+        }, /key <LOGIN> not found on MoreLocales/);
+        
+        assert.throws(function() {
+            sut.get("SOME_OTHER", "Locales");
+        }, /key <SOME_OTHER> not found on Locales/);
+        done();
+    });
+});
+
+
+/**
+ * get
+ */
+QUnit.test("get-initialized-values-for-multiple-locales", function(assert){
+
+    var done = assert.async(1);
+    
+    var bundles = [{
+        path: window.basePath + '/test-json/$locale/$bundle.json',
+        bundles: ['Locales']
+    }];
+    
+    sut.initialize(new HTTPManager(), ['es_ES', 'en_US'], bundles, function(errors){
+
+        assert.strictEqual(sut.get('PASSWORD'), 'Contraseña');
+        assert.strictEqual(sut.get('TAG_NOT_EXISTING_ON_ES_ES'), 'Missing tag');
+        
+        done();
+    });
+});
+
+
+/**
+ * get
+ */
+QUnit.test("get-initialized-keys-from-multiple-paths-bundles-and-locales", function(assert){
+    
+    var done = assert.async(1);
+    
+    var bundles = [{
+        path: window.basePath + '/test-multiple-paths/path-1/$locale/$bundle.properties',
+        bundles: ['bundle1']
+    },{
+        path: window.basePath + '/test-multiple-paths/path-2/$locale/$bundle.properties',
+        bundles: ['bundle1']
+    },{
+        path: window.basePath + '/test-multiple-paths/path-3/$locale/$bundle.properties',
+        bundles: ['bundle1']
+    }];
+    
+    sut.initialize(new HTTPManager(), ['es_ES', 'en_US'], bundles, function(errors){
+
+        assert.strictEqual(sut.get('PATH_NAME'), 'ruta3');
+        assert.strictEqual(sut.get('PATH_NAME', 'bundle1'), 'ruta3');
+        assert.strictEqual(sut.get('PATH_NAME', '', window.basePath + '/test-multiple-paths/path-2/$locale/$bundle.properties'), 'ruta2');
+        assert.strictEqual(sut.get('PATH_NAME', 'bundle1', window.basePath + '/test-multiple-paths/path-2/$locale/$bundle.properties'), 'ruta2');
+        assert.strictEqual(sut.get('PATH_NAME'), 'ruta2');
+
+        assert.strictEqual(sut.get('NOT_ON_ES'), 'not on es 2');
+        assert.strictEqual(sut.get('NOT_ON_ES', 'bundle1'), 'not on es 2');
+        assert.strictEqual(sut.get('NOT_ON_ES', '', window.basePath + '/test-multiple-paths/path-1/$locale/$bundle.properties'), 'not on es 1');
+        assert.strictEqual(sut.get('NOT_ON_ES', 'bundle1'), 'not on es 1');
+        done();
+    });
+});
+
+
+/**
  * getStartCase
  */
 QUnit.test("getStartCase", function(assert){
@@ -1452,3 +1452,103 @@ QUnit.test("test-properties", function(assert){
         done();
     });
 });
+
+
+/**
+ * test-get-with-wildcards
+ */
+QUnit.test("test-get-with-wildcards", function(assert){
+    
+    var done = assert.async(1);
+    
+    var bundles = [{
+        path: window.basePath + '/test-get-with-wildcards/$locale/$bundle.properties',
+        bundles: ['Locales']
+    }];
+
+    sut.initialize(new HTTPManager(), ['en_US', 'es_ES'], bundles, function(errors){
+
+        assert.strictEqual(sut.get('TAG_1'), 'this has no wildcards');
+        assert.strictEqual(sut.get('TAG_1', '', '', []), 'this has no wildcards');
+        assert.strictEqual(sut.get('TAG_1', '', '', ['test']), 'this has no wildcards');
+        assert.strictEqual(sut.get('TAG_1', '', '', 'noreplacethis'), 'this has no wildcards');
+
+        sut.setPrimaryLocale('es_ES');
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['es_ES', 'en_US'])); 
+
+        assert.strictEqual(sut.get('TAG_1'), 'ésta no tiene wildcards');
+        assert.strictEqual(sut.get('TAG_1', '', '', []), 'ésta no tiene wildcards');
+        assert.strictEqual(sut.get('TAG_1', '', '', ['test']), 'ésta no tiene wildcards');
+        assert.strictEqual(sut.get('TAG_1', '', '', 'noreplacethis'), 'ésta no tiene wildcards');
+
+        sut.setPrimaryLocale('en_US');
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['en_US', 'es_ES']));
+
+        assert.strictEqual(sut.get('TAG_2'), 'this has {0}');
+        assert.strictEqual(sut.get('TAG_2', '', '', []), 'this has {0}');
+        assert.strictEqual(sut.get('TAG_2', '', '', ['replace']), 'this has replace');
+        assert.strictEqual(sut.get('TAG_2', '', '', ['1', '2', '3']), 'this has 1');
+
+        sut.setPrimaryLocale('es_ES');
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['es_ES', 'en_US']));
+
+        assert.strictEqual(sut.get('TAG_2'), 'ésta tiene {0}');
+        assert.strictEqual(sut.get('TAG_2', '', '', []), 'ésta tiene {0}');
+        assert.strictEqual(sut.get('TAG_2', '', '', ['replace']), 'ésta tiene replace');
+        assert.strictEqual(sut.get('TAG_2', '', '', ['1', '2', '3']), 'ésta tiene 1');
+
+        sut.setPrimaryLocale('en_US');
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['en_US', 'es_ES']));
+
+        assert.strictEqual(sut.get('TAG_3'), 'this has {0} {1} {2}');
+        assert.strictEqual(sut.get('TAG_3', '', '', []), 'this has {0} {1} {2}');
+        assert.strictEqual(sut.get('TAG_3', '', '', ['replace']), 'this has replace {1} {2}');
+        assert.strictEqual(sut.get('TAG_3', '', '', ['replace', 'replace']), 'this has replace replace {2}');
+        assert.strictEqual(sut.get('TAG_3', '', '', ['1', '2', '3']), 'this has 1 2 3');
+        assert.strictEqual(sut.get('TAG_3', '', '', ['1', '2', '3', '4']), 'this has 1 2 3');
+        assert.strictEqual(sut.get('TAG_3', '', '', ['1', '', '3']), 'this has 1  3');
+
+        assert.strictEqual(sut.get('TAG_4'), 'some $2 custom $0 format $1');
+        assert.strictEqual(sut.get('TAG_4', '', '', ['1', '2', '3']), 'some $2 custom $0 format $1');
+        assert.strictEqual(sut.get('TAG_4', '', '', ['1', '2', '3', '4']), 'some $2 custom $0 format $1');
+
+        sut.wildCardsFormat = '$N';
+        assert.strictEqual(sut.get('TAG_4'), 'some $2 custom $0 format $1');
+        assert.strictEqual(sut.get('TAG_4', '', '', []), 'some $2 custom $0 format $1');
+        assert.strictEqual(sut.get('TAG_4', '', '', ['a']), 'some $2 custom a format $1');
+        assert.strictEqual(sut.get('TAG_4', '', '', ['a', 'b']), 'some $2 custom a format b');
+        assert.strictEqual(sut.get('TAG_4', '', '', ['a', 'b', 'c']), 'some c custom a format b');
+        assert.strictEqual(sut.get('TAG_4', '', '', ['a', 'b', 'c', 'd']), 'some c custom a format b');
+        assert.strictEqual(sut.get('TAG_4', '', '', ['a', '', 'c']), 'some c custom a format ');
+
+        sut.setPrimaryLocale('es_ES');
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['es_ES', 'en_US']));
+
+        assert.strictEqual(sut.get('TAG_4'), 'algun $2 personalizado $0 formato $1');
+        assert.strictEqual(sut.get('TAG_4', '', '', []), 'algun $2 personalizado $0 formato $1');
+        assert.strictEqual(sut.get('TAG_4', '', '', ['a']), 'algun $2 personalizado a formato $1');
+        assert.strictEqual(sut.get('TAG_4', '', '', ['a', 'b']), 'algun $2 personalizado a formato b');
+        assert.strictEqual(sut.get('TAG_4', '', '', ['a', 'b', 'c']), 'algun c personalizado a formato b');
+        assert.strictEqual(sut.get('TAG_4', '', '', ['a', 'b', 'c', 'd']), 'algun c personalizado a formato b');
+        assert.strictEqual(sut.get('TAG_4', '', '', ['a', '', 'c']), 'algun c personalizado a formato ');
+
+        sut.setPrimaryLocale('en_US');
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['en_US', 'es_ES']));
+
+        assert.strictEqual(sut.get('TAG_5'), 'missing _1_ wildcard _3_ indices _5_');
+        assert.strictEqual(sut.get('TAG_5', '', '', ['1', '2', '3']), 'missing _1_ wildcard _3_ indices _5_');
+        assert.strictEqual(sut.get('TAG_5', '', '', ['1', '2', '3', '4']), 'missing _1_ wildcard _3_ indices _5_');
+
+        sut.wildCardsFormat = '_N_';
+        assert.strictEqual(sut.get('TAG_5'), 'missing _1_ wildcard _3_ indices _5_');
+        assert.strictEqual(sut.get('TAG_5', '', '', []), 'missing _1_ wildcard _3_ indices _5_');
+        assert.strictEqual(sut.get('TAG_5', '', '', ['a']), 'missing _1_ wildcard _3_ indices _5_');
+        assert.strictEqual(sut.get('TAG_5', '', '', ['a', 'b']), 'missing b wildcard _3_ indices _5_');
+        assert.strictEqual(sut.get('TAG_5', '', '', ['a', 'b', 'c']), 'missing b wildcard _3_ indices _5_');
+        assert.strictEqual(sut.get('TAG_5', '', '', ['a', 'b', 'c', 'd']), 'missing b wildcard d indices _5_');
+        assert.strictEqual(sut.get('TAG_5', '', '', ['a', '', 'c', 'd', 'e', 'f', 'g']), 'missing  wildcard d indices f');
+        
+        done();
+    });
+});
+

@@ -648,366 +648,6 @@ class LocalizationManagerTest extends TestCase {
 
 
     /**
-     * testGet_non_initialized
-     *
-     * @return void
-     */
-    public function testGet_non_initialized(){
-
-        $this->assertSame('$exception', $this->sut->missingKeyFormat);
-
-        // Test empty values
-        for($i=0; $i < $this->emptyValuesCount; $i++){
-
-            try {
-                $this->sut->get($this->emptyValues[$i]);
-                $this->exceptionMessage = 'emptyValues did not cause exception';
-            } catch (Throwable $e) {
-                // We expect an exception to happen
-            }
-        }
-
-        try {
-            $this->sut->get("KEY");
-            $this->exceptionMessage = 'KEY did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            $this->sut->get("KEY", "Locales");
-            $this->exceptionMessage = 'KEY Locales did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            $this->sut->get("KEY", "Locales", "Some/path");
-            $this->exceptionMessage = 'KEY Locales Some/path did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        $this->sut->missingKeyFormat = '';
-        try {
-            $this->sut->get("KEY");
-            $this->exceptionMessage = 'KEY did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            $this->sut->get("KEY", "Locales");
-            $this->exceptionMessage = 'KEY Locales did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            $this->sut->get("KEY", "Locales", "Some/path");
-            $this->exceptionMessage = 'KEY Locales Some/path did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        $this->sut->missingKeyFormat = '--$key--';
-        try {
-            $this->sut->get("KEY");
-            $this->exceptionMessage = 'KEY did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            $this->sut->get("KEY", "Locales");
-            $this->exceptionMessage = 'KEY Locales did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            $this->sut->get("KEY", "Locales", "Some/path");
-            $this->exceptionMessage = 'KEY Locales Some/path did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        $this->sut->missingKeyFormat = '<$key>';
-        try {
-            $this->sut->get("NON_EXISTANT");
-            $this->exceptionMessage = 'NON_EXISTANT did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            $this->sut->get("NON_EXISTANT", "Nonexistant");
-            $this->exceptionMessage = 'NON_EXISTANT Nonexistant did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            $this->sut->get("NON_EXISTANT", "Nonexistant", "Nonexistant/path");
-            $this->exceptionMessage = 'NON_EXISTANT Nonexistant Nonexistant/path did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-    }
-
-
-    /**
-     * testGet_initialized_missing_values
-     *
-     * @return void
-     */
-    public function testGet_initialized_missing_values(){
-
-        $bundles = [[
-            'path' => $this->basePath.'/test-json/$locale/$bundle.json',
-            'bundles' => ['Locales']
-        ]];
-
-        $this->sut->initialize(new FilesManager(), ['en_US'], $bundles, function($errors){
-
-            // Test missingKeyFormat with $exception wildcard
-            $this->assertSame('$exception', $this->sut->missingKeyFormat);
-
-            try {
-                $this->sut->get("MISSINGKEY");
-                $this->exceptionMessage = 'MISSINGKEY did not cause exception';
-            } catch (Throwable $e) {
-                // We expect an exception to happen
-            }
-
-            try {
-                $this->sut->get("MISSINGKEY", "Locales");
-                $this->exceptionMessage = 'MISSINGKEY Locales did not cause exception';
-            } catch (Throwable $e) {
-                // We expect an exception to happen
-            }
-
-            try {
-                $this->sut->get("MISSINGKEY", "MissingBundle");
-                $this->exceptionMessage = 'MISSINGKEY MissingBundle did not cause exception';
-            } catch (Throwable $e) {
-                // We expect an exception to happen
-            }
-
-            try {
-                $this->sut->get("MISSINGKEY", "Locales", "Some/path");
-                $this->exceptionMessage = 'MISSINGKEY Locales Some/path did not cause exception';
-            } catch (Throwable $e) {
-                // We expect an exception to happen
-            }
-
-            // Test empty missingKeyFormat
-            $this->sut->missingKeyFormat = '';
-            $this->assertSame($this->sut->get("MISSINGKEY"), '');
-            $this->assertSame($this->sut->get("MISSINGKEY", "Locales"), '');
-            $this->assertSame($this->sut->get("MISSINGKEY", "Locales", $this->basePath.'/test-json/$locale/$bundle.json'), '');
-
-            try {
-                $this->sut->get("MISSINGKEY", "MissingBundle");
-                $this->exceptionMessage = 'MISSINGKEY MissingBundle did not cause exception';
-            } catch (Throwable $e) {
-                // We expect an exception to happen
-            }
-
-            try {
-                $this->sut->get("MISSINGKEY", "Locales", "Some/path");
-                $this->exceptionMessage = 'MISSINGKEY Locales Some/path did not cause exception';
-            } catch (Throwable $e) {
-                // We expect an exception to happen
-            }
-
-            // Test missingKeyFormat with some text
-            $this->sut->missingKeyFormat = 'sometext';
-            $this->assertSame($this->sut->get("MISSINGKEY"), 'sometext');
-            $this->assertSame($this->sut->get("MISSINGKEY", "Locales"), 'sometext');
-            $this->assertSame($this->sut->get("MISSINGKEY", "Locales", $this->basePath.'/test-json/$locale/$bundle.json'), 'sometext');
-
-            try {
-                $this->sut->get("MISSINGKEY", "MissingBundle");
-                $this->exceptionMessage = 'MISSINGKEY MissingBundle did not cause exception';
-            } catch (Throwable $e) {
-                // We expect an exception to happen
-            }
-
-            try {
-                $this->sut->get("MISSINGKEY", "Locales", "Some/path");
-                $this->exceptionMessage = 'MISSINGKEY Locales Some/path did not cause exception';
-            } catch (Throwable $e) {
-                // We expect an exception to happen
-            }
-
-            // Test missingKeyFormat with $key wildcard
-            $this->sut->missingKeyFormat = '--$key--';
-            $this->assertSame($this->sut->get("MISSINGKEY"), '--MISSINGKEY--');
-            $this->assertSame($this->sut->get("MISSINGKEY", "Locales"), '--MISSINGKEY--');
-            $this->assertSame($this->sut->get("MISSINGKEY", "Locales", $this->basePath.'/test-json/$locale/$bundle.json'), '--MISSINGKEY--');
-
-            try {
-                $this->sut->get("MISSINGKEY", "MissingBundle");
-                $this->exceptionMessage = 'MISSINGKEY MissingBundle did not cause exception';
-            } catch (Throwable $e) {
-                // We expect an exception to happen
-            }
-
-            try {
-                $this->sut->get("MISSINGKEY", "Locales", "Some/path");
-                $this->exceptionMessage = 'MISSINGKEY Locales Some/path did not cause exception';
-            } catch (Throwable $e) {
-                // We expect an exception to happen
-            }
-
-            $this->sut->missingKeyFormat = '<$key>';
-            $this->assertSame($this->sut->get("MISSINGKEY"), '<MISSINGKEY>');
-            $this->assertSame($this->sut->get("MISSINGKEY", "Locales"), '<MISSINGKEY>');
-            $this->assertSame($this->sut->get("MISSINGKEY", "Locales", $this->basePath.'/test-json/$locale/$bundle.json'), '<MISSINGKEY>');
-
-            try {
-                $this->sut->get("MISSINGKEY", "MissingBundle");
-                $this->exceptionMessage = 'MISSINGKEY MissingBundle did not cause exception';
-            } catch (Throwable $e) {
-                // We expect an exception to happen
-            }
-
-            try {
-                $this->sut->get("MISSINGKEY", "Locales", "Some/path");
-                $this->exceptionMessage = 'MISSINGKEY Locales Some/path did not cause exception';
-            } catch (Throwable $e) {
-                // We expect an exception to happen
-            }
-        });
-    }
-
-
-    /**
-     * testGet_initialized_correct_values_with_single_locale_loaded
-     *
-     * @return void
-     */
-    public function testGet_initialized_correct_values_with_single_locale_loaded(){
-
-        $bundles = [[
-            'path' => $this->basePath.'/test-json/$locale/$bundle.json',
-            'bundles' => ['Locales']
-        ]];
-
-        $this->sut->initialize(new FilesManager(), ['en_US'], $bundles, function($errors){
-
-            $this->assertSame($this->sut->get('TAG_NOT_EXISTING_ON_ES_ES'), 'Missing tag');
-            $this->assertSame($this->sut->get('PASSWORD'), 'Password');
-            $this->assertSame($this->sut->get('USER'), 'User');
-
-            $bundles = [[
-                'path' => $this->basePath.'/test-loadBundles/$locale/$bundle.json',
-                'bundles' => ['Locales', 'MoreLocales']
-            ]];
-
-            $this->sut->initialize(new FilesManager(), ['en_US'], $bundles, function($errors){
-
-                $this->assertSame($this->sut->get('LOGIN', 'Locales'), 'Login');
-                $this->assertSame($this->sut->get('PASSWORD'), 'Password');
-                $this->assertSame($this->sut->get('USER'), 'User');
-
-                $this->assertSame($this->sut->get('SOME_LOCALE', 'MoreLocales'), 'Some locale');
-                $this->assertSame($this->sut->get('SOME_OTHER'), 'Some other');
-            });
-        });
-    }
-
-
-    /**
-     * testGet_initialized_keys_from_another_bundle_fail
-     *
-     * @return void
-     */
-    public function testGet_initialized_keys_from_another_bundle_fail(){
-
-        $bundles = [[
-            'path' => $this->basePath.'/test-loadBundles/$locale/$bundle.json',
-            'bundles' => ['Locales', 'MoreLocales']
-        ]];
-
-        $this->sut->initialize(new FilesManager(), ['en_US'], $bundles, function($errors){
-
-            try {
-                $this->sut->get("LOGIN", "MoreLocales");
-                $this->exceptionMessage = 'LOGIN MoreLocales did not cause exception';
-            } catch (Throwable $e) {
-                // We expect an exception to happen
-            }
-
-            try {
-                $this->sut->get("SOME_OTHER", "Locales");
-                $this->exceptionMessage = 'SOME_OTHER Locales did not cause exception';
-            } catch (Throwable $e) {
-                // We expect an exception to happen
-            }
-        });
-
-        // Dummy assert to avoid phpunit warnings
-        $this->assertTrue(true);
-    }
-
-
-    /**
-     * testGet_initialized_values_for_multiple_locales
-     *
-     * @return void
-     */
-    public function testGet_initialized_values_for_multiple_locales(){
-
-        $bundles = [[
-            'path' => $this->basePath.'/test-json/$locale/$bundle.json',
-            'bundles' => ['Locales']
-        ]];
-
-        $this->sut->initialize(new FilesManager(), ['es_ES', 'en_US'], $bundles, function($errors){
-
-            $this->assertSame($this->sut->get('PASSWORD'), 'Contraseña');
-            $this->assertSame($this->sut->get('TAG_NOT_EXISTING_ON_ES_ES'), 'Missing tag');
-        });
-    }
-
-
-    /**
-     * testGet_initialized_keys_from_multiple_paths_bundles_and_locales
-     *
-     * @return void
-     */
-    public function testGet_initialized_keys_from_multiple_paths_bundles_and_locales(){
-
-        $bundles = [[
-            'path' => $this->basePath.'/test-multiple-paths/path-1/$locale/$bundle.properties',
-            'bundles' => ['bundle1']
-        ],[
-            'path' => $this->basePath.'/test-multiple-paths/path-2/$locale/$bundle.properties',
-            'bundles' => ['bundle1']
-        ],[
-            'path' => $this->basePath.'/test-multiple-paths/path-3/$locale/$bundle.properties',
-            'bundles' => ['bundle1']
-        ]];
-
-        $this->sut->initialize(new FilesManager(), ['es_ES', 'en_US'], $bundles, function($errors){
-
-            $this->assertSame($this->sut->get('PATH_NAME'), 'ruta3');
-            $this->assertSame($this->sut->get('PATH_NAME', 'bundle1'), 'ruta3');
-            $this->assertSame($this->sut->get('PATH_NAME', '', $this->basePath.'/test-multiple-paths/path-2/$locale/$bundle.properties'), 'ruta2');
-            $this->assertSame($this->sut->get('PATH_NAME', 'bundle1', $this->basePath.'/test-multiple-paths/path-2/$locale/$bundle.properties'), 'ruta2');
-            $this->assertSame($this->sut->get('PATH_NAME'), 'ruta2');
-
-            $this->assertSame($this->sut->get('NOT_ON_ES'), 'not on es 2');
-            $this->assertSame($this->sut->get('NOT_ON_ES', 'bundle1'), 'not on es 2');
-            $this->assertSame($this->sut->get('NOT_ON_ES', '', $this->basePath.'/test-multiple-paths/path-1/$locale/$bundle.properties'), 'not on es 1');
-            $this->assertSame($this->sut->get('NOT_ON_ES', 'bundle1'), 'not on es 1');
-        });
-    }
-
-
-    /**
      * testLocales
      *
      * @return void
@@ -1414,6 +1054,366 @@ class LocalizationManagerTest extends TestCase {
 
 
     /**
+     * testGet_non_initialized
+     *
+     * @return void
+     */
+    public function testGet_non_initialized(){
+
+        $this->assertSame('$exception', $this->sut->missingKeyFormat);
+
+        // Test empty values
+        for($i=0; $i < $this->emptyValuesCount; $i++){
+
+            try {
+                $this->sut->get($this->emptyValues[$i]);
+                $this->exceptionMessage = 'emptyValues did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+        }
+
+        try {
+            $this->sut->get("KEY");
+            $this->exceptionMessage = 'KEY did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            $this->sut->get("KEY", "Locales");
+            $this->exceptionMessage = 'KEY Locales did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            $this->sut->get("KEY", "Locales", "Some/path");
+            $this->exceptionMessage = 'KEY Locales Some/path did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        $this->sut->missingKeyFormat = '';
+        try {
+            $this->sut->get("KEY");
+            $this->exceptionMessage = 'KEY did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            $this->sut->get("KEY", "Locales");
+            $this->exceptionMessage = 'KEY Locales did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            $this->sut->get("KEY", "Locales", "Some/path");
+            $this->exceptionMessage = 'KEY Locales Some/path did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        $this->sut->missingKeyFormat = '--$key--';
+        try {
+            $this->sut->get("KEY");
+            $this->exceptionMessage = 'KEY did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            $this->sut->get("KEY", "Locales");
+            $this->exceptionMessage = 'KEY Locales did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            $this->sut->get("KEY", "Locales", "Some/path");
+            $this->exceptionMessage = 'KEY Locales Some/path did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        $this->sut->missingKeyFormat = '<$key>';
+        try {
+            $this->sut->get("NON_EXISTANT");
+            $this->exceptionMessage = 'NON_EXISTANT did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            $this->sut->get("NON_EXISTANT", "Nonexistant");
+            $this->exceptionMessage = 'NON_EXISTANT Nonexistant did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            $this->sut->get("NON_EXISTANT", "Nonexistant", "Nonexistant/path");
+            $this->exceptionMessage = 'NON_EXISTANT Nonexistant Nonexistant/path did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+    }
+
+
+    /**
+     * testGet_initialized_missing_values
+     *
+     * @return void
+     */
+    public function testGet_initialized_missing_values(){
+
+        $bundles = [[
+            'path' => $this->basePath.'/test-json/$locale/$bundle.json',
+            'bundles' => ['Locales']
+        ]];
+
+        $this->sut->initialize(new FilesManager(), ['en_US'], $bundles, function($errors){
+
+            // Test missingKeyFormat with $exception wildcard
+            $this->assertSame('$exception', $this->sut->missingKeyFormat);
+
+            try {
+                $this->sut->get("MISSINGKEY");
+                $this->exceptionMessage = 'MISSINGKEY did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            try {
+                $this->sut->get("MISSINGKEY", "Locales");
+                $this->exceptionMessage = 'MISSINGKEY Locales did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            try {
+                $this->sut->get("MISSINGKEY", "MissingBundle");
+                $this->exceptionMessage = 'MISSINGKEY MissingBundle did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            try {
+                $this->sut->get("MISSINGKEY", "Locales", "Some/path");
+                $this->exceptionMessage = 'MISSINGKEY Locales Some/path did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            // Test empty missingKeyFormat
+            $this->sut->missingKeyFormat = '';
+            $this->assertSame($this->sut->get("MISSINGKEY"), '');
+            $this->assertSame($this->sut->get("MISSINGKEY", "Locales"), '');
+            $this->assertSame($this->sut->get("MISSINGKEY", "Locales", $this->basePath.'/test-json/$locale/$bundle.json'), '');
+
+            try {
+                $this->sut->get("MISSINGKEY", "MissingBundle");
+                $this->exceptionMessage = 'MISSINGKEY MissingBundle did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            try {
+                $this->sut->get("MISSINGKEY", "Locales", "Some/path");
+                $this->exceptionMessage = 'MISSINGKEY Locales Some/path did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            // Test missingKeyFormat with some text
+            $this->sut->missingKeyFormat = 'sometext';
+            $this->assertSame($this->sut->get("MISSINGKEY"), 'sometext');
+            $this->assertSame($this->sut->get("MISSINGKEY", "Locales"), 'sometext');
+            $this->assertSame($this->sut->get("MISSINGKEY", "Locales", $this->basePath.'/test-json/$locale/$bundle.json'), 'sometext');
+
+            try {
+                $this->sut->get("MISSINGKEY", "MissingBundle");
+                $this->exceptionMessage = 'MISSINGKEY MissingBundle did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            try {
+                $this->sut->get("MISSINGKEY", "Locales", "Some/path");
+                $this->exceptionMessage = 'MISSINGKEY Locales Some/path did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            // Test missingKeyFormat with $key wildcard
+            $this->sut->missingKeyFormat = '--$key--';
+            $this->assertSame($this->sut->get("MISSINGKEY"), '--MISSINGKEY--');
+            $this->assertSame($this->sut->get("MISSINGKEY", "Locales"), '--MISSINGKEY--');
+            $this->assertSame($this->sut->get("MISSINGKEY", "Locales", $this->basePath.'/test-json/$locale/$bundle.json'), '--MISSINGKEY--');
+
+            try {
+                $this->sut->get("MISSINGKEY", "MissingBundle");
+                $this->exceptionMessage = 'MISSINGKEY MissingBundle did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            try {
+                $this->sut->get("MISSINGKEY", "Locales", "Some/path");
+                $this->exceptionMessage = 'MISSINGKEY Locales Some/path did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            $this->sut->missingKeyFormat = '<$key>';
+            $this->assertSame($this->sut->get("MISSINGKEY"), '<MISSINGKEY>');
+            $this->assertSame($this->sut->get("MISSINGKEY", "Locales"), '<MISSINGKEY>');
+            $this->assertSame($this->sut->get("MISSINGKEY", "Locales", $this->basePath.'/test-json/$locale/$bundle.json'), '<MISSINGKEY>');
+
+            try {
+                $this->sut->get("MISSINGKEY", "MissingBundle");
+                $this->exceptionMessage = 'MISSINGKEY MissingBundle did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            try {
+                $this->sut->get("MISSINGKEY", "Locales", "Some/path");
+                $this->exceptionMessage = 'MISSINGKEY Locales Some/path did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+        });
+    }
+
+
+    /**
+     * testGet_initialized_correct_values_with_single_locale_loaded
+     *
+     * @return void
+     */
+    public function testGet_initialized_correct_values_with_single_locale_loaded(){
+
+        $bundles = [[
+            'path' => $this->basePath.'/test-json/$locale/$bundle.json',
+            'bundles' => ['Locales']
+        ]];
+
+        $this->sut->initialize(new FilesManager(), ['en_US'], $bundles, function($errors){
+
+            $this->assertSame($this->sut->get('TAG_NOT_EXISTING_ON_ES_ES'), 'Missing tag');
+            $this->assertSame($this->sut->get('PASSWORD'), 'Password');
+            $this->assertSame($this->sut->get('USER'), 'User');
+
+            $bundles = [[
+                'path' => $this->basePath.'/test-loadBundles/$locale/$bundle.json',
+                'bundles' => ['Locales', 'MoreLocales']
+            ]];
+
+            $this->sut->initialize(new FilesManager(), ['en_US'], $bundles, function($errors){
+
+                $this->assertSame($this->sut->get('LOGIN', 'Locales'), 'Login');
+                $this->assertSame($this->sut->get('PASSWORD'), 'Password');
+                $this->assertSame($this->sut->get('USER'), 'User');
+
+                $this->assertSame($this->sut->get('SOME_LOCALE', 'MoreLocales'), 'Some locale');
+                $this->assertSame($this->sut->get('SOME_OTHER'), 'Some other');
+            });
+        });
+    }
+
+
+    /**
+     * testGet_initialized_keys_from_another_bundle_fail
+     *
+     * @return void
+     */
+    public function testGet_initialized_keys_from_another_bundle_fail(){
+
+        $bundles = [[
+            'path' => $this->basePath.'/test-loadBundles/$locale/$bundle.json',
+            'bundles' => ['Locales', 'MoreLocales']
+        ]];
+
+        $this->sut->initialize(new FilesManager(), ['en_US'], $bundles, function($errors){
+
+            try {
+                $this->sut->get("LOGIN", "MoreLocales");
+                $this->exceptionMessage = 'LOGIN MoreLocales did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            try {
+                $this->sut->get("SOME_OTHER", "Locales");
+                $this->exceptionMessage = 'SOME_OTHER Locales did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+        });
+
+            // Dummy assert to avoid phpunit warnings
+            $this->assertTrue(true);
+    }
+
+
+    /**
+     * testGet_initialized_values_for_multiple_locales
+     *
+     * @return void
+     */
+    public function testGet_initialized_values_for_multiple_locales(){
+
+        $bundles = [[
+            'path' => $this->basePath.'/test-json/$locale/$bundle.json',
+            'bundles' => ['Locales']
+        ]];
+
+        $this->sut->initialize(new FilesManager(), ['es_ES', 'en_US'], $bundles, function($errors){
+
+            $this->assertSame($this->sut->get('PASSWORD'), 'Contraseña');
+            $this->assertSame($this->sut->get('TAG_NOT_EXISTING_ON_ES_ES'), 'Missing tag');
+        });
+    }
+
+
+    /**
+     * testGet_initialized_keys_from_multiple_paths_bundles_and_locales
+     *
+     * @return void
+     */
+    public function testGet_initialized_keys_from_multiple_paths_bundles_and_locales(){
+
+        $bundles = [[
+            'path' => $this->basePath.'/test-multiple-paths/path-1/$locale/$bundle.properties',
+            'bundles' => ['bundle1']
+        ],[
+            'path' => $this->basePath.'/test-multiple-paths/path-2/$locale/$bundle.properties',
+            'bundles' => ['bundle1']
+        ],[
+            'path' => $this->basePath.'/test-multiple-paths/path-3/$locale/$bundle.properties',
+            'bundles' => ['bundle1']
+        ]];
+
+        $this->sut->initialize(new FilesManager(), ['es_ES', 'en_US'], $bundles, function($errors){
+
+            $this->assertSame($this->sut->get('PATH_NAME'), 'ruta3');
+            $this->assertSame($this->sut->get('PATH_NAME', 'bundle1'), 'ruta3');
+            $this->assertSame($this->sut->get('PATH_NAME', '', $this->basePath.'/test-multiple-paths/path-2/$locale/$bundle.properties'), 'ruta2');
+            $this->assertSame($this->sut->get('PATH_NAME', 'bundle1', $this->basePath.'/test-multiple-paths/path-2/$locale/$bundle.properties'), 'ruta2');
+            $this->assertSame($this->sut->get('PATH_NAME'), 'ruta2');
+
+            $this->assertSame($this->sut->get('NOT_ON_ES'), 'not on es 2');
+            $this->assertSame($this->sut->get('NOT_ON_ES', 'bundle1'), 'not on es 2');
+            $this->assertSame($this->sut->get('NOT_ON_ES', '', $this->basePath.'/test-multiple-paths/path-1/$locale/$bundle.properties'), 'not on es 1');
+            $this->assertSame($this->sut->get('NOT_ON_ES', 'bundle1'), 'not on es 1');
+        });
+    }
+
+
+    /**
      * testGetStartCase
      *
      * @return void
@@ -1695,6 +1695,103 @@ class LocalizationManagerTest extends TestCase {
             $this->assertSame($this->sut->get('NOT_TO_BE_FOUND'), '');
             $this->assertSame($this->sut->get('NOT_TO_BE_FOUND', 'Locales'), '');
             $this->assertSame($this->sut->get('NOT_TO_BE_FOUND', 'Locales', $this->basePath.'/test-properties/$locale/$bundle.properties'), '');
+        });
+    }
+
+
+    /**
+     * test_get_with_wildcards
+     *
+     * @return void
+     */
+    public function test_get_with_wildcards(){
+
+        $bundles = [[
+            'path' => $this->basePath.'/test-get-with-wildcards/$locale/$bundle.properties',
+            'bundles' => ['Locales']
+        ]];
+
+        $this->sut->initialize(new FilesManager(), ['en_US', 'es_ES'], $bundles, function($errors){
+
+            $this->assertSame($this->sut->get('TAG_1'), 'this has no wildcards');
+            $this->assertSame($this->sut->get('TAG_1', '', '', []), 'this has no wildcards');
+            $this->assertSame($this->sut->get('TAG_1', '', '', ['test']), 'this has no wildcards');
+            $this->assertSame($this->sut->get('TAG_1', '', '', 'noreplacethis'), 'this has no wildcards');
+
+            $this->sut->setPrimaryLocale('es_ES');
+            $this->assertSame($this->sut->locales(), ['es_ES', 'en_US']);
+
+            $this->assertSame($this->sut->get('TAG_1'), 'ésta no tiene wildcards');
+            $this->assertSame($this->sut->get('TAG_1', '', '', []), 'ésta no tiene wildcards');
+            $this->assertSame($this->sut->get('TAG_1', '', '', ['test']), 'ésta no tiene wildcards');
+            $this->assertSame($this->sut->get('TAG_1', '', '', 'noreplacethis'), 'ésta no tiene wildcards');
+
+            $this->sut->setPrimaryLocale('en_US');
+            $this->assertSame($this->sut->locales(), ['en_US', 'es_ES']);
+
+            $this->assertSame($this->sut->get('TAG_2'), 'this has {0}');
+            $this->assertSame($this->sut->get('TAG_2', '', '', []), 'this has {0}');
+            $this->assertSame($this->sut->get('TAG_2', '', '', ['replace']), 'this has replace');
+            $this->assertSame($this->sut->get('TAG_2', '', '', ['1', '2', '3']), 'this has 1');
+
+            $this->sut->setPrimaryLocale('es_ES');
+            $this->assertSame($this->sut->locales(), ['es_ES', 'en_US']);
+
+            $this->assertSame($this->sut->get('TAG_2'), 'ésta tiene {0}');
+            $this->assertSame($this->sut->get('TAG_2', '', '', []), 'ésta tiene {0}');
+            $this->assertSame($this->sut->get('TAG_2', '', '', ['replace']), 'ésta tiene replace');
+            $this->assertSame($this->sut->get('TAG_2', '', '', ['1', '2', '3']), 'ésta tiene 1');
+
+            $this->sut->setPrimaryLocale('en_US');
+            $this->assertSame($this->sut->locales(), ['en_US', 'es_ES']);
+
+            $this->assertSame($this->sut->get('TAG_3'), 'this has {0} {1} {2}');
+            $this->assertSame($this->sut->get('TAG_3', '', '', []), 'this has {0} {1} {2}');
+            $this->assertSame($this->sut->get('TAG_3', '', '', ['replace']), 'this has replace {1} {2}');
+            $this->assertSame($this->sut->get('TAG_3', '', '', ['replace', 'replace']), 'this has replace replace {2}');
+            $this->assertSame($this->sut->get('TAG_3', '', '', ['1', '2', '3']), 'this has 1 2 3');
+            $this->assertSame($this->sut->get('TAG_3', '', '', ['1', '2', '3', '4']), 'this has 1 2 3');
+            $this->assertSame($this->sut->get('TAG_3', '', '', ['1', '', '3']), 'this has 1  3');
+
+            $this->assertSame($this->sut->get('TAG_4'), 'some $2 custom $0 format $1');
+            $this->assertSame($this->sut->get('TAG_4', '', '', ['1', '2', '3']), 'some $2 custom $0 format $1');
+            $this->assertSame($this->sut->get('TAG_4', '', '', ['1', '2', '3', '4']), 'some $2 custom $0 format $1');
+
+            $this->sut->wildCardsFormat = '$N';
+            $this->assertSame($this->sut->get('TAG_4'), 'some $2 custom $0 format $1');
+            $this->assertSame($this->sut->get('TAG_4', '', '', []), 'some $2 custom $0 format $1');
+            $this->assertSame($this->sut->get('TAG_4', '', '', ['a']), 'some $2 custom a format $1');
+            $this->assertSame($this->sut->get('TAG_4', '', '', ['a', 'b']), 'some $2 custom a format b');
+            $this->assertSame($this->sut->get('TAG_4', '', '', ['a', 'b', 'c']), 'some c custom a format b');
+            $this->assertSame($this->sut->get('TAG_4', '', '', ['a', 'b', 'c', 'd']), 'some c custom a format b');
+            $this->assertSame($this->sut->get('TAG_4', '', '', ['a', '', 'c']), 'some c custom a format ');
+
+            $this->sut->setPrimaryLocale('es_ES');
+            $this->assertSame($this->sut->locales(), ['es_ES', 'en_US']);
+
+            $this->assertSame($this->sut->get('TAG_4'), 'algun $2 personalizado $0 formato $1');
+            $this->assertSame($this->sut->get('TAG_4', '', '', []), 'algun $2 personalizado $0 formato $1');
+            $this->assertSame($this->sut->get('TAG_4', '', '', ['a']), 'algun $2 personalizado a formato $1');
+            $this->assertSame($this->sut->get('TAG_4', '', '', ['a', 'b']), 'algun $2 personalizado a formato b');
+            $this->assertSame($this->sut->get('TAG_4', '', '', ['a', 'b', 'c']), 'algun c personalizado a formato b');
+            $this->assertSame($this->sut->get('TAG_4', '', '', ['a', 'b', 'c', 'd']), 'algun c personalizado a formato b');
+            $this->assertSame($this->sut->get('TAG_4', '', '', ['a', '', 'c']), 'algun c personalizado a formato ');
+
+            $this->sut->setPrimaryLocale('en_US');
+            $this->assertSame($this->sut->locales(), ['en_US', 'es_ES']);
+
+            $this->assertSame($this->sut->get('TAG_5'), 'missing _1_ wildcard _3_ indices _5_');
+            $this->assertSame($this->sut->get('TAG_5', '', '', ['1', '2', '3']), 'missing _1_ wildcard _3_ indices _5_');
+            $this->assertSame($this->sut->get('TAG_5', '', '', ['1', '2', '3', '4']), 'missing _1_ wildcard _3_ indices _5_');
+
+            $this->sut->wildCardsFormat = '_N_';
+            $this->assertSame($this->sut->get('TAG_5'), 'missing _1_ wildcard _3_ indices _5_');
+            $this->assertSame($this->sut->get('TAG_5', '', '', []), 'missing _1_ wildcard _3_ indices _5_');
+            $this->assertSame($this->sut->get('TAG_5', '', '', ['a']), 'missing _1_ wildcard _3_ indices _5_');
+            $this->assertSame($this->sut->get('TAG_5', '', '', ['a', 'b']), 'missing b wildcard _3_ indices _5_');
+            $this->assertSame($this->sut->get('TAG_5', '', '', ['a', 'b', 'c']), 'missing b wildcard _3_ indices _5_');
+            $this->assertSame($this->sut->get('TAG_5', '', '', ['a', 'b', 'c', 'd']), 'missing b wildcard d indices _5_');
+            $this->assertSame($this->sut->get('TAG_5', '', '', ['a', '', 'c', 'd', 'e', 'f', 'g']), 'missing  wildcard d indices f');
         });
     }
 }
