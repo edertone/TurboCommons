@@ -197,6 +197,44 @@ class ValidationManagerTest extends TestCase {
 	    $this->assertTrue(!$this->validationManager->isTrue(false, 'false error 2'));
 	    $this->assertTrue($this->validationManager->getLastMessage() === 'false error 2');
 	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
+
+	    // Test valid values on different tags
+	    $this->validationManager->reset();
+	    $this->assertTrue($this->validationManager->isTrue(true, 'no error', 'tag1'));
+	    $this->assertTrue($this->validationManager->isTrue(true, 'no error', 'tag2'));
+	    $this->assertTrue($this->validationManager->ok());
+	    $this->assertTrue($this->validationManager->ok('tag1'));
+	    $this->assertTrue($this->validationManager->ok('tag2'));
+
+	    // Test invalid values on different tags
+	    $this->validationManager->reset();
+	    $this->assertTrue(!$this->validationManager->isTrue(false, 'error', 'tag1'));
+	    $this->assertTrue(!$this->validationManager->isTrue(false, 'error', 'tag2'));
+	    $this->assertTrue(!$this->validationManager->ok());
+	    $this->assertTrue(!$this->validationManager->ok('tag1'));
+	    $this->assertTrue(!$this->validationManager->ok('tag2'));
+
+	    // Test valid and invalid values on different tags
+	    $this->validationManager->reset();
+	    $this->assertTrue($this->validationManager->isTrue(true, 'no error', 'tag1'));
+	    $this->assertTrue(!$this->validationManager->isTrue(false, 'error', 'tag2'));
+	    $this->assertTrue(!$this->validationManager->ok());
+	    $this->assertTrue($this->validationManager->ok('tag1'));
+	    $this->assertTrue(!$this->validationManager->ok('tag2'));
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
+	    $this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::OK);
+	    $this->assertTrue($this->validationManager->getStatus('tag2') === ValidationManager::ERROR);
+
+	    // Test valid and invalid sequentially on the same tag
+	    $this->validationManager->reset();
+	    $this->assertTrue($this->validationManager->isTrue(true, 'no error', 'tag1'));
+	    $this->assertTrue($this->validationManager->ok());
+	    $this->assertTrue($this->validationManager->ok('tag1'));
+	    $this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::OK);
+	    $this->assertTrue(!$this->validationManager->isTrue(false, 'error', 'tag1'));
+	    $this->assertTrue(!$this->validationManager->ok());
+	    $this->assertTrue(!$this->validationManager->ok('tag1'));
+	    $this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::ERROR);
 	}
 
 
@@ -241,6 +279,44 @@ class ValidationManagerTest extends TestCase {
 	    $this->assertTrue(!$this->validationManager->isBoolean('asdf', 'error 2'));
 	    $this->assertTrue($this->validationManager->getLastMessage() === 'error 2');
 	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
+
+	    // Test valid values on different tags
+	    $this->validationManager->reset();
+	    $this->assertTrue($this->validationManager->isBoolean(true, 'no error', 'tag1'));
+	    $this->assertTrue($this->validationManager->isBoolean(false, 'no error', 'tag2'));
+	    $this->assertTrue($this->validationManager->ok());
+	    $this->assertTrue($this->validationManager->ok('tag1'));
+	    $this->assertTrue($this->validationManager->ok('tag2'));
+
+	    // Test invalid values on different tags
+	    $this->validationManager->reset();
+	    $this->assertTrue(!$this->validationManager->isBoolean('hello', 'error', 'tag1'));
+	    $this->assertTrue(!$this->validationManager->isBoolean('hello', 'error', 'tag2'));
+	    $this->assertTrue(!$this->validationManager->ok());
+	    $this->assertTrue(!$this->validationManager->ok('tag1'));
+	    $this->assertTrue(!$this->validationManager->ok('tag2'));
+
+	    // Test valid and invalid values on different tags
+	    $this->validationManager->reset();
+	    $this->assertTrue($this->validationManager->isBoolean(true, 'no error', 'tag1'));
+	    $this->assertTrue(!$this->validationManager->isBoolean('hello', 'error', 'tag2'));
+	    $this->assertTrue(!$this->validationManager->ok());
+	    $this->assertTrue($this->validationManager->ok('tag1'));
+	    $this->assertTrue(!$this->validationManager->ok('tag2'));
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
+	    $this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::OK);
+	    $this->assertTrue($this->validationManager->getStatus('tag2') === ValidationManager::ERROR);
+
+	    // Test valid and invalid sequentially on the same tag
+	    $this->validationManager->reset();
+	    $this->assertTrue($this->validationManager->isBoolean(true, 'no error', 'tag1'));
+	    $this->assertTrue($this->validationManager->ok());
+	    $this->assertTrue($this->validationManager->ok('tag1'));
+	    $this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::OK);
+	    $this->assertTrue(!$this->validationManager->isBoolean('hello', 'error', 'tag1'));
+	    $this->assertTrue(!$this->validationManager->ok());
+	    $this->assertTrue(!$this->validationManager->ok('tag1'));
+	    $this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::ERROR);
 	}
 
 
@@ -299,6 +375,44 @@ class ValidationManagerTest extends TestCase {
 	    $this->assertFalse($this->validationManager->isNumeric('hello', 'numeric error 2'));
 	    $this->assertTrue($this->validationManager->getLastMessage() === 'numeric error 2');
 	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
+
+	    // Test valid values on different tags
+	    $this->validationManager->reset();
+	    $this->assertTrue($this->validationManager->isNumeric(1, 'no error', 'tag1'));
+	    $this->assertTrue($this->validationManager->isNumeric('1', 'no error', 'tag2'));
+	    $this->assertTrue($this->validationManager->ok());
+	    $this->assertTrue($this->validationManager->ok('tag1'));
+	    $this->assertTrue($this->validationManager->ok('tag2'));
+
+	    // Test invalid values on different tags
+	    $this->validationManager->reset();
+	    $this->assertTrue(!$this->validationManager->isNumeric('hello', 'error', 'tag1'));
+	    $this->assertTrue(!$this->validationManager->isNumeric(['a'], 'error', 'tag2'));
+	    $this->assertTrue(!$this->validationManager->ok());
+	    $this->assertTrue(!$this->validationManager->ok('tag1'));
+	    $this->assertTrue(!$this->validationManager->ok('tag2'));
+
+	    // Test valid and invalid values on different tags
+	    $this->validationManager->reset();
+	    $this->assertTrue($this->validationManager->isNumeric(4.4, 'no error', 'tag1'));
+	    $this->assertTrue(!$this->validationManager->isNumeric('hello', 'error', 'tag2'));
+	    $this->assertTrue(!$this->validationManager->ok());
+	    $this->assertTrue($this->validationManager->ok('tag1'));
+	    $this->assertTrue(!$this->validationManager->ok('tag2'));
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
+	    $this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::OK);
+	    $this->assertTrue($this->validationManager->getStatus('tag2') === ValidationManager::ERROR);
+
+	    // Test valid and invalid sequentially on the same tag
+	    $this->validationManager->reset();
+	    $this->assertTrue($this->validationManager->isNumeric(1, 'no error', 'tag1'));
+	    $this->assertTrue($this->validationManager->ok());
+	    $this->assertTrue($this->validationManager->ok('tag1'));
+	    $this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::OK);
+	    $this->assertTrue(!$this->validationManager->isNumeric('hello', 'error', 'tag1'));
+	    $this->assertTrue(!$this->validationManager->ok());
+	    $this->assertTrue(!$this->validationManager->ok('tag1'));
+	    $this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::ERROR);
 	}
 
 
@@ -349,6 +463,57 @@ class ValidationManagerTest extends TestCase {
 
 		$this->validationManager->reset();
 		$this->assertTrue($this->validationManager->getStatus() === ValidationManager::OK);
+
+		// Test valid values on different tags
+		$this->validationManager->reset();
+		$this->assertTrue($this->validationManager->isString('a', 'no error', 'tag1'));
+		$this->assertTrue($this->validationManager->isString('1', 'no error', 'tag2'));
+		$this->assertTrue($this->validationManager->ok());
+		$this->assertTrue($this->validationManager->ok('tag1'));
+		$this->assertTrue($this->validationManager->ok('tag2'));
+
+		// Test invalid values on different tags
+		$this->validationManager->reset();
+		$this->assertTrue(!$this->validationManager->isString(1, 'error', 'tag1'));
+		$this->assertTrue(!$this->validationManager->isString(['a'], 'error', 'tag2'));
+		$this->assertTrue(!$this->validationManager->ok());
+		$this->assertTrue(!$this->validationManager->ok('tag1'));
+		$this->assertTrue(!$this->validationManager->ok('tag2'));
+
+		// Test valid and invalid values on different tags
+		$this->validationManager->reset();
+		$this->assertTrue($this->validationManager->isString('1', 'no error', 'tag1'));
+		$this->assertTrue(!$this->validationManager->isString(0, 'error', 'tag2'));
+		$this->assertTrue(!$this->validationManager->ok());
+		$this->assertTrue($this->validationManager->ok('tag1'));
+		$this->assertTrue(!$this->validationManager->ok('tag2'));
+		$this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
+		$this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::OK);
+		$this->assertTrue($this->validationManager->getStatus('tag2') === ValidationManager::ERROR);
+
+		// Test valid and invalid sequentially on the same tag
+		$this->validationManager->reset();
+		$this->assertTrue($this->validationManager->isString('1', 'no error', 'tag1'));
+		$this->assertTrue($this->validationManager->ok());
+		$this->assertTrue($this->validationManager->ok('tag1'));
+		$this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::OK);
+		$this->assertTrue(!$this->validationManager->isString([1], 'error', 'tag1'));
+		$this->assertTrue(!$this->validationManager->ok());
+		$this->assertTrue(!$this->validationManager->ok('tag1'));
+		$this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::ERROR);
+
+		// Test mixed validations with several tags
+		$this->validationManager->reset();
+		$this->assertTrue($this->validationManager->isTrue(true, 'no error', 'tag1'));
+		$this->assertTrue($this->validationManager->isString('string', 'no error', 'tag1'));
+		$this->assertTrue($this->validationManager->ok());
+		$this->assertTrue($this->validationManager->ok('tag1'));
+		$this->assertTrue(!$this->validationManager->isNumeric('a', 'non numeric error', 'tag1'));
+		$this->assertTrue(!$this->validationManager->ok());
+		$this->assertTrue(!$this->validationManager->ok('tag1'));
+		$this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::ERROR);
+		$this->assertTrue($this->validationManager->isTrue(true, 'no error', 'tag1'));
+		$this->assertTrue($this->validationManager->isString('string', 'no error', 'tag1'));
 	}
 
 
@@ -394,6 +559,44 @@ class ValidationManagerTest extends TestCase {
 		} catch (Throwable $e) {
 			// We expect an exception to happen
 		}
+
+		// Test valid values on different tags
+		$this->validationManager->reset();
+		$this->assertTrue($this->validationManager->isUrl('http://google.com', 'no error', 'tag1'));
+		$this->assertTrue($this->validationManager->isUrl('http://google.com', 'no error', 'tag2'));
+		$this->assertTrue($this->validationManager->ok());
+		$this->assertTrue($this->validationManager->ok('tag1'));
+		$this->assertTrue($this->validationManager->ok('tag2'));
+
+		// Test invalid values on different tags
+		$this->validationManager->reset();
+		$this->assertTrue(!$this->validationManager->isUrl('1', 'error', 'tag1'));
+		$this->assertTrue(!$this->validationManager->isUrl('a', 'error', 'tag2'));
+		$this->assertTrue(!$this->validationManager->ok());
+		$this->assertTrue(!$this->validationManager->ok('tag1'));
+		$this->assertTrue(!$this->validationManager->ok('tag2'));
+
+		// Test valid and invalid values on different tags
+		$this->validationManager->reset();
+		$this->assertTrue($this->validationManager->isUrl('http://google.com', 'no error', 'tag1'));
+		$this->assertTrue(!$this->validationManager->isUrl('0', 'error', 'tag2'));
+		$this->assertTrue(!$this->validationManager->ok());
+		$this->assertTrue($this->validationManager->ok('tag1'));
+		$this->assertTrue(!$this->validationManager->ok('tag2'));
+		$this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
+		$this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::OK);
+		$this->assertTrue($this->validationManager->getStatus('tag2') === ValidationManager::ERROR);
+
+		// Test valid and invalid sequentially on the same tag
+		$this->validationManager->reset();
+		$this->assertTrue($this->validationManager->isUrl('http://google.com', 'no error', 'tag1'));
+		$this->assertTrue($this->validationManager->ok());
+		$this->assertTrue($this->validationManager->ok('tag1'));
+		$this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::OK);
+		$this->assertTrue(!$this->validationManager->isUrl('1', 'error', 'tag1'));
+		$this->assertTrue(!$this->validationManager->ok());
+		$this->assertTrue(!$this->validationManager->ok('tag1'));
+		$this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::ERROR);
 	}
 
 
@@ -421,6 +624,44 @@ class ValidationManagerTest extends TestCase {
 
 		$this->validationManager->reset();
 		$this->assertTrue($this->validationManager->getStatus() === ValidationManager::OK);
+
+		// Test valid values on different tags
+		$this->validationManager->reset();
+		$this->assertTrue($this->validationManager->isArray(['a', 1], 'no error', 'tag1'));
+		$this->assertTrue($this->validationManager->isArray(['a', 1], 'no error', 'tag2'));
+		$this->assertTrue($this->validationManager->ok());
+		$this->assertTrue($this->validationManager->ok('tag1'));
+		$this->assertTrue($this->validationManager->ok('tag2'));
+
+		// Test invalid values on different tags
+		$this->validationManager->reset();
+		$this->assertTrue(!$this->validationManager->isArray(1, 'error', 'tag1'));
+		$this->assertTrue(!$this->validationManager->isArray('a', 'error', 'tag2'));
+		$this->assertTrue(!$this->validationManager->ok());
+		$this->assertTrue(!$this->validationManager->ok('tag1'));
+		$this->assertTrue(!$this->validationManager->ok('tag2'));
+
+		// Test valid and invalid values on different tags
+		$this->validationManager->reset();
+		$this->assertTrue($this->validationManager->isArray(['a', 1], 'no error', 'tag1'));
+		$this->assertTrue(!$this->validationManager->isArray('0', 'error', 'tag2'));
+		$this->assertTrue(!$this->validationManager->ok());
+		$this->assertTrue($this->validationManager->ok('tag1'));
+		$this->assertTrue(!$this->validationManager->ok('tag2'));
+		$this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
+		$this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::OK);
+		$this->assertTrue($this->validationManager->getStatus('tag2') === ValidationManager::ERROR);
+
+		// Test valid and invalid sequentially on the same tag
+		$this->validationManager->reset();
+		$this->assertTrue($this->validationManager->isArray(['a', 1], 'no error', 'tag1'));
+		$this->assertTrue($this->validationManager->ok());
+		$this->assertTrue($this->validationManager->ok('tag1'));
+		$this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::OK);
+		$this->assertTrue(!$this->validationManager->isArray(1, 'error', 'tag1'));
+		$this->assertTrue(!$this->validationManager->ok());
+		$this->assertTrue(!$this->validationManager->ok('tag1'));
+		$this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::ERROR);
 	}
 
 
@@ -467,6 +708,44 @@ class ValidationManagerTest extends TestCase {
 
 		$this->validationManager->reset();
 		$this->assertTrue($this->validationManager->getStatus() === ValidationManager::OK);
+
+		// Test valid values on different tags
+		$this->validationManager->reset();
+		$this->assertTrue($this->validationManager->isObject((object)['a' => 1], 'no error', 'tag1'));
+		$this->assertTrue($this->validationManager->isObject((object)['a' => 2], 'no error', 'tag2'));
+		$this->assertTrue($this->validationManager->ok());
+		$this->assertTrue($this->validationManager->ok('tag1'));
+		$this->assertTrue($this->validationManager->ok('tag2'));
+
+		// Test invalid values on different tags
+		$this->validationManager->reset();
+		$this->assertTrue(!$this->validationManager->isObject(1, 'error', 'tag1'));
+		$this->assertTrue(!$this->validationManager->isObject('a', 'error', 'tag2'));
+		$this->assertTrue(!$this->validationManager->ok());
+		$this->assertTrue(!$this->validationManager->ok('tag1'));
+		$this->assertTrue(!$this->validationManager->ok('tag2'));
+
+		// Test valid and invalid values on different tags
+		$this->validationManager->reset();
+		$this->assertTrue($this->validationManager->isObject((object)['a' => 1], 'no error', 'tag1'));
+		$this->assertTrue(!$this->validationManager->isObject('0', 'error', 'tag2'));
+		$this->assertTrue(!$this->validationManager->ok());
+		$this->assertTrue($this->validationManager->ok('tag1'));
+		$this->assertTrue(!$this->validationManager->ok('tag2'));
+		$this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
+		$this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::OK);
+		$this->assertTrue($this->validationManager->getStatus('tag2') === ValidationManager::ERROR);
+
+		// Test valid and invalid sequentially on the same tag
+		$this->validationManager->reset();
+		$this->assertTrue($this->validationManager->isObject((object)['a' => 1], 'no error', 'tag1'));
+		$this->assertTrue($this->validationManager->ok());
+		$this->assertTrue($this->validationManager->ok('tag1'));
+		$this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::OK);
+		$this->assertTrue(!$this->validationManager->isObject(1, 'error', 'tag1'));
+		$this->assertTrue(!$this->validationManager->ok());
+		$this->assertTrue(!$this->validationManager->ok('tag1'));
+		$this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::ERROR);
 	}
 
 
@@ -525,6 +804,44 @@ class ValidationManagerTest extends TestCase {
 	    } catch (Throwable $e) {
 	        // We expect an exception to happen
 	    }
+
+	    // Test valid values on different tags
+	    $this->validationManager->reset();
+	    $this->assertTrue($this->validationManager->isFilledIn('hello', [], 'no error', 'tag1'));
+	    $this->assertTrue($this->validationManager->isFilledIn('hello', [], 'no error', 'tag2'));
+	    $this->assertTrue($this->validationManager->ok());
+	    $this->assertTrue($this->validationManager->ok('tag1'));
+	    $this->assertTrue($this->validationManager->ok('tag2'));
+
+	    // Test invalid values on different tags
+	    $this->validationManager->reset();
+	    $this->assertTrue(!$this->validationManager->isFilledIn(' ', [], 'error', 'tag1'));
+	    $this->assertTrue(!$this->validationManager->isFilledIn('  ', [], 'error', 'tag2'));
+	    $this->assertTrue(!$this->validationManager->ok());
+	    $this->assertTrue(!$this->validationManager->ok('tag1'));
+	    $this->assertTrue(!$this->validationManager->ok('tag2'));
+
+	    // Test valid and invalid values on different tags
+	    $this->validationManager->reset();
+	    $this->assertTrue($this->validationManager->isFilledIn('hello', [], 'no error', 'tag1'));
+	    $this->assertTrue(!$this->validationManager->isFilledIn('  ', [], 'error', 'tag2'));
+	    $this->assertTrue(!$this->validationManager->ok());
+	    $this->assertTrue($this->validationManager->ok('tag1'));
+	    $this->assertTrue(!$this->validationManager->ok('tag2'));
+	    $this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
+	    $this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::OK);
+	    $this->assertTrue($this->validationManager->getStatus('tag2') === ValidationManager::ERROR);
+
+	    // Test valid and invalid sequentially on the same tag
+	    $this->validationManager->reset();
+	    $this->assertTrue($this->validationManager->isFilledIn('hello', [], 'no error', 'tag1'));
+	    $this->assertTrue($this->validationManager->ok());
+	    $this->assertTrue($this->validationManager->ok('tag1'));
+	    $this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::OK);
+	    $this->assertTrue(!$this->validationManager->isFilledIn('         ', [], 'error', 'tag1'));
+	    $this->assertTrue(!$this->validationManager->ok());
+	    $this->assertTrue(!$this->validationManager->ok('tag1'));
+	    $this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::ERROR);
 	}
 
 
@@ -584,6 +901,47 @@ class ValidationManagerTest extends TestCase {
 				'c' => 1,
 				'b' => 3
 		])));
+
+		// Test valid values on different tags
+		$this->validationManager->reset();
+		$this->assertTrue($this->validationManager->isEqualTo('hello', 'hello', 'no error', 'tag1'));
+		$this->assertTrue($this->validationManager->isEqualTo('hello', 'hello', 'no error', 'tag2'));
+		$this->assertTrue($this->validationManager->ok());
+		$this->assertTrue($this->validationManager->ok('tag1'));
+		$this->assertTrue($this->validationManager->ok('tag2'));
+
+		// Test invalid values on different tags
+		$this->validationManager->reset();
+		$this->assertTrue(!$this->validationManager->isEqualTo('hello', 'hello1', 'error', 'tag1'));
+		$this->assertTrue(!$this->validationManager->isEqualTo('hello', 'hello2', 'error', 'tag2'));
+		$this->assertTrue(!$this->validationManager->ok());
+		$this->assertTrue(!$this->validationManager->ok('tag1'));
+		$this->assertTrue(!$this->validationManager->ok('tag2'));
+
+		// Test valid and invalid values on different tags
+		$this->validationManager->reset();
+		$this->assertTrue($this->validationManager->isEqualTo('hello', 'hello', 'no error', 'tag1'));
+		$this->assertTrue(!$this->validationManager->isEqualTo('hello', 'hello1', 'error', 'tag2'));
+		$this->assertTrue(!$this->validationManager->ok());
+		$this->assertTrue($this->validationManager->ok('tag1'));
+		$this->assertTrue(!$this->validationManager->ok('tag2'));
+		$this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
+		$this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::OK);
+		$this->assertTrue($this->validationManager->getStatus('tag2') === ValidationManager::ERROR);
+
+		// Test valid and invalid sequentially on the same tag
+		$this->validationManager->reset();
+		$this->assertTrue($this->validationManager->isEqualTo('hello', 'hello', 'no error', 'tag1'));
+		$this->assertTrue($this->validationManager->ok());
+		$this->assertTrue($this->validationManager->ok('tag1'));
+		$this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::OK);
+		$this->assertTrue(!$this->validationManager->isEqualTo('hello', 'hello2', 'error', 'tag1'));
+		$this->assertTrue(!$this->validationManager->ok());
+		$this->assertTrue(!$this->validationManager->ok('tag1'));
+		$this->assertTrue($this->validationManager->getStatus('tag1') === ValidationManager::ERROR);
 	}
+
+
+	//TODO - Add all missing tests
 }
 ?>

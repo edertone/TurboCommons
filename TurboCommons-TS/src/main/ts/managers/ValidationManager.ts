@@ -188,14 +188,14 @@ export class ValidationManager{
      *
      * @param value A boolean expression to validate
      * @param errorMessage The error message that will be generated if validation fails
-     * @param tag We can define a tag name to group the validation results. We can use this tag later to filter validation state
+     * @param tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
      * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
      *
      * @return False in case the validation fails or true if validation succeeds.
      */
-    isTrue(value:any, errorMessage = 'value is not true', tag:string = '', isWarning = false){
+    isTrue(value:any, errorMessage = 'value is not true', tags:string|string[] = '', isWarning = false){
 
-        return this._updateValidationStatus(value === true, errorMessage, tag, isWarning);
+        return this._updateValidationStatus(value === true, errorMessage, tags, isWarning);
     }
     
     
@@ -204,14 +204,14 @@ export class ValidationManager{
      *
      * @param value The boolean to validate
      * @param errorMessage The error message that will be generated if validation fails
+     * @param tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
      * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
-     * @param tag We can define a tag name to group the validation results. We can use this tag later to filter validation state
      * 
      * @return False in case the validation fails or true if validation succeeds.
      */
-    isBoolean(value:any, errorMessage = 'value is not a boolean', tag:string = '', isWarning = false){
+    isBoolean(value:any, errorMessage = 'value is not a boolean', tags:string|string[] = '', isWarning = false){
 
-        return this._updateValidationStatus((typeof (value) === 'boolean'), errorMessage, tag, isWarning);
+        return this._updateValidationStatus((typeof (value) === 'boolean'), errorMessage, tags, isWarning);
     }
     
     
@@ -220,14 +220,14 @@ export class ValidationManager{
      *
      * @param value The number to validate
      * @param errorMessage The error message that will be generated if validation fails
-     * @param tag We can define a tag name to group the validation results. We can use this tag later to filter validation state
+     * @param tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
      * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
      *
      * @return False in case the validation fails or true if validation succeeds.
      */
-    isNumeric(value:any, errorMessage = 'value is not a number', tag:string = '', isWarning = false){
+    isNumeric(value:any, errorMessage = 'value is not a number', tags:string|string[] = '', isWarning = false){
 
-        return this._updateValidationStatus(NumericUtils.isNumeric(value), errorMessage, tag, isWarning);
+        return this._updateValidationStatus(NumericUtils.isNumeric(value), errorMessage, tags, isWarning);
     }
     
     
@@ -238,15 +238,15 @@ export class ValidationManager{
      * @param min The minimum accepted value (included)
      * @param max The maximum accepted value (included)
      * @param errorMessage The error message that will be generated if validation fails
-     * @param tag We can define a tag name to group the validation results. We can use this tag later to filter validation state
+     * @param tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
      * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
      *
      * @return False in case the validation fails or true if validation succeeds.
      */
-    isNumericBetween(value:any, min:number, max:number, errorMessage = 'value is not between min and max', tag:string = '', isWarning = false){
+    isNumericBetween(value:any, min:number, max:number, errorMessage = 'value is not between min and max', tags:string|string[] = '', isWarning = false){
         
         return this._updateValidationStatus(NumericUtils.isNumeric(value) && value >= min && value <= max,
-                errorMessage, tag, isWarning);
+                errorMessage, tags, isWarning);
     }
     
     
@@ -255,14 +255,14 @@ export class ValidationManager{
      *
      * @param $value The element to validate
      * @param errorMessage The error message that will be generated if validation fails
-     * @param tag We can define a tag name to group the validation results. We can use this tag later to filter validation state
+     * @param tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
      * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
      *
      * @return False in case the validation fails or true if validation succeeds.
      */
-    isString(value:any, errorMessage = 'value is not a string', tag:string = '', isWarning = false){
+    isString(value:any, errorMessage = 'value is not a string', tags:string|string[] = '', isWarning = false){
 
-        return this._updateValidationStatus(StringUtils.isString(value), errorMessage, tag, isWarning);
+        return this._updateValidationStatus(StringUtils.isString(value), errorMessage, tags, isWarning);
     }
             
             
@@ -271,14 +271,14 @@ export class ValidationManager{
      *
      * @param value The element to validate
      * @param errorMessage The error message that will be generated if validation fails
-     * @param tag We can define a tag name to group the validation results. We can use this tag later to filter validation state
+     * @param tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
      * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
      *
      * @return False in case the validation fails or true if validation succeeds.
      */
-    isUrl(value:any, errorMessage = 'value is not an URL', tag:string = '', isWarning = false){
+    isUrl(value:any, errorMessage = 'value is not an URL', tags:string|string[] = '', isWarning = false){
 
-        return this._updateValidationStatus(StringUtils.isUrl(value), errorMessage, tag, isWarning);
+        return this._updateValidationStatus(StringUtils.isUrl(value), errorMessage, tags, isWarning);
     }
     
     
@@ -287,14 +287,14 @@ export class ValidationManager{
      *
      * @param value The array to validate
      * @param errorMessage The error message that will be generated if validation fails
-     * @param tag We can define a tag name to group the validation results. We can use this tag later to filter validation state
+     * @param tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
      * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
      *
      * @return False in case the validation fails or true if validation succeeds.
      */
-    isArray(value:any, errorMessage = 'value is not an array', tag:string = '', isWarning = false){
+    isArray(value:any, errorMessage = 'value is not an array', tags:string|string[] = '', isWarning = false){
 
-        return this._updateValidationStatus(ArrayUtils.isArray(value), errorMessage, tag, isWarning);
+        return this._updateValidationStatus(ArrayUtils.isArray(value), errorMessage, tags, isWarning);
     }
     
     
@@ -303,14 +303,14 @@ export class ValidationManager{
      *
      * @param value The object to validate
      * @param errorMessage The error message that will be generated if validation fails
-     * @param tag We can define a tag name to group the validation results. We can use this tag later to filter validation state
+     * @param tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
      * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
      *
      * @return False in case the validation fails or true if validation succeeds.
      */
-    isObject(value:any, errorMessage = 'value is not an object', tag:string = '', isWarning = false){
+    isObject(value:any, errorMessage = 'value is not an object', tags:string|string[] = '', isWarning = false){
 
-        return this._updateValidationStatus(ObjectUtils.isObject(value), errorMessage, tag, isWarning);
+        return this._updateValidationStatus(ObjectUtils.isObject(value), errorMessage, tags, isWarning);
     }
     
     
@@ -321,16 +321,16 @@ export class ValidationManager{
      * @param value A text that must not be empty.
      * @param emptyChars Optional array containing a list of string values that will be considered as empty for the given string. This can be useful in some cases when we want to consider a string like 'NULL' as an empty string.
      * @param errorMessage The error message that will be generated if validation fails
-     * @param tag We can define a tag name to group the validation results. We can use this tag later to filter validation state
+     * @param tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
      * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
      *
      * @see Stringutils.isEmpty
      *
      * @return False in case the validation fails or true if validation succeeds.
      */
-    isFilledIn(value:any, emptyChars = [], errorMessage = 'value is required', tag:string = '', isWarning = false){
+    isFilledIn(value:any, emptyChars = [], errorMessage = 'value is required', tags:string|string[] = '', isWarning = false){
 
-        return this._updateValidationStatus(!StringUtils.isEmpty(value, emptyChars), errorMessage, tag, isWarning);
+        return this._updateValidationStatus(!StringUtils.isEmpty(value, emptyChars), errorMessage, tags, isWarning);
     }
             
     
@@ -354,12 +354,12 @@ export class ValidationManager{
      * @param value First of the two objects to compare. Almost any type can be provided: ints, strings, arrays...
      * @param value2 Second of the two objects to compare. Almost any type can be provided: ints, strings, arrays...
      * @param errorMessage The error message that will be generated if validation fails
-     * @param tag We can define a tag name to group the validation results. We can use this tag later to filter validation state
+     * @param tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
      * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
      *
      * @return False in case the validation fails or true if validation succeeds.
      */
-    isEqualTo(value:any, value2:any, errorMessage = 'values are not equal', tag:string = '', isWarning = false){
+    isEqualTo(value:any, value2:any, errorMessage = 'values are not equal', tags:string|string[] = '', isWarning = false){
 
         let res = false;
 
@@ -383,7 +383,7 @@ export class ValidationManager{
             }
         }
 
-        return this._updateValidationStatus(res, errorMessage, tag, isWarning);
+        return this._updateValidationStatus(res, errorMessage, tags, isWarning);
     }
     
     
@@ -403,6 +403,13 @@ export class ValidationManager{
     
     isMinimumLength(string:string):boolean {
     
+        // TODO
+        return false;
+    }
+    
+    
+    isMaximumLength(string:string):boolean {
+        
         // TODO
         return false;
     }
@@ -450,46 +457,56 @@ export class ValidationManager{
      *
      * @param result the result of the validation
      * @param errorMessage The error message that's been generated from a previously executed validation method
-     * @param tag The tag that has been defiend for the validation value
+     * @param tags The tag or list of tags that have been defiend for the validation value
      * @param isWarning Tells if the validation fail will be processed as a validation error or a validation warning
      *
      * @return True if received errorMessage was '' (validation passed) or false if some error message was received (validation failed)
      */
-    private _updateValidationStatus(result:boolean, errorMessage: string, tag:string, isWarning: boolean){
+    private _updateValidationStatus(result:boolean, errorMessage: string, tags:string|string[] = '', isWarning: boolean){
         
         if(!result){
             
-            // If specified tag does not exist, we will create it
-            let tagFound = false;
+            // If specified tags do not exist, we will create them
+            let tagsList = StringUtils.isString(tags) ? [tags] : tags;
             
-            for (let status of this._validationStatus) {
+            for (let t of tagsList) {
+	
+                let tagFound = false;
                 
-                if(status.tag === tag){
+                for (let status of this._validationStatus) {
                     
-                    tagFound = true;
-                    break;
+                    if(status.tag === t){
+                        
+                        tagFound = true;
+                        break;
+                    }
+                }
+                
+                if(!tagFound){
+                    
+                    this._validationStatus.push({
+                        tag: String(t),
+                        status: ValidationManager.OK
+                    });
                 }
             }
             
-            if(!tagFound){
-                
-                this._validationStatus.push({
-                    tag: tag,
-                    status: ValidationManager.OK
-                });
-            }
+            // We must find the specified tags and change their validation status
+            for (let t of tagsList) {
             
-            // We must find the specified tag and change its validation status
-            for (let i = 0; i < this._validationStatus.length; i++) {
-	
-                if(this._validationStatus[i].tag === tag){
+                for (let i = 0; i < this._validationStatus.length; i++) {
                     
-                    this._failedMessages.push({tag: tag, message: errorMessage});
+                    if(this._validationStatus[i].tag === t){
+                        
+                        this._failedMessages.push({tag: t, message: errorMessage});
 
-                    this._validationStatus[i].status =
-                        (isWarning && this._validationStatus[i].status != ValidationManager.ERROR) ?
-                            ValidationManager.WARNING :
-                            ValidationManager.ERROR;
+                        this._validationStatus[i].status =
+                            (isWarning && this._validationStatus[i].status != ValidationManager.ERROR) ?
+                                ValidationManager.WARNING :
+                                ValidationManager.ERROR;
+                        
+                        break;
+                    }
                 }
             }
         }

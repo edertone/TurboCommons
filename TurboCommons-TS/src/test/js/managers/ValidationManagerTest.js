@@ -135,6 +135,44 @@ QUnit.test("isTrue", function(assert) {
     assert.ok(!validationManager.isTrue(false, 'false error 2'));
     assert.ok(validationManager.getLastMessage() === 'false error 2');
     assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
+    
+    // Test valid values on different tags
+    validationManager.reset();
+    assert.ok(validationManager.isTrue(true, 'no error', 'tag1'));
+    assert.ok(validationManager.isTrue(true, 'no error', 'tag2'));
+    assert.ok(validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(validationManager.ok('tag2'));
+
+    // Test invalid values on different tags
+    validationManager.reset();
+    assert.ok(!validationManager.isTrue(false, 'error', 'tag1'));
+    assert.ok(!validationManager.isTrue(false, 'error', 'tag2'));
+    assert.ok(!validationManager.ok());
+    assert.ok(!validationManager.ok('tag1'));
+    assert.ok(!validationManager.ok('tag2'));
+    
+    // Test valid and invalid values on different tags
+    validationManager.reset();
+    assert.ok(validationManager.isTrue(true, 'no error', 'tag1'));
+    assert.ok(!validationManager.isTrue(false, 'error', 'tag2'));
+    assert.ok(!validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(!validationManager.ok('tag2')); 
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.OK);
+    assert.ok(validationManager.getStatus('tag2') === ValidationManager.ERROR);
+    
+    // Test valid and invalid sequentially on the same tag
+    validationManager.reset();
+    assert.ok(validationManager.isTrue(true, 'no error', 'tag1'));
+    assert.ok(validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.OK);
+    assert.ok(!validationManager.isTrue(false, 'error', 'tag1'));
+    assert.ok(!validationManager.ok());
+    assert.ok(!validationManager.ok('tag1'));
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.ERROR);
 });
 
 
@@ -178,6 +216,44 @@ QUnit.test("isBoolean", function(assert) {
     assert.ok(!validationManager.isBoolean('asdf', 'error 2'));
     assert.ok(validationManager.getLastMessage() === 'error 2');
     assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
+    
+    // Test valid values on different tags
+    validationManager.reset();
+    assert.ok(validationManager.isBoolean(true, 'no error', 'tag1'));
+    assert.ok(validationManager.isBoolean(false, 'no error', 'tag2'));
+    assert.ok(validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(validationManager.ok('tag2'));
+
+    // Test invalid values on different tags
+    validationManager.reset();
+    assert.ok(!validationManager.isBoolean('hello', 'error', 'tag1'));
+    assert.ok(!validationManager.isBoolean('hello', 'error', 'tag2'));
+    assert.ok(!validationManager.ok());
+    assert.ok(!validationManager.ok('tag1'));
+    assert.ok(!validationManager.ok('tag2'));
+    
+    // Test valid and invalid values on different tags
+    validationManager.reset();
+    assert.ok(validationManager.isBoolean(true, 'no error', 'tag1'));
+    assert.ok(!validationManager.isBoolean('hello', 'error', 'tag2'));
+    assert.ok(!validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(!validationManager.ok('tag2')); 
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.OK);
+    assert.ok(validationManager.getStatus('tag2') === ValidationManager.ERROR);
+    
+    // Test valid and invalid sequentially on the same tag
+    validationManager.reset();
+    assert.ok(validationManager.isBoolean(true, 'no error', 'tag1'));
+    assert.ok(validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.OK);
+    assert.ok(!validationManager.isBoolean('hello', 'error', 'tag1'));
+    assert.ok(!validationManager.ok());
+    assert.ok(!validationManager.ok('tag1'));
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.ERROR);
 });
 
 
@@ -235,6 +311,44 @@ QUnit.test("isNumeric", function(assert) {
     assert.notOk(validationManager.isNumeric('hello', 'numeric error 2'));
     assert.ok(validationManager.getLastMessage() === 'numeric error 2');
     assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
+    
+    // Test valid values on different tags
+    validationManager.reset();
+    assert.ok(validationManager.isNumeric(1, 'no error', 'tag1'));
+    assert.ok(validationManager.isNumeric('1', 'no error', 'tag2'));
+    assert.ok(validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(validationManager.ok('tag2'));
+
+    // Test invalid values on different tags
+    validationManager.reset();
+    assert.ok(!validationManager.isNumeric('hello', 'error', 'tag1'));
+    assert.ok(!validationManager.isNumeric(['a'], 'error', 'tag2'));
+    assert.ok(!validationManager.ok());
+    assert.ok(!validationManager.ok('tag1'));
+    assert.ok(!validationManager.ok('tag2'));
+    
+    // Test valid and invalid values on different tags
+    validationManager.reset();
+    assert.ok(validationManager.isNumeric(4.4, 'no error', 'tag1'));
+    assert.ok(!validationManager.isNumeric('hello', 'error', 'tag2'));
+    assert.ok(!validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(!validationManager.ok('tag2')); 
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.OK);
+    assert.ok(validationManager.getStatus('tag2') === ValidationManager.ERROR);
+    
+    // Test valid and invalid sequentially on the same tag
+    validationManager.reset();
+    assert.ok(validationManager.isNumeric(1, 'no error', 'tag1'));
+    assert.ok(validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.OK);
+    assert.ok(!validationManager.isNumeric('hello', 'error', 'tag1'));
+    assert.ok(!validationManager.ok());
+    assert.ok(!validationManager.ok('tag1'));
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.ERROR);
 });
 
 
@@ -281,6 +395,57 @@ QUnit.test("isString", function(assert) {
 
     validationManager.reset();
     assert.ok(validationManager.getStatus() === ValidationManager.OK);
+    
+    // Test valid values on different tags
+    validationManager.reset();
+    assert.ok(validationManager.isString('a', 'no error', 'tag1'));
+    assert.ok(validationManager.isString('1', 'no error', 'tag2'));
+    assert.ok(validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(validationManager.ok('tag2'));
+
+    // Test invalid values on different tags
+    validationManager.reset();
+    assert.ok(!validationManager.isString(1, 'error', 'tag1'));
+    assert.ok(!validationManager.isString(['a'], 'error', 'tag2'));
+    assert.ok(!validationManager.ok());
+    assert.ok(!validationManager.ok('tag1'));
+    assert.ok(!validationManager.ok('tag2'));
+    
+    // Test valid and invalid values on different tags
+    validationManager.reset();
+    assert.ok(validationManager.isString('1', 'no error', 'tag1'));
+    assert.ok(!validationManager.isString(0, 'error', 'tag2'));
+    assert.ok(!validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(!validationManager.ok('tag2')); 
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.OK);
+    assert.ok(validationManager.getStatus('tag2') === ValidationManager.ERROR);
+    
+    // Test valid and invalid sequentially on the same tag
+    validationManager.reset();
+    assert.ok(validationManager.isString('1', 'no error', 'tag1'));
+    assert.ok(validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.OK);
+    assert.ok(!validationManager.isString([1], 'error', 'tag1'));
+    assert.ok(!validationManager.ok());
+    assert.ok(!validationManager.ok('tag1'));
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.ERROR);
+    
+    // Test mixed validations with several tags
+    validationManager.reset();
+    assert.ok(validationManager.isTrue(true, 'no error', 'tag1'));
+    assert.ok(validationManager.isString('string', 'no error', 'tag1'));
+    assert.ok(validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(!validationManager.isNumeric('a', 'non numeric error', 'tag1'));
+    assert.ok(!validationManager.ok());
+    assert.ok(!validationManager.ok('tag1'));
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.ERROR);
+    assert.ok(validationManager.isTrue(true, 'no error', 'tag1'));
+    assert.ok(validationManager.isString('string', 'no error', 'tag1'));
 });
 
 
@@ -320,6 +485,44 @@ QUnit.test("isUrl", function(assert) {
 
         validationManager.isUrl(12341);
     });
+    
+    // Test valid values on different tags
+    validationManager.reset();
+    assert.ok(validationManager.isUrl('http://google.com', 'no error', 'tag1'));
+    assert.ok(validationManager.isUrl('http://google.com', 'no error', 'tag2'));
+    assert.ok(validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(validationManager.ok('tag2'));
+
+    // Test invalid values on different tags
+    validationManager.reset();
+    assert.ok(!validationManager.isUrl('1', 'error', 'tag1'));
+    assert.ok(!validationManager.isUrl('a', 'error', 'tag2'));
+    assert.ok(!validationManager.ok());
+    assert.ok(!validationManager.ok('tag1'));
+    assert.ok(!validationManager.ok('tag2'));
+    
+    // Test valid and invalid values on different tags
+    validationManager.reset();
+    assert.ok(validationManager.isUrl('http://google.com', 'no error', 'tag1'));
+    assert.ok(!validationManager.isUrl('0', 'error', 'tag2'));
+    assert.ok(!validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(!validationManager.ok('tag2')); 
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.OK);
+    assert.ok(validationManager.getStatus('tag2') === ValidationManager.ERROR);
+    
+    // Test valid and invalid sequentially on the same tag
+    validationManager.reset();
+    assert.ok(validationManager.isUrl('http://google.com', 'no error', 'tag1'));
+    assert.ok(validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.OK);
+    assert.ok(!validationManager.isUrl('1', 'error', 'tag1'));
+    assert.ok(!validationManager.ok());
+    assert.ok(!validationManager.ok('tag1'));
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.ERROR);
 });
 
 
@@ -346,6 +549,44 @@ QUnit.test("isArray", function(assert) {
 
     validationManager.reset();
     assert.ok(validationManager.getStatus() === ValidationManager.OK);
+    
+    // Test valid values on different tags
+    validationManager.reset();
+    assert.ok(validationManager.isArray(['a', 1], 'no error', 'tag1'));
+    assert.ok(validationManager.isArray(['a', 1], 'no error', 'tag2'));
+    assert.ok(validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(validationManager.ok('tag2'));
+
+    // Test invalid values on different tags
+    validationManager.reset();
+    assert.ok(!validationManager.isArray(1, 'error', 'tag1'));
+    assert.ok(!validationManager.isArray('a', 'error', 'tag2'));
+    assert.ok(!validationManager.ok());
+    assert.ok(!validationManager.ok('tag1'));
+    assert.ok(!validationManager.ok('tag2'));
+    
+    // Test valid and invalid values on different tags
+    validationManager.reset();
+    assert.ok(validationManager.isArray(['a', 1], 'no error', 'tag1'));
+    assert.ok(!validationManager.isArray('0', 'error', 'tag2'));
+    assert.ok(!validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(!validationManager.ok('tag2')); 
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.OK);
+    assert.ok(validationManager.getStatus('tag2') === ValidationManager.ERROR);
+    
+    // Test valid and invalid sequentially on the same tag
+    validationManager.reset();
+    assert.ok(validationManager.isArray(['a', 1], 'no error', 'tag1'));
+    assert.ok(validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.OK);
+    assert.ok(!validationManager.isArray(1, 'error', 'tag1'));
+    assert.ok(!validationManager.ok());
+    assert.ok(!validationManager.ok('tag1'));
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.ERROR);
 });
 
 
@@ -390,6 +631,44 @@ QUnit.test("isObject", function(assert) {
 
     validationManager.reset();
     assert.ok(validationManager.getStatus() === ValidationManager.OK);
+    
+    // Test valid values on different tags
+    validationManager.reset();
+    assert.ok(validationManager.isObject({a:1}, 'no error', 'tag1'));
+    assert.ok(validationManager.isObject({a:2}, 'no error', 'tag2'));
+    assert.ok(validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(validationManager.ok('tag2'));
+
+    // Test invalid values on different tags
+    validationManager.reset();
+    assert.ok(!validationManager.isObject(1, 'error', 'tag1'));
+    assert.ok(!validationManager.isObject('a', 'error', 'tag2'));
+    assert.ok(!validationManager.ok());
+    assert.ok(!validationManager.ok('tag1'));
+    assert.ok(!validationManager.ok('tag2'));
+    
+    // Test valid and invalid values on different tags
+    validationManager.reset();
+    assert.ok(validationManager.isObject({a:1}, 'no error', 'tag1'));
+    assert.ok(!validationManager.isObject('0', 'error', 'tag2'));
+    assert.ok(!validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(!validationManager.ok('tag2')); 
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.OK);
+    assert.ok(validationManager.getStatus('tag2') === ValidationManager.ERROR);
+    
+    // Test valid and invalid sequentially on the same tag
+    validationManager.reset();
+    assert.ok(validationManager.isObject({a:1}, 'no error', 'tag1'));
+    assert.ok(validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.OK);
+    assert.ok(!validationManager.isObject(1, 'error', 'tag1'));
+    assert.ok(!validationManager.ok());
+    assert.ok(!validationManager.ok('tag1'));
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.ERROR);
 });
 
 
@@ -425,7 +704,7 @@ QUnit.test("isFilledIn", function(assert) {
     assert.notOk(validationManager.isFilledIn('EMPTY       void   hole    ', ['EMPTY', 'void', 'hole']));
     assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
 
-    // Test non string value gives exception
+    // Test exceptions
     assert.throws(function() {
 
         validationManager.isFilledIn(125);
@@ -439,7 +718,45 @@ QUnit.test("isFilledIn", function(assert) {
     assert.throws(function() {
 
         validationManager.isFilledIn(new Error());
-    });
+    }); 
+    
+    // Test valid values on different tags
+    validationManager.reset();
+    assert.ok(validationManager.isFilledIn('hello', [], 'no error', 'tag1'));
+    assert.ok(validationManager.isFilledIn('hello', [], 'no error', 'tag2'));
+    assert.ok(validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(validationManager.ok('tag2'));
+
+    // Test invalid values on different tags
+    validationManager.reset();
+    assert.ok(!validationManager.isFilledIn(' ', [], 'error', 'tag1'));
+    assert.ok(!validationManager.isFilledIn('  ', [], 'error', 'tag2'));
+    assert.ok(!validationManager.ok());
+    assert.ok(!validationManager.ok('tag1'));
+    assert.ok(!validationManager.ok('tag2'));
+    
+    // Test valid and invalid values on different tags
+    validationManager.reset();
+    assert.ok(validationManager.isFilledIn('hello', [], 'no error', 'tag1'));
+    assert.ok(!validationManager.isFilledIn('  ', [], 'error', 'tag2'));
+    assert.ok(!validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(!validationManager.ok('tag2')); 
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.OK);
+    assert.ok(validationManager.getStatus('tag2') === ValidationManager.ERROR);
+    
+    // Test valid and invalid sequentially on the same tag
+    validationManager.reset();
+    assert.ok(validationManager.isFilledIn('hello', [], 'no error', 'tag1'));
+    assert.ok(validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.OK);
+    assert.ok(!validationManager.isFilledIn('         ', [], 'error', 'tag1'));
+    assert.ok(!validationManager.ok());
+    assert.ok(!validationManager.ok('tag1'));
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.ERROR);
 });
 
 
@@ -511,6 +828,45 @@ QUnit.test("isEqualTo", function(assert) {
             c : 1,
             b : 3
         }));
+    
+    // Test valid values on different tags
+    validationManager.reset();
+    assert.ok(validationManager.isEqualTo('hello', 'hello', 'no error', 'tag1'));
+    assert.ok(validationManager.isEqualTo('hello', 'hello', 'no error', 'tag2'));
+    assert.ok(validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(validationManager.ok('tag2'));
+
+    // Test invalid values on different tags
+    validationManager.reset();
+    assert.ok(!validationManager.isEqualTo('hello', 'hello1', 'error', 'tag1'));
+    assert.ok(!validationManager.isEqualTo('hello', 'hello2', 'error', 'tag2'));
+    assert.ok(!validationManager.ok());
+    assert.ok(!validationManager.ok('tag1'));
+    assert.ok(!validationManager.ok('tag2'));
+    
+    // Test valid and invalid values on different tags
+    validationManager.reset();
+    assert.ok(validationManager.isEqualTo('hello', 'hello', 'no error', 'tag1'));
+    assert.ok(!validationManager.isEqualTo('hello', 'hello1', 'error', 'tag2'));
+    assert.ok(!validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(!validationManager.ok('tag2')); 
+    assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.OK);
+    assert.ok(validationManager.getStatus('tag2') === ValidationManager.ERROR);
+    
+    // Test valid and invalid sequentially on the same tag
+    validationManager.reset();
+    assert.ok(validationManager.isEqualTo('hello', 'hello', 'no error', 'tag1'));
+    assert.ok(validationManager.ok());
+    assert.ok(validationManager.ok('tag1'));
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.OK);
+    assert.ok(!validationManager.isEqualTo('hello', 'hello2', 'error', 'tag1'));
+    assert.ok(!validationManager.ok());
+    assert.ok(!validationManager.ok('tag1'));
+    assert.ok(validationManager.getStatus('tag1') === ValidationManager.ERROR);
 });
+
 
 //TODO - Add all missing tests
