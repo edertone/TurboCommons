@@ -85,16 +85,29 @@ class ValidationManagerTest extends TestCase {
     public function testGetStatus(){
 
         // Test empty values
-        // TODO
+        $this->assertSame($this->validationManager->getStatus(), ValidationManager::OK);
+        $this->assertSame($this->validationManager->getStatus(null), ValidationManager::OK);
+        $this->assertSame($this->validationManager->getStatus([]), ValidationManager::OK);
+        $this->assertSame($this->validationManager->getStatus(''), ValidationManager::OK);
+
+        $this->validationManager->reset();
 
         // Test ok values
-        // TODO
+        $this->assertTrue($this->validationManager->isTrue(true, 'error', 'tag1'));
+        $this->assertSame($this->validationManager->getStatus(), ValidationManager::OK);
+        $this->assertSame($this->validationManager->getStatus('tag1'), ValidationManager::OK);
 
         // Test wrong values
-        // TODO
-
-        // Test exceptions
-        // TODO
+        $this->assertFalse($this->validationManager->isTrue(false, 'error', 'tag1'));
+        $this->assertTrue($this->validationManager->isTrue(true, 'error', 'tag2'));
+        $this->assertFalse($this->validationManager->isTrue(false, 'error', 'tag3', true));
+        $this->assertSame($this->validationManager->getStatus(), ValidationManager::ERROR);
+        $this->assertSame($this->validationManager->getStatus('tag1'), ValidationManager::ERROR);
+        $this->assertSame($this->validationManager->getStatus('tag2'), ValidationManager::OK);
+        $this->assertSame($this->validationManager->getStatus('tag3'), ValidationManager::WARNING);
+        $this->assertSame($this->validationManager->getStatus(['tag2', 'tag3']), ValidationManager::WARNING);
+        $this->assertSame($this->validationManager->getStatus(['tag1', 'tag2']), ValidationManager::ERROR);
+        $this->assertSame($this->validationManager->getStatus(['tag1', 'tag3']), ValidationManager::ERROR);
     }
 
 
@@ -106,16 +119,29 @@ class ValidationManagerTest extends TestCase {
     public function testOk(){
 
         // Test empty values
-        // TODO
+        $this->assertSame($this->validationManager->ok(), true);
+        $this->assertSame($this->validationManager->ok(null), true);
+        $this->assertSame($this->validationManager->ok([]), true);
+        $this->assertSame($this->validationManager->ok(''), true);
+
+        $this->validationManager->reset();
 
         // Test ok values
-        // TODO
+        $this->assertTrue($this->validationManager->isTrue(true, 'error', 'tag1'));
+        $this->assertSame($this->validationManager->ok(), true);
+        $this->assertSame($this->validationManager->ok('tag1'), true);
 
         // Test wrong values
-        // TODO
-
-        // Test exceptions
-        // TODO
+        $this->assertFalse($this->validationManager->isTrue(false, 'error', 'tag1'));
+        $this->assertTrue($this->validationManager->isTrue(true, 'error', 'tag2'));
+        $this->assertFalse($this->validationManager->isTrue(false, 'error', 'tag3', true));
+        $this->assertSame($this->validationManager->ok(), false);
+        $this->assertSame($this->validationManager->ok('tag1'), false);
+        $this->assertSame($this->validationManager->ok('tag2'), true);
+        $this->assertSame($this->validationManager->ok('tag3'), false);
+        $this->assertSame($this->validationManager->ok(['tag2', 'tag3']), false);
+        $this->assertSame($this->validationManager->ok(['tag1', 'tag2']), false);
+        $this->assertSame($this->validationManager->ok(['tag1', 'tag3']), false);
     }
 
 
@@ -127,16 +153,37 @@ class ValidationManagerTest extends TestCase {
     public function testGetFirstMessage(){
 
         // Test empty values
-        // TODO
+        $this->assertSame($this->validationManager->getFirstMessage(), '');
+        $this->assertSame($this->validationManager->getFirstMessage(null), '');
+        $this->assertSame($this->validationManager->getFirstMessage([]), '');
+        $this->assertSame($this->validationManager->getFirstMessage(''), '');
+
+        $this->assertFalse($this->validationManager->isTrue(false, 'error'));
+
+        $this->assertSame($this->validationManager->getFirstMessage(), 'error');
+        $this->assertSame($this->validationManager->getFirstMessage(null), 'error');
+        $this->assertSame($this->validationManager->getFirstMessage([]), 'error');
+        $this->assertSame($this->validationManager->getFirstMessage(''), 'error');
+
+        $this->validationManager->reset();
 
         // Test ok values
-        // TODO
+        $this->assertTrue($this->validationManager->isTrue(true, 'error1', 'tag1'));
+        $this->assertSame($this->validationManager->getFirstMessage(), '');
+        $this->assertSame($this->validationManager->getFirstMessage('tag1'), '');
 
         // Test wrong values
-        // TODO
-
-        // Test exceptions
-        // TODO
+        $this->assertFalse($this->validationManager->isTrue(false, 'error1', 'tag1'));
+        $this->assertTrue($this->validationManager->isTrue(true, 'error2', 'tag2'));
+        $this->assertFalse($this->validationManager->isTrue(false, 'warning3', 'tag3', true));
+        $this->assertSame($this->validationManager->getFirstMessage(), 'error1');
+        $this->assertSame($this->validationManager->getFirstMessage('tag1'), 'error1');
+        $this->assertSame($this->validationManager->getFirstMessage('tag2'), '');
+        $this->assertSame($this->validationManager->getFirstMessage('tag3'), 'warning3');
+        $this->assertSame($this->validationManager->getFirstMessage(['tag2', 'tag3']), 'warning3');
+        $this->assertSame($this->validationManager->getFirstMessage(['tag1', 'tag2']), 'error1');
+        $this->assertSame($this->validationManager->getFirstMessage(['tag1', 'tag3']), 'error1');
+        $this->assertSame($this->validationManager->getFirstMessage(['tag3', 'tag1']), 'error1');
     }
 
 
@@ -148,16 +195,39 @@ class ValidationManagerTest extends TestCase {
     public function testGetLastMessage(){
 
         // Test empty values
-        // TODO
+        $this->assertSame($this->validationManager->getLastMessage(), '');
+        $this->assertSame($this->validationManager->getLastMessage(null), '');
+        $this->assertSame($this->validationManager->getLastMessage([]), '');
+        $this->assertSame($this->validationManager->getLastMessage(''), '');
+
+        $this->assertFalse($this->validationManager->isTrue(false, 'error1'));
+        $this->assertFalse($this->validationManager->isTrue(false, 'error2'));
+        $this->assertFalse($this->validationManager->isTrue(false, 'error3'));
+
+        $this->assertSame($this->validationManager->getLastMessage(), 'error3');
+        $this->assertSame($this->validationManager->getLastMessage(null), 'error3');
+        $this->assertSame($this->validationManager->getLastMessage([]), 'error3');
+        $this->assertSame($this->validationManager->getLastMessage(''), 'error3');
+
+        $this->validationManager->reset();
 
         // Test ok values
-        // TODO
+        $this->assertTrue($this->validationManager->isTrue(true, 'error1', 'tag1'));
+        $this->assertSame($this->validationManager->getLastMessage(), '');
+        $this->assertSame($this->validationManager->getLastMessage('tag1'), '');
 
         // Test wrong values
-        // TODO
-
-        // Test exceptions
-        // TODO
+        $this->assertFalse($this->validationManager->isTrue(false, 'error1', 'tag1'));
+        $this->assertTrue($this->validationManager->isTrue(true, 'error2', 'tag2'));
+        $this->assertFalse($this->validationManager->isTrue(false, 'warning3', 'tag3', true));
+        $this->assertSame($this->validationManager->getLastMessage(), 'warning3');
+        $this->assertSame($this->validationManager->getLastMessage('tag1'), 'error1');
+        $this->assertSame($this->validationManager->getLastMessage('tag2'), '');
+        $this->assertSame($this->validationManager->getLastMessage('tag3'), 'warning3');
+        $this->assertSame($this->validationManager->getLastMessage(['tag2', 'tag3']), 'warning3');
+        $this->assertSame($this->validationManager->getLastMessage(['tag1', 'tag2']), 'error1');
+        $this->assertSame($this->validationManager->getLastMessage(['tag1', 'tag3']), 'warning3');
+        $this->assertSame($this->validationManager->getLastMessage(['tag3', 'tag1']), 'warning3');
     }
 
 

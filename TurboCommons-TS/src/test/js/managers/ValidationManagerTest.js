@@ -27,76 +27,146 @@ QUnit.module("ValidationManagerTest", {
 /**
  * getStatus
  */
-QUnit.todo("getStatus", function(assert) {
+QUnit.test("getStatus", function(assert) {
 
     // Test empty values
-    // TODO
+    assert.strictEqual(validationManager.getStatus(), ValidationManager.OK);
+    assert.strictEqual(validationManager.getStatus(null), ValidationManager.OK);
+    assert.strictEqual(validationManager.getStatus([]), ValidationManager.OK);
+    assert.strictEqual(validationManager.getStatus(''), ValidationManager.OK);
+
+    validationManager.reset();
 
     // Test ok values
-    // TODO
+    assert.ok(validationManager.isTrue(true, 'error', 'tag1'));
+    assert.strictEqual(validationManager.getStatus(), ValidationManager.OK);
+    assert.strictEqual(validationManager.getStatus('tag1'), ValidationManager.OK);
 
     // Test wrong values
-    // TODO
-
-    // Test exceptions
-    // TODO
+    assert.notOk(validationManager.isTrue(false, 'error', 'tag1'));
+    assert.ok(validationManager.isTrue(true, 'error', 'tag2'));
+    assert.notOk(validationManager.isTrue(false, 'error', 'tag3', true));
+    assert.strictEqual(validationManager.getStatus(), ValidationManager.ERROR);
+    assert.strictEqual(validationManager.getStatus('tag1'), ValidationManager.ERROR);
+    assert.strictEqual(validationManager.getStatus('tag2'), ValidationManager.OK);
+    assert.strictEqual(validationManager.getStatus('tag3'), ValidationManager.WARNING);
+    assert.strictEqual(validationManager.getStatus(['tag2', 'tag3']), ValidationManager.WARNING);
+    assert.strictEqual(validationManager.getStatus(['tag1', 'tag2']), ValidationManager.ERROR);
+    assert.strictEqual(validationManager.getStatus(['tag1', 'tag3']), ValidationManager.ERROR);
 });
 
 
 /**
  * ok
  */
-QUnit.todo("ok", function(assert) {
+QUnit.test("ok", function(assert) {
 
     // Test empty values
-    // TODO
+    assert.strictEqual(validationManager.ok(), true);
+    assert.strictEqual(validationManager.ok(null), true);
+    assert.strictEqual(validationManager.ok([]), true);
+    assert.strictEqual(validationManager.ok(''), true);
+
+    validationManager.reset();
 
     // Test ok values
-    // TODO
+    assert.ok(validationManager.isTrue(true, 'error', 'tag1'));
+    assert.strictEqual(validationManager.ok(), true);
+    assert.strictEqual(validationManager.ok('tag1'), true);
 
     // Test wrong values
-    // TODO
-
-    // Test exceptions
-    // TODO
+    assert.notOk(validationManager.isTrue(false, 'error', 'tag1'));
+    assert.ok(validationManager.isTrue(true, 'error', 'tag2'));
+    assert.notOk(validationManager.isTrue(false, 'error', 'tag3', true));
+    assert.strictEqual(validationManager.ok(), false);
+    assert.strictEqual(validationManager.ok('tag1'), false);
+    assert.strictEqual(validationManager.ok('tag2'), true);
+    assert.strictEqual(validationManager.ok('tag3'), false);
+    assert.strictEqual(validationManager.ok(['tag2', 'tag3']), false);
+    assert.strictEqual(validationManager.ok(['tag1', 'tag2']), false);
+    assert.strictEqual(validationManager.ok(['tag1', 'tag3']), false);
 });
 
 
 /**
  * getFirstMessage
  */
-QUnit.todo("getFirstMessage", function(assert) {
+QUnit.test("getFirstMessage", function(assert) {
 
     // Test empty values
-    // TODO
+    assert.strictEqual(validationManager.getFirstMessage(), '');
+    assert.strictEqual(validationManager.getFirstMessage(null), '');
+    assert.strictEqual(validationManager.getFirstMessage([]), '');
+    assert.strictEqual(validationManager.getFirstMessage(''), '');
+    
+    assert.notOk(validationManager.isTrue(false, 'error'));
+    
+    assert.strictEqual(validationManager.getFirstMessage(), 'error');
+    assert.strictEqual(validationManager.getFirstMessage(null), 'error');
+    assert.strictEqual(validationManager.getFirstMessage([]), 'error');
+    assert.strictEqual(validationManager.getFirstMessage(''), 'error');
+    
+    validationManager.reset();
 
     // Test ok values
-    // TODO
+    assert.ok(validationManager.isTrue(true, 'error1', 'tag1'));
+    assert.strictEqual(validationManager.getFirstMessage(), '');
+    assert.strictEqual(validationManager.getFirstMessage('tag1'), '');
 
     // Test wrong values
-    // TODO
-
-    // Test exceptions
-    // TODO
+    assert.notOk(validationManager.isTrue(false, 'error1', 'tag1'));
+    assert.ok(validationManager.isTrue(true, 'error2', 'tag2'));
+    assert.notOk(validationManager.isTrue(false, 'warning3', 'tag3', true));
+    assert.strictEqual(validationManager.getFirstMessage(), 'error1');
+    assert.strictEqual(validationManager.getFirstMessage('tag1'), 'error1');
+    assert.strictEqual(validationManager.getFirstMessage('tag2'), '');
+    assert.strictEqual(validationManager.getFirstMessage('tag3'), 'warning3');
+    assert.strictEqual(validationManager.getFirstMessage(['tag2', 'tag3']), 'warning3');
+    assert.strictEqual(validationManager.getFirstMessage(['tag1', 'tag2']), 'error1');
+    assert.strictEqual(validationManager.getFirstMessage(['tag1', 'tag3']), 'error1');
+    assert.strictEqual(validationManager.getFirstMessage(['tag3', 'tag1']), 'error1');
 });
 
 
 /**
  * getLastMessage
  */
-QUnit.todo("getLastMessage", function(assert) {
+QUnit.test("getLastMessage", function(assert) {
 
     // Test empty values
-    // TODO
+    assert.strictEqual(validationManager.getLastMessage(), '');
+    assert.strictEqual(validationManager.getLastMessage(null), '');
+    assert.strictEqual(validationManager.getLastMessage([]), '');
+    assert.strictEqual(validationManager.getLastMessage(''), '');
+    
+    assert.notOk(validationManager.isTrue(false, 'error1'));
+    assert.notOk(validationManager.isTrue(false, 'error2'));
+    assert.notOk(validationManager.isTrue(false, 'error3'));
+    
+    assert.strictEqual(validationManager.getLastMessage(), 'error3');
+    assert.strictEqual(validationManager.getLastMessage(null), 'error3');
+    assert.strictEqual(validationManager.getLastMessage([]), 'error3');
+    assert.strictEqual(validationManager.getLastMessage(''), 'error3');
+    
+    validationManager.reset();
 
     // Test ok values
-    // TODO
+    assert.ok(validationManager.isTrue(true, 'error1', 'tag1'));
+    assert.strictEqual(validationManager.getLastMessage(), '');
+    assert.strictEqual(validationManager.getLastMessage('tag1'), '');
 
     // Test wrong values
-    // TODO
-
-    // Test exceptions
-    // TODO
+    assert.notOk(validationManager.isTrue(false, 'error1', 'tag1'));
+    assert.ok(validationManager.isTrue(true, 'error2', 'tag2'));
+    assert.notOk(validationManager.isTrue(false, 'warning3', 'tag3', true));
+    assert.strictEqual(validationManager.getLastMessage(), 'warning3');
+    assert.strictEqual(validationManager.getLastMessage('tag1'), 'error1');
+    assert.strictEqual(validationManager.getLastMessage('tag2'), '');
+    assert.strictEqual(validationManager.getLastMessage('tag3'), 'warning3');
+    assert.strictEqual(validationManager.getLastMessage(['tag2', 'tag3']), 'warning3');
+    assert.strictEqual(validationManager.getLastMessage(['tag1', 'tag2']), 'error1');
+    assert.strictEqual(validationManager.getLastMessage(['tag1', 'tag3']), 'warning3');
+    assert.strictEqual(validationManager.getLastMessage(['tag3', 'tag1']), 'warning3');
 });
 
 

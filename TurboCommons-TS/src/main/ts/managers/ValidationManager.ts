@@ -69,55 +69,42 @@ export class ValidationManager{
      * Check the current validation state.
      * Possible return values are ValidationManager.OK, ValidationManager.WARNING or ValidationManager.ERROR
      * 
-     * @param tag If we want to check the validation state for a specific tag, we can set it here. If we want to
+     * @param tags If we want to check the validation state for a specific tag or a list of tags, we can set it here. If we want to
      *        get the global validation state for all the tags we will leave this value empty ''.
      *        
      * @returns ValidationManager.OK, ValidationManager.WARNING or ValidationManager.ERROR 
      */
-    getStatus(tag = ''){
-                
-        if(tag === ''){
+    getStatus(tags:string|string[] = ''){
+    
+        let maxStatus = 0;
         
-            let maxStatus = 0;
-            
-            for (let status of this._validationStatus) {
-            
-                if(status.status > maxStatus){
-                    
-                    maxStatus = status.status;
-                }
-            }
-            
-            return maxStatus;
-            
-        }else{
-            
-            for (let status of this._validationStatus) {
-	
-                if(status.tag === tag){
-                    
-                    return status.status;
-                }
-            }
-        }     
+        let tagsList = ArrayUtils.isArray(tags) ? tags as string[] : [tags as string];
         
-        return 0;
+        for (let status of this._validationStatus) {
+            
+            if((tags === '' || tagsList.indexOf(status.tag) >= 0) &&
+                status.status > maxStatus){
+                    
+                maxStatus = status.status;
+            }
+        }
+        
+        return maxStatus;
     }
     
     
     /**
-     * Provides a way to perform a fast validation check. Will return true if
-     * validation state is ok, or false if validation manager is in a warning or
-     * error state.
+     * Provides a way to perform a fast validation check. Will return true if validation state is ok, or false if validation
+     * manager is in a warning or error state.
      * 
-     * @param tag If we want to check the validation state for a specific tag, we can set it here. If we want to
+     * @param tags If we want to check the validation state for a specific tag or a list of tags, we can set it here. If we want to
      *        get the global validation state for all the tags we will leave this value empty ''.
      * 
      * @return boolean True if status is ok, false if status is warning or error
      */
-    ok(tag = ''){
+    ok(tags:string|string[] = ''){
     
-        return this.getStatus(tag) === ValidationManager.OK;
+        return this.getStatus(tags) === ValidationManager.OK;
     }
     
     
@@ -125,28 +112,25 @@ export class ValidationManager{
      * Find the first error or warning message that happened since the validation manager was instantiated or
      * since the last reset 
      * 
-     * @param tag If we want to filter only the warning / error messages by tag we can set it here. If we want to
+     * @param tag If we want to filter only the warning / error messages by tag or list of tags, we can set it here. If we want to
      *        get the first of all messages, no matter which tag was applied, we will leave this value empty ''.
      *        
      * @return The first error or warning message or empty string if no message exists
      */
-    getFirstMessage(tag = ''){
+    getFirstMessage(tags:string|string[] = ''){
         
-        if(tag === ''){
-            
-            return this._failedMessages[0].message;
-            
-        }else{
-            
-            for (let message of this._failedMessages) {
-    
-                if(message.tag === tag){
-                    
-                    return message.message;
-                }
+        let tagsList = ArrayUtils.isArray(tags) ? tags as string[] : [tags as string];
+
+        for (let message of this._failedMessages) {
+
+            if(tags === '' || tags === null ||
+                (ArrayUtils.isArray(tags) && tags.length === 0) ||
+                tagsList.indexOf(message.tag) >= 0){
+
+                return message.message;
             }
         }
-        
+
         return '';
     }
     
@@ -155,30 +139,25 @@ export class ValidationManager{
      * Find the latest error or warning message that happened since the validation manager was instantiated or
      * since the last reset 
      * 
-     * @param tag If we want to filter only the warning / error messages by tag we can set it here. If we want to
+     * @param tag If we want to filter only the warning / error messages by tag or list of tags, we can set it here. If we want to
      *        get the latest of all messages, no matter which tag was applied, we will leave this value empty ''.
      *        
      * @return The last error or warning message or empty string if no message exists
      */
-    getLastMessage(tag = ''){
+    getLastMessage(tags:string|string[] = ''){
         
-        if(tag === ''){
+        let tagsList = ArrayUtils.isArray(tags) ? tags as string[] : [tags as string];
+
+        for (let i = this._failedMessages.length - 1; i >= 0; i--) {
             
-            return (this._failedMessages.length > 0) ? 
-                    this._failedMessages[this._failedMessages.length - 1].message :
-                    '';
-            
-        }else{
-            
-            for (var i = this._failedMessages.length - 1; i >= 0; i--) {
-	
-                if(this._failedMessages[i].tag === tag){
-                    
-                    return this._failedMessages[i].message;
-                }
+            if(tags === '' || tags === null ||
+                (ArrayUtils.isArray(tags) && tags.length === 0) ||
+                tagsList.indexOf(this._failedMessages[i].tag) >= 0){
+
+                return this._failedMessages[i].message;
             }
         }
-        
+
         return '';
     }
           
@@ -467,7 +446,7 @@ export class ValidationManager{
         if(!result){
             
             // If specified tags do not exist, we will create them
-            let tagsList = StringUtils.isString(tags) ? [tags] : tags;
+            let tagsList = ArrayUtils.isArray(tags) ? tags as string[] : [tags as string];
             
             for (let t of tagsList) {
 	

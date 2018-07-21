@@ -70,39 +70,27 @@ class ValidationManager extends BaseStrictClass{
 	 * Check the current validation state.
 	 * Possible return values are ValidationManager.OK, ValidationManager.WARNING or ValidationManager.ERROR
 	 *
-	 * @param string $tag If we want to check the validation state for a specific tag, we can set it here. If we want to
-	 *        get the global validation state for all the tags we will leave this value empty ''.
-	 *
+	 * @param string|array $tags If we want to check the validation state for a specific tag or a list of tags, we can set it here. If we want to
+     *        get the global validation state for all the tags we will leave this value empty ''.
+     *
 	 * @return int ValidationManager.OK, ValidationManager.WARNING or ValidationManager.ERROR
 	 */
-	public function getStatus(string $tag = ''){
+	public function getStatus($tags = ''){
 
-	    if($tag === ''){
+	    $maxStatus = 0;
 
-	        $maxStatus = 0;
+	    $tagsList = ArrayUtils::isArray($tags) ? $tags : [$tags];
 
-	        foreach ($this->_validationStatus as $status) {
+	    foreach ($this->_validationStatus as $status) {
 
-	            if($status['status'] > $maxStatus){
+	        if(($tags === '' || in_array($status['tag'], $tagsList)) &&
+	            $status['status'] > $maxStatus){
 
 	                $maxStatus = $status['status'];
-	            }
-	        }
-
-	        return $maxStatus;
-
-	    }else{
-
-	        foreach ($this->_validationStatus as $status) {
-
-	            if($status['tag'] === $tag){
-
-	                return $status['status'];
-	            }
 	        }
 	    }
 
-	    return 0;
+	    return $maxStatus;
 	}
 
 
@@ -111,14 +99,14 @@ class ValidationManager extends BaseStrictClass{
 	 * validation state is ok, or false if validation manager is in a warning or
 	 * error state.
 	 *
-	 * @param string $tag If we want to check the validation state for a specific tag, we can set it here. If we want to
-	 *        get the global validation state for all the tags we will leave this value empty ''.
-	 *
+	 * @param string|array $tags If we want to check the validation state for a specific tag or a list of tags, we can set it here. If we want to
+     *        get the global validation state for all the tags we will leave this value empty ''.
+     *
 	 * @return boolean True if status is ok, false if status is warning or error
 	 */
-	public function ok(string $tag = ''){
+	public function ok($tags = ''){
 
-	    return $this->getStatus($tag) === ValidationManager::OK;
+	    return $this->getStatus($tags) === ValidationManager::OK;
 	}
 
 
@@ -126,29 +114,26 @@ class ValidationManager extends BaseStrictClass{
      * Find the first error or warning message that happened since the validation manager was instantiated or
      * since the last reset
      *
-     * @param string $tag If we want to filter only the warning / error messages by tag we can set it here. If we want to
+     * @param string|array $tags If we want to filter only the warning / error messages by tag or list of tags, we can set it here. If we want to
      *        get the first of all messages, no matter which tag was applied, we will leave this value empty ''.
      *
      * @return string The first error or warning message or empty string if no message exists
      */
-	public function getFirstMessage(string $tag = ''){
+	public function getFirstMessage($tags = ''){
 
-	    if($tag === ''){
+	    $tagsList = ArrayUtils::isArray($tags) ? $tags : [$tags];
 
-	        return $this->_failedMessages[0]['message'];
+        foreach ($this->_failedMessages as $message) {
 
-	    }else{
+            if($tags === '' || $tags === null ||
+                (ArrayUtils::isArray($tags) && count($tags) === 0) ||
+                in_array($message['tag'], $tagsList)){
 
-	        foreach ($this->_failedMessages as $message) {
+                return $message['message'];
+            }
+        }
 
-	            if($message['tag'] === $tag){
-
-	                return $message['message'];
-	            }
-	        }
-	    }
-
-	    return '';
+        return '';
 	}
 
 
@@ -156,31 +141,26 @@ class ValidationManager extends BaseStrictClass{
 	 * Find the latest error or warning message that happened since the validation manager was instantiated or
 	 * since the last reset
 	 *
-	 * @param string $tag If we want to filter only the warning / error messages by tag we can set it here. If we want to
-	 *        get the latest of all messages, no matter which tag was applied, we will leave this value empty ''.
-	 *
+	 * @param string|array $tags If we want to filter only the warning / error messages by tag or list of tags, we can set it here. If we want to
+     *        get the latest of all messages, no matter which tag was applied, we will leave this value empty ''.
+     *
 	 * @return string The last error or warning message or empty string if no message exists
 	 */
-	public function getLastMessage(string $tag = ''){
+	public function getLastMessage($tags = ''){
 
-	    if($tag === ''){
+	    $tagsList = ArrayUtils::isArray($tags) ? $tags : [$tags];
 
-	        return (count($this->_failedMessages) > 0) ?
-	           $this->_failedMessages[count($this->_failedMessages) - 1]['message'] :
-	           '';
+        for ($i = count($this->_failedMessages) - 1; $i >= 0; $i--) {
 
-	    }else{
+            if($tags === '' || $tags === null ||
+                (ArrayUtils::isArray($tags) && count($tags) === 0) ||
+                in_array($this->_failedMessages[$i]['tag'], $tagsList)){
 
-	        for ($i = count($this->_failedMessages) - 1; $i >= 0; $i--) {
+                return $this->_failedMessages[$i]['message'];
+            }
+        }
 
-	            if($this->_failedMessages[$i]['tag'] === $tag){
-
-	                return $this->_failedMessages[$i]['message'];
-	            }
-	        }
-	    }
-
-	    return '';
+        return '';
 	}
 
 
@@ -486,7 +466,7 @@ class ValidationManager extends BaseStrictClass{
 	    if(!$result){
 
 	        // If specified tags do not exist, we will create them
-	        $tagsList = StringUtils::isString($tags) ? [$tags] : $tags;
+	        $tagsList = ArrayUtils::isArray($tags) ? $tags : [$tags];
 
 	        foreach ($tagsList as $t) {
 
