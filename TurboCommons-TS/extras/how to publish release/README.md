@@ -18,14 +18,16 @@
 	turbocommons-es6
 	turbocommons-ts
 
-8 - Open a command line inside the created desktop folder and run:
+8 - Open a command line inside each package.json folder and run:
 	npm publish
+	
+9 - Verify that new versions appear for all the packages at www.npmjs.com/~edertone
 
-9 - Get the downloadable zip files for each target and update the files inside with the new versions
+10 - Get the downloadable zip files for each target and update the files inside with the new versions
 	- docs, readme, compiled code, etc..
 	
-10 - Upload the new zip versions to turbocommons website for direct download
+11 - Upload the new zip versions to turbocommons website for direct download
 	- review that zip download work as expected
 
-11 - Upload the new generated docs to the turbocommons website
+12 - Upload the new generated docs to the turbocommons website
 	- review that links to docs still work
