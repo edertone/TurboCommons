@@ -657,6 +657,35 @@ export class FilesManager{
 
         // TODO - translate from php
     }
+    
+    
+    /**
+     * Renames a directory.
+
+     *
+     * @param sourcePath The full path to the source directory that must be renamed (including the directoy itself).
+     * @param destPath The full path to the new directoy name (including the directoy itself). It must not exist.
+     *
+     * @return boolean true on success or false on failure.
+     */
+    renameDirectory(sourcePath:string, destPath:string){
+
+        if(!this.isDirectory(sourcePath) || this.isDirectory(destPath) || this.isFile(destPath)){
+
+            return false;
+        }
+        
+        try {
+            
+            this.fs.renameSync(sourcePath, destPath);
+            
+            return true;
+            
+        } catch (e) {
+
+            return false;
+        }
+    }
 
 
     /**
@@ -870,6 +899,34 @@ export class FilesManager{
             
         }catch(e){
         
+            return false;
+        }
+    }
+    
+    
+    /**
+     * Renames a file.
+     *
+     * @param sourcePath The full path to the source file that must be renamed (including the filename itself).
+     * @param destPath The full path to the new file name (including the filename itself). It must not exist.
+     *
+     * @return True on success or false on failure.
+     */
+    renameFile(sourcePath: string, destPath: string){
+
+        if(!this.isFile(sourcePath) || this.isDirectory(destPath) || this.isFile(destPath)){
+
+            return false;
+        }
+
+        try {
+            
+            this.fs.renameSync(sourcePath, destPath);
+            
+            return true;
+            
+        } catch (e) {
+
             return false;
         }
     }

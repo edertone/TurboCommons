@@ -1353,6 +1353,27 @@ class FilesManagerTest extends TestCase {
 
 
 	/**
+	 * testRenameDirectory
+	 *
+	 * @return void
+	 */
+	public function testRenameDirectory(){
+
+	    // Test empty values
+	    // TODO
+
+	    // Test ok values
+	    // TODO
+
+	    // Test wrong values
+	    // TODO
+
+	    // Test exceptions
+	    // TODO
+	}
+
+
+	/**
 	 * testDeleteDirectory
 	 *
 	 * @return void

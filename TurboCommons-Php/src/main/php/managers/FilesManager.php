@@ -651,6 +651,25 @@ class FilesManager extends BaseStrictClass{
 
 
     /**
+     * Renames a directory.
+     *
+     * @param string $sourcePath The full path to the source directory that must be renamed (including the directoy itself).
+     * @param string $destPath The full path to the new directoy name (including the directoy itself). It must not exist.
+     *
+     * @return boolean true on success or false on failure.
+     */
+    public function renameDirectory(string $sourcePath, string $destPath){
+
+        if(!$this->isDirectory($sourcePath) || $this->isDirectory($destPath) || $this->isFile($destPath)){
+
+            return false;
+        }
+
+        return rename($sourcePath, $destPath);
+    }
+
+
+    /**
      * Delete a directory from the filesystem and return a boolean telling if the directory delete succeeded or not
      * Note: All directory contents, folders and files will be also removed.
      *
@@ -889,6 +908,25 @@ class FilesManager extends BaseStrictClass{
     public function copyFile(string $sourcePath, string $destPath){
 
         return copy($sourcePath, $destPath);
+    }
+
+
+    /**
+     * Renames a file.
+     *
+     * @param string $sourcePath The full path to the source file that must be renamed (including the filename itself).
+     * @param string $destPath The full path to the new file name (including the filename itself). It must not exist.
+     *
+     * @return boolean True on success or false on failure.
+     */
+    public function renameFile(string $sourcePath, string $destPath){
+
+        if(!$this->isFile($sourcePath) || $this->isDirectory($destPath) || $this->isFile($destPath)){
+
+            return false;
+        }
+
+        return rename ($sourcePath, $destPath);
     }
 
 
