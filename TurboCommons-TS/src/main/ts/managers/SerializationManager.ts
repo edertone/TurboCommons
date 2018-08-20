@@ -124,7 +124,7 @@ export class SerializationManager {
      *
      * @return The provided class instance with all its properties filled with the corresponding object values
      */
-    objectToClass<T>(object:Object, classInstance:any): any{
+    objectToClass(object:Object, classInstance:any): any{
 
         let objectKeys = ObjectUtils.getKeys(object);
         let classInstanceName = (classInstance.constructor as any).name;
