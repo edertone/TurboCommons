@@ -556,6 +556,58 @@ export class StringUtils {
     
     /**
      * Given a string with a list of elements separated by '/' or '\' that represent some arbitrary path structure,
+     * this method will format the specified path and remove the number of requested path elements (from its right
+     * side) and return the path without that elements.
+     *
+     * This method can be used with Operating system file paths, urls, or any other string that uses the 'slash separated'
+     * format to encode a path.
+     *
+     * @example "//folder/folder2/folder3/file.txt" -> results in "/folder/folder2/folder3" if elementsToRemove = 1<br>
+     *          "//folder/folder2\folder3\file.txt" -> results in "/folder/folder2" if elementsToRemove = 2
+     * 
+     * @see StringUtils.formatPath
+     * 
+     * @param path A string containing some arbitrary path.
+     * @param elementsToRemove (one by default) The number of elements that we want to remove from the right side of the path.
+     *
+     * @return The received path without the specified number of elements
+     */
+    public static getPath(path:string, elementsToRemove = 1){
+        
+        if(StringUtils.isEmpty(path)){
+
+            return '';
+        }
+
+        path = StringUtils.formatPath(path, '/');
+
+        let processedPath = (path.indexOf('/') === 0) ? path.substr(1) : path;
+
+        let elements = processedPath.split('/');
+
+        if(elementsToRemove > elements.length || elementsToRemove < -1){
+
+            return '';
+        }
+        
+        let arrayToRemove = [];
+        
+        for (let i = elements.length - elementsToRemove; i < elements.length; i++) {
+	
+            arrayToRemove.push(elements[i]);
+        }
+        
+        if(arrayToRemove.length <= 0){
+         
+            return path;
+        }
+        
+        return StringUtils.formatPath(path.substring(0, path.length - arrayToRemove.join('/').length - 1), '/');
+    }
+    
+    
+    /**
+     * Given a string with a list of elements separated by '/' or '\' that represent some arbitrary path structure,
      * this method will return the element that is located at the requested position. If no position is defined,
      * the last element of the path will be returned (the most to the right one).
      *
@@ -567,7 +619,7 @@ export class StringUtils {
      *
      * @param path A string containing some arbitrary path.
      * @param position The index for the element that we want to extract from the path. If not specified, the
-     *                 last one will be returned.
+     *                 last one will be returned. (Positions go from left to right)
      *
      * @return The element at the specified path position or the last one if no position is defined
      */
