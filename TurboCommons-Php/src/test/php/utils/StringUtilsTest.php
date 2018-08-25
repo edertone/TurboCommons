@@ -818,6 +818,17 @@ class StringUtilsTest extends TestCase {
 
 
 	/**
+	 * testGetPath
+	 *
+	 * @return void
+	 */
+	public function testGetPath(){
+
+	    // TODO - translate from TS
+	}
+
+
+	/**
 	 * testGetPathElement
 	 *
 	 * @return void

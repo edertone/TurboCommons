@@ -588,6 +588,15 @@ class StringUtils {
 
 
     /**
+     * TODO
+     */
+    public static function getPath(){
+
+        // TODO - translate from ts
+    }
+
+
+    /**
      * Given a string with a list of elements separated by '/' or '\' that represent some arbitrary path structure,
      * this method will return the element that is located at the requested position. If no position is defined,
      * the last element of the path will be returned (the most to the right one).
@@ -600,7 +609,7 @@ class StringUtils {
      *
      * @param string $path A string containing some arbitrary path.
      * @param integer $position The index for the element that we want to extract from the path. If not specified, the
-     *                          last one will be returned.
+     *                          last one will be returned. (Positions go from left to right)
      *
      * @return string The element at the specified path position or the last one if no position is defined
      */
