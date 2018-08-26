@@ -824,7 +824,121 @@ class StringUtilsTest extends TestCase {
 	 */
 	public function testGetPath(){
 
-	    // TODO - translate from TS
+	    // Test empty values
+	    $this->assertSame(StringUtils::getPath(null), '');
+	    $this->assertSame(StringUtils::getPath(''), '');
+	    $this->assertSame(StringUtils::getPath('       '), '');
+	    $this->assertSame(StringUtils::getPath([]), '');
+
+	    // Test ok values
+
+	    // With 0 elements removed
+	    $this->assertSame(StringUtils::getPath('/', 0), '');
+	    $this->assertSame(StringUtils::getPath('///////', 0), '');
+	    $this->assertSame(StringUtils::getPath('\\', 0), '');
+	    $this->assertSame(StringUtils::getPath('c:/', 0), 'c:');
+	    $this->assertSame(StringUtils::getPath('c:/', 0), 'c:');
+	    $this->assertSame(StringUtils::getPath('c:\\', 0), 'c:');
+	    $this->assertSame(StringUtils::getPath('folder', 0), 'folder');
+	    $this->assertSame(StringUtils::getPath('//folder', 0), '/folder');
+	    $this->assertSame(StringUtils::getPath('CCleaner64.exe', 0), 'CCleaner64.exe');
+	    $this->assertSame(StringUtils::getPath('\\Files/CCleaner/CCleaner64.exe', 0), '/Files/CCleaner/CCleaner64.exe');
+	    $this->assertSame(StringUtils::getPath("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe", 0), "MultiLine\n\n\r\n   and strange &%·Characters/CCleaner64.exe");
+	    $this->assertSame(StringUtils::getPath('C:\\Program Files\\CCleaner\\CCleaner64.exe', 0), 'C:/Program Files/CCleaner/CCleaner64.exe');
+	    $this->assertSame(StringUtils::getPath('https://www.google.es//////', 0), 'https:/www.google.es');
+	    $this->assertSame(StringUtils::getPath('https://www.google.es/search?q=zero+latency', 0), 'https:/www.google.es/search?q=zero+latency');
+
+	    // With 1 element removed
+	    $this->assertSame(StringUtils::getPath('/', 1), '');
+	    $this->assertSame(StringUtils::getPath('///////', 1), '');
+	    $this->assertSame(StringUtils::getPath('\\', 1), '');
+	    $this->assertSame(StringUtils::getPath('c:/', 1), '');
+	    $this->assertSame(StringUtils::getPath('c:/', 1), '');
+	    $this->assertSame(StringUtils::getPath('c:\\', 1), '');
+	    $this->assertSame(StringUtils::getPath('folder', 1), '');
+	    $this->assertSame(StringUtils::getPath('//folder', 1), '');
+	    $this->assertSame(StringUtils::getPath('CCleaner64.exe', 1), '');
+	    $this->assertSame(StringUtils::getPath('\\\\\\CCleaner64.exe', 1), '');
+	    $this->assertSame(StringUtils::getPath('//folder/folder2/folder3/file.txt', 1), '/folder/folder2/folder3');
+	    $this->assertSame(StringUtils::getPath("folder1\\\\folder2//folder3///\\\\folder4", 1), 'folder1/folder2/folder3');
+	    $this->assertSame(StringUtils::getPath('\\Files/CCleaner/CCleaner64.exe', 1), '/Files/CCleaner');
+	    $this->assertSame(StringUtils::getPath("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe", 1), "MultiLine\n\n\r\n   and strange &%·Characters");
+	    $this->assertSame(StringUtils::getPath('\\some long path containing lots of spaces\\///CCleaner64.exe', 1), '/some long path containing lots of spaces');
+	    $this->assertSame(StringUtils::getPath('C:\\Program Files\\CCleaner\\CCleaner64.exe', 1), 'C:/Program Files/CCleaner');
+	    $this->assertSame(StringUtils::getPath('https://www.google.es', 1), 'https:');
+	    $this->assertSame(StringUtils::getPath('https://www.google.es//////', 1), 'https:');
+	    $this->assertSame(StringUtils::getPath('https://www.google.es/search?q=zero+latency', 1), 'https:/www.google.es');
+
+	    // With 2 element removed
+	    $this->assertSame(StringUtils::getPath('/', 2), '');
+	    $this->assertSame(StringUtils::getPath('///////', 2), '');
+	    $this->assertSame(StringUtils::getPath('\\', 2), '');
+	    $this->assertSame(StringUtils::getPath('c:/', 2), '');
+	    $this->assertSame(StringUtils::getPath('c:/', 2), '');
+	    $this->assertSame(StringUtils::getPath('c:\\', 2), '');
+	    $this->assertSame(StringUtils::getPath('folder', 2), '');
+	    $this->assertSame(StringUtils::getPath('//folder', 2), '');
+	    $this->assertSame(StringUtils::getPath('CCleaner64.exe', 2), '');
+	    $this->assertSame(StringUtils::getPath('\\\\\\CCleaner64.exe', 2), '');
+	    $this->assertSame(StringUtils::getPath('//folder/folder2/folder3/file.txt', 2), '/folder/folder2');
+	    $this->assertSame(StringUtils::getPath("folder1\\\\folder2//folder3///\\\\folder4", 2), 'folder1/folder2');
+	    $this->assertSame(StringUtils::getPath('\\Files/CCleaner/CCleaner64.exe', 2), '/Files');
+	    $this->assertSame(StringUtils::getPath("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe", 2), "");
+	    $this->assertSame(StringUtils::getPath('\\some long path containing lots of spaces\\///CCleaner64.exe', 2), '');
+	    $this->assertSame(StringUtils::getPath('C:\\Program Files\\CCleaner\\CCleaner64.exe', 2), 'C:/Program Files');
+	    $this->assertSame(StringUtils::getPath('https://www.google.es', 2), '');
+	    $this->assertSame(StringUtils::getPath('https://www.google.es//////', 2), '');
+	    $this->assertSame(StringUtils::getPath('https://www.google.es/search?q=zero+latency', 2), 'https:');
+
+	    // With many element removed
+	    $this->assertSame(StringUtils::getPath('/', 3), '');
+	    $this->assertSame(StringUtils::getPath('///////', 4), '');
+	    $this->assertSame(StringUtils::getPath('\\', 5), '');
+	    $this->assertSame(StringUtils::getPath('c:/', 10), '');
+	    $this->assertSame(StringUtils::getPath('c:/', 20), '');
+	    $this->assertSame(StringUtils::getPath('c:\\', 40), '');
+	    $this->assertSame(StringUtils::getPath('folder', 60), '');
+	    $this->assertSame(StringUtils::getPath('//folder', 200), '');
+	    $this->assertSame(StringUtils::getPath('CCleaner64.exe', 2000), '');
+	    $this->assertSame(StringUtils::getPath('\\\\\\CCleaner64.exe', 9), '');
+	    $this->assertSame(StringUtils::getPath('//folder/folder2/folder3/file.txt', 3), '/folder');
+	    $this->assertSame(StringUtils::getPath("folder1\\\\folder2//folder3///\\\\folder4", 4), '');
+	    $this->assertSame(StringUtils::getPath('\\Files/CCleaner/CCleaner64.exe', 300), '');
+	    $this->assertSame(StringUtils::getPath("MultiLine\n\n\r\n   and strange &%·Characters\\CCleaner64.exe", 15), "");
+	    $this->assertSame(StringUtils::getPath('\\some long path containing lots of spaces\\///CCleaner64.exe', 19), '');
+	    $this->assertSame(StringUtils::getPath('C:\\Program Files\\CCleaner\\CCleaner64.exe', 3), 'C:');
+	    $this->assertSame(StringUtils::getPath('https://www.google.es', 29), '');
+	    $this->assertSame(StringUtils::getPath('https://www.google.es//////', 28), '');
+	    $this->assertSame(StringUtils::getPath('https://www.google.es/search?q=zero+latency', 78), '');
+	    $this->assertSame(StringUtils::getPath('1/2/3/4/5/6/7/8/9/10/11/12/13', 3), '1/2/3/4/5/6/7/8/9/10');
+	    $this->assertSame(StringUtils::getPath('1/2/3/4/5/6/7/8/9/10/11/12/13', 5), '1/2/3/4/5/6/7/8');
+	    $this->assertSame(StringUtils::getPath('1/2/3/4/5/6/7/8/9/10/11/12/13', 7), '1/2/3/4/5/6');
+	    $this->assertSame(StringUtils::getPath('1/2/3/4/5/6/7/8/9/10/11/12/13', 10), '1/2/3');
+	    $this->assertSame(StringUtils::getPath('1/2/3/4/5/6/7/8/9/10/11/12/13', 12), '1');
+	    $this->assertSame(StringUtils::getPath('1/2/3/4/5/6/7/8/9/10/11/12/13', 25), '');
+
+	    // Test wrong values
+	    // Test exceptions
+	    try {
+	        StringUtils::getPath(['//folder/folder2/folder3/file.txt']);
+	        $this->exceptionMessage = '//folder/ did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::getPath(125);
+	        $this->exceptionMessage = '125 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::getPath(new stdClass());
+	        $this->exceptionMessage = 'stdClass did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 	}
 
 

@@ -588,11 +588,55 @@ class StringUtils {
 
 
     /**
-     * TODO
+     * Given a string with a list of elements separated by '/' or '\' that represent some arbitrary path structure,
+     * this method will format the specified path and remove the number of requested path elements (from its right
+     * side) and return the path without that elements.
+     *
+     * This method can be used with Operating system file paths, urls, or any other string that uses the 'slash separated'
+     * format to encode a path.
+     *
+     * @example "//folder/folder2/folder3/file.txt" -> results in "/folder/folder2/folder3" if elementsToRemove = 1<br>
+     *          "//folder/folder2\folder3\file.txt" -> results in "/folder/folder2" if elementsToRemove = 2
+     *
+     * @see StringUtils::formatPath
+     *
+     * @param string $path A string containing some arbitrary path.
+     * @param int $elementsToRemove (one by default) The number of elements that we want to remove from the right side of the path.
+     *
+     * @retur string The received path without the specified number of elements
      */
-    public static function getPath(){
+    public static function getPath($path, int $elementsToRemove = 1){
 
-        // TODO - translate from ts
+        if(StringUtils::isEmpty($path)){
+
+            return '';
+        }
+
+        $path = StringUtils::formatPath($path, '/');
+
+        $processedPath = (strpos($path, '/') === 0) ? substr($path, 1) : $path;
+
+        $elements = explode('/', $processedPath);
+        $elementsCount = count($elements);
+
+        if($elementsToRemove > $elementsCount || $elementsToRemove < -1){
+
+            return '';
+        }
+
+        $arrayToRemove = [];
+
+        for ($i = $elementsCount - $elementsToRemove; $i < $elementsCount; $i++) {
+
+            $arrayToRemove[] = $elements[$i];
+        }
+
+        if(count($arrayToRemove) <= 0){
+
+            return $path;
+        }
+
+        return StringUtils::formatPath(substr($path, 0, max(0, strlen($path) - strlen(implode('/', $arrayToRemove)) - 1)), '/');
     }
 
 
