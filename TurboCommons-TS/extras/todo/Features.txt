@@ -1,3 +1,5 @@
 - All exception error messages must be reviewed to reduce it's length to the maximum while preserving the semantical meaning.
   this is important to reduce the size of the generated js files. When the messages are modified, it must be done on all turbocomons 
   versions at the same time: PHP and TS
+    
+- The FilesManager class should be moved to TurboIO library cause it is specific to the input output or OS scenarios

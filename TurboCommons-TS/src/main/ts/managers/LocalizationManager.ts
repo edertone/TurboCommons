@@ -376,7 +376,7 @@ export class LocalizationManager {
             return;
         }
         
-        (this._httpManager as HTTPManager).multiGetRequest(pathsToLoad, (results, anyError) =>{
+        (this._httpManager as HTTPManager).execute(pathsToLoad, (results, anyError) => {
             
             let errors: {path:string, errorMsg:string, errorCode:number}[] = [];
             
@@ -385,7 +385,7 @@ export class LocalizationManager {
                 if(results[i].isError){
                     
                     errors.push({
-                        path: results[i].path,
+                        path: results[i].url,
                         errorMsg: results[i].errorMsg,
                         errorCode: results[i].errorCode 
                     });
@@ -415,11 +415,11 @@ export class LocalizationManager {
             
             processWhenDone(errors);
             
-        }, null, (completedUrl, totalUrls) => {
+        }, (completedUrl, totalRequests) => {
             
             if (progressCallback !== null) {
 
-                progressCallback(completedUrl, totalUrls);
+                progressCallback(completedUrl, totalRequests);
             }
         });
     }

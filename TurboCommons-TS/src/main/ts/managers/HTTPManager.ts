@@ -12,10 +12,12 @@ import { StringUtils } from '../utils/StringUtils';
 import { ObjectUtils } from '../utils/ObjectUtils';
 import { ArrayUtils } from '../utils/ArrayUtils';
 import { HashMapObject } from '../model/HashMapObject';
+import { HTTPManagerGetRequest } from './HTTPManagerGetRequest';
+import { HTTPManagerBaseRequest } from "./HTTPManagerBaseRequest";
 
    
 /**
- * Class that contains functionalities related to the HTTP protocol and its most common operations
+ * Class that contains functionalities related to the HTTP protocol and its most common requests
  */ 
 export class HTTPManager{
     
@@ -49,12 +51,22 @@ export class HTTPManager{
                               'https://code.jquery.com/jquery-3.2.1.slim.min.js'];
     
     
-    /** Error message that is used when a timeout happens */
-    private static ERROR_TIMEOUT =  ' ms Timeout reached';
+    /**
+     * Error message that is used when a timeout happens
+     */
+    private static ERROR_TIMEOUT = ' ms Timeout reached';
     
     
     /**
-     * Class that contains functionalities related to the HTTP protocol and its most common operations
+     * Structure containing all the created request queues and their status
+     */
+    private _queues:{name:string,
+                     isRunning: boolean,
+                     pendingRequests: HTTPManagerBaseRequest[]}[] = [];
+    
+    
+    /**
+     * Class that contains functionalities related to the HTTP protocol and its most common requests
      * 
      * @param asynchronous Specify if the HTTP manager instance will work in asynchronous or synchronous mode. 
      * (Synchronous mode is NOT recommended)
@@ -63,10 +75,135 @@ export class HTTPManager{
         
         if(typeof asynchronous !== 'boolean'){
             
-            throw new Error("HTTPManager.constructor: value is not a boolean");
+            throw new Error("asynchronous is not boolean");
         }
         
         this.asynchronous = asynchronous;
+    }
+    
+    
+    /**
+     * Create a new http queue. Requests can then be added to this queue with the queue() method.
+     * 
+     * @param name The name we want to define for this queue
+     * 
+     * @see this.queue()
+     * 
+     * @returns void
+     */
+    createQueue(name: string){
+        
+        for (let queue of this._queues) {
+	
+            if(queue.name === name){
+               
+                throw new Error(`queue ${name} already exists`);
+            }
+        }
+        
+        this._queues.push({name: name, isRunning: false, pendingRequests: []});
+    }
+    
+    
+    /**
+     * Check if the specified queue is currently executing http requests
+     * 
+     * @param name The name for the queue we want to check
+     * 
+     * @see this.queue()
+     * 
+     * @returns boolean True if the specified queue is actually running its http requests
+     */
+    isQueueRunning(name: string){
+        
+        for (let queue of this._queues) {
+            
+            if(queue.name === name){
+               
+                return queue.isRunning;
+            }
+        }
+        
+        throw new Error(`queue ${name} does not exist`);
+    }
+    
+    
+    /**
+     * Remove the specified queue from this manager. 
+     * Make sure the queue is not running when calling this method, or an exception will happen
+     * 
+     * @param name The name for the queue we want to remove
+     * 
+     * @see this.queue()
+     * 
+     * @returns void
+     */
+    deleteQueue(name: string){
+        
+        for (var i = 0; i < this._queues.length; i++) {
+	
+            if(this._queues[i].name === name){
+                
+                if(this._queues[i].isRunning){
+                    
+                    throw new Error(`queue ${name} is currently running`);
+                }
+                
+                this._queues.splice(i, 1);
+                
+                return;
+            }
+        }
+        
+        throw new Error(`queue ${name} does not exist`);
+    }
+    
+    
+    /**
+     * This method generates a GET url query from a set of key/value pairs
+     * 
+     * A query string is the part of an url that contains the GET parameters. It is placed after
+     * the ? symbol and contains a list of parameters and values that are sent to the url.
+     * 
+     * @param keyValuePairs An object or a HashMapObject containing key/value pairs that will be used to construct the query string
+     * 
+     * @see https://en.wikipedia.org/wiki/Query_string
+     * @see HashMapObject
+     *
+     * @returns A valid query string that can be used with any url: http://www.url.com?query_string (Note that ? symbol is not included)
+     */
+    generateUrlQueryString(keyValuePairs: { [key: string]: string } | HashMapObject){
+        
+        let result = '';
+        let keys:string[] = [];
+        let values:string[] = [];
+        
+        if(ObjectUtils.isObject(keyValuePairs) && ObjectUtils.getKeys(keyValuePairs).length > 0){
+        
+            if(keyValuePairs instanceof HashMapObject){
+                
+                keys = (keyValuePairs as HashMapObject).getKeys();
+                values = (keyValuePairs as HashMapObject).getValues();
+            
+            } else {
+                
+                keys = Object.getOwnPropertyNames(keyValuePairs);
+
+                for(var i = 0; i < keys.length; i++){
+
+                    values.push(keyValuePairs[keys[i]]);
+                }
+            }
+            
+            for (var i = 0; i < keys.length; i++) {
+                
+                result += '&' + encodeURIComponent(keys[i]) + '=' + encodeURIComponent(values[i]);
+            }
+
+            return result.substring(1, result.length);        
+        }
+
+        throw new Error('keyValuePairs must be a HashMapObject or a non empty Object');
     }
         
     
@@ -82,12 +219,12 @@ export class HTTPManager{
         
         if(typeof yesCallback  !== 'function' || typeof noCallback !== 'function'){
             
-            throw new Error("HTTPManager.isInternetAvailable: params must be functions");
+            throw new Error("params must be functions");
         }
         
         if(this.internetCheckLocations.length <= 0){
             
-            throw new Error("HTTPManager.isInternetAvailable: no check locations specified");
+            throw new Error("no check locations specified");
         }
         
         // A recursive function that will loop all the defined list of urls to check
@@ -103,23 +240,20 @@ export class HTTPManager{
                 
             if(!StringUtils.isUrl(url)){
                 
-                throw new Error("HTTPManager.isInternetAvailable: invalid check url : " + url);
+                throw new Error("invalid check url : " + url);
             }
             
             // We must prevent the browser cache from giving false positives, so we generate
             // an url containing a random GET parameter
-            this.urlExists(String(url + '?r=' + StringUtils.generateRandom(15, 15)), () => {
-                
-                return yesCallback();
-                
-            }, () => {
-                
-                recursiveUrlTest(urls);
-            });
+            this.urlExists(String(url + '?r=' + StringUtils.generateRandom(15, 15)),
+                yesCallback,
+                () => recursiveUrlTest(urls));
         }
         
         if(navigator.onLine === false){
             
+            // Navigator.online is only fiable when it returns false. If it returns true, we still need to
+            // test the internet connectivity by performing a real check via recursiveUrlTest
             noCallback();
         
         }else{
@@ -160,15 +294,13 @@ export class HTTPManager{
             
             return;
         }
-
-        this.get(url, (result) =>{
-            
-            yesCallback();
-            
-        }, (error) => {
-            
-            noCallback();
-        });        
+        
+        let request = new HTTPManagerGetRequest(url);
+        
+        request.successCallback = () => yesCallback(); 
+        request.errorCallback = () => noCallback();
+        
+        this.execute(request);        
     }
     
     
@@ -178,9 +310,9 @@ export class HTTPManager{
      *
      * @param url The url for which we want to get the http headers.
      * @param successCallback Executed when headers are read. An array of strings will be passed to this method
-     * containing all the read headers with each header line as an array element.
+     *        containing all the read headers with each header line as an array element.
      * @param errorCallback Executed if headers cannot be read. A string containing the error description and the error
-     *                      code will be passed to this method.
+     *        code will be passed to this method.
      * 
      * @return void
      */
@@ -203,232 +335,253 @@ export class HTTPManager{
             throw new Error("invalid url " + url);
         }
         
-        let request = new XMLHttpRequest();
+        let xmlHttprequest = new XMLHttpRequest();
         
         if(this.timeout > 0){
         
-            request.timeout = this.timeout;
+            xmlHttprequest.timeout = this.timeout;
         }
         
-        request.open('GET', url, this.asynchronous);
+        xmlHttprequest.open('GET', url, this.asynchronous);
         
-        request.onload = () => {
-            
-            successCallback(request.getAllResponseHeaders().split("\n"));
-        };
+        xmlHttprequest.onload = () => successCallback(xmlHttprequest.getAllResponseHeaders().split("\n"));
 
-        request.onerror = () => {
+        xmlHttprequest.onerror = () => errorCallback(xmlHttprequest.statusText, xmlHttprequest.status);
         
-            errorCallback(request.statusText, request.status);          
-        };
+        xmlHttprequest.ontimeout = () => errorCallback(this.timeout + HTTPManager.ERROR_TIMEOUT, 408);
         
-        request.ontimeout = () => {
-            
-            errorCallback(this.timeout + HTTPManager.ERROR_TIMEOUT, 408);          
-        };
-        
-        request.send();
+        xmlHttprequest.send();
     }
-    
+       
     
     /**
-     * This method generates a GET url query from a set of key/value pairs
+     * Launch one or more http requests without caring about their execution order.
      * 
-     * A query string is the part of an url that contains the GET parameters. It is placed after
-     * the ? symbol and contains a list of parameters and values that are sent to the url.
-     * 
-     * @param object An object or a HashMapObject containing key/value pairs that will be used to construct the query string
-     * 
-     * @see https://en.wikipedia.org/wiki/Query_string
-     * @see HashMapObject
-     *
-     * @returns A valid query string that can be used with any url: http://www.url.com?query_string (Note that ? symbol is not included)
-     */
-    generateUrlQueryString(object: { [key: string]: string } | HashMapObject){
-        
-        let result = '';
-        let keys:string[] = [];
-        let values:string[] = [];
-        
-        if(ObjectUtils.isObject(object) && ObjectUtils.getKeys(object).length > 0){
-        
-            if(object instanceof HashMapObject){
-                
-                keys = (object as HashMapObject).getKeys();
-                values = (object as HashMapObject).getValues();
-            
-            } else {
-                
-                keys = Object.getOwnPropertyNames(object);
-
-                for(var i = 0; i < keys.length; i++){
-
-                    values.push(object[keys[i]]);
-                }
-            }
-            
-            for (var i = 0; i < keys.length; i++) {
-                
-                result += '&' + encodeURIComponent(keys[i]) + '=' + encodeURIComponent(values[i]);
-            }
-
-            return result.substring(1, result.length);        
-        }
-
-        throw new Error('object must be a HashMapObject or a non empty Object');
-    }
-        
-    
-    /**
-     * Perform an HTTP get request to the specified location
-     * 
-     * @param url The url to call
-     * @param successCallback Executed once request is successful. Request result will be passed as a string
-     * @param errorCallback Executed if headers cannot be read. A string containing the error description and the error
-     *                      code will be passed to this method.
-     * @param parameters TODO - Implement this feature
-     * 
-     * @returns void
-     */
-    get(url:string,
-        successCallback: (response: string) => void,
-        errorCallback: (errorMsg:string, errorCode:number) => void,
-        parameters: { [s: string]: string } | HashMapObject | null = null){
-        
-        if(!StringUtils.isString(url) || StringUtils.isEmpty(url)){
-            
-            throw new Error('url must be a non empty string');
-        }
-        
-        var request = new XMLHttpRequest();
-        
-        if(this.timeout > 0){
-            
-            request.timeout = this.timeout;
-        }  
-        
-        // TODO - we must implement the params parameter
-        
-        request.open('GET', url, this.asynchronous);
-        
-        request.onload = () => {
-        
-            if (request.status >= 200 && request.status < 400) {
-            
-                successCallback(request.responseText);
-            
-            } else {
-            
-                errorCallback(request.statusText, request.status);
-            }
-        };
-
-        request.onerror = () => {
-          
-            // There was a connection error of some sort
-            errorCallback(request.statusText, request.status);
-        };
-        
-        request.ontimeout = () => {
-            
-            errorCallback(this.timeout + HTTPManager.ERROR_TIMEOUT, 408);          
-        };
-
-        request.send();
-    }
-    
-    
-    // TODO
-    post(){
-        
-        // Implement this method
-    }
-    
-    
-    /**
-     * Performs a sequential execution of GET http requests and obtains the response data for each one.
-     * 
-     * After a list of urls is provided, this method will secuentially execute each one of them as a GET
-     * request, one after the other and in the same order as they are provided. Once all have 
-     * finished correctly, the result data will be available as an array of objects stored with the same
-     * order as the provided source urls.
-     * 
-     * This method can be used to load multiple resource files at once, process batch requests, etc..
-     *
-     * @param paths List with all the urls that we want to execute as http GET requests
-     * @param finishedCallback Executed once all the urls have been called and responses received. An array of
-     *        objects containing the results information of each request and a boolean variable telling if any
-     *        error happened will be passed to this method 
-     * @param parameters TODO - implement this feature after this.get implements it
-     * @param progressCallback Executed after each one of the urls is executed. A string with the requested url and
+     * @param requests One or more requests to be inmediately launched (at the same time if possible). Each request can be defined as a string
+     *        that will be used as a GET request url, or as an HTTPManagerBaseRequest instance in case we want to define parameters and callbacks.
+     * @param finishedCallback A method to be executed once all the http requests have finished (either succesfully or with errors). The callback will
+     *        receive two parameters: results (an array with information about each request result in the same order as provided to this method) and
+     *        anyError (true if any of the requests has failed)      
+     * @param progressCallback Executed after each one of the urls finishes (either successfully or with an error). A string with the requested url and
      *        the total requests to perform will be passed to this method.
-     * 
+     *        
      * @returns void
      */
-    multiGetRequest(paths: string[],
-                    finishedCallback: (results: {path:string, response:string, isError:boolean, errorMsg:string, errorCode:number}[], anyError:boolean) => void,
-                    parameters: [{[s: string]: string}] | [HashMapObject] | null = null,
-                    progressCallback: null | ((completedUrl: string, totalUrls: number) => void) = null){
-    
-        if(!ArrayUtils.isArray(paths) || paths.length <= 0){
+    execute(requests: string|string[]|HTTPManagerBaseRequest|HTTPManagerBaseRequest[],
+            finishedCallback: ((results: {url:string, response:string, isError:boolean, errorMsg:string, errorCode:number}[], anyError:boolean) => void) | null = null,
+            progressCallback: null | ((completedUrl: string, totalRequests: number) => void) = null){
+        
+        // Convert the received requests to a standarized array of HTTPManagerBaseRequest instances
+        let requestsList:HTTPManagerBaseRequest[] = [];
             
-            throw new Error('paths must be a non empty array');
+        if(ArrayUtils.isArray(requests) && (requests as Array<any>).length > 0){
+            
+            requestsList = StringUtils.isString((requests as Array<any>)[0]) ?
+                    (requests as string[]).map((url) => new HTTPManagerGetRequest(url)) :
+                    (requests as HTTPManagerBaseRequest[]);
+                        
+        }else{
+            
+            requestsList = StringUtils.isString(requests) ?
+                [new HTTPManagerGetRequest(requests as string)] :
+                [requests as HTTPManagerBaseRequest];
         }
-
-        // Recursive method that will perform the calls to the specified requests
-        let perform = (paths: string[],
-                       results: {path:string, response:string, isError:boolean, errorMsg:string, errorCode:number}[],
-                       anyError: boolean,
-                       totalCount: number) => {
+        
+        let finishedCount = 0;
+        let finishedAnyError = false;
+        let finishedResults:{url:string, response:string, isError:boolean, errorMsg:string, errorCode:number}[] = [];
+        
+        // A method that will be executed every time a request is finished (even successfully or with errors)
+        const processFinishedRequest = (requestWithIndex:{index:number, request:HTTPManagerBaseRequest},
+                                        response:string,
+                                        isError:boolean = false,
+                                        errorMsg:string = '',
+                                        errorCode:number = -1) => {
             
-            if(paths.length > 0){
+            let request = requestWithIndex.request;
+            
+            finishedCount ++;
+            finishedResults[requestWithIndex.index] = {url:request.url, response:response, isError:isError, errorMsg:errorMsg, errorCode:errorCode};
+            
+            if(isError){
                 
-                let url = String(paths.shift());
-                
-                this.get(url, (response: string) => {
-                    
-                    results.push({
-                        path: url,
-                        response: response,
-                        isError: false,
-                        errorMsg: '',
-                        errorCode: 0
-                    });
-                    
-                    if(progressCallback !== null){
-                    
-                        progressCallback(url, totalCount);
-                    }
-                    
-                    perform(paths, results, anyError ? true : false, totalCount);
-                    
-                }, (errorMsg:string, errorCode:number) => {
-                    
-                    results.push({
-                        path: url,
-                        response: '',
-                        isError: true,
-                        errorMsg: errorMsg,
-                        errorCode: errorCode
-                    });
-
-                    perform(paths, results, true, totalCount);                    
-                });
+                finishedAnyError = true;
+                request.errorCallback(errorMsg, errorCode);
             
             }else{
+                
+                request.successCallback(response);
+            }
             
-                finishedCallback(results, anyError);
+            request.finallyCallback();
+            
+            if(progressCallback !== null){
+                
+                progressCallback(request.url, requestsList.length);
+            }
+            
+            if(finishedCount >= requestsList.length && finishedCallback !== null){
+                
+                finishedCallback(finishedResults, finishedAnyError);
             }
         };
         
-        perform(ObjectUtils.clone(paths), [], false, paths.length);
+        // Execute each one of the received requests and process their results
+        for (var i = 0; i < requestsList.length; i++) {
+	
+            let requestWithIndex = {index: i, request: requestsList[i]};
+            
+            if(!StringUtils.isString(requestsList[i].url) || StringUtils.isEmpty(requestsList[i].url)){
+                
+                throw new Error(`url ${i} must be a non empty string`);
+            }
+            
+            let xmlHttprequest = new XMLHttpRequest();
+            
+            // Define the request timeout if specified on the request or the httpmanager class
+            if(requestsList[i].timeout > 0 || this.timeout > 0){
+                
+                xmlHttprequest.timeout = requestsList[i].timeout > 0 ? requestsList[i].timeout : this.timeout;
+            }
+            
+            // Detect the request type
+            let requestType = requestsList[i] instanceof HTTPManagerGetRequest ? 'GET' : 'POST';
+            
+            // TODO - implement the request GET or POST params
+            
+            xmlHttprequest.open(requestType, requestsList[i].url, this.asynchronous);
+            
+            xmlHttprequest.onload = () => {
+            
+                if (xmlHttprequest.status >= 200 && xmlHttprequest.status < 400) {
+                
+                    processFinishedRequest(requestWithIndex, xmlHttprequest.responseText);
+                
+                } else {
+                
+                    processFinishedRequest(requestWithIndex, '', true, xmlHttprequest.statusText, xmlHttprequest.status);
+                }
+            };
+
+            xmlHttprequest.onerror = () => {
+
+                processFinishedRequest(requestWithIndex, '', true, xmlHttprequest.statusText, xmlHttprequest.status);
+            };
+            
+            xmlHttprequest.ontimeout = () => {
+                
+                processFinishedRequest(requestWithIndex, '', true, this.timeout + HTTPManager.ERROR_TIMEOUT, 408);
+            };
+
+            xmlHttprequest.send();
+        }
     }
     
     
-    // TODO
-    multiPostRequest(){
+    /**
+     * Sequentially launch one or more http requests to the specified queue, one after the other.
+     * Each request will start inmediately after the previous one is finished (either succesfully or with an error).
+     * We can have several independent queues that run their requests at the same time. 
+     * 
+     * @param requests One or more requests that must be added to the specified queue. Each request can be defined as a string
+     *        that will be used as a GET request url, or as an HTTPManagerBaseRequest instance in case we want to define parameters and callbacks.
+     *        Requests will be sequentially executed one after the other in the same order. If the specified queue contains requests
+     *        that have not finished yet, they will be executed before the ones provided here.
+     * @param queueName The name for an existing queue (created with this.createQueue()) where the specified requests will be added
+     * @param finishedAllCallback A method that will be executed once all the queued requests by this method have finished. Note that
+     *        if the specified queue already contains running requests, the current ones will be added to be executed after and
+     *        when all have finished, this method will be called.
+     * 
+     * @returns void
+     */
+    queue(requests: string|string[]|HTTPManagerBaseRequest|HTTPManagerBaseRequest[],
+          queueName: string,
+          finishedAllCallback: (() => void) | null = null){
+    
+        let requestsList = ArrayUtils.isArray(requests) ?
+                requests as HTTPManagerBaseRequest[] :
+                [requests as HTTPManagerBaseRequest];
+
+        for (let queue of this._queues) {
+	
+            if(queue.name === queueName){
                 
-        // Implement this method
+                // Add all the received requests to the beginning of the queue pending array
+                for (var i = requestsList.length - 1; i >= 0; i--) {
+
+                    queue.pendingRequests.unshift(requestsList[i]);
+                }
+                
+                // Add a dummy request with a special url, containing the finished callback method
+                // to be executed after all the requests are done
+                if(finishedAllCallback !== null){
+                    
+                    let finishedCallbackRequest = new HTTPManagerGetRequest('FINISHED_REQUEST_CALLBACK');
+                    
+                    finishedCallbackRequest.finallyCallback = finishedAllCallback;
+                    
+                    queue.pendingRequests.unshift(finishedCallbackRequest);
+                }
+                
+                // Run the queue if it is not already processing requests
+                if(!this.isQueueRunning(queueName)){
+                    
+                    this._startQueue(queueName);
+                }
+                
+                return;
+            }
+        }  
+        
+        throw new Error(`queue ${queueName} does not exist`);
+    }
+    
+    
+    /**
+     * Auxiliary method that is used to begin executing the http requests that are pending on the specified queue.
+     * A recursive operation will be used to launch the next http request once the previous has totally finished.
+     * 
+     * @param name The name for the queue we want to start
+     * 
+     * @returns void
+     */
+    private _startQueue(name:string){
+
+        // Recursive method that will perform the calls to the queue requests
+        let runRequests = (queue: {name: string,
+                                   isRunning: boolean,
+                                   pendingRequests: HTTPManagerBaseRequest[]}) => {
+            
+            if(queue.pendingRequests.length <= 0){
+                
+                queue.isRunning = false;
+            
+            } else {
+                
+                // Check if a finished queue callback must be called
+                if(queue.pendingRequests[queue.pendingRequests.length - 1].url === 'FINISHED_REQUEST_CALLBACK'){
+                    
+                    let finallyCallback = queue.pendingRequests.pop() as HTTPManagerBaseRequest;
+                    
+                    finallyCallback.finallyCallback();
+                }
+                
+                queue.isRunning = true;
+
+                this.execute(queue.pendingRequests.pop() as HTTPManagerBaseRequest, () => runRequests(queue));           
+            }
+        };
+        
+        // Find the requested queue and start the recursive execution on it
+        for (let queue of this._queues) {
+            
+            if(queue.name === name){
+                
+                runRequests(queue);
+                
+                return;
+            }            
+        }
     }
     
     
@@ -439,7 +592,7 @@ export class HTTPManager{
      * 
      * This method implements a technique that allows us to read a big list of files from an http server without needing to
      * write much code. We simply put the files on the server, create a list with all the file names, and call this method.
-     * When the process succeeds, we will have all the files loaded and ready to be used. We have also an progress callback
+     * When the process succeeds, we will have all the files data loaded and ready to be used. We have also a progress callback
      * that will notify us when each one of the files is correctly loaded.
      * 
      * @param urlToResourcesList A url that contains the list of resources that will be loaded. It normally contains a list of file names
@@ -461,25 +614,34 @@ export class HTTPManager{
                           errorCallback: (errorUrl:string, errorMsg:string, errorCode:number) => void,
                           progressCallback: ((completedUrl: string) => void) | null = null){
         
+        if(!StringUtils.isString(urlToResourcesList) || StringUtils.isEmpty(urlToResourcesList)){
+            
+            throw new Error('urlToResourcesList must be a non empty string');
+        }
+        
         if(!StringUtils.isString(basePath) || StringUtils.isEmpty(basePath)){
             
             throw new Error('basePath must be a non empty string');
         }
-
-        this.get(urlToResourcesList, (response) => {
         
+        this.execute(urlToResourcesList, (results, anyError) => {
+            
+            if(results[0].isError){
+                
+                return errorCallback(urlToResourcesList, results[0].errorMsg, results[0].errorCode);
+            }
+            
             let resourcesFullUrls: string[] = [];
             let basePathWithSlash = basePath + ((basePath.charAt(basePath.length - 1) === '/') ? '' : '/');
         
-            var resourcesList = StringUtils.getLines(response);
+            var resourcesList = StringUtils.getLines(results[0].response);
             
             for (var resource of resourcesList){
                 
                 resourcesFullUrls.push(StringUtils.formatPath(basePathWithSlash + resource, '/'));  
             }
             
-            this.multiGetRequest(resourcesFullUrls,
-                    (results: {path:string, response:string, isError:boolean, errorMsg:string, errorCode:number}[], anyError:boolean) => {
+            this.execute(resourcesFullUrls, (results, anyError) => {
 
                 let resultsData: string[] = [];
                 
@@ -487,7 +649,7 @@ export class HTTPManager{
 
                     if(result.isError){
                 
-                        return errorCallback(result.path, result.errorMsg, result.errorCode);
+                        return errorCallback(result.url, result.errorMsg, result.errorCode);
                     }
                     
                     resultsData.push(result.response);
@@ -495,11 +657,7 @@ export class HTTPManager{
                     
                 successCallback(resourcesList, resultsData);
                 
-            }, null, progressCallback);
-            
-        }, (errorMsg, errorCode) => {
-            
-            errorCallback(urlToResourcesList, errorMsg, errorCode);
+            }, progressCallback);
         });
     }
 }
