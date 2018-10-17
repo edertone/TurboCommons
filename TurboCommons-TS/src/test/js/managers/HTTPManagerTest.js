@@ -878,7 +878,7 @@ QUnit.test("execute - multiple HTTPManagerGetRequest without errors", function(a
 /**
  * execute
  */
-QUnit.test("execute - single HTTPManagerPostRequest with errors", function(assert){
+QUnit.todo("execute - single HTTPManagerPostRequest with errors", function(assert){
     
     // TODO
 });
@@ -887,7 +887,7 @@ QUnit.test("execute - single HTTPManagerPostRequest with errors", function(asser
 /**
  * execute
  */
-QUnit.test("execute - single HTTPManagerPostRequest without errors", function(assert){
+QUnit.todo("execute - single HTTPManagerPostRequest without errors", function(assert){
     
     // TODO
 });
@@ -896,7 +896,7 @@ QUnit.test("execute - single HTTPManagerPostRequest without errors", function(as
 /**
  * execute
  */
-QUnit.test("execute - multiple HTTPManagerPostRequest with errors", function(assert){
+QUnit.todo("execute - multiple HTTPManagerPostRequest with errors", function(assert){
     
     // TODO
 });
@@ -905,80 +905,32 @@ QUnit.test("execute - multiple HTTPManagerPostRequest with errors", function(ass
 /**
  * execute
  */
-QUnit.test("execute - multiple HTTPManagerPostRequest without errors", function(assert){
+QUnit.todo("execute - multiple HTTPManagerPostRequest without errors", function(assert){
     
     // TODO
+});
+
+
+/**
+ * execute
+ */
+QUnit.todo("execute - multiple string, HTTPManagerGetRequest and HTTPManagerPostRequest with and without errors", function(assert){
+    
+    // TODO - the most complex call possible: strings, HTTPManagerGetRequest, HTTPManagerPostRequest some failing and some not
 });
 
 
 /**
  * queue
  */
-QUnit.test("queue - TODO all cases", function(assert){
+QUnit.todo("queue - TODO all cases", function(assert){
 
-    // TODO - review all these tests (previously multiGetRequest)
-    
-    // Test empty values
-//    for (var i = 0; i < emptyValuesCount; i++) {
-//        
-//        assert.throws(function() {
-//            sut.multiGetRequest(emptyValues[i]);
-//        }, /paths must be a non empty array/);
-//    } 
-//
-//    // Test ok values
-//    var done = assert.async(3);
-//
-//    var resources = [basePath + '/file1.txt',
-//                     basePath + '/file2.xml',
-//                     basePath + '/file3.json'];
-//    
-//    sut.multiGetRequest(resources, function(results, anyError){
-//
-//        assert.strictEqual(false, anyError);
-//        
-//        assert.strictEqual(results.length, 3);
-//        assert.strictEqual(results[0].response, 'text1');
-//        assert.strictEqual(results[1].response, "<test>\r\n    hello\r\n</test>");
-//        assert.strictEqual(results[2].response, '{\r\n"a": "1",\r\n"b": 2\r\n}');
-//        done();        
-//    });
-//    
-//    // test ok values with resourceLoadedCallback
-//    var progressCalls = 0;
-//    
-//    sut.multiGetRequest(resources, function(results, anyError){
-//
-//        assert.strictEqual(false, anyError);
-//        
-//        assert.strictEqual(results.length, 3);
-//        assert.strictEqual(results[0].response, 'text1');
-//        assert.strictEqual(results[1].response, "<test>\r\n    hello\r\n</test>");
-//        assert.strictEqual(results[2].response, '{\r\n"a": "1",\r\n"b": 2\r\n}');
-//        assert.strictEqual(progressCalls, 3);        
-//        done();
-//        
-//    }, null, function(completedUrl, totalUrls){
-//        
-//        assert.strictEqual(3, totalUrls);
-//        progressCalls ++;
-//    });
-//
-//    // Test wrong values
-//    sut.multiGetRequest([nonExistantUrl], function(results, anyError){
-//
-//        assert.strictEqual(true, anyError);
-//        
-//        assert.strictEqual(results[0].path, nonExistantUrl);
-//        assert.strictEqual(results[0].response, '');
-//        assert.strictEqual(results[0].isError, true);
-//        assert.strictEqual(results[0].errorCode, 404);
-//        assert.ok(results[0].errorMsg.length > 5);
-//        done();
-//    });
-
-    // Test exceptions
-    // not necessary
+    // TODO - extensive tests must be written the same way as the execute method
+    // has been tested:
+    // Test single and multiple string url calls
+    // Test single and multiple HTTPManagerGetRequest calls
+    // Test single and multiple HTTPManagerPostRequest calls
+    // Test multiple mixed requests n the same method call: strings, HTTPManagerGetRequest, HTTPManagerPostRequest
 });
 
 

@@ -558,6 +558,12 @@ export class HTTPManager{
           queueName: string,
           finishedCallback: (() => void) | null = null){
     
+        // TODO - this method is almost finished, but some things are pending:
+        // 1- FinishedCallback should work the same way as the execute method, and give us the results data and info
+        // 2- There should be a progressCallback method
+        // 3- Extensive tests must be written: verify requests are sequentially executed one after the other, and all
+		//    the rest of the expected behaviour
+        
         let requestsList = this._generateValidRequestsList(requests);
 
         // Validate callbacks are ok

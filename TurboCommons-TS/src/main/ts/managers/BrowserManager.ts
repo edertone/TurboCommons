@@ -322,7 +322,9 @@ export class BrowserManager{
      */
     getWindowWidth(){
         
-        return window.innerWidth || document.documentElement.clientWidth || document.getElementsByTagName('body')[0].clientWidth || -1;
+        return window.innerWidth ||
+            (document.documentElement as HTMLElement).clientWidth ||
+            document.getElementsByTagName('body')[0].clientWidth || -1;
     }
     
     
@@ -335,7 +337,9 @@ export class BrowserManager{
      */
     getWindowHeight(){
 
-        return window.innerHeight || document.documentElement.clientHeight || document.getElementsByTagName('body')[0].clientHeight || -1;
+        return window.innerHeight ||
+            (document.documentElement as HTMLElement).clientHeight ||
+            document.getElementsByTagName('body')[0].clientHeight || -1;
     }
     
     
@@ -346,7 +350,11 @@ export class BrowserManager{
      */
     getDocumentWidth(){
 
-        return Math.max(document.body.scrollWidth, document.body.offsetWidth, document.documentElement.clientWidth, document.documentElement.scrollWidth, document.documentElement.offsetWidth);
+        return Math.max(document.body.scrollWidth,
+                document.body.offsetWidth,
+                (document.documentElement as HTMLElement).clientWidth,
+                (document.documentElement as HTMLElement).scrollWidth,
+                (document.documentElement as HTMLElement).offsetWidth);
     }
     
     
@@ -357,7 +365,11 @@ export class BrowserManager{
      */
     getDocumentHeight(){
 
-        return Math.max(document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight);
+        return Math.max(document.body.scrollHeight,
+                document.body.offsetHeight,
+                (document.documentElement as HTMLElement).clientHeight,
+                (document.documentElement as HTMLElement).scrollHeight,
+                (document.documentElement as HTMLElement).offsetHeight);
     }
     
 
