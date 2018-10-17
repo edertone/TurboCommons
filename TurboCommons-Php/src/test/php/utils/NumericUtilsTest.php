@@ -126,6 +126,10 @@ class NumericUtilsTest extends TestCase {
 	    $this->assertTrue(NumericUtils::isNumeric('    1     '));
 	    $this->assertTrue(NumericUtils::isNumeric("1     \n"));
 
+	    $objectThatMustNotBeAltered = ((object) ['value' => " 15  "]);
+	    $this->assertTrue(NumericUtils::isNumeric($objectThatMustNotBeAltered->value));
+	    $this->assertSame($objectThatMustNotBeAltered->value, " 15  ");
+
 	    // Test wrong values
 	    $this->assertFalse(NumericUtils::isNumeric('abc'));
 	    $this->assertFalse(NumericUtils::isNumeric('col20'));

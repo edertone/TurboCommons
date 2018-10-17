@@ -76,7 +76,11 @@ QUnit.test("isNumeric", function(assert){
     assert.ok(NumericUtils.isNumeric(' 1 '));
     assert.ok(NumericUtils.isNumeric('    1     '));
     assert.ok(NumericUtils.isNumeric("1     \n"));
-
+    
+    var objectThatMustNotBeAltered = {value: " 15  "};    
+    assert.ok(NumericUtils.isNumeric(objectThatMustNotBeAltered.value));
+    assert.strictEqual(objectThatMustNotBeAltered.value, " 15  ");
+    
     // Test wrong values
     assert.notOk(NumericUtils.isNumeric('abc'));
     assert.notOk(NumericUtils.isNumeric('1-'));
