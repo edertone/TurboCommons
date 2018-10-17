@@ -8,9 +8,6 @@
  */
 
 
-import { HashMapObject } from '../model/HashMapObject';
-
- 
 /**
  * Class that defines the base http request to be used with http manager
  */ 

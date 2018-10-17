@@ -12,6 +12,8 @@
 export { BrowserManager } from './managers/BrowserManager';
 export { FilesManager } from './managers/FilesManager';
 export { HTTPManager } from './managers/HTTPManager';
+export { HTTPManagerGetRequest } from './managers/httpmanager/HTTPManagerGetRequest';
+export { HTTPManagerPostRequest } from './managers/httpmanager/HTTPManagerPostRequest';
 export { LocalizationManager} from './managers/LocalizationManager';
 export { ModelHistoryManager} from './managers/ModelHistoryManager';
 export { SerializationManager } from './managers/SerializationManager';

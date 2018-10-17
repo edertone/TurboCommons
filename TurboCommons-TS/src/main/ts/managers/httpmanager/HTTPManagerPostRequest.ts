@@ -8,8 +8,8 @@
  */
 
 
-import { HashMapObject } from '../model/HashMapObject';
 import { HTTPManagerBaseRequest } from './HTTPManagerBaseRequest';
+import { HashMapObject } from '../../model/HashMapObject';
 
  
 /**

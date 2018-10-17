@@ -17,9 +17,11 @@ QUnit.module("HTTPManagerTest", {
         window.emptyValuesCount = window.emptyValues.length;
 
         window.StringUtils = org_turbocommons.StringUtils;
+        window.ArrayUtils = org_turbocommons.ArrayUtils;
         window.ObjectUtils = org_turbocommons.ObjectUtils;
         window.HashMapObject = org_turbocommons.HashMapObject;
         window.HTTPManager = org_turbocommons.HTTPManager;
+        window.HTTPManagerGetRequest = org_turbocommons.HTTPManagerGetRequest;
         window.browserManager = new org_turbocommons.BrowserManager();
         window.sut = new org_turbocommons.HTTPManager();
 
@@ -35,9 +37,11 @@ QUnit.module("HTTPManagerTest", {
         delete window.emptyValuesCount;
         
         delete window.StringUtils;
+        delete window.ArrayUtils;
         delete window.ObjectUtils;
         delete window.HashMapObject;
         delete window.HTTPManager;
+        delete window.HttpManagerGetRequest;
         delete window.browserManager;
         delete window.sut;
         
@@ -62,16 +66,266 @@ QUnit.test("testConstructor", function(assert){
 
     // Test ok values
     sut = new HTTPManager(true);
-    assert.ok(sut.asynchronous === true);
+    assert.strictEqual(sut.asynchronous, true);
+    assert.strictEqual(sut.timeout, 0);
     
     sut = new HTTPManager(false);
-    assert.ok(sut.asynchronous === false);
+    assert.strictEqual(sut.asynchronous, false);
+    assert.strictEqual(sut.timeout, 0);
+    assert.strictEqual(sut.countQueues(), 0);
 
     // Test wrong values
     // Already tested at empty values
 
     // Test exceptions
     // Already tested at empty values
+});
+
+
+/**
+ * createQueue
+ */
+QUnit.test("createQueue", function(assert){
+
+    // Test empty values
+    for (var i = 0; i < emptyValuesCount; i++) {
+        
+        assert.throws(function() {
+            sut.createQueue(emptyValues[i]);
+        }, /name must be a non empty string|value is not a string/);
+    }
+
+    // Test ok values
+    assert.strictEqual(sut.countQueues(), 0);
+    sut.createQueue("first queue");
+    assert.strictEqual(sut.countQueues(), 1);
+    assert.strictEqual(sut.isQueueRunning("first queue"), false);
+    
+    sut.createQueue("second queue");
+    assert.strictEqual(sut.countQueues(), 2);
+    assert.strictEqual(sut.isQueueRunning("second queue"), false);
+    
+    sut.createQueue("third queue");
+    assert.strictEqual(sut.countQueues(), 3);
+    assert.strictEqual(sut.isQueueRunning("third queue"), false);
+    
+    // Test wrong values
+    assert.throws(function() {
+        sut.createQueue("first queue");
+    }, /queue first queue already exists/);
+
+    assert.throws(function() {
+        sut.createQueue("second queue");
+    }, /queue second queue already exists/);
+
+    // Test exceptions
+    assert.throws(function() {
+        sut.createQueue(13435);
+    }, /value is not a string/);
+    
+    assert.throws(function() {
+        sut.createQueue({hello: 1});
+    }, /value is not a string/);
+    
+    assert.throws(function() {
+        sut.createQueue([1, 2, 3]);
+    }, /value is not a string/);
+});
+
+
+/**
+ * countQueues
+ */
+QUnit.test("countQueues", function(assert){
+
+    // Test empty values
+    // Not necessary
+
+    // Test ok values
+    assert.strictEqual(sut.countQueues(), 0);
+    
+    for (var i = 0; i < 20; i++) {
+        
+        sut.createQueue("queue " + i);
+        assert.strictEqual(sut.countQueues(), i + 1);
+        assert.strictEqual(sut.isQueueRunning("queue " + i), false);
+    }
+
+    // Test wrong values
+    // Not necessary
+
+    // Test exceptions
+    // Not necessary
+});
+
+
+/**
+ * isQueueRunning
+ */
+QUnit.test("isQueueRunning", function(assert){
+
+    // Test empty values
+    for (var i = 0; i < emptyValuesCount; i++) {
+        
+        assert.throws(function() {
+            sut.isQueueRunning(emptyValues[i]);
+        }, /name must be a non empty string|value is not a string/);
+    }
+
+    // Test ok values
+    sut.createQueue("queue1");
+    sut.createQueue("queue2");
+    assert.strictEqual(sut.countQueues(), 2);
+    assert.strictEqual(sut.isQueueRunning("queue1"), false);
+    assert.strictEqual(sut.isQueueRunning("queue2"), false);
+    
+    var done = assert.async(2);
+    
+    sut.queue('some invalid url', 'queue1', function(){
+
+        assert.strictEqual(sut.isQueueRunning("queue1"), false);
+        done();        
+    });
+    
+    assert.strictEqual(sut.isQueueRunning("queue1"), true);
+
+    sut.queue(basePath + '/file1.txt', 'queue2', function(){
+
+        assert.strictEqual(sut.isQueueRunning("queue2"), false);
+        done();        
+    });
+    
+    assert.strictEqual(sut.isQueueRunning("queue2"), true);
+
+    // Test wrong values
+    // Not necessary
+
+    // Test exceptions
+    assert.throws(function() {
+        sut.isQueueRunning(13435);
+    }, /value is not a string/);
+    
+    assert.throws(function() {
+        sut.isQueueRunning({hello: 1});
+    }, /value is not a string/);
+    
+    assert.throws(function() {
+        sut.isQueueRunning([1, 2, 3]);
+    }, /value is not a string/);
+});
+
+
+/**
+ * deleteQueue
+ */
+QUnit.test("deleteQueue", function(assert){
+
+    // Test empty values
+    for (var i = 0; i < emptyValuesCount; i++) {
+        
+        assert.throws(function() {
+            sut.deleteQueue(emptyValues[i]);
+        }, /name must be a non empty string|value is not a string/);
+    }
+
+    // Test ok values
+    sut.createQueue("queue1");
+    sut.createQueue("queue2");
+    sut.createQueue("queue3");
+    assert.strictEqual(sut.countQueues(), 3);
+    sut.deleteQueue("queue1");
+    assert.strictEqual(sut.countQueues(), 2);
+    
+    assert.throws(function() {
+        sut.isQueueRunning("queue1");
+    }, /queue queue1 does not exist/);
+    
+    assert.strictEqual(sut.isQueueRunning("queue2"), false);
+    sut.deleteQueue("queue2");
+    assert.strictEqual(sut.countQueues(), 1);
+    
+    assert.throws(function() {
+        sut.isQueueRunning("queue2");
+    }, /queue queue2 does not exist/);
+
+    // Test wrong values
+    assert.throws(function() {
+        sut.deleteQueue("non existant queue");
+    }, /queue non existant queue does not exist/);
+
+    // Test exceptions
+    assert.throws(function() {
+        sut.deleteQueue(13435);
+    }, /value is not a string/);
+    
+    assert.throws(function() {
+        sut.deleteQueue({hello: 1});
+    }, /value is not a string/);
+    
+    assert.throws(function() {
+        sut.deleteQueue([1, 2, 3]);
+    }, /value is not a string/);
+});
+
+
+/**
+ * generateUrlQueryString
+ */
+QUnit.test("generateUrlQueryString", function(assert){
+
+    // Test empty values
+    for (var i = 0; i < emptyValuesCount; i++) {
+          
+        assert.throws(function() {
+            sut.generateUrlQueryString(emptyValues[i]);
+        }, /keyValuePairs must be a HashMapObject or a non empty Object/);
+    }
+
+    // Test ok values with objects
+    assert.strictEqual(sut.generateUrlQueryString({a:1}), 'a=1');
+    assert.strictEqual(sut.generateUrlQueryString({a:1,b:2}), 'a=1&b=2');
+    assert.strictEqual(sut.generateUrlQueryString({a:1,b:2,c:3}), 'a=1&b=2&c=3');
+    assert.strictEqual(sut.generateUrlQueryString({a:"h&b",b:"-_.*="}), 'a=h%26b&b=-_.*%3D');
+    assert.strictEqual(sut.generateUrlQueryString({"/&%$·#&=":"1"}), '%2F%26%25%24%C2%B7%23%26%3D=1');
+    assert.strictEqual(sut.generateUrlQueryString({"%":"%"}), '%25=%25');
+    
+    // Test ok values with HashMapObjects
+    var hashMapObject = new HashMapObject();
+    hashMapObject.set('/&%$·#&=', 1);
+    assert.strictEqual(sut.generateUrlQueryString(hashMapObject), '%2F%26%25%24%C2%B7%23%26%3D=1');
+    
+    hashMapObject.set('b', 2);
+    assert.strictEqual(sut.generateUrlQueryString(hashMapObject), '%2F%26%25%24%C2%B7%23%26%3D=1&b=2');
+    
+    hashMapObject.set('c', 3);
+    assert.strictEqual(sut.generateUrlQueryString(hashMapObject), '%2F%26%25%24%C2%B7%23%26%3D=1&b=2&c=3');
+    
+    hashMapObject.set('d', 'he/&%$·#&=llo');
+    assert.strictEqual(sut.generateUrlQueryString(hashMapObject), '%2F%26%25%24%C2%B7%23%26%3D=1&b=2&c=3&d=he%2F%26%25%24%C2%B7%23%26%3Dllo');
+    
+    // Test wrong values
+    // Tested with exceptions
+
+    // Test exceptions
+    assert.throws(function() {
+        sut.generateUrlQueryString("hello");
+    }, /keyValuePairs must be a HashMapObject or a non empty Object/);
+    
+    assert.throws(function() {
+        sut.generateUrlQueryString([1,2,3,4]);
+    }, /keyValuePairs must be a HashMapObject or a non empty Object/);
+    
+    assert.throws(function() {
+        sut.generateUrlQueryString(new Error());
+    }, /keyValuePairs must be a HashMapObject or a non empty Object/);
+    
+    assert.throws(function() {
+        sut.generateUrlQueryString(10);
+    }, /keyValuePairs must be a HashMapObject or a non empty Object/);
+    
+    assert.throws(function() {
+        sut.generateUrlQueryString(true);
+    }, /keyValuePairs must be a HashMapObject or a non empty Object/);
 });
 
 
@@ -245,217 +499,486 @@ QUnit.test("getUrlHeaders", function(assert){
 
 
 /**
- * generateUrlQueryString
+ * execute
  */
-QUnit.test("generateUrlQueryString", function(assert){
-
+QUnit.test("execute - requests with string urls", function(assert){
+    
     // Test empty values
     for (var i = 0; i < emptyValuesCount; i++) {
-          
+        
+        var expectedError = /Invalid requests value/;
+        
+        if(ArrayUtils.isArray(emptyValues[i]) && emptyValues[i].length === 0){
+           
+            expectedError = /No requests to execute/;
+        }
+        
         assert.throws(function() {
-            sut.generateUrlQueryString(emptyValues[i]);
-        }, /object must be a HashMapObject or a non empty Object/);
+            sut.execute(emptyValues[i]);
+        }, expectedError);
     }
 
-    // Test ok values with objects
-    assert.strictEqual(sut.generateUrlQueryString({a:1}), 'a=1');
-    assert.strictEqual(sut.generateUrlQueryString({a:1,b:2}), 'a=1&b=2');
-    assert.strictEqual(sut.generateUrlQueryString({a:1,b:2,c:3}), 'a=1&b=2&c=3');
-    assert.strictEqual(sut.generateUrlQueryString({a:"h&b",b:"-_.*="}), 'a=h%26b&b=-_.*%3D');
-    assert.strictEqual(sut.generateUrlQueryString({"/&%$·#&=":"1"}), '%2F%26%25%24%C2%B7%23%26%3D=1');
-    assert.strictEqual(sut.generateUrlQueryString({"%":"%"}), '%25=%25');
+    // Test ok values
+    var done = assert.async(5);
     
-    // Test ok values with HashMapObjects
-    var hashMapObject = new HashMapObject();
-    hashMapObject.set('/&%$·#&=', 1);
-    assert.strictEqual(sut.generateUrlQueryString(hashMapObject), '%2F%26%25%24%C2%B7%23%26%3D=1');
+    // Single url with error
+    sut.execute('some invalid url', function(results, anyError){
+
+        assert.strictEqual(anyError, true);
+        assert.strictEqual(results[0].isError, true);
+        assert.ok(results[0].errorMsg.length > 3);
+        done();
+    });
     
-    hashMapObject.set('b', 2);
-    assert.strictEqual(sut.generateUrlQueryString(hashMapObject), '%2F%26%25%24%C2%B7%23%26%3D=1&b=2');
+    // Single url without error
+    sut.execute(browserManager.getCurrentUrl(), function(results, anyError){
+
+        assert.ok(!StringUtils.isEmpty(results[0].response));
+        assert.ok(results[0].response.length > 5);
+        
+        assert.strictEqual(anyError, false);
+        assert.strictEqual(results[0].isError, false);
+        done();
+    });
     
-    hashMapObject.set('c', 3);
-    assert.strictEqual(sut.generateUrlQueryString(hashMapObject), '%2F%26%25%24%C2%B7%23%26%3D=1&b=2&c=3');
+    // Multiple urls with errors
+    var multiErrProgressCount = 0;
     
-    hashMapObject.set('d', 'he/&%$·#&=llo');
-    assert.strictEqual(sut.generateUrlQueryString(hashMapObject), '%2F%26%25%24%C2%B7%23%26%3D=1&b=2&c=3&d=he%2F%26%25%24%C2%B7%23%26%3Dllo');
+    sut.execute(['invalidUrl1', 'invalidUrl2', 'invalidUrl3'], function(results, anyError){
+
+        assert.strictEqual(multiErrProgressCount, 3);
+        assert.strictEqual(anyError, true);
+        assert.strictEqual(results[0].isError, true);
+        assert.ok(results[0].errorMsg.length > 3);
+        assert.strictEqual(results[1].isError, true);
+        assert.ok(results[1].errorMsg.length > 3);
+        assert.strictEqual(results[2].isError, true);
+        assert.ok(results[2].errorMsg.length > 3);
+        done();
+        
+    }, function(completedUrl, totalRequests) {
+        
+        assert.strictEqual(totalRequests, 3);
+        multiErrProgressCount ++;
+    });
+    
+    sut.execute([browserManager.getCurrentUrl(), 'invalidUrl2', browserManager.getCurrentUrl()], function(results, anyError){
+
+        assert.strictEqual(anyError, true);
+        assert.strictEqual(results[0].isError, false);
+        assert.strictEqual(results[0].errorMsg, '');
+        assert.strictEqual(results[1].isError, true);
+        assert.ok(results[1].errorMsg.length > 3);
+        assert.strictEqual(results[2].isError, false);
+        assert.strictEqual(results[2].errorMsg, '');
+        done();
+    });
+    
+    // Multiple urls without errors
+    var multiProgressCount = 0;
+    
+    sut.execute([basePath + '/file1.txt', basePath + '/file2.xml', basePath + '/file3.json'], function(results, anyError){
+
+        assert.strictEqual(multiProgressCount, 3);
+        assert.strictEqual(anyError, false);
+        assert.strictEqual(results[0].isError, false);
+        assert.strictEqual(results[0].errorMsg, '');
+        assert.strictEqual(results[1].isError, false);
+        assert.strictEqual(results[1].errorMsg, '');
+        assert.strictEqual(results[2].isError, false);
+        assert.strictEqual(results[2].errorMsg, '');
+        done();
+        
+    }, function(completedUrl, totalRequests) {
+        
+        assert.strictEqual(totalRequests, 3);
+        multiProgressCount ++;
+    });
     
     // Test wrong values
-    // Tested with exceptions
+    // Not necessary
 
     // Test exceptions
     assert.throws(function() {
-        sut.generateUrlQueryString("hello");
-    }, /object must be a HashMapObject or a non empty Object/);
+        sut.execute(basePath + '/file1.txt', ['hello'], () => {});
+    }, /finishedCallback and progressCallback must be functions/);
     
     assert.throws(function() {
-        sut.generateUrlQueryString([1,2,3,4]);
-    }, /object must be a HashMapObject or a non empty Object/);
+        sut.execute(basePath + '/file1.txt', () => {}, ['hello']);
+    }, /finishedCallback and progressCallback must be functions/);
     
     assert.throws(function() {
-        sut.generateUrlQueryString(new Error());
-    }, /object must be a HashMapObject or a non empty Object/);
+        sut.execute([1, 2], () => {}, () => {});
+    }, /url 0 must be a non empty string/);
     
     assert.throws(function() {
-        sut.generateUrlQueryString(10);
-    }, /object must be a HashMapObject or a non empty Object/);
-    
-    assert.throws(function() {
-        sut.generateUrlQueryString(true);
-    }, /object must be a HashMapObject or a non empty Object/);
+        sut.execute(["1", 2], () => {}, () => {});
+    }, /url 1 must be a non empty string/);
 });
 
 
 /**
- * get
+ * execute
  */
-QUnit.test("get", function(assert){
+QUnit.test("execute - single HTTPManagerGetRequest with errors", function(assert){
+
+    var done = assert.async();
     
-    // Test empty values
-    for (var i = 0; i < emptyValuesCount; i++) {
-        
-        assert.throws(function() {
-            sut.get(emptyValues[i]);
-        }, /must be a non empty string/);
-    } 
+    var progressCount = 0;
+    var successCalled = false;
+    var errorCalled = false;
+    var finallyCalled = false;
     
-    // Test ok values
-    var done = assert.async(2);
+    var request = new HTTPManagerGetRequest('some invalid url');
     
-    sut.get(browserManager.getCurrentUrl(), function(result){
+    request.successCallback = (response) => successCalled = true;
 
-        assert.ok(!StringUtils.isEmpty(result));
-        assert.ok(result.length > 5);
-        done();
-        
-    }, function(){
-        
-        assert.ok(false);
-        done();
-    });
-        
-    // Test wrong values
-    sut.get(nonExistantUrl, function(result){
-
-        assert.ok(false);
-        done();
-        
-    }, function(msg, code){
-        
-        assert.ok(StringUtils.isString(msg));
-        assert.ok(msg.length > 5);
-        assert.strictEqual(code, 404);
-        done();
-    });
-
-    // Test exceptions
-    // This test is considered innecessary and skiped
-});
-
-
-/**
- * post
- */
-QUnit.todo("post", function(assert){
-
-    // Test empty values
-    // TODO
-
-    // Test ok values
-    // TODO
-
-    // Test wrong values
-    // TODO
-
-    // Test exceptions
-    // TODO
-});
-
-
-/**
- * multiGetRequest
- */
-QUnit.test("multiGetRequest", function(assert){
-
-    // Test empty values
-    for (var i = 0; i < emptyValuesCount; i++) {
-        
-        assert.throws(function() {
-            sut.multiGetRequest(emptyValues[i]);
-        }, /paths must be a non empty array/);
-    } 
-
-    // Test ok values
-    var done = assert.async(3);
-
-    var resources = [basePath + '/file1.txt',
-                     basePath + '/file2.xml',
-                     basePath + '/file3.json'];
+    request.errorCallback = (errorMsg, errorCode) => {
+        assert.ok(errorMsg.length > 3);
+        assert.strictEqual(errorCode, 404);
+        errorCalled = true;
+    };
     
-    sut.multiGetRequest(resources, function(results, anyError){
-
-        assert.strictEqual(false, anyError);
-        
-        assert.strictEqual(results.length, 3);
-        assert.strictEqual(results[0].response, 'text1');
-        assert.strictEqual(results[1].response, "<test>\r\n    hello\r\n</test>");
-        assert.strictEqual(results[2].response, '{\r\n"a": "1",\r\n"b": 2\r\n}');
-        done();        
-    });
+    request.finallyCallback = () => finallyCalled = true;
     
-    // test ok values with resourceLoadedCallback
-    var progressCalls = 0;
-    
-    sut.multiGetRequest(resources, function(results, anyError){
+    sut.execute(request, function(results, anyError){
 
-        assert.strictEqual(false, anyError);
+        assert.strictEqual(progressCount, 1);
+        assert.strictEqual(successCalled, false);
+        assert.strictEqual(errorCalled, true);
+        assert.strictEqual(finallyCalled, true);
         
-        assert.strictEqual(results.length, 3);
-        assert.strictEqual(results[0].response, 'text1');
-        assert.strictEqual(results[1].response, "<test>\r\n    hello\r\n</test>");
-        assert.strictEqual(results[2].response, '{\r\n"a": "1",\r\n"b": 2\r\n}');
-        assert.strictEqual(progressCalls, 3);        
-        done();
-        
-    }, null, function(completedUrl, totalUrls){
-        
-        assert.strictEqual(3, totalUrls);
-        progressCalls ++;
-    });
-
-    // Test wrong values
-    sut.multiGetRequest([nonExistantUrl], function(results, anyError){
-
-        assert.strictEqual(true, anyError);
-        
-        assert.strictEqual(results[0].path, nonExistantUrl);
+        assert.strictEqual(anyError, true);
+        assert.strictEqual(results[0].url, 'some invalid url');
         assert.strictEqual(results[0].response, '');
         assert.strictEqual(results[0].isError, true);
-        assert.strictEqual(results[0].errorCode, 404);
-        assert.ok(results[0].errorMsg.length > 5);
+        assert.ok(results[0].errorMsg.length > 3);
+        assert.ok(results[0].errorCode > 0);
         done();
+        
+    }, function(completedUrl, totalRequests) {
+        
+        assert.strictEqual(completedUrl, 'some invalid url');
+        assert.strictEqual(totalRequests, 1);
+        progressCount ++;
     });
+});
+
+
+/**
+ * execute
+ */
+QUnit.test("execute - single HTTPManagerGetRequest without errors", function(assert){
+
+    var done = assert.async();
+    
+    var progressCount = 0;
+    var successCalled = false;
+    var errorCalled = false;
+    var finallyCalled = false;
+    
+    var request = new HTTPManagerGetRequest(basePath + '/file1.txt');
+    
+    request.successCallback = (response) => {
+        assert.strictEqual(response, 'text1');
+        successCalled = true;
+    }
+
+    request.errorCallback = (errorMsg, errorCode) => errorCalled = true;
+    
+    request.finallyCallback = () => finallyCalled = true;
+    
+    sut.execute(request, function(results, anyError){
+
+        assert.strictEqual(progressCount, 1);
+        assert.strictEqual(successCalled, true);
+        assert.strictEqual(errorCalled, false);
+        assert.strictEqual(finallyCalled, true);
+        
+        assert.strictEqual(anyError, false);
+        assert.strictEqual(results[0].url, basePath + '/file1.txt');
+        assert.strictEqual(results[0].response, 'text1');
+        assert.strictEqual(results[0].isError, false);
+        assert.strictEqual(results[0].errorMsg, '');
+        assert.strictEqual(results[0].errorCode, -1);
+        done();
+    
+    }, function(completedUrl, totalRequests) {
+        
+        assert.strictEqual(completedUrl, basePath + '/file1.txt');
+        assert.strictEqual(totalRequests, 1);
+        progressCount ++;
+    });
+});
+
+
+/**
+ * execute
+ */
+QUnit.test("execute - multiple HTTPManagerGetRequest with errors", function(assert){
+    
+    var done = assert.async();
+    
+    var progressCount = 0;
+    var successCalledCount = 0;
+    var errorCalledCount = 0;
+    var finallyCalledCount = 0;
+    
+    // Declare first request
+    var request1 = new HTTPManagerGetRequest(basePath + '/file1.txt');
+    
+    request1.successCallback = (response) => {
+        assert.strictEqual(response, 'text1');
+        successCalledCount ++;
+    }
+
+    request1.errorCallback = (errorMsg, errorCode) => errorCalledCount ++;
+    
+    request1.finallyCallback = () => finallyCalledCount ++;
+    
+    // Declare second request
+    var request2 = new HTTPManagerGetRequest('invalid url 1');
+    
+    request2.successCallback = (response) => successCalledCount ++;
+
+    request2.errorCallback = (errorMsg, errorCode) => {
+        assert.ok(errorMsg.length > 3);
+        assert.strictEqual(errorCode, 404);
+        errorCalledCount ++;
+    };
+    
+    request2.finallyCallback = () => finallyCalledCount ++;
+    
+    // Declare third request
+    var request3 = new HTTPManagerGetRequest('invalid url 2');
+    
+    request3.successCallback = (response) => successCalledCount ++;
+
+    request3.errorCallback = (errorMsg, errorCode) => {
+        assert.ok(errorMsg.length > 3);
+        assert.strictEqual(errorCode, 404);
+        errorCalledCount ++;
+    };
+    
+    request3.finallyCallback = () => finallyCalledCount ++;
+    
+    // Launch the 3 requests and process the results
+    sut.execute([request1, request2, request3], function(results, anyError){
+
+        assert.strictEqual(progressCount, 3);
+        assert.strictEqual(successCalledCount, 1);
+        assert.strictEqual(errorCalledCount, 2);
+        assert.strictEqual(finallyCalledCount, 3);
+        
+        assert.strictEqual(anyError, true);
+        
+        assert.strictEqual(results[0].url, basePath + '/file1.txt');
+        
+        for(var i = 1; i < 3; i++){
+            
+            assert.strictEqual(results[i].url, 'invalid url ' + i);
+            assert.strictEqual(results[i].response, '');
+            assert.strictEqual(results[i].isError, true);
+            assert.ok(results[i].errorMsg.length > 3);
+            assert.ok(results[i].errorCode > 0);
+        }
+        
+        done();
+        
+    }, function(completedUrl, totalRequests) {
+        
+        assert.strictEqual(totalRequests, 3);
+        progressCount ++;
+    });
+});
+
+
+/**
+ * execute
+ */
+QUnit.test("execute - multiple HTTPManagerGetRequest without errors", function(assert){
+    
+    var done = assert.async();
+    
+    var progressCount = 0;
+    var successCalledCount = 0;
+    var errorCalledCount = 0;
+    var finallyCalledCount = 0;
+    
+    // Declare first request
+    var request1 = new HTTPManagerGetRequest(basePath + '/file1.txt');
+    
+    request1.successCallback = (response) => {
+        assert.strictEqual(response, 'text1');
+        successCalledCount ++;
+    }
+
+    request1.errorCallback = (errorMsg, errorCode) => errorCalledCount ++;
+    
+    request1.finallyCallback = () => finallyCalledCount ++;
+    
+    // Declare second request
+    var request2 = new HTTPManagerGetRequest(basePath + '/file2.xml');
+    
+    request2.successCallback = (response) => {
+        assert.strictEqual(response, "<test>\r\n    hello\r\n</test>");
+        successCalledCount ++;
+    }
+
+    request2.errorCallback = (errorMsg, errorCode) => errorCalledCount ++;
+    
+    request2.finallyCallback = () => finallyCalledCount ++;
+    
+    // Declare third request
+    var request3 = new HTTPManagerGetRequest(basePath + '/file3.json');
+    
+    request3.successCallback = (response) => {
+        assert.strictEqual(response, '{\r\n"a": "1",\r\n"b": 2\r\n}');
+        successCalledCount ++;
+    }
+
+    request3.errorCallback = (errorMsg, errorCode) => errorCalledCount ++;
+    
+    request3.finallyCallback = () => finallyCalledCount ++;
+    
+    // Launch the 3 requests and process the results
+    sut.execute([request1, request2, request3], function(results, anyError){
+
+        assert.strictEqual(progressCount, 3);
+        assert.strictEqual(successCalledCount, 3);
+        assert.strictEqual(errorCalledCount, 0);
+        assert.strictEqual(finallyCalledCount, 3);
+        
+        assert.strictEqual(anyError, false);
+        
+        assert.strictEqual(results[0].url, basePath + '/file1.txt');
+        assert.strictEqual(results[0].response, 'text1');
+        assert.strictEqual(results[1].url, basePath + '/file2.xml');
+        assert.strictEqual(results[1].response, "<test>\r\n    hello\r\n</test>");
+        assert.strictEqual(results[2].url, basePath + '/file3.json');
+        assert.strictEqual(results[2].response, '{\r\n"a": "1",\r\n"b": 2\r\n}');
+        
+        for(var i = 0; i < 3; i++){
+            
+            assert.strictEqual(results[i].isError, false);
+            assert.strictEqual(results[i].errorMsg, '');
+            assert.strictEqual(results[i].errorCode, -1);
+        }
+        
+        done();
+        
+    }, function(completedUrl, totalRequests) {
+        
+        assert.strictEqual(totalRequests, 3);
+        progressCount ++;
+    });
+});
+
+
+/**
+ * execute
+ */
+QUnit.test("execute - single HTTPManagerPostRequest with errors", function(assert){
+    
+    // TODO
+});
+
+
+/**
+ * execute
+ */
+QUnit.test("execute - single HTTPManagerPostRequest without errors", function(assert){
+    
+    // TODO
+});
+
+
+/**
+ * execute
+ */
+QUnit.test("execute - multiple HTTPManagerPostRequest with errors", function(assert){
+    
+    // TODO
+});
+
+
+/**
+ * execute
+ */
+QUnit.test("execute - multiple HTTPManagerPostRequest without errors", function(assert){
+    
+    // TODO
+});
+
+
+/**
+ * queue
+ */
+QUnit.test("queue - TODO all cases", function(assert){
+
+    // TODO - review all these tests (previously multiGetRequest)
+    
+    // Test empty values
+//    for (var i = 0; i < emptyValuesCount; i++) {
+//        
+//        assert.throws(function() {
+//            sut.multiGetRequest(emptyValues[i]);
+//        }, /paths must be a non empty array/);
+//    } 
+//
+//    // Test ok values
+//    var done = assert.async(3);
+//
+//    var resources = [basePath + '/file1.txt',
+//                     basePath + '/file2.xml',
+//                     basePath + '/file3.json'];
+//    
+//    sut.multiGetRequest(resources, function(results, anyError){
+//
+//        assert.strictEqual(false, anyError);
+//        
+//        assert.strictEqual(results.length, 3);
+//        assert.strictEqual(results[0].response, 'text1');
+//        assert.strictEqual(results[1].response, "<test>\r\n    hello\r\n</test>");
+//        assert.strictEqual(results[2].response, '{\r\n"a": "1",\r\n"b": 2\r\n}');
+//        done();        
+//    });
+//    
+//    // test ok values with resourceLoadedCallback
+//    var progressCalls = 0;
+//    
+//    sut.multiGetRequest(resources, function(results, anyError){
+//
+//        assert.strictEqual(false, anyError);
+//        
+//        assert.strictEqual(results.length, 3);
+//        assert.strictEqual(results[0].response, 'text1');
+//        assert.strictEqual(results[1].response, "<test>\r\n    hello\r\n</test>");
+//        assert.strictEqual(results[2].response, '{\r\n"a": "1",\r\n"b": 2\r\n}');
+//        assert.strictEqual(progressCalls, 3);        
+//        done();
+//        
+//    }, null, function(completedUrl, totalUrls){
+//        
+//        assert.strictEqual(3, totalUrls);
+//        progressCalls ++;
+//    });
+//
+//    // Test wrong values
+//    sut.multiGetRequest([nonExistantUrl], function(results, anyError){
+//
+//        assert.strictEqual(true, anyError);
+//        
+//        assert.strictEqual(results[0].path, nonExistantUrl);
+//        assert.strictEqual(results[0].response, '');
+//        assert.strictEqual(results[0].isError, true);
+//        assert.strictEqual(results[0].errorCode, 404);
+//        assert.ok(results[0].errorMsg.length > 5);
+//        done();
+//    });
 
     // Test exceptions
     // not necessary
-});
-
-
-/**
- * multiPostRequest
- */
-QUnit.todo("multiPostRequest", function(assert){
-
-    // Test empty values
-    // TODO
-
-    // Test ok values
-    // TODO
-
-    // Test wrong values
-    // TODO
-
-    // Test exceptions
-    // TODO
 });
 
 
@@ -469,7 +992,7 @@ QUnit.test("loadResourcesFromList", function(assert){
         
         assert.throws(function() {
             sut.loadResourcesFromList(emptyValues[i], 'somepath');
-        }, /url must be a non empty string/);
+        }, /urlToResourcesList must be a non empty string/);
         
         assert.throws(function() {
             sut.loadResourcesFromList('somepath', emptyValues[i]);

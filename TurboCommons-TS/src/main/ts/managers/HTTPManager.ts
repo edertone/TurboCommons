@@ -12,8 +12,8 @@ import { StringUtils } from '../utils/StringUtils';
 import { ObjectUtils } from '../utils/ObjectUtils';
 import { ArrayUtils } from '../utils/ArrayUtils';
 import { HashMapObject } from '../model/HashMapObject';
-import { HTTPManagerGetRequest } from './HTTPManagerGetRequest';
-import { HTTPManagerBaseRequest } from "./HTTPManagerBaseRequest";
+import { HTTPManagerGetRequest } from './httpmanager/HTTPManagerGetRequest';
+import { HTTPManagerBaseRequest } from './httpmanager/HTTPManagerBaseRequest';
 
    
 /**
@@ -93,6 +93,11 @@ export class HTTPManager{
      */
     createQueue(name: string){
         
+        if(StringUtils.isEmpty(name)){
+        
+            throw new Error('name must be a non empty string');
+        }
+        
         for (let queue of this._queues) {
 	
             if(queue.name === name){
@@ -106,6 +111,19 @@ export class HTTPManager{
     
     
     /**
+     * Get the number of created queues. Some may be running and some may be not
+     * 
+     * @see this.queue()
+     * 
+     * @returns The number of existing queues
+     */
+    countQueues(){
+        
+        return this._queues.length;
+    }
+    
+    
+    /**
      * Check if the specified queue is currently executing http requests
      * 
      * @param name The name for the queue we want to check
@@ -115,6 +133,11 @@ export class HTTPManager{
      * @returns boolean True if the specified queue is actually running its http requests
      */
     isQueueRunning(name: string){
+        
+        if(StringUtils.isEmpty(name)){
+            
+            throw new Error('name must be a non empty string');
+        }
         
         for (let queue of this._queues) {
             
@@ -140,6 +163,11 @@ export class HTTPManager{
      */
     deleteQueue(name: string){
         
+        if(StringUtils.isEmpty(name)){
+            
+            throw new Error('name must be a non empty string');
+        }
+
         for (var i = 0; i < this._queues.length; i++) {
 	
             if(this._queues[i].name === name){
@@ -371,20 +399,13 @@ export class HTTPManager{
             finishedCallback: ((results: {url:string, response:string, isError:boolean, errorMsg:string, errorCode:number}[], anyError:boolean) => void) | null = null,
             progressCallback: null | ((completedUrl: string, totalRequests: number) => void) = null){
         
-        // Convert the received requests to a standarized array of HTTPManagerBaseRequest instances
-        let requestsList:HTTPManagerBaseRequest[] = [];
-            
-        if(ArrayUtils.isArray(requests) && (requests as Array<any>).length > 0){
-            
-            requestsList = StringUtils.isString((requests as Array<any>)[0]) ?
-                    (requests as string[]).map((url) => new HTTPManagerGetRequest(url)) :
-                    (requests as HTTPManagerBaseRequest[]);
-                        
-        }else{
-            
-            requestsList = StringUtils.isString(requests) ?
-                [new HTTPManagerGetRequest(requests as string)] :
-                [requests as HTTPManagerBaseRequest];
+        let requestsList = this._generateValidRequestsList(requests);
+        
+        // Validate callbacks are ok
+        if((finishedCallback !== null && !(finishedCallback instanceof Function)) ||
+           (progressCallback !== null && !(progressCallback instanceof Function))){
+        
+            throw new Error('finishedCallback and progressCallback must be functions');
         }
         
         let finishedCount = 0;
@@ -479,6 +500,45 @@ export class HTTPManager{
     
     
     /**
+     * Auxiliary method to generate a valid list of HTTPManagerBaseRequest instances from multiple sources
+     */
+    private _generateValidRequestsList(requests:string|string[]|HTTPManagerBaseRequest|HTTPManagerBaseRequest[]){
+        
+        // Convert the received requests to a standarized array of HTTPManagerBaseRequest instances
+        let requestsList:HTTPManagerBaseRequest[] = [];
+        
+        if(ArrayUtils.isArray(requests)){
+            
+            if((requests as Array<any>).length <= 0){
+                
+                throw new Error('No requests to execute');
+            }
+            
+            requestsList = StringUtils.isString((requests as Array<any>)[0]) ?
+                    (requests as string[]).map((url) => new HTTPManagerGetRequest(url)) :
+                    (requests as HTTPManagerBaseRequest[]);
+                        
+        }else{
+            
+            if(StringUtils.isString(requests) && !StringUtils.isEmpty(requests as string)){
+                
+                requestsList = [new HTTPManagerGetRequest(requests as string)];
+                
+            } else if (requests instanceof HTTPManagerBaseRequest){
+                
+                requestsList = [requests as HTTPManagerBaseRequest]
+            
+            }else{
+                
+                throw new Error('Invalid requests value');
+            }
+        }
+        
+        return requestsList;
+    }
+    
+    
+    /**
      * Sequentially launch one or more http requests to the specified queue, one after the other.
      * Each request will start inmediately after the previous one is finished (either succesfully or with an error).
      * We can have several independent queues that run their requests at the same time. 
@@ -496,12 +556,16 @@ export class HTTPManager{
      */
     queue(requests: string|string[]|HTTPManagerBaseRequest|HTTPManagerBaseRequest[],
           queueName: string,
-          finishedAllCallback: (() => void) | null = null){
+          finishedCallback: (() => void) | null = null){
     
-        let requestsList = ArrayUtils.isArray(requests) ?
-                requests as HTTPManagerBaseRequest[] :
-                [requests as HTTPManagerBaseRequest];
+        let requestsList = this._generateValidRequestsList(requests);
 
+        // Validate callbacks are ok
+        if((finishedCallback !== null && !(finishedCallback instanceof Function))){
+        
+            throw new Error('finishedCallback and progressCallback must be functions');
+        }
+        
         for (let queue of this._queues) {
 	
             if(queue.name === queueName){
@@ -514,13 +578,13 @@ export class HTTPManager{
                 
                 // Add a dummy request with a special url, containing the finished callback method
                 // to be executed after all the requests are done
-                if(finishedAllCallback !== null){
+                if(finishedCallback !== null){
                     
-                    let finishedCallbackRequest = new HTTPManagerGetRequest('FINISHED_REQUEST_CALLBACK');
+                    let dummyRequest = new HTTPManagerGetRequest('FINISHED_REQUEST_CALLBACK');
                     
-                    finishedCallbackRequest.finallyCallback = finishedAllCallback;
+                    dummyRequest.finallyCallback = finishedCallback;
                     
-                    queue.pendingRequests.unshift(finishedCallbackRequest);
+                    queue.pendingRequests.unshift(dummyRequest);
                 }
                 
                 // Run the queue if it is not already processing requests
@@ -563,12 +627,20 @@ export class HTTPManager{
                     
                     let finallyCallback = queue.pendingRequests.pop() as HTTPManagerBaseRequest;
                     
+                    if(queue.pendingRequests.length <= 0){
+                    
+                        queue.isRunning = false;
+                    }
+                    
                     finallyCallback.finallyCallback();
                 }
                 
-                queue.isRunning = true;
-
-                this.execute(queue.pendingRequests.pop() as HTTPManagerBaseRequest, () => runRequests(queue));           
+                if(queue.pendingRequests.length > 0){
+                                        
+                    queue.isRunning = true;
+    
+                    this.execute(queue.pendingRequests.pop() as HTTPManagerBaseRequest, () => runRequests(queue));           
+                }                    
             }
         };
         
