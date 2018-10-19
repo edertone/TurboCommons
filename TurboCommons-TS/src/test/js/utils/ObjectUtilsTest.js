@@ -292,6 +292,17 @@ QUnit.test("clone", function(assert) {
     assert.ok(ObjectUtils.isEqualTo(clonedValue, {a:1, b:{ref:1}}));
     assert.ok(ObjectUtils.isEqualTo(value, {a:1, b:{ref:2}}));
     
+    // Test an object containing a function
+    var value = {a:1, b:function(a) { return a + 2 }};
+    var clonedValue = ObjectUtils.clone(value);
+    assert.ok(ObjectUtils.isEqualTo(clonedValue, value));
+    
+    assert.strictEqual(value.a, 1);
+    assert.strictEqual(value.b(4), 6);
+    assert.strictEqual(clonedValue.a, 1);
+    assert.strictEqual(clonedValue.b(4), 6);
+    assert.strictEqual(clonedValue.b(6), 8);
+    
     // Test wrong values
     // not necessary
 
