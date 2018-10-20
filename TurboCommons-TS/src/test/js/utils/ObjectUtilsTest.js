@@ -233,6 +233,91 @@ QUnit.test("isEqualTo", function(assert) {
 
 
 /**
+ * merge
+ */
+QUnit.test("merge", function(assert) {
+    
+    // Test empty values
+    let emptyValues = [null, undefined, 0, [], '', '    ', "\n\n\n\n"];
+    
+    for(var i = 0; i < emptyValues.length; i++){
+       
+        assert.throws(function() {
+
+            ObjectUtils.merge(emptyValues[i], {});
+        }, /destination and source must objects/);
+        
+        assert.throws(function() {
+
+            ObjectUtils.merge({}, emptyValues[i]);
+        }, /destination and source must objects/);
+    }
+    
+    assert.ok(ObjectUtils.isEqualTo(ObjectUtils.merge({}, {}), {}));
+    
+    // Test ok values
+    var destination = {a:1, b:2};
+    var source = {a:2};
+    assert.ok(ObjectUtils.isEqualTo(ObjectUtils.merge(destination, source), {a:2, b:2}));
+    assert.ok(ObjectUtils.isEqualTo(destination, {a:2, b:2}));
+    
+    var destination = {a:1, b:2, c:{c1: 1, c2: 2}};
+    var source = {a:2, c: 1};
+    assert.ok(ObjectUtils.isEqualTo(ObjectUtils.merge(destination, source), {a:2, b:2, c:1}));
+    assert.ok(ObjectUtils.isEqualTo(destination, {a:2, b:2, c:1}));
+    
+    var destination = {a:1, b:2, c:{c1: 1, c2: 2}};
+    var source = {a:2, c:{c1: 1, c2: 3}};
+    assert.ok(ObjectUtils.isEqualTo(ObjectUtils.merge(destination, source), {a:2, b:2, c:{c1: 1, c2: 3}}));
+    assert.ok(ObjectUtils.isEqualTo(destination, {a:2, b:2, c:{c1: 1, c2: 3}}));
+    
+    var destination = {a:1, b:{c:2, d:3, e:{f:4, g:6}}};
+    var source = {b:{e:{f:5}}, h:9};
+    assert.ok(ObjectUtils.isEqualTo(ObjectUtils.merge(destination, source), {a:1, b:{c:2, d:3, e:{f:5, g:6}}, h:9}));
+    assert.ok(ObjectUtils.isEqualTo(destination, {a:1, b:{c:2, d:3, e:{f:5, g:6}}, h:9}));
+    
+    var destination = {a:1, b:"hello", c:[1, 2, 3]};
+    var source = {a:2, b:"goodbye", c:[4, 5, 6], d:8};
+    assert.ok(ObjectUtils.isEqualTo(ObjectUtils.merge(destination, source), {a:2, b:"goodbye", c:[4, 5, 6], d:8}));
+    assert.ok(ObjectUtils.isEqualTo(destination, {a:2, b:"goodbye", c:[4, 5, 6], d:8}));
+    
+    var destination = {a:1, c:"hello", e:[1, 2, 3]};
+    var source = {b:2, d:["a", "b"]};
+    assert.ok(ObjectUtils.isEqualTo(ObjectUtils.merge(destination, source), {a:1, b:2, c:"hello", d:["a", "b"], e:[1, 2, 3]}));
+    assert.ok(ObjectUtils.isEqualTo(destination, {a:1, b:2, c:"hello", d:["a", "b"], e:[1, 2, 3]}));
+    
+    var destination = {a:1, b:{c:"hello", d:{e:[1,2]}}};
+    var source = {b:{a:"go", d:1}, d:{a:1}};
+    assert.ok(ObjectUtils.isEqualTo(ObjectUtils.merge(destination, source), {a:1, b:{a:"go", c:"hello", d:1}, d:{a:1}}));
+    assert.ok(ObjectUtils.isEqualTo(destination, {a:1, b:{a:"go", c:"hello", d:1}, d:{a:1}}));
+        
+    // Test wrong values
+    // not necessary
+
+    // Test exceptions
+    assert.throws(function() {
+
+        ObjectUtils.merge({}, 12);
+    }, /destination and source must objects/);
+    
+    assert.throws(function() {
+
+        ObjectUtils.merge([12], {});
+    }, /destination and source must objects/);
+    
+    assert.throws(function() {
+
+        ObjectUtils.merge("hello", {});
+    }, /destination and source must objects/);
+    
+    assert.throws(function() {
+
+        ObjectUtils.merge({}, "bye");
+    }, /destination and source must objects/);
+});
+
+
+/**
  * clone
  */
 QUnit.test("clone", function(assert) {

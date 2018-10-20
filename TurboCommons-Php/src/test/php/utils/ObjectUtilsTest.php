@@ -256,6 +256,28 @@ class ObjectUtilsTest extends TestCase {
 
 
 	/**
+	 * testMerge
+	 *
+	 * @return void
+	 */
+	public function testMerge(){
+
+	    // Test empty values
+	    // TODO - translate from ts
+
+	    // Test ok values
+	    // TODO - translate from ts
+
+	    // Test wrong values
+	    // TODO - translate from ts
+
+	    // Test exceptions
+	    // TODO - translate from ts
+	    $this->markTestIncomplete('This test has not been implemented yet.');
+	}
+
+
+	/**
 	 * testClone
 	 *
 	 * @return void

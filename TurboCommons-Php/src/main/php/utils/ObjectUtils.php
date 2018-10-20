@@ -112,6 +112,13 @@ class ObjectUtils {
 
 
 	// TODO - translate from TS
+	public static function merge(){
+
+	    // TODO - translate from TS
+	}
+
+
+	// TODO - translate from TS
 	public static function clone($object){
 
 	    // TODO - translate from TS

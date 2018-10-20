@@ -97,6 +97,44 @@ export class ObjectUtils {
     
     
     /**
+     * Combine a source object into a destination one by applying a deep merge.
+     * All properties from the source will be replaced into the destination object, without altering the
+     * destination properties that are not found on source. 
+     * 
+     * @param destination The object that will be overriden with the source one. The given instance will be permanently modified.
+     * @param source An object to merge into the destination one. This instance will not be modified
+     * 
+     * @returns The destination object instance after being modified by merging the source object into it
+     */
+    public static merge(destination:any, source:any) {
+     
+        if(!ObjectUtils.isObject(destination) || !ObjectUtils.isObject(source)){
+            
+            throw new Error('destination and source must objects');
+        }
+        
+        let sourceKeys = ObjectUtils.getKeys(source);
+        
+        // Loop all the source object keys and merge them into the destination
+        for(let key of sourceKeys){
+            
+            if(destination.hasOwnProperty(key) &&
+               ObjectUtils.isObject(source[key]) &&
+               ObjectUtils.isObject(destination[key])){
+                
+                destination[key] = ObjectUtils.merge(destination[key], source[key]);
+                
+            }else{
+                
+                destination[key] = ObjectUtils.clone(source[key]);
+            }
+        }
+        
+        return destination;
+    }
+    
+    
+    /**
      * Perform a deep copy of the given object.
      * 
      * @see https://stackoverflow.com/questions/4459928/how-to-deep-clone-in-javascript
