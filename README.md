@@ -9,7 +9,6 @@ Reading a file, validating an email address, counting the words on a string, par
 TurboCommons tries to standarize all those common operations so they are performed the same way across all possible languages. There's a set of well known common problems, with a set of well known common solutions that are the same for all the programming languages in the world. Our goal is that any developer who knows this library can start doing the same things with Php, typescript, javascript, Java, C# ... without having to learn new method and class names. In brief, make our coding lifes easier!
 
 ### What does it do?
-This library tries to cover the following development areas:
 - Data manipulation: Strings, Arrays, Objects, HashMaps, XML, CSV, ...
 - Full standard ISO 8601 date/time values and timezone manipulation
 - Universal conversion and serialization / de-serialization of complex data structures
@@ -18,10 +17,6 @@ This library tries to cover the following development areas:
 - Global exception management
 - Validation: Mails, Urls, postal codes, ...
 - Remote operations: Sending emails, http requests, ftp operations ...
-
-### Documentation
-- Typescript / Javascript: http://turbocommons.org/resources/shared/html/doc-ts/globals.html
-- Php: http://turbocommons.org/resources/shared/html/doc-php/namespaces/org.html
 
 ### How to use it
 
@@ -59,28 +54,16 @@ const {StringUtils} = require('turbocommons-ts');
 var n = StringUtils.countWords("word1 word2 word3");
 ```
 
-### Download
-If you don't want to use a package manager like npm or composer, latest compiled versions can be found at:
-
-- Typescript: http://turbocommons.org/resources/shared/zip/TurboCommons-TS.zip
-- Javascript 5: http://turbocommons.org/resources/shared/zip/TurboCommons-ES5.zip
-- Javascript 6: http://turbocommons.org/resources/shared/zip/TurboCommons-ES6.zip
-- Php: http://turbocommons.org/resources/shared/zip/TurboCommons-Php.zip
-
-### How many languages does it support
+### Language support
+We want to increase this list. So! if you want to translate the library to your language of choice, please contact us and help us build the most standard cross language development library in the world! We're starting so we need your help to port this library to as many languages as possible, and more important, we need to code the SAME unit tests across all the implemented languages. This is the only way to guarantee that TurboCommons delivers exactly the same behaviour everywhere.
 
 - Php (7 or more recommended)
 - Typescript
 - Javascript 5
 - Javascript 6
 
-We want to increase this list. So! if you want to translate the library to your language of choice, please contact us and help us build the most standard cross language development library in the world! We're starting so we need your help to port this library to as many languages as possible, and more important, we need to code the SAME unit tests across all the implemented languages. This is the only way to guarantee that TurboCommons delivers exactly the same behaviour everywhere.
-
 ### Dependencies
 The main goal for this library is to have zero dependencies. We are building a true standalone general purpose library.
-
-### Official website
-The official site https://turbocommons.org is under development. Here you'll find examples, tutorials, and tons of documentation for all the library classes and methods. Stay tuned!
 
 ### Implementation details
 If we want to create a library that does this magic, we must be really strict. There are some rules that must be followed to make sure our goal is reached:
@@ -106,11 +89,7 @@ We are 100% active users of the library, and we can tell you it really helps! No
 
 This is just a small taste of what you can achieve when you have a cross language library.
 
-**Learn once, code forever**
-
 ### Support
 Turbo Commons is 100% free and open source, but we will be really pleased to receive any help, support, comments or donations to help us improve this library. If you like it, spread the word!
 
-[![Donate](http://turbocommons.org/resources/shared/images/DonateButton.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=53MJ6SY66WZZ2&lc=ES&item_name=TurboCommons&no_note=0&cn=A%c3%b1adir%20instrucciones%20especiales%20para%20el%20vendedor%3a&no_shipping=2&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
-
-TurboCommons is part of the [turboframework.org](http://turboframework.org) project.
+[![Donate](https://turbocommons.org/view/views/home/donate-button.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=53MJ6SY66WZZ2&lc=ES&item_name=TurboCommons&no_note=0&cn=A%c3%b1adir%20instrucciones%20especiales%20para%20el%20vendedor%3a&no_shipping=2&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
