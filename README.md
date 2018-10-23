@@ -18,6 +18,12 @@ TurboCommons tries to standarize all those common operations so they are perform
 - Validation: Mails, Urls, postal codes, ...
 - Remote operations: Sending emails, http requests, ftp operations ...
 
+### API Documentation
+**A detailed code specification is available online. You can check it here:**
+
+| [Typescript / Javascript](https://turbocommons.org/data/storage/docs-api/ts/globals.html) | [Php](https://turbocommons.org/data/storage/docs-api/php/namespaces/org.html) |
+|-------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+
 ### How to use it
 
 - Php:
@@ -55,12 +61,13 @@ var n = StringUtils.countWords("word1 word2 word3");
 ```
 
 ### Language support
-We want to increase this list. So! if you want to translate the library to your language of choice, please contact us and help us build the most standard cross language development library in the world! We're starting so we need your help to port this library to as many languages as possible, and more important, we need to code the SAME unit tests across all the implemented languages. This is the only way to guarantee that TurboCommons delivers exactly the same behaviour everywhere.
 
 - Php (7 or more recommended)
 - Typescript
 - Javascript 5
 - Javascript 6
+
+We want to increase this list. So! if you want to translate the library to your language of choice, please contact us and help us build the most standard cross language development library in the world! We're starting so we need your help to port this library to as many languages as possible, and more important, we need to code the SAME unit tests across all the implemented languages. This is the only way to guarantee that TurboCommons delivers exactly the same behaviour everywhere.
 
 ### Dependencies
 The main goal for this library is to have zero dependencies. We are building a true standalone general purpose library.
@@ -83,9 +90,11 @@ If we want to create a library that does this magic, we must be really strict. T
 ### Does it really work?
 We are 100% active users of the library, and we can tell you it really helps! Nowadays, everybody works with more than one language on an average development project. This library helps a lot with keeping a consistent project code base.
 
-- Example 1: You can serialize an object or class in php, and de-serialize it again in JS or Typescript, to get exactly the same structure. Cross language serialization? YEAH! Just a small taste of all the things that can be done when your code works the same on all your different project layers.
-- Example 2: You can use the library HashMap object in Php and TS with exactly the same methods and behaviour.
-- Example 3: You can use ValidationManger to validate a form on your front end, and use it again on the back end with the guarantee that validation will work exactly the same on both sides.
+- **Example 1**: You can serialize an object or class in php, and de-serialize it again in JS or Typescript, to get exactly the same structure. Cross language serialization? YEAH! Just a small taste of all the things that can be done when your code works the same on all your different project layers.
+
+- **Example 2**: You can use the library HashMap object in Php and TS with exactly the same methods and behaviour.
+
+- **Example 3**: You can use ValidationManger to validate a form on your front end, and use it again on the back end with the guarantee that validation will work exactly the same on both sides.
 
 This is just a small taste of what you can achieve when you have a cross language library.
 
