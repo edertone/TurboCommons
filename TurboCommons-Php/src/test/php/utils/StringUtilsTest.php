@@ -530,8 +530,75 @@ class StringUtilsTest extends TestCase {
 	 */
 	public function testTrimLeft(){
 
-	    // TODO - translate from TS
-	    $this->markTestIncomplete('This test has not been implemented yet.');
+	    // Test empty values
+	    try {
+	        StringUtils::trimLeft(null);
+	        $this->exceptionMessage = 'null did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::trimLeft(0);
+	        $this->exceptionMessage = '0 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::trimLeft([]);
+	        $this->exceptionMessage = '[] did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+        $this->assertSame(StringUtils::trimLeft(""), "");
+
+        // Test ok values
+        $this->assertSame(StringUtils::trimLeft("   "), "");
+        $this->assertSame(StringUtils::trimLeft("\n\n\r\r"), "");
+        $this->assertSame(StringUtils::trimLeft("  \n\n\r\r"), "");
+        $this->assertSame(StringUtils::trimLeft("\n\n\r\r   "), "");
+        $this->assertSame(StringUtils::trimLeft("   \n\n\r\r   "), "");
+        $this->assertSame(StringUtils::trimLeft("hello"), "hello");
+        $this->assertSame(StringUtils::trimLeft("hello\n"), "hello\n");
+        $this->assertSame(StringUtils::trimLeft("hello\r\n"), "hello\r\n");
+        $this->assertSame(StringUtils::trimLeft("\nhello\r\n"), "hello\r\n");
+        $this->assertSame(StringUtils::trimLeft("   hello"), "hello");
+        $this->assertSame(StringUtils::trimLeft("hello   "), "hello   ");
+        $this->assertSame(StringUtils::trimLeft("  hello  "), "hello  ");
+
+        $this->assertSame(StringUtils::trimLeft("helloxax", "xa"), "helloxax");
+        $this->assertSame(StringUtils::trimLeft("XXXhello", "xlX"), "hello");
+        $this->assertSame(StringUtils::trimLeft("XXXhelloxxx", "xX"), "helloxxx");
+        $this->assertSame(StringUtils::trimLeft("1|2", "123"), "|2");
+        $this->assertSame(StringUtils::trimLeft("1|2", ""), "1|2");
+        $this->assertSame(StringUtils::trimLeft("1|2\n", "1"), "|2\n");
+
+        // Test wrong values
+        // Not necessary
+
+        // Test exceptions
+        try {
+            StringUtils::trimLeft([1, 2, 3, 4]);
+            $this->exceptionMessage = '[1, 2, 3, 4] did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            StringUtils::trimLeft(new Exception());
+            $this->exceptionMessage = 'new Exception() did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            StringUtils::trimLeft(123466);
+            $this->exceptionMessage = '123466 did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
 	}
 
 

@@ -322,11 +322,24 @@ class StringUtils {
 
 
     /**
-     * TODO translate from TS
+     * Remove whitespaces (or any custom set of characters) from a string left side
+     *
+     * @param string $string A string to process
+     * @param string $characters A set of characters that will be trimmed from string left side. By default,
+     *        empty space and new line characters are defined : " \n\r"
+     *
+     * @example: StringUtils::trimLeft("abcXXabc", "abc") outputs "XXabc"
+     *
+     * @return string The trimmed string
      */
-    public static function trimLeft(){
+    public static function trimLeft($string, $characters = " \n\r"){
 
-        // TODO translate from TS
+        if(!is_string($string)){
+
+            throw new InvalidArgumentException('value is not a string');
+        }
+
+        return ltrim($string, $characters);
     }
 
 

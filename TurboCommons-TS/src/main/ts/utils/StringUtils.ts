@@ -286,9 +286,8 @@ export class StringUtils {
      * Remove whitespaces (or any custom set of characters) from a string left side
      * 
      * @param string A string to process
-     * 
      * @param characters A set of characters that will be trimmed from string left side. By default,
-     * empty space and new line characters are defined : " \n\r"
+     *        empty space and new line characters are defined : " \n\r"
      * 
      * @example: StringUtils.trimLeft("abcXXabc", "abc") outputs "XXabc"
      *  
