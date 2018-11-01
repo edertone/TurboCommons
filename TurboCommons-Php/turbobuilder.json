@@ -9,6 +9,9 @@
 	},
 	
 	"validate": {
+	   "projectStructure" : {                    
+            "readmeFileMandatory": false
+        },
 	    "phpNamespaces" : {
 	        "enabled": true,
 	        "mandatory": true,
