@@ -9,6 +9,9 @@
 	},
 	
 	"validate": {
+	    "projectStructure" : {                    
+            "readmeFileMandatory": false
+        },
 	    "copyrightHeaders": [
 	    	{
 	    		"path": "extras/copyright headers/TsFiles-Header.txt",
@@ -41,9 +44,6 @@
     
     "release": {
     },
-        
-    "sync": [
-    ],
     
     "test": [
     	{
