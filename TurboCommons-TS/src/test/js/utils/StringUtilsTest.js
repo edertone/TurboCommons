@@ -1145,13 +1145,65 @@ QUnit.test("formatCase", function(assert) {
     // TODO - translate from PHP
     
     // Test FORMAT_CAMEL_CASE values
-    // TODO - translate from PHP
-    
+    assert.ok(StringUtils.formatCase('h', StringUtils.FORMAT_CAMEL_CASE) === 'h');
+    assert.ok(StringUtils.formatCase('0', StringUtils.FORMAT_CAMEL_CASE) === '0');
+    assert.ok(StringUtils.formatCase('ü', StringUtils.FORMAT_CAMEL_CASE) === 'u');
+    assert.ok(StringUtils.formatCase('hI', StringUtils.FORMAT_CAMEL_CASE) === 'hI');
+    assert.ok(StringUtils.formatCase('HI', StringUtils.FORMAT_CAMEL_CASE) === 'HI');
+    assert.ok(StringUtils.formatCase('Ü        ', StringUtils.FORMAT_CAMEL_CASE) === 'U');
+    assert.ok(StringUtils.formatCase('CamelCase', StringUtils.FORMAT_CAMEL_CASE) === 'CamelCase');
+    assert.ok(StringUtils.formatCase('camelCase', StringUtils.FORMAT_CAMEL_CASE) === 'camelCase');
+    assert.ok(StringUtils.formatCase('camelCaSE', StringUtils.FORMAT_CAMEL_CASE) === 'camelCaSE');
+    assert.ok(StringUtils.formatCase('camel CaSE', StringUtils.FORMAT_CAMEL_CASE) === 'camelCaSE');
+    assert.ok(StringUtils.formatCase('Camel Case', StringUtils.FORMAT_CAMEL_CASE) === 'CamelCase');
+    assert.ok(StringUtils.formatCase('HTTP   Connection', StringUtils.FORMAT_CAMEL_CASE) === 'HTTPConnection');
+    assert.ok(StringUtils.formatCase('sNake_Case', StringUtils.FORMAT_CAMEL_CASE) === 'sNakeCase');
+    assert.ok(StringUtils.formatCase('Ibs Release Test Verification Regression Suite', StringUtils.FORMAT_CAMEL_CASE) === 'IbsReleaseTestVerificationRegressionSuite');
+    assert.ok(StringUtils.formatCase('üéllò World', StringUtils.FORMAT_CAMEL_CASE) === 'uelloWorld');
+    assert.ok(StringUtils.formatCase('óyeà!!! üst??', StringUtils.FORMAT_CAMEL_CASE) === 'oyeaUst');
+    assert.ok(StringUtils.formatCase('this is some random text', StringUtils.FORMAT_CAMEL_CASE) === 'thisIsSomeRandomText');
+    assert.ok(StringUtils.formatCase("över! còmpléx.   \n\n\n\t\t   ís test!is?for!?!? you.!  ", StringUtils.FORMAT_CAMEL_CASE) === 'overComplexIsTestIsForYou');
+
     // Test FORMAT_UPPER_CAMEL_CASE values
-    // TODO - translate from PHP
-    
+    assert.ok(StringUtils.formatCase('h', StringUtils.FORMAT_UPPER_CAMEL_CASE) === 'H');
+    assert.ok(StringUtils.formatCase('0', StringUtils.FORMAT_UPPER_CAMEL_CASE) === '0');
+    assert.ok(StringUtils.formatCase('ü', StringUtils.FORMAT_UPPER_CAMEL_CASE) === 'U');
+    assert.ok(StringUtils.formatCase('hI', StringUtils.FORMAT_UPPER_CAMEL_CASE) === 'HI');
+    assert.ok(StringUtils.formatCase('HI', StringUtils.FORMAT_UPPER_CAMEL_CASE) === 'HI');
+    assert.ok(StringUtils.formatCase('Ü        ', StringUtils.FORMAT_UPPER_CAMEL_CASE) === 'U');
+    assert.ok(StringUtils.formatCase('CamelCase', StringUtils.FORMAT_UPPER_CAMEL_CASE) === 'CamelCase');
+    assert.ok(StringUtils.formatCase('camelCase', StringUtils.FORMAT_UPPER_CAMEL_CASE) === 'CamelCase');
+    assert.ok(StringUtils.formatCase('camelCaSE', StringUtils.FORMAT_UPPER_CAMEL_CASE) === 'CamelCaSE');
+    assert.ok(StringUtils.formatCase('camel CaSE', StringUtils.FORMAT_UPPER_CAMEL_CASE) === 'CamelCaSE');
+    assert.ok(StringUtils.formatCase('Camel Case', StringUtils.FORMAT_UPPER_CAMEL_CASE) === 'CamelCase');
+    assert.ok(StringUtils.formatCase('HTTP   Connection', StringUtils.FORMAT_UPPER_CAMEL_CASE) === 'HTTPConnection');
+    assert.ok(StringUtils.formatCase('sNake_Case', StringUtils.FORMAT_UPPER_CAMEL_CASE) === 'SNakeCase');
+    assert.ok(StringUtils.formatCase('Ibs Release Test Verification Regression Suite', StringUtils.FORMAT_UPPER_CAMEL_CASE) === 'IbsReleaseTestVerificationRegressionSuite');
+    assert.ok(StringUtils.formatCase('üéllò World', StringUtils.FORMAT_UPPER_CAMEL_CASE) === 'UelloWorld');
+    assert.ok(StringUtils.formatCase('óyeà!!! üst??', StringUtils.FORMAT_UPPER_CAMEL_CASE) === 'OyeaUst');
+    assert.ok(StringUtils.formatCase('this is some random text', StringUtils.FORMAT_UPPER_CAMEL_CASE) === 'ThisIsSomeRandomText');
+    assert.ok(StringUtils.formatCase("över! còmpléx.   \n\n\n\t\t   ís test!is?for!?!? you.!  ", StringUtils.FORMAT_UPPER_CAMEL_CASE) === 'OverComplexIsTestIsForYou');
+
     // Test FORMAT_LOWER_CAMEL_CASE values
-    // TODO - translate from PHP
+    assert.ok(StringUtils.formatCase('h', StringUtils.FORMAT_LOWER_CAMEL_CASE) === 'h');
+    assert.ok(StringUtils.formatCase('0', StringUtils.FORMAT_LOWER_CAMEL_CASE) === '0');
+    assert.ok(StringUtils.formatCase('ü', StringUtils.FORMAT_LOWER_CAMEL_CASE) === 'u');
+    assert.ok(StringUtils.formatCase('hI', StringUtils.FORMAT_LOWER_CAMEL_CASE) === 'hI');
+    assert.ok(StringUtils.formatCase('HI', StringUtils.FORMAT_LOWER_CAMEL_CASE) === 'hI');
+    assert.ok(StringUtils.formatCase('Ü        ', StringUtils.FORMAT_LOWER_CAMEL_CASE) === 'u');
+    assert.ok(StringUtils.formatCase('CamelCase', StringUtils.FORMAT_LOWER_CAMEL_CASE) === 'camelCase');
+    assert.ok(StringUtils.formatCase('camelCase', StringUtils.FORMAT_LOWER_CAMEL_CASE) === 'camelCase');
+    assert.ok(StringUtils.formatCase('camelCaSE', StringUtils.FORMAT_LOWER_CAMEL_CASE) === 'camelCaSE');
+    assert.ok(StringUtils.formatCase('camel CaSE', StringUtils.FORMAT_LOWER_CAMEL_CASE) === 'camelCaSE');
+    assert.ok(StringUtils.formatCase('Camel Case', StringUtils.FORMAT_LOWER_CAMEL_CASE) === 'camelCase');
+    assert.ok(StringUtils.formatCase('HTTP   Connection', StringUtils.FORMAT_LOWER_CAMEL_CASE) === 'hTTPConnection');
+    assert.ok(StringUtils.formatCase('sNake_Case', StringUtils.FORMAT_LOWER_CAMEL_CASE) === 'sNakeCase');
+    assert.ok(StringUtils.formatCase('Ibs Release Test Verification Regression Suite', StringUtils.FORMAT_LOWER_CAMEL_CASE) === 'ibsReleaseTestVerificationRegressionSuite');
+    assert.ok(StringUtils.formatCase('üéllò World', StringUtils.FORMAT_LOWER_CAMEL_CASE) === 'uelloWorld');
+    assert.ok(StringUtils.formatCase('óyeà!!! üst??', StringUtils.FORMAT_LOWER_CAMEL_CASE) === 'oyeaUst');
+    assert.ok(StringUtils.formatCase('this is some random text', StringUtils.FORMAT_LOWER_CAMEL_CASE) === 'thisIsSomeRandomText');
+    assert.ok(StringUtils.formatCase("över! còmpléx.   \n\n\n\t\t   ís test!is?for!?!? you.!  ", StringUtils.FORMAT_LOWER_CAMEL_CASE) === 'overComplexIsTestIsForYou');
+
     
     // Test exception cases
     assert.throws(function() {

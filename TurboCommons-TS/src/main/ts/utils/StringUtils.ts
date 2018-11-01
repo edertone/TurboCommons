@@ -803,7 +803,34 @@ export class StringUtils {
         // TODO - translate from PHP
         
         // Generate the camel case format
-        // TODO - translate from PHP
+        if(format.indexOf('CAMEL_CASE') > 0){
+
+            // non-alpha and non-numeric characters become spaces and the whole string is splitted to words
+            let stringWords = StringUtils.removeAccents(string).replace(/[^a-z0-9]+/ig, ' ').trim().split(' ');
+            
+            // uppercase the first character of each word except the first one
+            if(stringWords.length > 1){
+
+                for(let i=1; i<stringWords.length; i++){
+
+                    stringWords[i] = stringWords[i].charAt(0).toUpperCase() + stringWords[i].slice(1);
+                }
+            }
+
+            string = stringWords.join('');
+
+            if(format == StringUtils.FORMAT_UPPER_CAMEL_CASE){
+
+                return string.charAt(0).toUpperCase() + string.slice(1);
+            }
+
+            if(format == StringUtils.FORMAT_LOWER_CAMEL_CASE){
+
+                return string.charAt(0).toLowerCase() + string.slice(1);
+            }
+
+            return string;
+        }
         
         throw new Error('Unknown format specified');
     }

@@ -803,6 +803,8 @@ class StringUtils {
 
             foreach ($sentences as $s) {
 
+                $match = null;
+
                 if(preg_match('~[a-z]~i', self::removeAccents($s), $match, PREG_OFFSET_CAPTURE) == 1){
 
                     $result .= mb_substr($s, 0, $match[0][1]).mb_strtoupper(mb_substr($s, $match[0][1], 1)).mb_substr($s, $match[0][1] + 1);
@@ -874,18 +876,18 @@ class StringUtils {
         if(strpos($format, 'CAMEL_CASE') !== false){
 
             // non-alpha and non-numeric characters become spaces and the whole string is splitted to words
-            $string = explode(' ', trim(preg_replace('/[^a-z0-9]+/i', ' ', self::removeAccents($string))));
+            $stringWords = explode(' ', trim(preg_replace('/[^a-z0-9]+/i', ' ', self::removeAccents($string))));
 
             // uppercase the first character of each word except the first one
-            if(($stringCount = count($string)) > 1){
+            if(($stringCount = count($stringWords)) > 1){
 
                 for ($i = 1; $i < $stringCount; $i++) {
 
-                    $string[$i] = ucfirst($string[$i]);
+                    $stringWords[$i] = ucfirst($stringWords[$i]);
                 }
             }
 
-            $string = implode('', $string);
+            $string = implode('', $stringWords);
 
             if($format == self::FORMAT_UPPER_CAMEL_CASE){
 
