@@ -1671,6 +1671,120 @@ class StringUtilsTest extends TestCase {
 
 
 	/**
+	 * testCompareByLevenshtein
+	 *
+	 * @return void
+	 */
+	public function testCompareByLevenshtein(){
+
+	    // Test empty values
+	    try {
+	        StringUtils::compareByLevenshtein(null, null);
+	        $this->exceptionMessage = 'null did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::compareByLevenshtein([], []);
+	        $this->exceptionMessage = '[] did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    $this->assertSame(0, StringUtils::compareByLevenshtein("", ""));
+	    $this->assertSame(0, StringUtils::compareByLevenshtein("   ", "   "));
+
+	    // Test ok values
+	    $this->assertSame(1, StringUtils::compareByLevenshtein("a", ""));
+	    $this->assertSame(1, StringUtils::compareByLevenshtein("", "a"));
+	    $this->assertSame(3, StringUtils::compareByLevenshtein("abc", ""));
+	    $this->assertSame(3, StringUtils::compareByLevenshtein("", "abc"));
+
+	    $this->assertSame(0, StringUtils::compareByLevenshtein("", ""));
+	    $this->assertSame(0, StringUtils::compareByLevenshtein("a", "a"));
+	    $this->assertSame(0, StringUtils::compareByLevenshtein("abc", "abc"));
+
+	    $this->assertSame(1, StringUtils::compareByLevenshtein("", "a"));
+	    $this->assertSame(1, StringUtils::compareByLevenshtein("a", "ab"));
+	    $this->assertSame(1, StringUtils::compareByLevenshtein("b", "ab"));
+	    $this->assertSame(1, StringUtils::compareByLevenshtein("ac", "abc"));
+	    $this->assertSame(6, StringUtils::compareByLevenshtein("abcdefg", "xabxcdxxefxgx"));
+
+	    $this->assertSame(1, StringUtils::compareByLevenshtein("a", ""));
+	    $this->assertSame(1, StringUtils::compareByLevenshtein("ab", "a"));
+	    $this->assertSame(1, StringUtils::compareByLevenshtein("ab", "b"));
+	    $this->assertSame(1, StringUtils::compareByLevenshtein("abc", "ac"));
+	    $this->assertSame(6, StringUtils::compareByLevenshtein("xabxcdxxefxgx", "abcdefg"));
+
+	    $this->assertSame(1, StringUtils::compareByLevenshtein("a", "b"));
+	    $this->assertSame(1, StringUtils::compareByLevenshtein("ab", "ac"));
+	    $this->assertSame(1, StringUtils::compareByLevenshtein("ac", "bc"));
+	    $this->assertSame(1, StringUtils::compareByLevenshtein("abc", "axc"));
+	    $this->assertSame(6, StringUtils::compareByLevenshtein("xabxcdxxefxgx", "1ab2cd34ef5g6"));
+
+	    $this->assertSame(3, StringUtils::compareByLevenshtein("example", "samples"));
+	    $this->assertSame(6, StringUtils::compareByLevenshtein("sturgeon", "urgently"));
+	    $this->assertSame(6, StringUtils::compareByLevenshtein("levenshtein", "frankenstein"));
+	    $this->assertSame(5, StringUtils::compareByLevenshtein("distance", "difference"));
+	    $this->assertSame(7, StringUtils::compareByLevenshtein("java was neat", "scala is great"));
+
+	    $this->assertSame(1, StringUtils::compareByLevenshtein("èéöÖU", "eéöÖU"));
+	    $this->assertSame(2, StringUtils::compareByLevenshtein("èéöÖU", "eéöOU"));
+	    $this->assertSame(3, StringUtils::compareByLevenshtein("èéöÖU", "eéöOu"));
+	    $this->assertSame(4, StringUtils::compareByLevenshtein("èéöÖU", "eèöOu"));
+	    $this->assertSame(5, StringUtils::compareByLevenshtein("èéöÖU", "eèöOu "));
+	    $this->assertSame(4, StringUtils::compareByLevenshtein("èéöÖ", "eèöOu"));
+
+	    // Test wrong values
+	    // Not necessary
+
+	    // Test exceptions
+	    try {
+	        StringUtils::compareByLevenshtein(1234, 345345);
+	        $this->exceptionMessage = '1234 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::compareByLevenshtein([1, 2, 3, 4], [2, 4, 5, 6]);
+	        $this->exceptionMessage = '[1, 2, 3, 4] did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::compareByLevenshtein(new Exception(), new Exception());
+	        $this->exceptionMessage = 'new Exception() did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+	}
+
+
+	/**
+	 * testCompareSimilarityPercent
+	 *
+	 * @return void
+	 */
+	public function testCompareSimilarityPercent(){
+
+	    // Test empty values
+	    // TODO
+
+	    // Test ok values
+	    // TODO
+
+	    // Test wrong values
+	    // TODO
+
+	    // Test exceptions
+	    // TODO
+	}
+
+
+	/**
 	 * testGenerateRandom
 	 *
 	 * @return void
@@ -1994,11 +2108,11 @@ class StringUtilsTest extends TestCase {
 
 
 	/**
-	 * testRemoveMultipleSpaces
+	 * removeDuplicateCharacters
 	 *
 	 * @return void
 	 */
-	public function testRemoveMultipleSpaces(){
+	public function removeDuplicateCharacters(){
 
 	    // TODO!!
 	    $this->markTestIncomplete('This test has not been implemented yet.');

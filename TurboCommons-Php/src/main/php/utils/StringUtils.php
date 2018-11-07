@@ -1001,6 +1001,90 @@ class StringUtils {
 
 
     /**
+     * Compares two strings and gives the number of character replacements that must be performed to convert one
+     * of the strings into the other. A very useful method to use in fuzzy text searches where we want to look for
+     * similar texts. This method uses the Levenshtein method for the comparison:
+     *
+     * The Levenshtein distance is defined as the minimal number of characters you have to replace, insert or delete
+     * to transform string1 into string2. The complexity of the algorithm is O(m*n), where n and m are the length
+     * of string1 and string2.
+     *
+     * @example "aha" and "aba" will output 1 cause we need to change the h for a b to transform one string into another.
+     *
+     * @param string $string1 The first string to compare
+     * @param string $string2 The second string to compare
+     *
+     * @return number The number of characters to replace to convert $string1 into $string2 where 0 means both strings are the same.
+     *         The higher the result, the more different the strings are.
+     */
+    public static function compareByLevenshtein($string1, $string2){
+
+        // This function was found at https://gist.github.com/santhoshtr/1710925
+
+        if(!is_string($string1) || !is_string($string2)){
+
+            throw new InvalidArgumentException('string1 and string2 must be strings');
+        }
+
+        $length1 = mb_strlen($string1, 'UTF-8');
+        $length2 = mb_strlen($string2, 'UTF-8');
+
+        if($length1 < $length2) {
+
+            return self::compareByLevenshtein($string2, $string1);
+        }
+
+        if($length1 == 0) {
+
+            return $length2;
+        }
+
+        if($string1 === $string2) {
+
+            return 0;
+        }
+
+        $prevRow = range(0, $length2);
+        $currentRow = [];
+
+        for ($i = 0; $i < $length1; $i++) {
+
+            $currentRow = [];
+            $currentRow[0] = $i + 1;
+            $c1 = mb_substr($string1, $i, 1, 'UTF-8');
+
+            for ($j = 0; $j < $length2; $j++) {
+
+                $c2 = mb_substr($string2, $j, 1, 'UTF-8');
+                $insertions = $prevRow[$j+1] + 1;
+                $deletions = $currentRow[$j] + 1;
+                $substitutions = $prevRow[$j] + (($c1 != $c2)?1:0);
+                $currentRow[] = min($insertions, $deletions, $substitutions);
+            }
+
+            $prevRow = $currentRow;
+        }
+
+        return $prevRow[$length2];
+    }
+
+
+    /**
+     * Compares the percentage of similarity between two strings, based on the Levenshtein method. A very useful method
+     * to use in fuzzy text searches where we want to look for similar texts.
+     *
+     * @param string $string1 The first string to compare
+     * @param string $string2 The second string to compare
+     *
+     * @return number A number between 0 and 100, being 100 if both strings are the same and 0 if both strings are totally different
+     */
+    public static function compareSimilarityPercent($string1, $string2){
+
+        return (1 - self::compareByLevenshtein($string1, $string2) / max(mb_strlen($string1), mb_strlen($string2))) * 100;
+    }
+
+
+    /**
      * Generates a random string with the specified length and options
      *
      * @param int $minLength Specify the minimum possible length for the generated string
