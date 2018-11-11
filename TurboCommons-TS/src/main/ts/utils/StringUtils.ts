@@ -960,6 +960,103 @@ export class StringUtils {
     
     
     /**
+     * Compares two strings and gives the number of character replacements that must be performed to convert one
+     * of the strings into the other. A very useful method to use in fuzzy text searches where we want to look for
+     * similar texts. This method uses the Levenshtein method for the comparison:
+     *
+     * The Levenshtein distance is defined as the minimal number of characters you have to replace, insert or delete
+     * to transform string1 into string2. The complexity of the algorithm is O(m*n), where n and m are the length
+     * of string1 and string2.
+     *
+     * @example "aha" and "aba" will output 1 cause we need to change the h for a b to transform one string into another.
+     *
+     * @param string1 The first string to compare
+     * @param string2 The second string to compare
+     *
+     * @return The number of characters to replace to convert $string1 into $string2 where 0 means both strings are the same.
+     *         The higher the result, the more different the strings are.
+     */
+    public static compareByLevenshtein(string1: string, string2: string): number {
+        
+        // This function was found at https://gist.github.com/santhoshtr/1710925
+
+        if(!StringUtils.isString(string1) || !StringUtils.isString(string2)){
+
+            throw new Error('string1 and string2 must be strings');
+        }
+
+        let length1 = string1.length;
+        let length2 = string2.length;
+
+        if(length1 < length2) {
+
+            return StringUtils.compareByLevenshtein(string2, string1);
+        }
+
+        if(length1 == 0) {
+
+            return length2;
+        }
+
+        if(string1 === string2) {
+
+            return 0;
+        }
+
+        let currentRow: number[] = [];
+
+        // This code is the equivalent to the range(0, $length2) in php version
+        let prevRow: number[] = [];
+        for (let i = 0; i <= length2; i++) {
+	
+            prevRow.push(i);
+        }
+        
+        for (let i = 0; i < length1; i++) {
+
+            currentRow = [];
+            currentRow[0] = i + 1;
+            let c1 = string1.substr(i, 1);
+
+            for (let j = 0; j < length2; j++) {
+
+                let c2 = string2.substr(j, 1);
+                let insertions = prevRow[j+1] + 1;
+                let deletions = currentRow[j] + 1;
+                let substitutions = prevRow[j] + ((c1 !== c2) ? 1 : 0);
+                currentRow.push(Math.min(insertions, deletions, substitutions));
+            }
+
+            prevRow = currentRow;
+        }
+
+        return prevRow[length2];
+    }
+    
+    
+    /**
+     * Compares the percentage of similarity between two strings, based on the Levenshtein method. A very useful method
+     * to use in fuzzy text searches where we want to look for similar texts.
+     *
+     * @param string1 The first string to compare
+     * @param string2 The second string to compare
+     *
+     * @return A number between 0 and 100, being 100 if both strings are the same and 0 if both strings are totally different
+     */
+    public static compareSimilarityPercent(string1: string, string2: string) {
+        
+        let levenshtein = StringUtils.compareByLevenshtein(string1, string2);
+
+        if(levenshtein === 0){
+
+            return 100;
+        }
+
+        return (1 - levenshtein / Math.max(string1.length, string2.length)) * 100;
+    }
+    
+    
+    /**
      * Generates a random string with the specified length and options
      *
      * @param minLength Specify the minimum possible length for the generated string
@@ -1368,7 +1465,7 @@ export class StringUtils {
     }
     
     
-    public static removeMultipleSpaces() {
+    public static removeDuplicateCharacters() {
         
         // TODO: translate from php
     }

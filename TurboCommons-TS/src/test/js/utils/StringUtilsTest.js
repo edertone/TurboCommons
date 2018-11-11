@@ -1352,6 +1352,142 @@ QUnit.todo("formatForFullTextSearch", function(assert) {
 
 
 /**
+ * compareByLevenshtein
+ */
+QUnit.test("compareByLevenshtein", function(assert) {
+
+    // Test empty values
+    assert.throws(function() {
+        StringUtils.compareByLevenshtein(null, null);
+    }, /string1 and string2 must be strings/);
+
+    assert.throws(function() {
+        StringUtils.compareByLevenshtein([], []);
+    }, /string1 and string2 must be strings/);
+
+    assert.strictEqual(0, StringUtils.compareByLevenshtein("", ""));
+    assert.strictEqual(0, StringUtils.compareByLevenshtein("   ", "   "));
+
+    // Test ok values
+    assert.strictEqual(1, StringUtils.compareByLevenshtein("a", ""));
+    assert.strictEqual(1, StringUtils.compareByLevenshtein("", "a"));
+    assert.strictEqual(3, StringUtils.compareByLevenshtein("abc", ""));
+    assert.strictEqual(3, StringUtils.compareByLevenshtein("", "abc"));
+
+    assert.strictEqual(0, StringUtils.compareByLevenshtein("", ""));
+    assert.strictEqual(0, StringUtils.compareByLevenshtein("a", "a"));
+    assert.strictEqual(0, StringUtils.compareByLevenshtein("abc", "abc"));
+
+    assert.strictEqual(1, StringUtils.compareByLevenshtein("", "a"));
+    assert.strictEqual(1, StringUtils.compareByLevenshtein("a", "ab"));
+    assert.strictEqual(1, StringUtils.compareByLevenshtein("b", "ab"));
+    assert.strictEqual(1, StringUtils.compareByLevenshtein("ac", "abc"));
+    assert.strictEqual(6, StringUtils.compareByLevenshtein("abcdefg", "xabxcdxxefxgx"));
+
+    assert.strictEqual(1, StringUtils.compareByLevenshtein("a", ""));
+    assert.strictEqual(1, StringUtils.compareByLevenshtein("ab", "a"));
+    assert.strictEqual(1, StringUtils.compareByLevenshtein("ab", "b"));
+    assert.strictEqual(1, StringUtils.compareByLevenshtein("abc", "ac"));
+    assert.strictEqual(6, StringUtils.compareByLevenshtein("xabxcdxxefxgx", "abcdefg"));
+
+    assert.strictEqual(1, StringUtils.compareByLevenshtein("a", "b"));
+    assert.strictEqual(1, StringUtils.compareByLevenshtein("ab", "ac"));
+    assert.strictEqual(1, StringUtils.compareByLevenshtein("ac", "bc"));
+    assert.strictEqual(1, StringUtils.compareByLevenshtein("abc", "axc"));
+    assert.strictEqual(6, StringUtils.compareByLevenshtein("xabxcdxxefxgx", "1ab2cd34ef5g6"));
+
+    assert.strictEqual(3, StringUtils.compareByLevenshtein("example", "samples"));
+    assert.strictEqual(6, StringUtils.compareByLevenshtein("sturgeon", "urgently"));
+    assert.strictEqual(6, StringUtils.compareByLevenshtein("levenshtein", "frankenstein"));
+    assert.strictEqual(5, StringUtils.compareByLevenshtein("distance", "difference"));
+    assert.strictEqual(7, StringUtils.compareByLevenshtein("java was neat", "scala is great"));
+
+    assert.strictEqual(1, StringUtils.compareByLevenshtein("èéöÖU", "eéöÖU"));
+    assert.strictEqual(2, StringUtils.compareByLevenshtein("èéöÖU", "eéöOU"));
+    assert.strictEqual(3, StringUtils.compareByLevenshtein("èéöÖU", "eéöOu"));
+    assert.strictEqual(4, StringUtils.compareByLevenshtein("èéöÖU", "eèöOu"));
+    assert.strictEqual(5, StringUtils.compareByLevenshtein("èéöÖU", "eèöOu "));
+    assert.strictEqual(4, StringUtils.compareByLevenshtein("èéöÖ", "eèöOu"));
+
+    assert.strictEqual(3, StringUtils.compareByLevenshtein("HONDA", "HYUNDAI"));
+    assert.strictEqual(3, StringUtils.compareByLevenshtein("kitten", "sitting"));
+
+    assert.strictEqual(1, StringUtils.compareByLevenshtein("形声字 / 形聲字", "形声字 A 形聲字"));
+    assert.strictEqual(3, StringUtils.compareByLevenshtein("形声字 / 形聲字", "1声字 A 形聲"));
+    assert.strictEqual(5, StringUtils.compareByLevenshtein("形声字 / 形聲字", "13字 A 形A"));
+    assert.strictEqual(9, StringUtils.compareByLevenshtein("形声字 / 形聲字", "sitting"));
+
+    // Test wrong values
+    // Not necessary
+
+    // Test exceptions
+    assert.throws(function() {
+        StringUtils.compareByLevenshtein(1234, 345345);
+    }, /string1 and string2 must be strings/);
+
+    assert.throws(function() {
+        StringUtils.compareByLevenshtein([1, 2, 3, 4], [2, 4, 5, 6]);
+    }, /string1 and string2 must be strings/);
+
+    assert.throws(function() {
+        StringUtils.compareByLevenshtein(new Error(), new Error());
+    }, /string1 and string2 must be strings/);
+});
+
+
+/**
+ * compareSimilarityPercent
+ */
+QUnit.todo("compareSimilarityPercent", function(assert) {
+
+    // Test empty values
+    assert.throws(function() {
+        StringUtils.compareSimilarityPercent(null, null);
+    }, /string1 and string2 must be strings/);
+
+    assert.throws(function() {
+        StringUtils.compareSimilarityPercent(null, "");
+    }, /string1 and string2 must be strings/);
+
+    assert.throws(function() {
+        StringUtils.compareSimilarityPercent([], []);
+    }, /string1 and string2 must be strings/);
+
+    assert.strictEqual(100, StringUtils.compareSimilarityPercent("", ""));
+    assert.strictEqual(0, StringUtils.compareSimilarityPercent("", "    "));
+    assert.strictEqual(0, StringUtils.compareSimilarityPercent("    ", ""));
+    assert.strictEqual(100, StringUtils.compareSimilarityPercent("   ", "   "));
+
+    // Test ok values
+    assert.strictEqual(0, StringUtils.compareSimilarityPercent("a", "b"));
+    assert.strictEqual(25.0, StringUtils.compareSimilarityPercent("aaaa", "anUy"));
+    assert.strictEqual(50.0, StringUtils.compareSimilarityPercent("aa", "ab"));
+    assert.strictEqual(50.0, StringUtils.compareSimilarityPercent("aaaa", "aaXx"));
+    assert.strictEqual(75.0, StringUtils.compareSimilarityPercent("aaaa", "aaaQ"));
+    assert.strictEqual(80.0, StringUtils.compareSimilarityPercent("abcde", "abcd"));
+    assert.strictEqual(83.33333333333334, StringUtils.compareSimilarityPercent("aiuygb", "aiUygb"));
+    assert.strictEqual(94.44444444444444, StringUtils.compareSimilarityPercent("形声字 A 形聲字形声字 / 形聲字", "形声字 / 形聲字形声字 / 形聲字"));
+    assert.strictEqual(100, StringUtils.compareSimilarityPercent("形声字 / 形聲字形声字 / 形聲字", "形声字 / 形聲字形声字 / 形聲字"));
+
+    // Test wrong values
+    // Not necessary
+
+    // Test exceptions
+    assert.throws(function() {
+        StringUtils.compareSimilarityPercent(1234, 345345);
+    }, /string1 and string2 must be strings/);
+
+    assert.throws(function() {
+        StringUtils.compareSimilarityPercent([1, 2, 3, 4], [2, 4, 5, 6]);
+    }, /string1 and string2 must be strings/);
+
+    assert.throws(function() {
+        StringUtils.compareSimilarityPercent(new Exception(), new Exception());
+    }, /string1 and string2 must be strings/);
+});
+
+
+/**
  * generateRandom
  */
 QUnit.test("generateRandom", function(assert) {
@@ -1568,9 +1704,9 @@ QUnit.todo("removeHtmlCode", function(assert) {
 
 
 /**
- * removeMultipleSpaces
+ * removeDuplicateCharacters
  */
-QUnit.todo("removeMultipleSpaces", function(assert) {
+QUnit.todo("removeDuplicateCharacters", function(assert) {
 
     // TODO: copy tests from PHP
 });
