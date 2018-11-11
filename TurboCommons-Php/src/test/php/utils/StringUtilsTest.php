@@ -1736,6 +1736,14 @@ class StringUtilsTest extends TestCase {
 	    $this->assertSame(5, StringUtils::compareByLevenshtein("èéöÖU", "eèöOu "));
 	    $this->assertSame(4, StringUtils::compareByLevenshtein("èéöÖ", "eèöOu"));
 
+	    $this->assertSame(3, StringUtils::compareByLevenshtein("HONDA", "HYUNDAI"));
+	    $this->assertSame(3, StringUtils::compareByLevenshtein("kitten", "sitting"));
+
+	    $this->assertSame(1, StringUtils::compareByLevenshtein("形声字 / 形聲字", "形声字 A 形聲字"));
+	    $this->assertSame(3, StringUtils::compareByLevenshtein("形声字 / 形聲字", "1声字 A 形聲"));
+	    $this->assertSame(5, StringUtils::compareByLevenshtein("形声字 / 形聲字", "13字 A 形A"));
+	    $this->assertSame(9, StringUtils::compareByLevenshtein("形声字 / 形聲字", "sitting"));
+
 	    // Test wrong values
 	    // Not necessary
 
@@ -1771,16 +1779,67 @@ class StringUtilsTest extends TestCase {
 	public function testCompareSimilarityPercent(){
 
 	    // Test empty values
-	    // TODO
+	    try {
+	        StringUtils::compareSimilarityPercent(null, null);
+	        $this->exceptionMessage = 'null did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::compareSimilarityPercent(null, "");
+	        $this->exceptionMessage = '"" did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::compareSimilarityPercent([], []);
+	        $this->exceptionMessage = '[] did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    $this->assertSame(100, StringUtils::compareSimilarityPercent("", ""));
+	    $this->assertSame(0, StringUtils::compareSimilarityPercent("", "    "));
+	    $this->assertSame(0, StringUtils::compareSimilarityPercent("    ", ""));
+	    $this->assertSame(100, StringUtils::compareSimilarityPercent("   ", "   "));
 
 	    // Test ok values
-	    // TODO
+	    $this->assertSame(0, StringUtils::compareSimilarityPercent("a", "b"));
+	    $this->assertSame(25.0, StringUtils::compareSimilarityPercent("aaaa", "anUy"));
+	    $this->assertSame(50.0, StringUtils::compareSimilarityPercent("aa", "ab"));
+	    $this->assertSame(50.0, StringUtils::compareSimilarityPercent("aaaa", "aaXx"));
+	    $this->assertSame(75.0, StringUtils::compareSimilarityPercent("aaaa", "aaaQ"));
+	    $this->assertSame(80.0, StringUtils::compareSimilarityPercent("abcde", "abcd"));
+	    $this->assertSame(83.33333333333334, StringUtils::compareSimilarityPercent("aiuygb", "aiUygb"));
+	    $this->assertSame(94.44444444444444, StringUtils::compareSimilarityPercent("形声字 A 形聲字形声字 / 形聲字", "形声字 / 形聲字形声字 / 形聲字"));
+	    $this->assertSame(100, StringUtils::compareSimilarityPercent("形声字 / 形聲字形声字 / 形聲字", "形声字 / 形聲字形声字 / 形聲字"));
 
 	    // Test wrong values
-	    // TODO
+	    // Not necessary
 
 	    // Test exceptions
-	    // TODO
+	    try {
+	        StringUtils::compareSimilarityPercent(1234, 345345);
+	        $this->exceptionMessage = '1234 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::compareSimilarityPercent([1, 2, 3, 4], [2, 4, 5, 6]);
+	        $this->exceptionMessage = '[1, 2, 3, 4] did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::compareSimilarityPercent(new Exception(), new Exception());
+	        $this->exceptionMessage = 'new Exception() did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 	}
 
 

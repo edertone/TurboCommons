@@ -1044,8 +1044,8 @@ class StringUtils {
             return 0;
         }
 
-        $prevRow = range(0, $length2);
         $currentRow = [];
+        $prevRow = range(0, $length2);
 
         for ($i = 0; $i < $length1; $i++) {
 
@@ -1058,7 +1058,7 @@ class StringUtils {
                 $c2 = mb_substr($string2, $j, 1, 'UTF-8');
                 $insertions = $prevRow[$j+1] + 1;
                 $deletions = $currentRow[$j] + 1;
-                $substitutions = $prevRow[$j] + (($c1 != $c2)?1:0);
+                $substitutions = $prevRow[$j] + (($c1 !== $c2) ? 1 : 0);
                 $currentRow[] = min($insertions, $deletions, $substitutions);
             }
 
@@ -1080,7 +1080,14 @@ class StringUtils {
      */
     public static function compareSimilarityPercent($string1, $string2){
 
-        return (1 - self::compareByLevenshtein($string1, $string2) / max(mb_strlen($string1), mb_strlen($string2))) * 100;
+        $levenshtein = self::compareByLevenshtein($string1, $string2);
+
+        if($levenshtein === 0){
+
+            return 100;
+        }
+
+        return (1 - $levenshtein / max(mb_strlen($string1), mb_strlen($string2))) * 100;
     }
 
 
