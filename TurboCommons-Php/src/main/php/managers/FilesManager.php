@@ -459,7 +459,10 @@ class FilesManager extends BaseStrictClass{
 
                     foreach ($this->_tempDirectoriesToDelete as $temp) {
 
-                        $this->deleteDirectory($temp);
+                        if($this->isDirectory($temp)){
+
+                            $this->deleteDirectory($temp);
+                        }
                     }
                 });
             }
@@ -684,10 +687,12 @@ class FilesManager extends BaseStrictClass{
 
         if (!is_dir($path)){
 
-            return false;
+            throw new UnexpectedValueException('Not a directory: '.$path);
         }
 
-        foreach (new DirectoryIterator($path) as $fileInfo){
+        $dirIterator = new DirectoryIterator($path);
+
+        foreach ($dirIterator as $fileInfo){
 
             if(!$fileInfo->isDot()){
 
@@ -709,8 +714,8 @@ class FilesManager extends BaseStrictClass{
         }
 
         // Only for windows, to prevent folder deleting permision error
-        unset($dirIterator);
         unset($fileInfo);
+        unset($dirIterator);
 
         return $deleteDirectoryItself ? rmdir($path) : true;
     }

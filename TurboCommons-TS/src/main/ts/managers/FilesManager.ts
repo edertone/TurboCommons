@@ -475,7 +475,10 @@ export class FilesManager{
                     
                     for (let temp of this._tempDirectoriesToDelete) {
 	
-                        this.deleteDirectory(temp);
+                        if(this.isDirectory(temp)){
+                        
+                            this.deleteDirectory(temp);
+                        }
                     }                
                 });
             }
@@ -703,7 +706,7 @@ export class FilesManager{
 
         if (!this.isDirectory(path)){
 
-            return false;
+            throw new Error('Not a directory: ' + path);
         }
 
         for (let file of this.getDirectoryList(path)) {

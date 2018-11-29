@@ -1381,16 +1381,73 @@ class FilesManagerTest extends TestCase {
 	public function testDeleteDirectory(){
 
 	    // Test empty values
-	    // TODO
+	    try {
+	        $this->sut->deleteDirectory(null);
+	        $this->exceptionMessage = 'null did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->sut->deleteDirectory(new stdClass());
+	        $this->exceptionMessage = 'new stdClass() did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->sut->deleteDirectory(0);
+	        $this->exceptionMessage = '0 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->sut->deleteDirectory('');
+	        $this->exceptionMessage = '"" did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        $this->sut->deleteDirectory('          ');
+	        $this->exceptionMessage = '"          " did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
 	    // Test ok values
-	    // TODO
+	    $this->assertTrue($this->sut->isDirectoryEqualTo($this->tempFolder, $this->tempFolder));
+
+	    // Create some folder structures
+	    $dir1 = $this->tempFolder.DIRECTORY_SEPARATOR.'dir1';
+	    $dir2 = $this->tempFolder.DIRECTORY_SEPARATOR.'dir2';
+	    $this->createDummyDirectoryStucture($dir1, 4, 4, 'somefile', 5, 'file content');
+	    $this->createDummyDirectoryStucture($dir2, 8, 2, 'somefile', 2, 'f');
+
+	    $this->assertTrue($this->sut->deleteDirectory($dir1, false));
+	    $this->assertTrue($this->sut->isDirectory($dir1));
+	    $this->assertTrue($this->sut->deleteDirectory($dir1, true));
+	    $this->assertFalse($this->sut->isDirectory($dir1));
+
+	    $this->assertTrue($this->sut->deleteDirectory($dir2));
+	    $this->assertFalse($this->sut->isDirectory($dir1));
 
 	    // Test wrong values
-	    // TODO
+	    try {
+	        $this->sut->deleteDirectory($this->tempFolder.DIRECTORY_SEPARATOR.'dir-non-existant');
+	        $this->exceptionMessage = '"dir-non-existant" did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 
 	    // Test exceptions
-	    // TODO
+	    try {
+	        $this->sut->deleteDirectory([1, 2, 3, 4]);
+	        $this->exceptionMessage = '[1, 2, 3, 4] did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 	}
 
 
