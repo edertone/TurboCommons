@@ -416,7 +416,10 @@ export class ValidationManager{
     
     
     /** 
-     * Reinitialize the validation status for this class
+     * Reinitialize the validation status.
+     *
+     * This is normally called at the beginning of every global validation we perform. It will reset all the validation
+     * errors on this class and for all tags, so we can re validate whatever we need to.
      * 
      * @returns void
      */
