@@ -1,3 +1,9 @@
+# compiled output
+/dist
+/tmp
+/out-tsc
+
+
 # Turbo Builder files and folders
 target/
 bin/
@@ -27,6 +33,7 @@ thumbs.db
 *.launch
 .settings/
 *.sublime-workspace
+.sonarlint
 
 
 # IDE - VSCode
@@ -35,3 +42,14 @@ thumbs.db
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
