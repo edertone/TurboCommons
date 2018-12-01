@@ -1704,9 +1704,9 @@ QUnit.todo("removeHtmlCode", function(assert) {
 
 
 /**
- * removeDuplicateCharacters
+ * removeSameConsecutive
  */
-QUnit.todo("removeDuplicateCharacters", function(assert) {
+QUnit.todo("removeSameConsecutive", function(assert) {
 
     // TODO: copy tests from PHP
 });

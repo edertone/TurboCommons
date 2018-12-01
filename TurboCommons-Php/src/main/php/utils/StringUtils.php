@@ -1413,19 +1413,39 @@ class StringUtils {
 
 
     /**
-     * Removes all multiple spaces from the given string, including tabulators, leaving a single space instead.
+     * Remove all duplicate consecutive fragments from the provided string
      *
      * @param string $string The string to process
+     * @param array $set A list with the fragments that will be removed when found consecutive. If this value is
+     *        an empty array, all duplicate consecutive characters will be deleted. We can pass here words or special characters like "\n"
      *
-     * @return string The string with a maximum of one consecutive space
+     * @example If we want to remove all duplicate consecutive empty spaces, we will call removeSameConsecutive('string', [' '])
+     * @example If we want to remove all duplicate consecutive new line characters, we will call removeSameConsecutive("string\n\n\nstring", ["\n"])
+     * @example If we want to remove all duplicate "hello" words, we will call removeSameConsecutive('hellohellohellohello', ['hello'])
+     *
+     * @return string The string with a maximum of one consecutive sequence for all those matching the provided set
      */
-    public static function removeMultipleSpaces($string){
+    public static function removeSameConsecutive($string, array $set = []){
 
-        // Remove line breaks and tabs
-        $res = preg_replace('/\t/', ' ', $string);
+        if($string === null){
 
-        // Remove more than one spaces on the string
-        return preg_replace('/ +/', ' ', $res);
+            return '';
+        }
+
+        if(!is_string($string)){
+
+            throw new InvalidArgumentException('string must be a string');
+        }
+
+        if($set === []){
+
+            // All possible duplicate characters will be removed from the string
+            // Note that \R represents any line ending sequence
+            return preg_replace('/(.|\R)\1+/u','$1', $string);
+        }
+
+        // Split the characters string into an array
+        return preg_replace('/('.implode('|', $set).')\1+/u','$1', $string);
     }
 }
 

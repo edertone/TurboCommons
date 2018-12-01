@@ -1465,7 +1465,7 @@ export class StringUtils {
     }
     
     
-    public static removeDuplicateCharacters() {
+    public static removeSameConsecutive() {
         
         // TODO: translate from php
     }

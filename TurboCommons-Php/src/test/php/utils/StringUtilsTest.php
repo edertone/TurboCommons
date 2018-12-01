@@ -2167,14 +2167,73 @@ class StringUtilsTest extends TestCase {
 
 
 	/**
-	 * removeDuplicateCharacters
+	 * testRemoveSameConsecutive
 	 *
 	 * @return void
 	 */
-	public function removeDuplicateCharacters(){
+	public function testRemoveSameConsecutive(){
 
-	    // TODO!!
-	    $this->markTestIncomplete('This test has not been implemented yet.');
+	    // Test empty values
+	    $this->assertSame('', StringUtils::removeSameConsecutive(null));
+	    $this->assertSame('', StringUtils::removeSameConsecutive(''));
+	    $this->assertSame(' ', StringUtils::removeSameConsecutive('     '));
+	    $this->assertSame("\n", StringUtils::removeSameConsecutive("\n\n\n\n"));
+	    $this->assertSame("\r", StringUtils::removeSameConsecutive("\r\r\r\r"));
+	    $this->assertSame("\r\n", StringUtils::removeSameConsecutive("\r\n\r\n\r\n\r\n\r\n"));
+
+	    try {
+	        StringUtils::removeSameConsecutive([]);
+	        $this->exceptionMessage = '[] did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    // Test ok values - ALL CHARACTERS
+	    $this->assertSame('a', StringUtils::removeSameConsecutive('a'));
+	    $this->assertSame('abc', StringUtils::removeSameConsecutive('abc'));
+	    $this->assertSame('a', StringUtils::removeSameConsecutive('aa'));
+	    $this->assertSame('abcabc', StringUtils::removeSameConsecutive('abcabc'));
+	    $this->assertSame('abc', StringUtils::removeSameConsecutive('aabbcc'));
+	    $this->assertSame("ab c\nd", StringUtils::removeSameConsecutive("abbbbbbbbbb    cccccc\n\n\nddd"));
+	    $this->assertSame(".8ynbvER745bhbvFGFfCc \n\r Ww?o?-", StringUtils::removeSameConsecutive("..88ynbvER745bhbvFFGFfCc   \n\n\r\r  Www?o??--"));
+	    $this->assertSame('形声字 / 形聲字', StringUtils::removeSameConsecutive('形声字 / 形聲字'));
+	    $this->assertSame('形声字 / 形聲字', StringUtils::removeSameConsecutive('形形形形声字 / 形聲字'));
+	    $this->assertSame("形声字形聲字 \n形声字形聲字\r ", StringUtils::removeSameConsecutive("形声字形聲字  \n\n形声字字字形聲字\r\r\r\r    "));
+
+	    // Test ok values - A SET OF CHARACTERS
+	    $this->assertSame(' ', StringUtils::removeSameConsecutive('       ', [' ']));
+	    $this->assertSame(' asdf asdf', StringUtils::removeSameConsecutive(' asdf  asdf', [' ']));
+	    $this->assertSame('abuu77abc7 ', StringUtils::removeSameConsecutive('aabbuu77abc7     ', ['a', 'b', ' ']));
+	    $this->assertSame('abu77abc7 ', StringUtils::removeSameConsecutive('aabbuu77abc7     ', ['a', 'b', ' ', 'u']));
+	    $this->assertSame("ab\n\r\r\n bbbbaaa", StringUtils::removeSameConsecutive("ab\n\n\r\r\n    bbbbaaa", [" ", "\n"]));
+	    $this->assertSame("ab\n\r\r\n    ba", StringUtils::removeSameConsecutive("ab\n\n\r\r\n    bbbbaaa", ["a", "b", "\n"]));
+	    $this->assertSame("ab\n\r\n    ba", StringUtils::removeSameConsecutive("ab\n\n\r\r\n    bbbbaaa",  ["a", "b", "\r", "\n"]));
+	    $this->assertSame("ab ab a b a b", StringUtils::removeSameConsecutive("ab abababab a b a b",  ["ab"]));
+	    $this->assertSame("ab abababab a b ", StringUtils::removeSameConsecutive("ab abababab a b a b ",  ["a b "]));
+	    $this->assertSame('形声字形形形形聲字   ', StringUtils::removeSameConsecutive('形声字字字形形形形聲字   ', ['字']));
+	    $this->assertSame('形声字形聲字   ', StringUtils::removeSameConsecutive('形声字字字形形形形聲字   ', ['字', '形']));
+	    $this->assertSame('形声字形聲字 ', StringUtils::removeSameConsecutive('形声字字字形形形形聲字   ', ['字', '形', ' ']));
+	    $this->assertSame("形声字形聲聲聲聲聲聲聲字 \n\r\n\r\n\r\n 聲聲聲聲", StringUtils::removeSameConsecutive("形声字字字形形形形聲聲聲聲聲聲聲字     \n\n\n\r\n\r\n\r\n     聲聲聲聲", ['字', '形', ' ', "\n"]));
+	    $this->assertSame("形声字形聲聲聲聲聲聲聲字 \n\r\n 聲聲聲聲", StringUtils::removeSameConsecutive("形声字字字形形形形聲聲聲聲聲聲聲字     \n\n\n\r\n\r\n\r\n     聲聲聲聲", ['字', '形', ' ', "\n", "\r\n"]));
+	    $this->assertSame("形声字形聲字 \n\r\n 聲", StringUtils::removeSameConsecutive("形声字字字形形形形聲聲聲聲聲聲聲字     \n\n\n\r\n\r\n\r\n     聲聲聲聲", ['字', '形', ' ', "\n", "\r\n", "聲"]));
+	    $this->assertSame('hello hello hello    ', StringUtils::removeSameConsecutive('hellohellohello hello hello    ', ['hello']));
+	    $this->assertSame('hello hello hello ', StringUtils::removeSameConsecutive('hellohellohello hello hello    ', ['hello', ' ']));
+
+        // Test wrong values
+        // Test exceptions
+	    try {
+	        StringUtils::removeSameConsecutive(123123);
+	        $this->exceptionMessage = '123123 did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
+
+	    try {
+	        StringUtils::removeSameConsecutive('abc', 'hello');
+	        $this->exceptionMessage = 'hello did not cause exception';
+	    } catch (Throwable $e) {
+	        // We expect an exception to happen
+	    }
 	}
 }
 
