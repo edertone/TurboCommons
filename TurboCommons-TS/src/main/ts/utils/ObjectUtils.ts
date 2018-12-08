@@ -42,8 +42,6 @@ export class ObjectUtils {
      */
     public static getKeys(object:any):string[]{
 
-        var res = [];
-        
         if(!ObjectUtils.isObject(object)){
 
             throw new Error("ObjectUtils.getKeys: parameter must be an object");

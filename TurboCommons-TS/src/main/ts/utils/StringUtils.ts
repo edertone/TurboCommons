@@ -10,7 +10,6 @@
 
 import { NumericUtils } from './NumericUtils';
 import { ArrayUtils } from './ArrayUtils';
-import { ValidationManager } from "../managers/ValidationManager";
 
     
 /**
@@ -706,7 +705,7 @@ export class StringUtils {
      * Given an internet URL, this method extracts only the scheme part.
      * Example: "http://google.com" -> results in "http"
      * 
-     * @see StringUtils.formatUrl, ValidationManager.isUrl
+     * @see StringUtils.formatUrl
      * 
      * @param url A valid internet url
      *

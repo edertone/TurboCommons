@@ -519,7 +519,7 @@ export class FilesManager{
 
         // Get all the folder contents
         let result = [];
-        let sortRes = [];
+        // TODO let sortRes = [];
 
         for (let fileInfo of this.fs.readdirSync(path)) {
 
@@ -877,7 +877,7 @@ export class FilesManager{
      *
      * @return the number of bytes read from the file.
      */
-    readFileBuffered(path: string, downloadRateLimit = 0){
+    readFileBuffered(){
 
         // TODO - translate from php
     }

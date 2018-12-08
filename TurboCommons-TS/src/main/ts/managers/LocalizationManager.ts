@@ -9,7 +9,6 @@
  
    
 import { StringUtils } from '../utils/StringUtils';
-import { ObjectUtils } from '../utils/ObjectUtils';
 import { ArrayUtils } from '../utils/ArrayUtils';
 import { JavaPropertiesObject } from '../model/JavaPropertiesObject';
 import { HTTPManager } from './HTTPManager';
@@ -312,7 +311,7 @@ export class LocalizationManager {
         
         if(this._filesManager !== null){
             
-            this._loadDataFromFiles(pathsToLoad, pathsToLoadInfo, finishedCallback, progressCallback);
+            // TODO this._loadDataFromFiles(pathsToLoad, pathsToLoadInfo, finishedCallback, progressCallback);
              
         }else{
             
@@ -329,14 +328,14 @@ export class LocalizationManager {
      * @param finishedCallback method to execute once finished
      * @param progressCallback method to execute after each path is loaded
      */
-    private _loadDataFromFiles(pathsToLoad: string[],
-                               pathsToLoadInfo: any[],
-                               finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void) | null = null,
-                               progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null){
-        
-        // TODO
-        // Use the filesManager instance to load all the locales from the specified paths
-    }
+//    private _loadDataFromFiles(pathsToLoad: string[],
+//                               pathsToLoadInfo: any[],
+//                               finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void) | null = null,
+//                               progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null){
+//        
+//        // TODO
+//        // Use the filesManager instance to load all the locales from the specified paths
+//    }
     
     
     /**
@@ -376,7 +375,7 @@ export class LocalizationManager {
             return;
         }
         
-        (this._httpManager as HTTPManager).execute(pathsToLoad, (results, anyError) => {
+        (this._httpManager as HTTPManager).execute(pathsToLoad, (results, _anyError) => {
             
             let errors: {path:string, errorMsg:string, errorCode:number}[] = [];
             

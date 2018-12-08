@@ -702,7 +702,7 @@ export class HTTPManager{
             throw new Error('basePath must be a non empty string');
         }
         
-        this.execute(urlToResourcesList, (results, anyError) => {
+        this.execute(urlToResourcesList, (results, _anyError) => {
             
             if(results[0].isError){
                 
@@ -719,7 +719,7 @@ export class HTTPManager{
                 resourcesFullUrls.push(StringUtils.formatPath(basePathWithSlash + resource, '/'));  
             }
             
-            this.execute(resourcesFullUrls, (results, anyError) => {
+            this.execute(resourcesFullUrls, (results, _anyError) => {
 
                 let resultsData: string[] = [];
                 

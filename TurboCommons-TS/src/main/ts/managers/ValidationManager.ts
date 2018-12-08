@@ -369,49 +369,49 @@ export class ValidationManager{
     isMinimumWords(string:string):boolean {
     
         // TODO
-        return false;
+        return string === '';
     }
     
     
     isNIF(string:string):boolean {
     
         // TODO
-        return false;
+        return string === '';
     }
     
     
     isMinimumLength(string:string):boolean {
     
         // TODO
-        return false;
+        return string === '';
     }
     
     
     isMaximumLength(string:string):boolean {
         
         // TODO
-        return false;
+        return string === '';
     }
     
     
     isPostalCode(string:string):boolean {
     
         // TODO
-        return false;
+        return string === '';
     }
     
     
     isPhone(string:string):boolean {
     
         // TODO
-        return false;
+        return string === '';
     }
     
     
     isHtmlFormValid(string:string):boolean {
     
         // TODO
-        return false;
+        return string === '';
     }
     
     

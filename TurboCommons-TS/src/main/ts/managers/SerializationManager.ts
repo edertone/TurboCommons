@@ -8,11 +8,7 @@
  */
  
 
-import { NumericUtils } from '../utils/NumericUtils';
-import { ValidationManager } from "./ValidationManager";
-import { HashMapObject } from '../model/HashMapObject';
 import { JavaPropertiesObject } from '../model/JavaPropertiesObject';
-import { StringUtils } from '../utils/StringUtils';
 import { ArrayUtils } from '../utils/ArrayUtils';
 import { ObjectUtils } from '../utils/ObjectUtils';
 
@@ -61,9 +57,9 @@ export class SerializationManager {
      *
      * @return The provided class instance with all its properties filled with the corresponding hashmap values
      */
-    hashMapObjectToClass<T>(hashMap:HashMapObject, classInstance:T): T{
-
-        // TODO - implement this and translate it to PHP
+//    hashMapObjectToClass<T>(hashMap:HashMapObject, classInstance:T): T{
+//
+//        TODO - implement this and translate it to PHP
 //        let keys = hashMap.getKeys(); 
 //        
 //        for (let key of keys) {
@@ -74,8 +70,8 @@ export class SerializationManager {
 //            }
 //        }
 //
-        return classInstance;
-    }
+//        return classInstance;
+//    }
         
 
     /**
