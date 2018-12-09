@@ -12,6 +12,7 @@
 export { BrowserManager } from './managers/BrowserManager';
 export { FilesManager } from './managers/FilesManager';
 export { HTTPManager } from './managers/HTTPManager';
+export { HTTPManagerBaseRequest } from './managers/httpmanager/HTTPManagerBaseRequest';
 export { HTTPManagerGetRequest } from './managers/httpmanager/HTTPManagerGetRequest';
 export { HTTPManagerPostRequest } from './managers/httpmanager/HTTPManagerPostRequest';
 export { LocalizationManager} from './managers/LocalizationManager';

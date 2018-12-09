@@ -577,7 +577,7 @@ export class HTTPManager{
             if(queue.name === queueName){
                 
                 // Add all the received requests to the beginning of the queue pending array
-                for (var i = requestsList.length - 1; i >= 0; i--) {
+                for (var i = 0; i < requestsList.length; i++) {
 
                     queue.pendingRequests.unshift(requestsList[i]);
                 }
@@ -603,7 +603,7 @@ export class HTTPManager{
             }
         }  
         
-        throw new Error(`queue ${queueName} does not exist`);
+        throw new Error(`queue ${queueName} does not exist. Create it with createQueue()`);
     }
     
     
