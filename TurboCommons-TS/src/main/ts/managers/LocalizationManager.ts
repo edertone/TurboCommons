@@ -302,7 +302,7 @@ export class LocalizationManager {
                     
                     pathsToLoadInfo.push({locale: locale, bundle: bundle, path: data.path});
                     
-                    pathsToLoad.push(data.path.replace('$locale', locale).replace('$bundle', bundle));
+                    pathsToLoad.push(StringUtils.replace(data.path, ['$locale', '$bundle'], [locale, bundle]));
                 }
             }
         }
