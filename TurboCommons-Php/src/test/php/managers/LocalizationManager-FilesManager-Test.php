@@ -1794,6 +1794,36 @@ class LocalizationManagerTest extends TestCase {
             $this->assertSame($this->sut->get('TAG_5', '', '', ['a', '', 'c', 'd', 'e', 'f', 'g']), 'missing  wildcard d indices f');
         });
     }
+
+
+    /**
+     * test_get_with_isBundleMandatory
+     *
+     * @return void
+     */
+    public function test_get_with_isBundleMandatory(){
+
+        $bundles = [[
+            'path' => $this->basePath.'/test-get-with-wildcards/$locale/$bundle.properties',
+            'bundles' => ['Locales']
+        ]];
+
+        $this->sut->isBundleMandatory = true;
+
+        $this->sut->initialize(new FilesManager(), ['en_US', 'es_ES'], $bundles, function($errors){
+
+            try {
+                $this->sut->get('TAG_1');
+                $this->exceptionMessage = 'TAG_1 did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            $this->sut->isBundleMandatory = false;
+
+            $this->assertSame($this->sut->get('TAG_1'), 'this has no wildcards');
+        });
+    }
 }
 
 ?>

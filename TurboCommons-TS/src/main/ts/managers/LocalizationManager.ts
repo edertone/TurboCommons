@@ -49,6 +49,13 @@ export class LocalizationManager {
 
     
     /**
+     * If set to true, when we call any get method from this class to retrieve a translated text, we will be forced
+     * to provide the bundle for the key we are looking for. If set to false, only the key parameter will be required.
+     */
+    isBundleMandatory = false;
+
+
+    /**
      * Tells if the class has been initialized or not
      */
     private _initialized = false;
@@ -651,6 +658,11 @@ export class LocalizationManager {
         // If no bundle is specified, the last one will be used
         if (bundle === '') {
 
+            if(this.isBundleMandatory){
+                
+                throw new Error('bundle is mandatory for key ' + key);
+            }
+            
             bundle = this._activeBundle;
         }
         

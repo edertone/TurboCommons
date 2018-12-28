@@ -57,6 +57,13 @@ class LocalizationManager extends BaseStrictClass{
 
 
     /**
+     * If set to true, when we call any get method from this class to retrieve a translated text, we will be forced
+     * to provide the bundle for the key we are looking for. If set to false, only the key parameter will be required.
+     */
+    public $isBundleMandatory = false;
+
+
+    /**
      * Tells if the class has been initialized or not
      */
     private $_initialized = false;
@@ -628,6 +635,11 @@ class LocalizationManager extends BaseStrictClass{
 
         // If no bundle is specified, the last one will be used
         if ($bundle === '') {
+
+            if($this->isBundleMandatory){
+
+                throw new UnexpectedValueException('bundle is mandatory for key '.$key);
+            }
 
             $bundle = $this->_activeBundle;
         }

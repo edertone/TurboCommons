@@ -1552,3 +1552,32 @@ QUnit.test("test-get-with-wildcards", function(assert){
     });
 });
 
+
+/**
+ * test-get-with-isBundleMandatory
+ */
+QUnit.test("test-get-with-isBundleMandatory", function(assert){
+    
+    var done = assert.async(1);
+    
+    var bundles = [{
+        path: window.basePath + '/test-get-with-wildcards/$locale/$bundle.properties',
+        bundles: ['Locales']
+    }];
+
+    sut.isBundleMandatory = true;
+    
+    sut.initialize(new HTTPManager(), ['en_US', 'es_ES'], bundles, function(errors){
+
+        assert.throws(function() {
+            sut.get('TAG_1');
+        }, /bundle is mandatory for key TAG_1/);
+        
+        sut.isBundleMandatory = false;
+        
+        assert.strictEqual(sut.get('TAG_1'), 'this has no wildcards');
+        
+        done();
+    });
+});
+
