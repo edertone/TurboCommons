@@ -146,6 +146,40 @@ class ValidationManagerTest extends TestCase {
 
 
     /**
+     * testNotOk
+     *
+     * @return void
+     */
+    public function testNotOk(){
+
+        // Test empty values
+        $this->assertSame($this->validationManager->notOk(), false);
+        $this->assertSame($this->validationManager->notOk(null), false);
+        $this->assertSame($this->validationManager->notOk([]), false);
+        $this->assertSame($this->validationManager->notOk(''), false);
+
+        $this->validationManager->reset();
+
+        // Test ok values
+        $this->assertTrue($this->validationManager->isTrue(true, 'error', 'tag1'));
+        $this->assertSame($this->validationManager->notOk(), false);
+        $this->assertSame($this->validationManager->notOk('tag1'), false);
+
+        // Test wrong values
+        $this->assertFalse($this->validationManager->isTrue(false, 'error', 'tag1'));
+        $this->assertTrue($this->validationManager->isTrue(true, 'error', 'tag2'));
+        $this->assertFalse($this->validationManager->isTrue(false, 'error', 'tag3', true));
+        $this->assertSame($this->validationManager->notOk(), true);
+        $this->assertSame($this->validationManager->notOk('tag1'), true);
+        $this->assertSame($this->validationManager->notOk('tag2'), false);
+        $this->assertSame($this->validationManager->notOk('tag3'), true);
+        $this->assertSame($this->validationManager->notOk(['tag2', 'tag3']), true);
+        $this->assertSame($this->validationManager->notOk(['tag1', 'tag2']), true);
+        $this->assertSame($this->validationManager->notOk(['tag1', 'tag3']), true);
+    }
+
+
+    /**
      * testGetFirstMessage
      *
      * @return void

@@ -100,14 +100,29 @@ export class ValidationManager{
      * @param tags If we want to check the validation state for a specific tag or a list of tags, we can set it here. If we want to
      *        get the global validation state for all the tags we will leave this value empty ''.
      * 
-     * @return boolean True if status is ok, false if status is warning or error
+     * @return True if status is ok, false if status is warning or error
      */
     ok(tags:string|string[] = ''){
     
         return this.getStatus(tags) === ValidationManager.OK;
     }
+
+
+    /**
+     * Provides a way to perform a fast validation check. Will return true if validation manager is in a warning or error state, or false
+     * if validation state is ok.
+     * 
+     * @param tags If we want to check the validation state for a specific tag or a list of tags, we can set it here. If we want to
+     *        get the global validation state for all the tags we will leave this value empty ''.
+     * 
+     * @return True if status is warning or error, False if status is ok
+     */
+    notOk(tags:string|string[] = ''){
     
-    
+        return this.getStatus(tags) !== ValidationManager.OK;
+    }
+
+
     /**
      * Find the first error or warning message that happened since the validation manager was instantiated or
      * since the last reset 

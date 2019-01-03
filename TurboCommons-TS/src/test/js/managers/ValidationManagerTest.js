@@ -89,6 +89,38 @@ QUnit.test("ok", function(assert) {
 
 
 /**
+ * notOk
+ */
+QUnit.test("notOk", function(assert) {
+
+    // Test empty values
+    assert.strictEqual(validationManager.notOk(), false);
+    assert.strictEqual(validationManager.notOk(null), false);
+    assert.strictEqual(validationManager.notOk([]), false);
+    assert.strictEqual(validationManager.notOk(''), false);
+
+    validationManager.reset();
+
+    // Test ok values
+    assert.ok(validationManager.isTrue(true, 'error', 'tag1'));
+    assert.strictEqual(validationManager.notOk(), false);
+    assert.strictEqual(validationManager.notOk('tag1'), false);
+
+    // Test wrong values
+    assert.notOk(validationManager.isTrue(false, 'error', 'tag1'));
+    assert.ok(validationManager.isTrue(true, 'error', 'tag2'));
+    assert.notOk(validationManager.isTrue(false, 'error', 'tag3', true));
+    assert.strictEqual(validationManager.notOk(), true);
+    assert.strictEqual(validationManager.notOk('tag1'), true);
+    assert.strictEqual(validationManager.notOk('tag2'), false);
+    assert.strictEqual(validationManager.notOk('tag3'), true);
+    assert.strictEqual(validationManager.notOk(['tag2', 'tag3']), true);
+    assert.strictEqual(validationManager.notOk(['tag1', 'tag2']), true);
+    assert.strictEqual(validationManager.notOk(['tag1', 'tag3']), true);
+});
+
+
+/**
  * getFirstMessage
  */
 QUnit.test("getFirstMessage", function(assert) {

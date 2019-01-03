@@ -95,9 +95,8 @@ class ValidationManager extends BaseStrictClass{
 
 
 	/**
-	 * Provides a way to perform a fast validation check. Will return true if
-	 * validation state is ok, or false if validation manager is in a warning or
-	 * error state.
+	 * Provides a way to perform a fast validation check. Will return true if validation state is ok, or false if validation
+     * manager is in a warning or error state.
 	 *
 	 * @param string|array $tags If we want to check the validation state for a specific tag or a list of tags, we can set it here. If we want to
      *        get the global validation state for all the tags we will leave this value empty ''.
@@ -107,6 +106,21 @@ class ValidationManager extends BaseStrictClass{
 	public function ok($tags = ''){
 
 	    return $this->getStatus($tags) === ValidationManager::OK;
+	}
+
+
+	/**
+	 * Provides a way to perform a fast validation check. Will return true if validation manager is in a warning or error state, or false
+     * if validation state is ok.
+	 *
+	 * @param string|array $tags If we want to check the validation state for a specific tag or a list of tags, we can set it here. If we want to
+	 *        get the global validation state for all the tags we will leave this value empty ''.
+	 *
+	 * @return boolean True if status is warning or error, False if status is ok
+	 */
+	public function notOk($tags = ''){
+
+	    return $this->getStatus($tags) !== ValidationManager::OK;
 	}
 
 
