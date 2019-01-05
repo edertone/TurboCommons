@@ -51,7 +51,7 @@
 	    	"testsRoot": "src/test/js",
 	        "httpServerPort": "8185",
 	        "targets": ["es5", "es6"],
-	        "browsers": {"chrome": true, "firefox": false, "iexplore": false}
+	        "browsers": {"chrome": true, "firefox": true, "iexplore": false}
 	    }
     ]
 }
