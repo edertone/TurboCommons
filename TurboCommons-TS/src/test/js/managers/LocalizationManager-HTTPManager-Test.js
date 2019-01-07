@@ -138,11 +138,16 @@ QUnit.test("initialize-without-bundles", function(assert){
         bundles: []
     }];
 
+    assert.strictEqual(sut.isInitialized(), false);
+
     sut.initialize(new HTTPManager(), ['es_ES', 'en_US', 'fr_FR'], bundles, function(errors){
         
         assert.strictEqual(errors.length, 0);
         assert.strictEqual(sut.locales().length, 3);
         assert.strictEqual(sut.languages().length, 3);
+        
+        assert.strictEqual(sut.isInitialized(), true);
+        
         done();
     });
 });
@@ -171,6 +176,8 @@ QUnit.test("initialize-secondth-time-resets-state", function(assert){
         path: window.basePath + '/test-json/$locale/$bundle.json',
         bundles: ['Locales']
     }];
+    
+    assert.strictEqual(sut.isInitialized(), false);
         
     sut.initialize(new HTTPManager(), ['es_ES'], bundles, function(errors){
 
@@ -200,7 +207,11 @@ QUnit.test("initialize-secondth-time-resets-state", function(assert){
         
         assert.strictEqual(sut.locales().length, 2);
         
+        assert.strictEqual(sut.isInitialized(), true);
+        
     }, function(completedUrl, totalUrls){
+        
+        assert.strictEqual(sut.isInitialized(), false);
         
         completedUrlsCount ++;        
         assert.strictEqual(totalUrls, 1);

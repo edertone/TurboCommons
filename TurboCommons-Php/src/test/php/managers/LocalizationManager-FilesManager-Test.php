@@ -197,11 +197,15 @@ class LocalizationManagerTest extends TestCase {
             'bundles' => []
         ]];
 
+        $this->assertSame($this->sut->isInitialized(), false);
+
         $this->sut->initialize(new FilesManager(), ['es_ES', 'en_US', 'fr_FR'], $bundles, function($errors){
 
             $this->assertSame(count($errors), 0);
             $this->assertSame(count($this->sut->locales()), 3);
             $this->assertSame(count($this->sut->languages()), 3);
+
+            $this->assertSame($this->sut->isInitialized(), true);
         });
     }
 
@@ -240,6 +244,8 @@ class LocalizationManagerTest extends TestCase {
             'bundles' => ['Locales']
         ]];
 
+        $this->assertSame($this->sut->isInitialized(), false);
+
         $this->sut->initialize(new FilesManager(), ['es_ES'], $bundles, function($errors){
 
             $this->assertSame(count($errors), 0);
@@ -267,7 +273,11 @@ class LocalizationManagerTest extends TestCase {
 
             $this->assertSame(count($this->sut->locales()), 2);
 
+            $this->assertSame($this->sut->isInitialized(), true);
+
         }, function($completedUrl, $totalUrls){
+
+            $this->assertSame($this->sut->isInitialized(), false);
 
             $this->completedUrlsCount ++;
             $this->assertSame($totalUrls, 1);

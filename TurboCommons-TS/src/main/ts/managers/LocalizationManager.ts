@@ -103,8 +103,17 @@ export class LocalizationManager {
      * An http manager instance used to load the data when paths are urls
      */
     private _httpManager:HTTPManager|null = null;
-    
-    
+
+
+    /**
+     * Check if the class has been correctly initialized
+     */
+    isInitialized(){
+        
+        return this._initialized;
+    }
+
+
     /**
      * Checks if the specified locale is currently loaded for the currently defined bundles and paths.
      * 

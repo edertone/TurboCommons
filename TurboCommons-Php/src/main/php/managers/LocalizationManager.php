@@ -114,6 +114,15 @@ class LocalizationManager extends BaseStrictClass{
 
 
     /**
+     * Check if the class has been correctly initialized
+     */
+    public function isInitialized(){
+
+        return $this->_initialized;
+    }
+
+
+    /**
      * Checks if the specified locale is currently loaded for the currently defined bundles and paths.
      *
      * @param string $locale A locale to check. For example 'en_US'
