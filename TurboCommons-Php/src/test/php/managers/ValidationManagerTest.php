@@ -538,6 +538,7 @@ class ValidationManagerTest extends TestCase {
 
 	    // Test exceptions
 	    // TODO
+	    $this->markTestIncomplete('This test is incomplete.');
 	}
 
 
