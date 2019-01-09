@@ -22,54 +22,54 @@ use org\turbocommons\src\main\php\managers\ValidationManager;
 class ConversionUtils {
 
 
-	/**
-	 * Encode a string to base64
-	 *
-	 * @param string $string The input string to be converted
-	 *
-	 * @return string The input string as base 64
-	 */
-	public static function stringToBase64($string){
+    /**
+     * Encode a string to base64
+     *
+     * @param string $string The input string to be converted
+     *
+     * @return string The input string as base 64
+     */
+    public static function stringToBase64($string){
 
-		if($string === null){
+        if($string === null){
 
-			return '';
-		}
+            return '';
+        }
 
-		$validationManager = new ValidationManager();
+        $validationManager = new ValidationManager();
 
-		if(!$validationManager->isString($string)){
+        if(!$validationManager->isString($string)){
 
-			throw new InvalidArgumentException('ConversionUtils->stringToBase64: value is not a string');
-		}
+            throw new InvalidArgumentException('ConversionUtils->stringToBase64: value is not a string');
+        }
 
-		return base64_encode($string);
-	}
+        return base64_encode($string);
+    }
 
 
-	/**
-	 * Decode a string from base64
-	 *
-	 * @param string $string a base64 string
-	 *
-	 * @return string The base64 decoded as its original string
-	 */
-	public static function base64ToString($string){
+    /**
+     * Decode a string from base64
+     *
+     * @param string $string a base64 string
+     *
+     * @return string The base64 decoded as its original string
+     */
+    public static function base64ToString($string){
 
-		if($string === null){
+        if($string === null){
 
-			return '';
-		}
+            return '';
+        }
 
-		$validationManager = new ValidationManager();
+        $validationManager = new ValidationManager();
 
-		if(!$validationManager->isString($string)){
+        if(!$validationManager->isString($string)){
 
-			throw new InvalidArgumentException('ConversionUtils->base64ToString: value is not a string');
-		}
+            throw new InvalidArgumentException('ConversionUtils->base64ToString: value is not a string');
+        }
 
-		return base64_decode($string);
-	}
+        return base64_decode($string);
+    }
 }
 
 ?>

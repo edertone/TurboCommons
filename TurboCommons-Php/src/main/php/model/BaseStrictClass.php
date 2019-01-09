@@ -20,34 +20,34 @@ use UnexpectedValueException;
 abstract class BaseStrictClass {
 
 
-	/**
-	 * Protection to prevent accessing undefined properties to this class
-	 *
-	 * @param string $name The property name
-	 *
-	 * @return void
-	 */
-	public function __get($name) {
+    /**
+     * Protection to prevent accessing undefined properties to this class
+     *
+     * @param string $name The property name
+     *
+     * @return void
+     */
+    public function __get($name) {
 
-		throw new UnexpectedValueException(get_class($this).' property '.$name.' does not exist');
-	}
-
-
-	/**
-	 * Protection to prevent creating extra properties to this class
-	 *
-	 * @param string $name The property name
-	 * @param string $value The property value
-	 *
-	 * @return void
-	 */
-	public function __set($name, $value) {
-
-		throw new UnexpectedValueException(get_class($this).' property '.$name.' does not exist');
-	}
+        throw new UnexpectedValueException(get_class($this).' property '.$name.' does not exist');
+    }
 
 
-	// TODO: Add More OOP best practices
+    /**
+     * Protection to prevent creating extra properties to this class
+     *
+     * @param string $name The property name
+     * @param string $value The property value
+     *
+     * @return void
+     */
+    public function __set($name, $value) {
+
+        throw new UnexpectedValueException(get_class($this).' property '.$name.' does not exist');
+    }
+
+
+    // TODO: Add More OOP best practices
 
 }
 

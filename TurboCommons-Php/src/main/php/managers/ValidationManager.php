@@ -27,104 +27,104 @@ use org\turbocommons\src\main\php\utils\ObjectUtils;
 class ValidationManager extends BaseStrictClass{
 
 
-	/**
+    /**
      * Constant that defines the correct validation status
      */
-	const OK = 0;
+    const OK = 0;
 
 
-	/**
+    /**
      * Constant that defines the warning validation status
      */
-	const WARNING = 1;
+    const WARNING = 1;
 
 
-	/**
+    /**
      * Constant that defines the error validation status
      */
-	const ERROR = 2;
+    const ERROR = 2;
 
 
-	/**
+    /**
      * Stores the current validation state for each one of the defined tags.
      *
      * tag contains the name of the tag for which we are saving the status
      * status can have 3 different values: OK / WARNING / ERROR
      */
-	private $_validationStatus = [[
-	   'tag' => '',
-	   'status' => ValidationManager::OK
-	]];
+    private $_validationStatus = [[
+       'tag' => '',
+       'status' => ValidationManager::OK
+    ]];
 
 
-	/**
+    /**
      * Stores a list of all the validation error or warning messages that have happened
      * since the validation manager was created or since the last reset was performed.
      *
      * Each message is stored with its associated tag.
      */
-	private $_failedMessages = [];
+    private $_failedMessages = [];
 
 
-	/**
-	 * Check the current validation state.
-	 * Possible return values are ValidationManager.OK, ValidationManager.WARNING or ValidationManager.ERROR
-	 *
-	 * @param string|array $tags If we want to check the validation state for a specific tag or a list of tags, we can set it here. If we want to
+    /**
+     * Check the current validation state.
+     * Possible return values are ValidationManager.OK, ValidationManager.WARNING or ValidationManager.ERROR
+     *
+     * @param string|array $tags If we want to check the validation state for a specific tag or a list of tags, we can set it here. If we want to
      *        get the global validation state for all the tags we will leave this value empty ''.
      *
-	 * @return int ValidationManager.OK, ValidationManager.WARNING or ValidationManager.ERROR
-	 */
-	public function getStatus($tags = ''){
+     * @return int ValidationManager.OK, ValidationManager.WARNING or ValidationManager.ERROR
+     */
+    public function getStatus($tags = ''){
 
-	    $maxStatus = 0;
+        $maxStatus = 0;
 
-	    $tagsList = ArrayUtils::isArray($tags) ? $tags : [$tags];
+        $tagsList = ArrayUtils::isArray($tags) ? $tags : [$tags];
 
-	    foreach ($this->_validationStatus as $status) {
+        foreach ($this->_validationStatus as $status) {
 
-	        if(($tags === '' || in_array($status['tag'], $tagsList)) &&
-	            $status['status'] > $maxStatus){
+            if(($tags === '' || in_array($status['tag'], $tagsList)) &&
+                $status['status'] > $maxStatus){
 
-	                $maxStatus = $status['status'];
-	        }
-	    }
+                    $maxStatus = $status['status'];
+            }
+        }
 
-	    return $maxStatus;
-	}
+        return $maxStatus;
+    }
 
 
-	/**
-	 * Provides a way to perform a fast validation check. Will return true if validation state is ok, or false if validation
+    /**
+     * Provides a way to perform a fast validation check. Will return true if validation state is ok, or false if validation
      * manager is in a warning or error state.
-	 *
-	 * @param string|array $tags If we want to check the validation state for a specific tag or a list of tags, we can set it here. If we want to
+     *
+     * @param string|array $tags If we want to check the validation state for a specific tag or a list of tags, we can set it here. If we want to
      *        get the global validation state for all the tags we will leave this value empty ''.
      *
-	 * @return boolean True if status is ok, false if status is warning or error
-	 */
-	public function ok($tags = ''){
+     * @return boolean True if status is ok, false if status is warning or error
+     */
+    public function ok($tags = ''){
 
-	    return $this->getStatus($tags) === ValidationManager::OK;
-	}
+        return $this->getStatus($tags) === ValidationManager::OK;
+    }
 
 
-	/**
-	 * Provides a way to perform a fast validation check. Will return true if validation manager is in a warning or error state, or false
+    /**
+     * Provides a way to perform a fast validation check. Will return true if validation manager is in a warning or error state, or false
      * if validation state is ok.
-	 *
-	 * @param string|array $tags If we want to check the validation state for a specific tag or a list of tags, we can set it here. If we want to
-	 *        get the global validation state for all the tags we will leave this value empty ''.
-	 *
-	 * @return boolean True if status is warning or error, False if status is ok
-	 */
-	public function notOk($tags = ''){
+     *
+     * @param string|array $tags If we want to check the validation state for a specific tag or a list of tags, we can set it here. If we want to
+     *        get the global validation state for all the tags we will leave this value empty ''.
+     *
+     * @return boolean True if status is warning or error, False if status is ok
+     */
+    public function notOk($tags = ''){
 
-	    return $this->getStatus($tags) !== ValidationManager::OK;
-	}
+        return $this->getStatus($tags) !== ValidationManager::OK;
+    }
 
 
-	/**
+    /**
      * Find the first error or warning message that happened since the validation manager was instantiated or
      * since the last reset
      *
@@ -133,9 +133,9 @@ class ValidationManager extends BaseStrictClass{
      *
      * @return string The first error or warning message or empty string if no message exists
      */
-	public function getFirstMessage($tags = ''){
+    public function getFirstMessage($tags = ''){
 
-	    $tagsList = ArrayUtils::isArray($tags) ? $tags : [$tags];
+        $tagsList = ArrayUtils::isArray($tags) ? $tags : [$tags];
 
         foreach ($this->_failedMessages as $message) {
 
@@ -148,21 +148,21 @@ class ValidationManager extends BaseStrictClass{
         }
 
         return '';
-	}
+    }
 
 
-	/**
-	 * Find the latest error or warning message that happened since the validation manager was instantiated or
-	 * since the last reset
-	 *
-	 * @param string|array $tags If we want to filter only the warning / error messages by tag or list of tags, we can set it here. If we want to
+    /**
+     * Find the latest error or warning message that happened since the validation manager was instantiated or
+     * since the last reset
+     *
+     * @param string|array $tags If we want to filter only the warning / error messages by tag or list of tags, we can set it here. If we want to
      *        get the latest of all messages, no matter which tag was applied, we will leave this value empty ''.
      *
-	 * @return string The last error or warning message or empty string if no message exists
-	 */
-	public function getLastMessage($tags = ''){
+     * @return string The last error or warning message or empty string if no message exists
+     */
+    public function getLastMessage($tags = ''){
 
-	    $tagsList = ArrayUtils::isArray($tags) ? $tags : [$tags];
+        $tagsList = ArrayUtils::isArray($tags) ? $tags : [$tags];
 
         for ($i = count($this->_failedMessages) - 1; $i >= 0; $i--) {
 
@@ -175,360 +175,360 @@ class ValidationManager extends BaseStrictClass{
         }
 
         return '';
-	}
+    }
 
 
-	/**
-	 * Validation will fail if specified value is not a true boolean value
-	 *
-	 * @param mixed $value A boolean expression to validate
-	 * @param string $errorMessage The error message that will be generated if validation fails
-	 * @param mixed $tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
+    /**
+     * Validation will fail if specified value is not a true boolean value
+     *
+     * @param mixed $value A boolean expression to validate
+     * @param string $errorMessage The error message that will be generated if validation fails
+     * @param mixed $tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
      * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
-	 *
-	 * @return boolean False in case the validation fails or true if validation succeeds.
-	 */
-	public function isTrue($value, string $errorMessage = 'value is not true', $tags = '', bool $isWarning = false){
+     *
+     * @return boolean False in case the validation fails or true if validation succeeds.
+     */
+    public function isTrue($value, string $errorMessage = 'value is not true', $tags = '', bool $isWarning = false){
 
-	    return $this->_updateValidationStatus($value === true, $errorMessage, $tags, $isWarning);
-	}
+        return $this->_updateValidationStatus($value === true, $errorMessage, $tags, $isWarning);
+    }
 
 
-	/**
-	 * Validation will fail if specified value is not a boolean
-	 *
-	 * @param mixed $value The boolean to validate
-	 * @param string $errorMessage The error message that will be generated if validation fails
-	 * @param mixed $tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
+    /**
+     * Validation will fail if specified value is not a boolean
+     *
+     * @param mixed $value The boolean to validate
+     * @param string $errorMessage The error message that will be generated if validation fails
+     * @param mixed $tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
      * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
-	 *
-	 * @return boolean False in case the validation fails or true if validation succeeds.
-	 */
-	public function isBoolean($value, string $errorMessage = 'value is not a boolean', $tags = '', bool $isWarning = false){
+     *
+     * @return boolean False in case the validation fails or true if validation succeeds.
+     */
+    public function isBoolean($value, string $errorMessage = 'value is not a boolean', $tags = '', bool $isWarning = false){
 
-	    return $this->_updateValidationStatus(is_bool($value), $errorMessage, $tags, $isWarning);
-	}
+        return $this->_updateValidationStatus(is_bool($value), $errorMessage, $tags, $isWarning);
+    }
 
 
-	/**
-	 * Validation will fail if specified value is not numeric
-	 *
-	 * @param mixed $value The number to validate
-	 * @param string $errorMessage The error message that will be generated if validation fails
-	 * @param mixed $tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
+    /**
+     * Validation will fail if specified value is not numeric
+     *
+     * @param mixed $value The number to validate
+     * @param string $errorMessage The error message that will be generated if validation fails
+     * @param mixed $tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
      * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
-	 *
-	 * @return boolean False in case the validation fails or true if validation succeeds.
-	 */
-	public function isNumeric($value, string $errorMessage = 'value is not a number', $tags = '', bool $isWarning = false){
+     *
+     * @return boolean False in case the validation fails or true if validation succeeds.
+     */
+    public function isNumeric($value, string $errorMessage = 'value is not a number', $tags = '', bool $isWarning = false){
 
-	    return $this->_updateValidationStatus(NumericUtils::isNumeric($value), $errorMessage, $tags, $isWarning);
-	}
+        return $this->_updateValidationStatus(NumericUtils::isNumeric($value), $errorMessage, $tags, $isWarning);
+    }
 
 
-	/**
+    /**
      * Validation will fail if specified value is not numeric and between the two provided values.
      *
      * @param mixed $value The number to validate
      * @param number min The minimum accepted value (included)
      * @param number max The maximum accepted value (included)
      * @param string $errorMessage The error message that will be generated if validation fails
-	 * @param mixed $tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
+     * @param mixed $tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
      * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
-	 *
+     *
      * @return boolean False in case the validation fails or true if validation succeeds.
      */
-	public function isNumericBetween($value, $min, $max, string $errorMessage = 'value is not between min and max', $tags = '', bool $isWarning = false){
+    public function isNumericBetween($value, $min, $max, string $errorMessage = 'value is not between min and max', $tags = '', bool $isWarning = false){
 
         return $this->_updateValidationStatus(NumericUtils::isNumeric($value) && $value >= $min && $value <= $max,
                 $errorMessage, $tags, $isWarning);
     }
 
 
-	/**
-	 * Validation will fail if specified value is not a string
-	 *
-	 * @param mixed $value The element to validate
-	 * @param string $errorMessage The error message that will be generated if validation fails
-	 * @param mixed $tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
+    /**
+     * Validation will fail if specified value is not a string
+     *
+     * @param mixed $value The element to validate
+     * @param string $errorMessage The error message that will be generated if validation fails
+     * @param mixed $tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
      * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
-	 *
-	 * @return boolean False in case the validation fails or true if validation succeeds.
-	 */
-	public function isString($value, string $errorMessage = 'value is not a string', $tags = '', bool $isWarning = false){
+     *
+     * @return boolean False in case the validation fails or true if validation succeeds.
+     */
+    public function isString($value, string $errorMessage = 'value is not a string', $tags = '', bool $isWarning = false){
 
-	    return $this->_updateValidationStatus(is_string($value), $errorMessage, $tags, $isWarning);
-	}
+        return $this->_updateValidationStatus(is_string($value), $errorMessage, $tags, $isWarning);
+    }
 
 
-	/**
-	 * Validation will fail if specified value is not an url
-	 *
-	 * @param mixed $value The element to validate
-	 * @param string $errorMessage The error message that will be generated if validation fails
-	 * @param mixed $tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
+    /**
+     * Validation will fail if specified value is not an url
+     *
+     * @param mixed $value The element to validate
+     * @param string $errorMessage The error message that will be generated if validation fails
+     * @param mixed $tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
      * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
-	 *
-	 * @return boolean False in case the validation fails or true if validation succeeds.
-	 */
-	public function isUrl($value, string $errorMessage = 'value is not an URL', $tags = '', bool $isWarning = false){
+     *
+     * @return boolean False in case the validation fails or true if validation succeeds.
+     */
+    public function isUrl($value, string $errorMessage = 'value is not an URL', $tags = '', bool $isWarning = false){
 
-	    return $this->_updateValidationStatus(StringUtils::isUrl($value), $errorMessage, $tags, $isWarning);
-	}
+        return $this->_updateValidationStatus(StringUtils::isUrl($value), $errorMessage, $tags, $isWarning);
+    }
 
 
-	/**
-	 * Validation will fail if specified value is not an array
-	 *
-	 * @param mixed $value The array to validate
-	 * @param string $errorMessage The error message that will be generated if validation fails
-	 * @param mixed $tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
+    /**
+     * Validation will fail if specified value is not an array
+     *
+     * @param mixed $value The array to validate
+     * @param string $errorMessage The error message that will be generated if validation fails
+     * @param mixed $tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
      * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
-	 *
-	 * @return boolean False in case the validation fails or true if validation succeeds.
-	 */
-	public function isArray($value, string $errorMessage = 'value is not an array', $tags = '', bool $isWarning = false){
+     *
+     * @return boolean False in case the validation fails or true if validation succeeds.
+     */
+    public function isArray($value, string $errorMessage = 'value is not an array', $tags = '', bool $isWarning = false){
 
-	    return $this->_updateValidationStatus(is_array($value), $errorMessage, $tags, $isWarning);
-	}
+        return $this->_updateValidationStatus(is_array($value), $errorMessage, $tags, $isWarning);
+    }
 
 
-	/**
-	 * Validation will fail if specified value is not an object
-	 *
-	 * @param mixed $value The object to validate
-	 * @param string $errorMessage The error message that will be generated if validation fails
-	 * @param mixed $tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
+    /**
+     * Validation will fail if specified value is not an object
+     *
+     * @param mixed $value The object to validate
+     * @param string $errorMessage The error message that will be generated if validation fails
+     * @param mixed $tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
      * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
-	 *
-	 * @return boolean False in case the validation fails or true if validation succeeds.
-	 */
-	public function isObject($value, string $errorMessage = 'value is not an object', $tags = '', bool $isWarning = false){
+     *
+     * @return boolean False in case the validation fails or true if validation succeeds.
+     */
+    public function isObject($value, string $errorMessage = 'value is not an object', $tags = '', bool $isWarning = false){
 
-	    return $this->_updateValidationStatus(is_object($value), $errorMessage, $tags, $isWarning);
-	}
+        return $this->_updateValidationStatus(is_object($value), $errorMessage, $tags, $isWarning);
+    }
 
 
-	/**
-	 * Validation will fail if specified text is empty.<br>
-	 * See Stringutils.isEmpty to understand what is considered as an empty text
-	 *
-	 * @param string $value A text that must not be empty.
-	 * @param array $emptyChars Optional array containing a list of string values that will be considered as empty for the given string. This can be useful in some cases when we want to consider a string like 'NULL' as an empty string.
-	 * @param string $errorMessage The error message that will be generated if validation fails
-	 * @param mixed $tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
+    /**
+     * Validation will fail if specified text is empty.<br>
+     * See Stringutils.isEmpty to understand what is considered as an empty text
+     *
+     * @param string $value A text that must not be empty.
+     * @param array $emptyChars Optional array containing a list of string values that will be considered as empty for the given string. This can be useful in some cases when we want to consider a string like 'NULL' as an empty string.
+     * @param string $errorMessage The error message that will be generated if validation fails
+     * @param mixed $tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
      * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
-	 *
-	 * @see Stringutils::isEmpty
-	 *
-	 * @return boolean False in case the validation fails or true if validation succeeds.
-	 */
-	public function isFilledIn($value, array $emptyChars = [], string $errorMessage = 'value is required', $tags = '', bool $isWarning = false){
+     *
+     * @see Stringutils::isEmpty
+     *
+     * @return boolean False in case the validation fails or true if validation succeeds.
+     */
+    public function isFilledIn($value, array $emptyChars = [], string $errorMessage = 'value is required', $tags = '', bool $isWarning = false){
 
-	    return $this->_updateValidationStatus(!StringUtils::isEmpty($value, $emptyChars), $errorMessage, $tags, $isWarning);
-	}
-
-
-	/**
-	 * TODO - translate from TS
-	 */
-	public function isDate(){
-
-		// TODO - translate from TS
-	}
+        return $this->_updateValidationStatus(!StringUtils::isEmpty($value, $emptyChars), $errorMessage, $tags, $isWarning);
+    }
 
 
-	/**
-	 * TODO - translate from TS
-	 */
-	public function isMail(){
+    /**
+     * TODO - translate from TS
+     */
+    public function isDate(){
 
-		// TODO - translate from TS
-	}
+        // TODO - translate from TS
+    }
 
 
-	/**
-	 * Validation will fail if specified elements are not identical.
-	 *
-	 * @param mixed $value First of the two objects to compare. Almost any type can be provided: ints, strings, arrays...
-	 * @param mixed $value2 Second of the two objects to compare. Almost any type can be provided: ints, strings, arrays...
-	 * @param string $errorMessage The error message that will be generated if validation fails
-	 * @param mixed $tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
+    /**
+     * TODO - translate from TS
+     */
+    public function isMail(){
+
+        // TODO - translate from TS
+    }
+
+
+    /**
+     * Validation will fail if specified elements are not identical.
+     *
+     * @param mixed $value First of the two objects to compare. Almost any type can be provided: ints, strings, arrays...
+     * @param mixed $value2 Second of the two objects to compare. Almost any type can be provided: ints, strings, arrays...
+     * @param string $errorMessage The error message that will be generated if validation fails
+     * @param mixed $tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
      * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
-	 *
-	 * @return boolean False in case the validation fails or true if validation succeeds.
-	 */
-	public function isEqualTo($value, $value2, string $errorMessage = 'values are not equal', $tags = '', bool $isWarning = false){
+     *
+     * @return boolean False in case the validation fails or true if validation succeeds.
+     */
+    public function isEqualTo($value, $value2, string $errorMessage = 'values are not equal', $tags = '', bool $isWarning = false){
 
-	    $res = false;
+        $res = false;
 
-		// Compare elements depending on its type
-		if(is_array($value) && is_array($value2)){
+        // Compare elements depending on its type
+        if(is_array($value) && is_array($value2)){
 
-			$res = ArrayUtils::isEqualTo($value, $value2);
+            $res = ArrayUtils::isEqualTo($value, $value2);
 
-		}else{
+        }else{
 
-		    if(is_object($value) && is_object($value2)){
+            if(is_object($value) && is_object($value2)){
 
-				$res = ObjectUtils::isEqualTo($value, $value2);
+                $res = ObjectUtils::isEqualTo($value, $value2);
 
-			}else{
+            }else{
 
-				if($value === $value2){
+                if($value === $value2){
 
-					$res = true;
-				}
-			}
-		}
+                    $res = true;
+                }
+            }
+        }
 
-		return $this->_updateValidationStatus($res, $errorMessage, $tags, $isWarning);
-	}
-
-
-	/**
-	 * TODO - translate from TS
-	 */
-	public function isMinimumWords(){
-
-		// TODO - translate from TS
-	}
+        return $this->_updateValidationStatus($res, $errorMessage, $tags, $isWarning);
+    }
 
 
-	/**
-	 * TODO - translate from TS
-	 */
-	public function isNIF(){
+    /**
+     * TODO - translate from TS
+     */
+    public function isMinimumWords(){
 
-		// TODO - translate from TS
-	}
-
-
-	/**
-	 * TODO - translate from TS
-	 */
-	public function isMinimumLength(){
-
-		// TODO - translate from TS
-	}
+        // TODO - translate from TS
+    }
 
 
-	/**
-	 * TODO - translate from TS
-	 */
-	public function isMaximumLength(){
+    /**
+     * TODO - translate from TS
+     */
+    public function isNIF(){
 
-	    // TODO - translate from TS
-	}
-
-
-	/**
-	 * TODO - translate from TS
-	 */
-	public function isPostalCode(){
-
-		// TODO - translate from TS
-	}
+        // TODO - translate from TS
+    }
 
 
-	/**
-	 * TODO - translate from TS
-	 */
-	public function isPhone(){
+    /**
+     * TODO - translate from TS
+     */
+    public function isMinimumLength(){
 
-		// TODO - translate from TS
-	}
-
-
-	/**
-	 * TODO - translate from TS
-	 */
-	public function isHtmlFormValid(){
-
-		// TODO - translate from TS
-	}
+        // TODO - translate from TS
+    }
 
 
-	/**
-	 * Reinitialize the validation status.
+    /**
+     * TODO - translate from TS
+     */
+    public function isMaximumLength(){
+
+        // TODO - translate from TS
+    }
+
+
+    /**
+     * TODO - translate from TS
+     */
+    public function isPostalCode(){
+
+        // TODO - translate from TS
+    }
+
+
+    /**
+     * TODO - translate from TS
+     */
+    public function isPhone(){
+
+        // TODO - translate from TS
+    }
+
+
+    /**
+     * TODO - translate from TS
+     */
+    public function isHtmlFormValid(){
+
+        // TODO - translate from TS
+    }
+
+
+    /**
+     * Reinitialize the validation status.
      *
      * This is normally called at the beginning of every global validation we perform. It will reset all the validation
      * errors on this class and for all tags, so we can re validate whatever we need to.
-	 *
-	 * @return void
-	 */
-	public function reset(){
+     *
+     * @return void
+     */
+    public function reset(){
 
-	    $this->_validationStatus = [[
-	        'tag' => '',
-	        'status' => ValidationManager::OK
-	    ]];
+        $this->_validationStatus = [[
+            'tag' => '',
+            'status' => ValidationManager::OK
+        ]];
 
         $this->_failedMessages = [];
-	}
+    }
 
 
-	/**
-	 * Update the class validation Status depending on the provided error message.
-	 *
-	 * @param boolean $result the result of the validation
+    /**
+     * Update the class validation Status depending on the provided error message.
+     *
+     * @param boolean $result the result of the validation
      * @param string $errorMessage The error message that's been generated from a previously executed validation method
-	 * @param mixed $tags The tag or list of tags that have been defiend for the validation value
+     * @param mixed $tags The tag or list of tags that have been defiend for the validation value
      * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
-	 *
-	 * @return boolean True if received errorMessage was '' (validation passed) or false if some error message was received (validation failed)
-	 */
-	private function _updateValidationStatus(bool $result, string $errorMessage, $tags, bool $isWarning){
+     *
+     * @return boolean True if received errorMessage was '' (validation passed) or false if some error message was received (validation failed)
+     */
+    private function _updateValidationStatus(bool $result, string $errorMessage, $tags, bool $isWarning){
 
-	    if(!$result){
+        if(!$result){
 
-	        // If specified tags do not exist, we will create them
-	        $tagsList = ArrayUtils::isArray($tags) ? $tags : [$tags];
+            // If specified tags do not exist, we will create them
+            $tagsList = ArrayUtils::isArray($tags) ? $tags : [$tags];
 
-	        foreach ($tagsList as $t) {
+            foreach ($tagsList as $t) {
 
-	            $tagFound = false;
+                $tagFound = false;
 
-	            foreach ($this->_validationStatus as $status) {
+                foreach ($this->_validationStatus as $status) {
 
-	                if($status['tag'] === $t){
+                    if($status['tag'] === $t){
 
-	                    $tagFound = true;
-	                    break;
-	                }
-	            }
+                        $tagFound = true;
+                        break;
+                    }
+                }
 
-	            if(!$tagFound){
+                if(!$tagFound){
 
-	                $this->_validationStatus[] = [
-    	                'tag' => $t,
-    	                'status' => ValidationManager::OK
-    	            ];
-	            }
-	        }
+                    $this->_validationStatus[] = [
+                        'tag' => $t,
+                        'status' => ValidationManager::OK
+                    ];
+                }
+            }
 
-	        // We must find the specified tags and change their validation status
-	        foreach ($tagsList as $t) {
+            // We must find the specified tags and change their validation status
+            foreach ($tagsList as $t) {
 
-	            for ($i = 0, $l = count($this->_validationStatus); $i < $l; $i++) {
+                for ($i = 0, $l = count($this->_validationStatus); $i < $l; $i++) {
 
-	                if($this->_validationStatus[$i]['tag'] === $t){
+                    if($this->_validationStatus[$i]['tag'] === $t){
 
-    	                $this->_failedMessages[] = ['tag' => $t, 'message' => $errorMessage];
+                        $this->_failedMessages[] = ['tag' => $t, 'message' => $errorMessage];
 
-    	                $this->_validationStatus[$i]['status'] =
-    	                   ($isWarning && $this->_validationStatus[$i]['status'] != ValidationManager::ERROR) ?
-    	                       ValidationManager::WARNING :
-    	                       ValidationManager::ERROR;
+                        $this->_validationStatus[$i]['status'] =
+                           ($isWarning && $this->_validationStatus[$i]['status'] != ValidationManager::ERROR) ?
+                               ValidationManager::WARNING :
+                               ValidationManager::ERROR;
 
                        break;
-    	            }
-	            }
-	        }
-	    }
+                    }
+                }
+            }
+        }
 
-	    return $result;
-	}
+        return $result;
+    }
 }
 
 ?>

@@ -20,13 +20,13 @@ use org\turbocommons\src\main\php\model\BaseDependantClass;
 class DependantClass2 extends BaseDependantClass {
 
 
-	public $publicProp = null;
+    public $publicProp = null;
 
 
-	private $_property1 = null;
+    private $_property1 = null;
 
 
-	private $_property2 = null;
+    private $_property2 = null;
 }
 
 ?>

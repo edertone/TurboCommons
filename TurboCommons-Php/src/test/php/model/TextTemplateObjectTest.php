@@ -75,129 +75,129 @@ class TextTemplateObjectTest extends TestCase {
     }
 
 
-	/**
-	 * testConstruct
-	 *
-	 * @return void
-	 */
-	public function testConstruct(){
+    /**
+     * testConstruct
+     *
+     * @return void
+     */
+    public function testConstruct(){
 
-	    // Test empty values
-	    try {
-    	    $test = new TextTemplateObject();
-    	    $this->exceptionMessage = 'No parameter did not cause exception';
-	    } catch (Throwable $e) {
-	        // We expect an exception to happen
-	    }
+        // Test empty values
+        try {
+            $test = new TextTemplateObject();
+            $this->exceptionMessage = 'No parameter did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
 
-	    $test = new TextTemplateObject('');
-	    $this->assertEquals('', $test->getText());
+        $test = new TextTemplateObject('');
+        $this->assertEquals('', $test->getText());
 
-	    $test = new TextTemplateObject('     ');
-	    $this->assertEquals('     ', $test->getText());
+        $test = new TextTemplateObject('     ');
+        $this->assertEquals('     ', $test->getText());
 
-	    $test = new TextTemplateObject("\n\n\n");
-	    $this->assertEquals("\n\n\n", $test->getText());
+        $test = new TextTemplateObject("\n\n\n");
+        $this->assertEquals("\n\n\n", $test->getText());
 
-	    for ($i = 0; $i < $this->emptyValuesCount; $i++) {
+        for ($i = 0; $i < $this->emptyValuesCount; $i++) {
 
-	        try {
-	            new TextTemplateObject($this->emptyValues[$i]);
-	            $this->exceptionMessage = $this->emptyValues[$i].' empty value did not cause exception';
-	        } catch (Throwable $e) {
-	            // We expect an exception to happen
-	        }
-	    }
+            try {
+                new TextTemplateObject($this->emptyValues[$i]);
+                $this->exceptionMessage = $this->emptyValues[$i].' empty value did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+        }
 
-	    // Test ok values
-	    $test = new TextTemplateObject('a');
-	    $this->assertEquals('a', $test->getText());
+        // Test ok values
+        $test = new TextTemplateObject('a');
+        $this->assertEquals('a', $test->getText());
 
-	    $test = new TextTemplateObject('hello');
-	    $this->assertEquals('hello', $test->getText());
+        $test = new TextTemplateObject('hello');
+        $this->assertEquals('hello', $test->getText());
 
-	    $test = new TextTemplateObject("multi\n\nLine\nText");
-	    $this->assertEquals("multi\n\nLine\nText", $test->getText());
+        $test = new TextTemplateObject("multi\n\nLine\nText");
+        $this->assertEquals("multi\n\nLine\nText", $test->getText());
 
-	    $test = new TextTemplateObject('新 あたら しい 記事 きじ を 書 か こうという 気持 きも ちになるまで 長');
-	    $this->assertEquals('新 あたら しい 記事 きじ を 書 か こうという 気持 きも ちになるまで 長', $test->getText());
+        $test = new TextTemplateObject('新 あたら しい 記事 きじ を 書 か こうという 気持 きも ちになるまで 長');
+        $this->assertEquals('新 あたら しい 記事 きじ を 書 か こうという 気持 きも ちになるまで 長', $test->getText());
 
-	    // Test wrong values
-	    // Nothing to test
+        // Test wrong values
+        // Nothing to test
 
-	    // Test exceptions
-	    try {
-	        $test = new TextTemplateObject(11);
-	        $this->exceptionMessage = '11 did not cause exception';
-	    } catch (Throwable $e) {
-	        // We expect an exception to happen
-	    }
+        // Test exceptions
+        try {
+            $test = new TextTemplateObject(11);
+            $this->exceptionMessage = '11 did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
 
-	    try {
-	        $test = new TextTemplateObject([1,2]);
-	        $this->exceptionMessage = '[1,2] did not cause exception';
-	    } catch (Throwable $e) {
-	        // We expect an exception to happen
-	    }
+        try {
+            $test = new TextTemplateObject([1,2]);
+            $this->exceptionMessage = '[1,2] did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
 
-	    try {
-	        $test = new TextTemplateObject(new stdClass());
-	        $this->exceptionMessage = 'new stdClass() did not cause exception';
-	    } catch (Throwable $e) {
-	        // We expect an exception to happen
-	    }
+        try {
+            $test = new TextTemplateObject(new stdClass());
+            $this->exceptionMessage = 'new stdClass() did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
 
-	    // TODO - review this test
-	    $this->markTestIncomplete('This test has not been implemented yet.');
-	}
-
-
-	/**
-	 * testReplace
-	 *
-	 * @return void
-	 */
-	public function testReplace(){
-
-	    // Test empty values
-	    // TODO
-
-	    // Test ok values
-	    // TODO
-
-	    // Test wrong values
-	    // TODO
-
-	    // Test exceptions
-	    // TODO
-
-	    // TODO
-	    $this->markTestIncomplete('This test has not been implemented yet.');
-	}
+        // TODO - review this test
+        $this->markTestIncomplete('This test has not been implemented yet.');
+    }
 
 
-	/**
-	 * testGetText
-	 *
-	 * @return void
-	 */
-	public function testGetText(){
+    /**
+     * testReplace
+     *
+     * @return void
+     */
+    public function testReplace(){
 
-	    // Test empty values
-	    // TODO
+        // Test empty values
+        // TODO
 
-	    // Test ok values
-	    // TODO
+        // Test ok values
+        // TODO
 
-	    // Test wrong values
-	    // TODO
+        // Test wrong values
+        // TODO
 
-	    // Test exceptions
-	    // TODO
+        // Test exceptions
+        // TODO
 
-	    // TODO
-	    $this->markTestIncomplete('This test has not been implemented yet.');
-	}
+        // TODO
+        $this->markTestIncomplete('This test has not been implemented yet.');
+    }
+
+
+    /**
+     * testGetText
+     *
+     * @return void
+     */
+    public function testGetText(){
+
+        // Test empty values
+        // TODO
+
+        // Test ok values
+        // TODO
+
+        // Test wrong values
+        // TODO
+
+        // Test exceptions
+        // TODO
+
+        // TODO
+        $this->markTestIncomplete('This test has not been implemented yet.');
+    }
 }
 
 ?>

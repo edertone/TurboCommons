@@ -21,13 +21,13 @@ use InvalidArgumentException;
 class EncodingUtils{
 
 
-	/**
-	 * Convert a string with unicode escaped sequence of characters (\u00ed, \u0110, ....) to an utf8 string.
-	 *
-	 * @param string $string A string containing unicode escaped characters.
-	 *
-	 * @return string An utf8 string conversion of the unicode encoded input.
-	 */
+    /**
+     * Convert a string with unicode escaped sequence of characters (\u00ed, \u0110, ....) to an utf8 string.
+     *
+     * @param string $string A string containing unicode escaped characters.
+     *
+     * @return string An utf8 string conversion of the unicode encoded input.
+     */
     public static function unicodeEscapedCharsToUtf8($string){
 
         if(is_string($string)){
@@ -38,32 +38,32 @@ class EncodingUtils{
         }
 
         throw new InvalidArgumentException('Specified value must be a string');
-	}
+    }
 
 
-	/**
-	 * Convert a utf8 string to a string with unicode escaped sequence of characters (\u00ed, \u0110, ...).
-	 *
-	 * @param string $string A string containing an utf8 valid sequence.
-	 *
-	 * @return string A string containing escaped sequences for all the original utf8 characters
-	 */
-	public static function utf8ToUnicodeEscapedChars($string){
+    /**
+     * Convert a utf8 string to a string with unicode escaped sequence of characters (\u00ed, \u0110, ...).
+     *
+     * @param string $string A string containing an utf8 valid sequence.
+     *
+     * @return string A string containing escaped sequences for all the original utf8 characters
+     */
+    public static function utf8ToUnicodeEscapedChars($string){
 
-	    if(!is_string($string)){
+        if(!is_string($string)){
 
-	        throw new InvalidArgumentException('Specified value must be a string');
-	    }
+            throw new InvalidArgumentException('Specified value must be a string');
+        }
 
-	    if(StringUtils::isEmpty($string)){
+        if(StringUtils::isEmpty($string)){
 
-	        return $string;
-	    }
+            return $string;
+        }
 
-	    $result = trim(json_encode($string, JSON_UNESCAPED_SLASHES + JSON_HEX_QUOT), '"');
+        $result = trim(json_encode($string, JSON_UNESCAPED_SLASHES + JSON_HEX_QUOT), '"');
 
-	    return str_replace('\\\\', '\\', $result);
-	}
+        return str_replace('\\\\', '\\', $result);
+    }
 }
 
 ?>

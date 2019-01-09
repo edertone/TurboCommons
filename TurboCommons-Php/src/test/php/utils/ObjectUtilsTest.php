@@ -63,240 +63,240 @@ class ObjectUtilsTest extends TestCase {
     }
 
 
-	/**
-	 * testGetKeys
-	 *
-	 * @return void
-	 */
-	public function testGetKeys(){
+    /**
+     * testGetKeys
+     *
+     * @return void
+     */
+    public function testGetKeys(){
 
-		$this->assertTrue(ArrayUtils::isEqualTo(ObjectUtils::getKeys(new stdClass()), []));
-		$this->assertTrue(ArrayUtils::isEqualTo(ObjectUtils::getKeys(((object) [
-				'1' => 1
-		])), ['1']));
-		$this->assertTrue(ArrayUtils::isEqualTo(ObjectUtils::getKeys(((object) [
-			'a' => 1
-		])), ['a']));
-		$this->assertTrue(ArrayUtils::isEqualTo(ObjectUtils::getKeys(((object) [
-				'a' => 1,
-				'b' => 2,
-				'c' => 3
-		])), ['a', 'b', 'c']));
-		$this->assertTrue(ArrayUtils::isEqualTo(ObjectUtils::getKeys(((object) [
-				'a' => 1,
-				'b' => (object) [
-						'a' => 1,
-						'x' => 0
-					],
-				'c' => 3
-		])), ['a', 'b', 'c']));
+        $this->assertTrue(ArrayUtils::isEqualTo(ObjectUtils::getKeys(new stdClass()), []));
+        $this->assertTrue(ArrayUtils::isEqualTo(ObjectUtils::getKeys(((object) [
+                '1' => 1
+        ])), ['1']));
+        $this->assertTrue(ArrayUtils::isEqualTo(ObjectUtils::getKeys(((object) [
+            'a' => 1
+        ])), ['a']));
+        $this->assertTrue(ArrayUtils::isEqualTo(ObjectUtils::getKeys(((object) [
+                'a' => 1,
+                'b' => 2,
+                'c' => 3
+        ])), ['a', 'b', 'c']));
+        $this->assertTrue(ArrayUtils::isEqualTo(ObjectUtils::getKeys(((object) [
+                'a' => 1,
+                'b' => (object) [
+                        'a' => 1,
+                        'x' => 0
+                    ],
+                'c' => 3
+        ])), ['a', 'b', 'c']));
 
-		// Test exceptions
-		$exceptionMessage = '';
+        // Test exceptions
+        $exceptionMessage = '';
 
-		try {
-			ObjectUtils::getKeys(null);
-			$exceptionMessage = 'null did not cause exception';
-		} catch (Throwable $e) {
-			// We expect an exception to happen
-		}
+        try {
+            ObjectUtils::getKeys(null);
+            $exceptionMessage = 'null did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
 
-		try {
-			ObjectUtils::getKeys([]);
-			$exceptionMessage = '[] did not cause exception';
-		} catch (Throwable $e) {
-			// We expect an exception to happen
-		}
+        try {
+            ObjectUtils::getKeys([]);
+            $exceptionMessage = '[] did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
 
-		try {
-			ObjectUtils::getKeys([1, 2, 3]);
-			$exceptionMessage = '[1, 2, 3] did not cause exception';
-		} catch (Throwable $e) {
-			// We expect an exception to happen
-		}
+        try {
+            ObjectUtils::getKeys([1, 2, 3]);
+            $exceptionMessage = '[1, 2, 3] did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
 
-		if($exceptionMessage != ''){
+        if($exceptionMessage != ''){
 
-			$this->fail($exceptionMessage);
-		}
-	}
-
-
-	/**
-	 * testIsEqualTo
-	 *
-	 * @return void
-	 */
-	public function testIsEqualTo(){
-
-		// Test identic values
-		$this->assertTrue(ObjectUtils::isEqualTo(new stdClass(), new stdClass()));
-		$this->assertTrue(ObjectUtils::isEqualTo(((object) [
-				'hello' => 'home'
-		]), ((object) [
-				'hello' => 'home'
-		])));
-		$this->assertTrue(ObjectUtils::isEqualTo(((object) [
-			'1' => 1
-		]), ((object) [
-			'1' => 1
-		])));
-		$this->assertTrue(ObjectUtils::isEqualTo(((object) [
-				'hello' => 'home',
-				'number' => 1
-		]), ((object) [
-				'hello' => 'home',
-				'number' => 1
-		])));
-		$this->assertTrue(ObjectUtils::isEqualTo(((object) [
-				'hello' => 'home',
-				'number' => 1,
-				'array' => [1, 2, 3]
-		]), ((object) [
-				'hello' => 'home',
-				'number' => 1,
-				'array' => [1, 2, 3]
-		])));
-		$this->assertTrue(ObjectUtils::isEqualTo(((object) [
-				'hello' => 'home',
-				'array' => ((object) [
-						'hello' => 'home',
-						'number' => 1
-				])
-		]), ((object) [
-				'hello' => 'home',
-				'array' => ((object) [
-						'hello' => 'home',
-						'number' => 1
-				])
-		])));
-
-		// Test same values but with different key order
-		$this->assertTrue(ObjectUtils::isEqualTo(((object) [
-		    'number' => 1,
-		    'hello' => 'home',
-		    'array' => [1, 2, 3]
-		]), ((object) [
-		    'hello' => 'home',
-		    'number' => 1,
-		    'array' => [1, 2, 3]
-		])));
-		$this->assertTrue(ObjectUtils::isEqualTo(((object) [
-		    'hello' => 'home',
-		    'array' => ((object) [
-		        'hello' => 'home',
-		        'number' => 1
-		    ])
-		]), ((object) [
-		    'array' => ((object) [
-		        'number' => 1,
-		        'hello' => 'home'
-		    ]),
-		    'hello' => 'home'
-		])));
-
-		// Test different values
-		$this->assertTrue(!ObjectUtils::isEqualTo(new stdClass(), ((object) [
-				'1' => 1
-		])));
-		$this->assertTrue(!ObjectUtils::isEqualTo(((object) [
-				'1' => 1
-		]), ((object) [
-				'1' => 2
-		])));
-		$this->assertTrue(!ObjectUtils::isEqualTo(((object) [
-				'hello' => 'guys'
-		]), ((object) [
-				'1' => 2
-		])));
-		$this->assertTrue(!ObjectUtils::isEqualTo(((object) [
-				'hello' => 'guys'
-		]), ((object) [
-				'hell' => 'guys'
-		])));
-		$this->assertTrue(!ObjectUtils::isEqualTo(((object) [
-				'hello' => 'home',
-				'number' => 1,
-				'array' => [1, 3]
-		]), ((object) [
-				'hello' => 'home',
-				'number' => 1,
-				'array' => [1, 2, 3]
-		])));
-
-		// Test exceptions with non objects
-		$exceptionMessage = '';
-
-		try {
-			ObjectUtils::isEqualTo(null, null);
-			$exceptionMessage = 'null did not cause exception';
-		} catch (Throwable $e) {
-			// We expect an exception to happen
-		}
-
-		try {
-			ObjectUtils::isEqualTo([], []);
-			$exceptionMessage = '[] did not cause exception';
-		} catch (Throwable $e) {
-			// We expect an exception to happen
-		}
-
-		try {
-			ObjectUtils::isEqualTo('hello', 'hello');
-			$exceptionMessage = 'hello did not cause exception';
-		} catch (Throwable $e) {
-			// We expect an exception to happen
-		}
-
-		if($exceptionMessage != ''){
-
-			$this->fail($exceptionMessage);
-		}
-	}
+            $this->fail($exceptionMessage);
+        }
+    }
 
 
-	/**
-	 * testMerge
-	 *
-	 * @return void
-	 */
-	public function testMerge(){
+    /**
+     * testIsEqualTo
+     *
+     * @return void
+     */
+    public function testIsEqualTo(){
 
-	    // Test empty values
-	    // TODO - translate from ts
+        // Test identic values
+        $this->assertTrue(ObjectUtils::isEqualTo(new stdClass(), new stdClass()));
+        $this->assertTrue(ObjectUtils::isEqualTo(((object) [
+                'hello' => 'home'
+        ]), ((object) [
+                'hello' => 'home'
+        ])));
+        $this->assertTrue(ObjectUtils::isEqualTo(((object) [
+            '1' => 1
+        ]), ((object) [
+            '1' => 1
+        ])));
+        $this->assertTrue(ObjectUtils::isEqualTo(((object) [
+                'hello' => 'home',
+                'number' => 1
+        ]), ((object) [
+                'hello' => 'home',
+                'number' => 1
+        ])));
+        $this->assertTrue(ObjectUtils::isEqualTo(((object) [
+                'hello' => 'home',
+                'number' => 1,
+                'array' => [1, 2, 3]
+        ]), ((object) [
+                'hello' => 'home',
+                'number' => 1,
+                'array' => [1, 2, 3]
+        ])));
+        $this->assertTrue(ObjectUtils::isEqualTo(((object) [
+                'hello' => 'home',
+                'array' => ((object) [
+                        'hello' => 'home',
+                        'number' => 1
+                ])
+        ]), ((object) [
+                'hello' => 'home',
+                'array' => ((object) [
+                        'hello' => 'home',
+                        'number' => 1
+                ])
+        ])));
 
-	    // Test ok values
-	    // TODO - translate from ts
+        // Test same values but with different key order
+        $this->assertTrue(ObjectUtils::isEqualTo(((object) [
+            'number' => 1,
+            'hello' => 'home',
+            'array' => [1, 2, 3]
+        ]), ((object) [
+            'hello' => 'home',
+            'number' => 1,
+            'array' => [1, 2, 3]
+        ])));
+        $this->assertTrue(ObjectUtils::isEqualTo(((object) [
+            'hello' => 'home',
+            'array' => ((object) [
+                'hello' => 'home',
+                'number' => 1
+            ])
+        ]), ((object) [
+            'array' => ((object) [
+                'number' => 1,
+                'hello' => 'home'
+            ]),
+            'hello' => 'home'
+        ])));
 
-	    // Test wrong values
-	    // TODO - translate from ts
+        // Test different values
+        $this->assertTrue(!ObjectUtils::isEqualTo(new stdClass(), ((object) [
+                '1' => 1
+        ])));
+        $this->assertTrue(!ObjectUtils::isEqualTo(((object) [
+                '1' => 1
+        ]), ((object) [
+                '1' => 2
+        ])));
+        $this->assertTrue(!ObjectUtils::isEqualTo(((object) [
+                'hello' => 'guys'
+        ]), ((object) [
+                '1' => 2
+        ])));
+        $this->assertTrue(!ObjectUtils::isEqualTo(((object) [
+                'hello' => 'guys'
+        ]), ((object) [
+                'hell' => 'guys'
+        ])));
+        $this->assertTrue(!ObjectUtils::isEqualTo(((object) [
+                'hello' => 'home',
+                'number' => 1,
+                'array' => [1, 3]
+        ]), ((object) [
+                'hello' => 'home',
+                'number' => 1,
+                'array' => [1, 2, 3]
+        ])));
 
-	    // Test exceptions
-	    // TODO - translate from ts
-	    $this->markTestIncomplete('This test has not been implemented yet.');
-	}
+        // Test exceptions with non objects
+        $exceptionMessage = '';
+
+        try {
+            ObjectUtils::isEqualTo(null, null);
+            $exceptionMessage = 'null did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            ObjectUtils::isEqualTo([], []);
+            $exceptionMessage = '[] did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        try {
+            ObjectUtils::isEqualTo('hello', 'hello');
+            $exceptionMessage = 'hello did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        if($exceptionMessage != ''){
+
+            $this->fail($exceptionMessage);
+        }
+    }
 
 
-	/**
-	 * testClone
-	 *
-	 * @return void
-	 */
-	public function testClone(){
+    /**
+     * testMerge
+     *
+     * @return void
+     */
+    public function testMerge(){
 
-	    // Test empty values
-	    // TODO - translate from ts
+        // Test empty values
+        // TODO - translate from ts
 
-	    // Test ok values
-	    // TODO - translate from ts
+        // Test ok values
+        // TODO - translate from ts
 
-	    // Test wrong values
-	    // TODO - translate from ts
+        // Test wrong values
+        // TODO - translate from ts
 
-	    // Test exceptions
-	    // TODO - translate from ts
-	    $this->markTestIncomplete('This test has not been implemented yet.');
-	}
+        // Test exceptions
+        // TODO - translate from ts
+        $this->markTestIncomplete('This test has not been implemented yet.');
+    }
+
+
+    /**
+     * testClone
+     *
+     * @return void
+     */
+    public function testClone(){
+
+        // Test empty values
+        // TODO - translate from ts
+
+        // Test ok values
+        // TODO - translate from ts
+
+        // Test wrong values
+        // TODO - translate from ts
+
+        // Test exceptions
+        // TODO - translate from ts
+        $this->markTestIncomplete('This test has not been implemented yet.');
+    }
 }
 
 ?>

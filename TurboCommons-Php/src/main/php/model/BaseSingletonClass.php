@@ -18,60 +18,60 @@ namespace org\turbocommons\src\main\php\model;
 abstract class BaseSingletonClass extends BaseStrictClass{
 
 
-	/**
-	 * Contains all the singleton global instances (for all classes that extend this one).
-	 * In php we must do it this way to avoid singletons from returning wrong class objects.
-	 */
-	private static $_instances = [];
+    /**
+     * Contains all the singleton global instances (for all classes that extend this one).
+     * In php we must do it this way to avoid singletons from returning wrong class objects.
+     */
+    private static $_instances = [];
 
 
-	/**
-	 * Returns the Singleton instance of this class.
-	 *
-	 * @return self The Singleton instance.
-	 */
-	public static function getInstance(){
+    /**
+     * Returns the Singleton instance of this class.
+     *
+     * @return self The Singleton instance.
+     */
+    public static function getInstance(){
 
-		$class = get_called_class();
+        $class = get_called_class();
 
-		if(!isset(self::$_instances[$class])) {
+        if(!isset(self::$_instances[$class])) {
 
-			self::$_instances[$class] = new $class();
-		}
+            self::$_instances[$class] = new $class();
+        }
 
-		return self::$_instances[$class];
-	}
-
-
-	/**
-	 * Protected constructor to prevent creating a new instance of the
-	 * *Singleton* via the `new` operator from outside of this class.
-	 */
-	protected function __construct(){
-
-	}
+        return self::$_instances[$class];
+    }
 
 
-	/**
-	 * Private clone method to prevent cloning of the instance of the
-	 * *Singleton* instance.
-	 *
-	 * @return void
-	 */
-	private function __clone(){
+    /**
+     * Protected constructor to prevent creating a new instance of the
+     * *Singleton* via the `new` operator from outside of this class.
+     */
+    protected function __construct(){
 
-	}
+    }
 
 
-	/**
-	 * Private unserialize method to prevent unserializing of the *Singleton*
-	 * instance.
-	 *
-	 * @return void
-	 */
-	private function __wakeup(){
+    /**
+     * Private clone method to prevent cloning of the instance of the
+     * *Singleton* instance.
+     *
+     * @return void
+     */
+    private function __clone(){
 
-	}
+    }
+
+
+    /**
+     * Private unserialize method to prevent unserializing of the *Singleton*
+     * instance.
+     *
+     * @return void
+     */
+    private function __wakeup(){
+
+    }
 }
 
 ?>
