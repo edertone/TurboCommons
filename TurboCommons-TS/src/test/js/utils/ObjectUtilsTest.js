@@ -180,7 +180,7 @@ QUnit.test("isEqualTo", function(assert) {
         hello : 'home'
     }));
 
-    // Test different values	
+    // Test different values
     assert.ok(!ObjectUtils.isEqualTo({}, {
             1 : 1
         }));

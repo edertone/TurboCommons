@@ -75,65 +75,65 @@ QUnit.test("isCookie", function(assert){
  */
 QUnit.test("setCookie", function(assert){
 
-	// Test several empty value combinations
-	assert.throws(function(){
+    // Test several empty value combinations
+    assert.throws(function(){
 
-		sut.setCookie(undefined, 'value');
-	});
+        sut.setCookie(undefined, 'value');
+    });
 
-	assert.throws(function(){
+    assert.throws(function(){
 
-		sut.setCookie(null, 'value');
-	});
+        sut.setCookie(null, 'value');
+    });
 
-	assert.throws(function(){
+    assert.throws(function(){
 
-		sut.setCookie('', 'value');
-	});
+        sut.setCookie('', 'value');
+    });
 
-	assert.throws(function(){
+    assert.throws(function(){
 
-		sut.setCookie('user1', []);
-	});
+        sut.setCookie('user1', []);
+    });
 
-	assert.throws(function(){
+    assert.throws(function(){
 
-		sut.setCookie('user1', sut);
-	});
+        sut.setCookie('user1', sut);
+    });
 
-	// Verify cookies do not exist
-	assert.ok(!sut.isCookie('user0'));
-	assert.ok(!sut.isCookie('user1'));
-	assert.ok(!sut.isCookie('user2'));
-	assert.ok(!sut.isCookie('user3'));
+    // Verify cookies do not exist
+    assert.ok(!sut.isCookie('user0'));
+    assert.ok(!sut.isCookie('user1'));
+    assert.ok(!sut.isCookie('user2'));
+    assert.ok(!sut.isCookie('user3'));
 
-	// Define some cookies
-	assert.ok(sut.setCookie('user1'));
-	assert.ok(sut.setCookie('user1', undefined));
-	assert.ok(sut.setCookie('user1', null));
-	assert.ok(sut.setCookie('user2', '       ', 200));
-	assert.ok(sut.setCookie('user3', 'value 3'));
+    // Define some cookies
+    assert.ok(sut.setCookie('user1'));
+    assert.ok(sut.setCookie('user1', undefined));
+    assert.ok(sut.setCookie('user1', null));
+    assert.ok(sut.setCookie('user2', '       ', 200));
+    assert.ok(sut.setCookie('user3', 'value 3'));
 
-	// Get values
-	assert.ok(sut.getCookie('user0') === undefined);
-	assert.ok(sut.getCookie('user1') === '');
-	assert.ok(sut.getCookie('user2') === '       ');
-	assert.ok(sut.getCookie('user3') === 'value 3');
+    // Get values
+    assert.ok(sut.getCookie('user0') === undefined);
+    assert.ok(sut.getCookie('user1') === '');
+    assert.ok(sut.getCookie('user2') === '       ');
+    assert.ok(sut.getCookie('user3') === 'value 3');
 
-	// Verify expiration is correct
+    // Verify expiration is correct
 
 
-	// Delete created cookies
-	assert.ok(sut.deleteCookie('user0') === false);
-	assert.ok(sut.deleteCookie('user1'));
-	assert.ok(sut.deleteCookie('user2'));
-	assert.ok(sut.deleteCookie('user3'));
+    // Delete created cookies
+    assert.ok(sut.deleteCookie('user0') === false);
+    assert.ok(sut.deleteCookie('user1'));
+    assert.ok(sut.deleteCookie('user2'));
+    assert.ok(sut.deleteCookie('user3'));
 
-	// Verify cookies do not exist
-	assert.ok(sut.getCookie('user0') === undefined);
-	assert.ok(sut.getCookie('user1') === undefined);
-	assert.ok(sut.getCookie('user2') === undefined);
-	assert.ok(sut.getCookie('user3') === undefined);
+    // Verify cookies do not exist
+    assert.ok(sut.getCookie('user0') === undefined);
+    assert.ok(sut.getCookie('user1') === undefined);
+    assert.ok(sut.getCookie('user2') === undefined);
+    assert.ok(sut.getCookie('user3') === undefined);
 });
 
 
@@ -142,50 +142,50 @@ QUnit.test("setCookie", function(assert){
  */
 QUnit.test("getCookie", function(assert){
 
-	// Test several empty value combinations
-	assert.throws(function(){
+    // Test several empty value combinations
+    assert.throws(function(){
 
-		sut.getCookie(null);
-	});
+        sut.getCookie(null);
+    });
 
-	assert.throws(function(){
+    assert.throws(function(){
 
-		sut.getCookie(undefined);
-	});
+        sut.getCookie(undefined);
+    });
 
-	assert.throws(function(){
+    assert.throws(function(){
 
-		sut.getCookie('');
-	});
+        sut.getCookie('');
+    });
 
-	// Verify cookies do not exist
-	assert.ok(!sut.isCookie('user1'));
-	assert.ok(!sut.isCookie('user2'));
-	assert.ok(!sut.isCookie('user3'));
+    // Verify cookies do not exist
+    assert.ok(!sut.isCookie('user1'));
+    assert.ok(!sut.isCookie('user2'));
+    assert.ok(!sut.isCookie('user3'));
 
-	// Define some cookies
-	assert.ok(sut.setCookie('user1', null));
-	assert.ok(sut.setCookie('user2', ''));
-	assert.ok(sut.setCookie('user3', 'value 3'));
+    // Define some cookies
+    assert.ok(sut.setCookie('user1', null));
+    assert.ok(sut.setCookie('user2', ''));
+    assert.ok(sut.setCookie('user3', 'value 3'));
 
-	// Get values
-	assert.ok(sut.getCookie('user1') === '');
-	assert.ok(sut.getCookie('user2') === '');
-	assert.ok(sut.getCookie('user3') === 'value 3');
+    // Get values
+    assert.ok(sut.getCookie('user1') === '');
+    assert.ok(sut.getCookie('user2') === '');
+    assert.ok(sut.getCookie('user3') === 'value 3');
 
-	// Modify value for a cookie and test that it has changed
-	assert.ok(sut.setCookie('user3', 'new value now'));
-	assert.ok(sut.getCookie('user3') === 'new value now');
+    // Modify value for a cookie and test that it has changed
+    assert.ok(sut.setCookie('user3', 'new value now'));
+    assert.ok(sut.getCookie('user3') === 'new value now');
 
-	// Delete created cookies
-	assert.ok(sut.deleteCookie('user1'));
-	assert.ok(sut.deleteCookie('user2'));
-	assert.ok(sut.deleteCookie('user3'));
+    // Delete created cookies
+    assert.ok(sut.deleteCookie('user1'));
+    assert.ok(sut.deleteCookie('user2'));
+    assert.ok(sut.deleteCookie('user3'));
 
-	// Verify cookies do not exist
-	assert.ok(!sut.isCookie('user1'));
-	assert.ok(!sut.isCookie('user2'));
-	assert.ok(!sut.isCookie('user3'));
+    // Verify cookies do not exist
+    assert.ok(!sut.isCookie('user1'));
+    assert.ok(!sut.isCookie('user2'));
+    assert.ok(!sut.isCookie('user3'));
 });
 
 
@@ -194,36 +194,36 @@ QUnit.test("getCookie", function(assert){
  */
 QUnit.test("deleteCookie", function(assert){
 
-	// Test several empty value combinations
-	assert.throws(function(){
+    // Test several empty value combinations
+    assert.throws(function(){
 
-		sut.deleteCookie(null);
-	});
+        sut.deleteCookie(null);
+    });
 
-	assert.throws(function(){
+    assert.throws(function(){
 
-		sut.deleteCookie(undefined);
-	});
+        sut.deleteCookie(undefined);
+    });
 
-	assert.throws(function(){
+    assert.throws(function(){
 
-		sut.deleteCookie('');
-	});
+        sut.deleteCookie('');
+    });
 
-	// Verify cookie do not exist
-	assert.ok(!sut.isCookie('user1'));
+    // Verify cookie do not exist
+    assert.ok(!sut.isCookie('user1'));
 
-	// Define a cookie
-	assert.ok(sut.setCookie('user1', 'go to the cookies'));
+    // Define a cookie
+    assert.ok(sut.setCookie('user1', 'go to the cookies'));
 
-	// Verify cookie exists
-	assert.ok(sut.isCookie('user1'));
+    // Verify cookie exists
+    assert.ok(sut.isCookie('user1'));
 
-	// Delete cookie
-	assert.ok(sut.deleteCookie('user1'));
+    // Delete cookie
+    assert.ok(sut.deleteCookie('user1'));
 
-	// Verify deleted
-	assert.ok(sut.getCookie('user1') === undefined);
+    // Verify deleted
+    assert.ok(sut.getCookie('user1') === undefined);
 });
 
 

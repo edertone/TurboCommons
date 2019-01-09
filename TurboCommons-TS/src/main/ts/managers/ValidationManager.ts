@@ -467,7 +467,7 @@ export class ValidationManager{
             let tagsList = ArrayUtils.isArray(tags) ? tags as string[] : [tags as string];
             
             for (let t of tagsList) {
-	
+
                 let tagFound = false;
                 
                 for (let status of this._validationStatus) {

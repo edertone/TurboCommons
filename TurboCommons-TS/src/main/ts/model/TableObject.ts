@@ -216,7 +216,7 @@ export class TableObject {
         let keys = this._columnNames.getKeys();
 
         for (let key of keys) {
-	
+
             if(this._columnNames.get(key) === name){
 
                 return Number(key);

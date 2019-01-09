@@ -99,7 +99,7 @@ export class HTTPManager{
         }
         
         for (let queue of this._queues) {
-	
+
             if(queue.name === name){
                
                 throw new Error(`queue ${name} already exists`);
@@ -169,7 +169,7 @@ export class HTTPManager{
         }
 
         for (var i = 0; i < this._queues.length; i++) {
-	
+
             if(this._queues[i].name === name){
                 
                 if(this._queues[i].isRunning){
@@ -449,7 +449,7 @@ export class HTTPManager{
         
         // Execute each one of the received requests and process their results
         for (var i = 0; i < requestsList.length; i++) {
-	
+
             let requestWithIndex = {index: i, request: requestsList[i]};
             
             if(!StringUtils.isString(requestsList[i].url) || StringUtils.isEmpty(requestsList[i].url)){
@@ -562,7 +562,7 @@ export class HTTPManager{
         // 1- FinishedCallback should work the same way as the execute method, and give us the results data and info
         // 2- There should be a progressCallback method
         // 3- Extensive tests must be written: verify requests are sequentially executed one after the other, and all
-		//    the rest of the expected behaviour
+        //    the rest of the expected behaviour
         
         let requestsList = this._generateValidRequestsList(requests);
 
@@ -573,7 +573,7 @@ export class HTTPManager{
         }
         
         for (let queue of this._queues) {
-	
+
             if(queue.name === queueName){
                 
                 // Add all the received requests to the beginning of the queue pending array

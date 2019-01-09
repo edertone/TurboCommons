@@ -28,7 +28,7 @@ export abstract class HTTPManagerBaseRequest{
 
     
     constructor(url: string, timeout = 0) {
-	
+
         this.url = url;        
         this.timeout = timeout;
     }

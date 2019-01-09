@@ -231,7 +231,7 @@ export class LocalizationManager {
         let bundles:any[] = [];
         
         for (let path of Object.keys(this._loadedData)) {
-	
+
             let bundleNames:string[] = [];
 
             for (let locale of Object.keys(this._loadedData[path])) {
@@ -565,7 +565,7 @@ export class LocalizationManager {
         let result = [locale];
         
         for (let l of this._locales) {
-	
+
             if(l !== locale){
                 
                 result.push(l);
@@ -623,7 +623,7 @@ export class LocalizationManager {
         }
         
         for (let locale of locales) {
-	
+
             if(!this.isLocaleLoaded(locale)){
                 
                 throw new Error(locale + ' not loaded');                
@@ -702,7 +702,7 @@ export class LocalizationManager {
                     let replacements = StringUtils.isString(toReplace) ? [String(toReplace)] : toReplace;
 
                     for (let i = 0; i < replacements.length; i++) {
-	
+
                         result = StringUtils.replace(result,
                                     StringUtils.replace(this.wildCardsFormat, 'N', String(i)),
                                     replacements[i]);
@@ -805,7 +805,7 @@ export class LocalizationManager {
         let javaPropertiesObject = new JavaPropertiesObject(propertiesString);
         
         for (let key of javaPropertiesObject.getKeys()) {
-	
+
             result[key] = javaPropertiesObject.get(key);
         }
         

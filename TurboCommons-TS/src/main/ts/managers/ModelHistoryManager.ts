@@ -215,7 +215,7 @@ export class ModelHistoryManager<T> {
             tag: tag
         });
 
-		return true;
+        return true;
     }
 
 

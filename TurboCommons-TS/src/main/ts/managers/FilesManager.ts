@@ -48,7 +48,7 @@ export class FilesManager{
                 private path:any,
                 private process: any,
                 private crypto: any) {
-	
+
     }
     
     
@@ -474,7 +474,7 @@ export class FilesManager{
                 this.process.once('exit', () => {
                     
                     for (let temp of this._tempDirectoriesToDelete) {
-	
+
                         if(this.isDirectory(temp)){
                         
                             this.deleteDirectory(temp);
@@ -730,7 +730,7 @@ export class FilesManager{
         if(deleteDirectoryItself){
             
             try {
-	
+
                 this.fs.rmdirSync(path);
                 
                 return true;
@@ -765,7 +765,7 @@ export class FilesManager{
     saveFile(pathToFile: string, data = '', append = false){
 
         try {
-	
+
             if(append){
                 
                 this.fs.appendFileSync(pathToFile, data);
@@ -837,7 +837,7 @@ export class FilesManager{
         }
 
         try {
-	
+
             return this.fs.statSync(path).size;
 
         } catch (e) {
@@ -950,7 +950,7 @@ export class FilesManager{
         }
 
         try {
-	
+
             this.fs.unlinkSync(path);
             
             return true;

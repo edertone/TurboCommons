@@ -7,47 +7,47 @@
 
 namespace org_turboCommons_test_serializationUtils {
 
-	export class SingleProp {
+    export class SingleProp {
 
-		oneProp = "hello";
-	}
-	
-	export class NonTypedProps {
+        oneProp = "hello";
+    }
+    
+    export class NonTypedProps {
 
-		nullProp = null;
+        nullProp = null;
 
-		undefinedProp = undefined;
-	}
-	
-	export class BasicTypeProps {
-	
-		boolean = false;
-	
-		number = 0;
-	
-		string = '';
-		
-		obj = {};
-		
-		someClass = new NonTypedProps();
-	
-		arr = [];
-	}
-	
-	export class TypedArrayProps {
-	
-		nonTypedArray = [];
+        undefinedProp = undefined;
+    }
+    
+    export class BasicTypeProps {
+    
+        boolean = false;
+    
+        number = 0;
+    
+        string = '';
+        
+        obj = {};
+        
+        someClass = new NonTypedProps();
 
-		boolArray = [false];
-		
-		numberArray = [0];
-		
-		stringArray = [""];
-		
-		objectArray = [{}];
+        arr = [];
+    }
+    
+    export class TypedArrayProps {
+    
+        nonTypedArray = [];
 
-		classArray = [new SingleProp()];
-		
-		arrayArray = [[]];
-	}
+        boolArray = [false];
+        
+        numberArray = [0];
+        
+        stringArray = [""];
+        
+        objectArray = [{}];
+
+        classArray = [new SingleProp()];
+        
+        arrayArray = [[]];
+    }
 }

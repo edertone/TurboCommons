@@ -531,7 +531,7 @@ export class StringUtils {
                 let replacedFilters = tmp[i];
                 
                 for (var j = 0; j < filters.length; j++) {
-	
+
                     replacedFilters = replacedFilters.replace(filters[j], '');
                 }
                 
@@ -591,7 +591,7 @@ export class StringUtils {
         let arrayToRemove = [];
         
         for (let i = elements.length - elementsToRemove; i < elements.length; i++) {
-	
+
             arrayToRemove.push(elements[i]);
         }
         
@@ -1007,7 +1007,7 @@ export class StringUtils {
         // This code is the equivalent to the range(0, $length2) in php version
         let prevRow: number[] = [];
         for (let i = 0; i <= length2; i++) {
-	
+
             prevRow.push(i);
         }
         
@@ -1091,7 +1091,7 @@ export class StringUtils {
         let upperCaseLetters = 'ABCDEFGHIJKMNOPQRSTUVWXYZ';
         
         for (let chars of charSet) {
-	
+
             if(!StringUtils.isString(chars) || StringUtils.isEmpty(chars)){
                 
                 throw new Error('invalid charset');
