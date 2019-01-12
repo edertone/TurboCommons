@@ -239,6 +239,9 @@ QUnit.test("replace", function(assert) {
     assert.strictEqual(StringUtils.replace("string", ["s", "i"], ["b", " "]), "btr ng");
     assert.strictEqual(StringUtils.replace("Hello???", ["H", "E", "?"], ["h", "X", "!"]), "hello!!!");
     assert.strictEqual(StringUtils.replace("  k9 ", ['\\', ' '], ['\\\\', '\\ ']), "\\ \\ k9\\ ");
+    assert.strictEqual(StringUtils.replace("yyyyyy", ["yy", "yyyy"], ["y", "y"]), "yyy");
+    assert.strictEqual(StringUtils.replace("yyyyyy", ["yyyy", "yy"], ["y", "y"]), "yy");
+    assert.strictEqual(StringUtils.replace("yyyyyyyy", ["yy", "yyyy"], ["y", "y"]), "y");
     
     // Test ok values with limited count
     assert.strictEqual(StringUtils.replace("x", "", "xyz", 1), "x");

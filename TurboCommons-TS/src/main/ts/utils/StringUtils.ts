@@ -186,7 +186,9 @@ export class StringUtils {
      * Replace all occurrences of the search string with the replacement string
      *  
      * @param string The string or array being searched and replaced on, otherwise known as the haystack.
-     * @param search The value being searched for, otherwise known as the needle. An array may be used to designate multiple needles. 
+     * @param search The value being searched for, otherwise known as the needle. An array may be used to designate multiple needles
+     *        (if we use an array, the order of replacement will be the same of the array: First element will be the first one to be replaced,
+     *         second element the second, etc..) 
      * @param replacement The value being searched for, otherwise known as the needle. An array may be used to designate multiple needles. 
      * @param count [optional] If passed and > 0, this will define the maximum number of replacements to perform
      * 
