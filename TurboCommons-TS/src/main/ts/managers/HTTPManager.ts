@@ -13,6 +13,7 @@ import { ObjectUtils } from '../utils/ObjectUtils';
 import { ArrayUtils } from '../utils/ArrayUtils';
 import { HashMapObject } from '../model/HashMapObject';
 import { HTTPManagerGetRequest } from './httpmanager/HTTPManagerGetRequest';
+import { HTTPManagerPostRequest } from './httpmanager/HTTPManagerPostRequest';
 import { HTTPManagerBaseRequest } from './httpmanager/HTTPManagerBaseRequest';
 
    
@@ -457,7 +458,16 @@ export class HTTPManager{
                 throw new Error(`url ${i} must be a non empty string`);
             }
             
-            let xmlHttprequest = new XMLHttpRequest();
+            let xmlHttprequest:XMLHttpRequest; 
+                
+            try {
+
+                xmlHttprequest = new XMLHttpRequest();
+
+            } catch (e) {
+
+                throw new Error("Could not initialize XMLHttpRequest. If you are running node, it is not natively available. We recommend using the npm xhr2 library which emulates XMLHttpRequest for node apps");
+            }
             
             // Define the request timeout if specified on the request or the httpmanager class
             if(requestsList[i].timeout > 0 || this.timeout > 0){
@@ -467,8 +477,6 @@ export class HTTPManager{
             
             // Detect the request type
             let requestType = requestsList[i] instanceof HTTPManagerGetRequest ? 'GET' : 'POST';
-            
-            // TODO - implement the request GET or POST params
             
             xmlHttprequest.open(requestType, requestsList[i].url, this.asynchronous);
             
@@ -493,8 +501,31 @@ export class HTTPManager{
                 
                 processFinishedRequest(requestWithIndex, '', true, this.timeout + HTTPManager.ERROR_TIMEOUT, 408);
             };
+            
+            // Encode the GET request parameters if any and run the request
+            if(requestType === 'GET'){
+                
+                // TODO - implement the GET request params
+                
+                xmlHttprequest.send();
+            }
 
-            xmlHttprequest.send();
+            // Encode the POST request parameters if any and run the request
+            if(requestType === 'POST'){
+
+                try {
+        
+                    let requestPostParams = this.generateUrlQueryString((requestsList[i] as HTTPManagerPostRequest).parameters);
+                    
+                    xmlHttprequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                    
+                    xmlHttprequest.send(requestPostParams);
+                    
+                } catch (e) {
+                    
+                    xmlHttprequest.send();
+                }
+            }
         }
     }
     
