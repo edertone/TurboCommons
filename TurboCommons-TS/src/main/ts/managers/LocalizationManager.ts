@@ -207,11 +207,12 @@ export class LocalizationManager {
     
     
     /**
-     * Adds extra languages to the list of currently loaded translation data.
-     * 
-     * This method can only be called after the class has been initialized in case we need to add more translations.
-     * 
-     * @param locales List of languages for which we want to load the translations. The list will be appended to any previously
+     * Adds extra locales to the end of the list of currently active locales and load its related translation data.
+     *
+     * This method can only be called after the class has been initialized in case we need to add more translations. If any of the provided new locales
+     * is already loaded, its translation data will be refreshed
+     *
+     * @param locales List of languages for which we want to load the translations. The list will be appended at the end of any previously
      *        loaded locales and included in the preferred translation order.
      * @param finishedCallback A method that will be executed once the load ends. An errors variable will be passed
      *        to this method containing an array with information on errors that may have happened while loading the data.
@@ -463,6 +464,8 @@ export class LocalizationManager {
      * A list of strings containing the languages that are used by this class to translate the given keys, sorted by preference.
      * Each string is formatted as a 2 digit language code, like: en, fr
      *
+     * This list is the same as the locales() one, but containing only the language part of each locale (the first two digits)
+     *
      * @see this.locales()
      */
     languages(){
@@ -541,8 +544,8 @@ export class LocalizationManager {
 
 
     /**
-     * Define the locale that will be placed at the front of the currently loaded locales list.
-     * 
+     * Define the locale that will be placed at the front of the currently loaded locales list (moving all the others one position to the right).
+     *
      * This will be the first locale to use when trying to get a translation.
      *
      * @param locale A currently loaded locale that will be moved to the first position of the loaded locales list. If the specified locale
@@ -578,7 +581,36 @@ export class LocalizationManager {
     
     
     /**
-     * Define the 2 digit language that will be placed at the front of the currently loaded locales list.
+     * Moves the specified locales to the beginning of the locales list. This also alters the translation priority by setting the first
+     * provided locale as the most prioritary, the second as the next one and so.
+     * 
+     * This method basically works exactly the same way as setPrimaryLocale but letting us add many locales at once.
+     * 
+     * @see LocalizationManager.setPrimaryLocale()
+     *
+     * @param locales A list of locales to be moved to the beginning of the translation priority. First locales item will be the prefered
+     *        locale for translation, second will be the next one in case some key is not translated for the firs one and so.
+     *  
+     * @return void
+     */
+    setPrimaryLocales(locales: string[]){
+        
+        if(!ArrayUtils.isArray(locales) ||
+           ArrayUtils.hasDuplicateElements(locales) ||
+           locales.length <= 0){
+            
+            throw new Error('locales must be non empty string array with no duplicate elements');
+        }
+        
+        for (var i = locales.length - 1; i >= 0; i--) {
+
+            this.setPrimaryLocale(locales[i]);
+        }
+    }
+    
+    
+    /**
+     * Define the 2 digit language that will be placed at the front of the currently loaded locales list (moving all the others one position to the right).
      *
      * This will be the first language to use when trying to get a translation.
      *
@@ -599,6 +631,33 @@ export class LocalizationManager {
         }
 
         throw new Error(language + ' not loaded');
+    }
+    
+    
+    /**
+     * Moves the locales that match the specified languages to the beginning of the locales list.
+     * Works the same as setPrimaryLocales() but with a list of the 2 digit language codes that match the respective locales.
+     * 
+     * @see LocalizationManager.setPrimaryLocale()
+     * @see LocalizationManager.setPrimaryLanguage()
+     *
+     * @param languages A list of 2 digit language codes to be moved to the beginning of the translation priority.
+     *  
+     * @return void
+     */
+    setPrimaryLanguages(languages: string[]){
+        
+        if(!ArrayUtils.isArray(languages) ||
+            ArrayUtils.hasDuplicateElements(languages) ||
+            languages.length <= 0){
+            
+            throw new Error('languages must be non empty string array with no duplicate elements');
+        }
+
+        for (var i = languages.length - 1; i >= 0; i--) {
+            
+            this.setPrimaryLanguage(languages[i]);
+        }
     }
     
     

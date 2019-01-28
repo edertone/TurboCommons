@@ -765,6 +765,81 @@ QUnit.test("setPrimaryLocale", function(assert){
 
 
 /**
+ * setPrimaryLocales
+ */
+QUnit.test("setPrimaryLocales", function(assert){
+    
+    assert.throws(function() {
+        sut.setPrimaryLocales(["en_US"]);
+    }, /en_US not loaded/);
+    
+    var done = assert.async(1);
+    
+    var bundles = [{
+        path: window.basePath + '/test-locales/$locale/$bundle.json',
+        bundles: ['Locales']
+    }];
+    
+    sut.initialize(new HTTPManager(), ['es_ES', 'en_US', 'fr_FR'], bundles, function(errors){
+
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['es_ES', 'en_US', 'fr_FR']));
+        assert.ok(ArrayUtils.isEqualTo(sut.languages(), ['es', 'en', 'fr']));
+        
+        sut.setPrimaryLocales(['en_US']);
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['en_US', 'es_ES', 'fr_FR']));
+        assert.ok(ArrayUtils.isEqualTo(sut.languages(), ['en', 'es', 'fr']));
+        
+        sut.setPrimaryLocales(['fr_FR']);
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['fr_FR', 'en_US', 'es_ES']));
+        assert.ok(ArrayUtils.isEqualTo(sut.languages(), ['fr', 'en', 'es']));
+
+        sut.setPrimaryLocales(['es_ES']);
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['es_ES', 'fr_FR', 'en_US']));
+        assert.ok(ArrayUtils.isEqualTo(sut.languages(), ['es', 'fr', 'en']));
+
+        sut.setPrimaryLocales(['en_US', 'fr_FR']);
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['en_US', 'fr_FR', 'es_ES']));
+        assert.ok(ArrayUtils.isEqualTo(sut.languages(), ['en', 'fr', 'es']));
+
+        sut.setPrimaryLocales(['es_ES', 'en_US', 'fr_FR']);
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['es_ES', 'en_US', 'fr_FR']));
+        assert.ok(ArrayUtils.isEqualTo(sut.languages(), ['es', 'en', 'fr']));
+
+        // Test exceptions
+        assert.throws(function() {
+            sut.setPrimaryLocales([]);
+        }, /locales must be non empty string array with no duplicate elements/);
+        
+        assert.throws(function() {
+            sut.setPrimaryLocales([1]);
+        }, /Invalid locale value/);
+        
+        assert.throws(function() {
+            sut.setPrimaryLocales(123);
+        }, /locales must be non empty string array with no duplicate elements/);
+        
+        assert.throws(function() {
+            sut.setPrimaryLocales(["LOGIN"]);
+        }, /LOGIN not loaded/);
+        
+        assert.throws(function() {
+            sut.setPrimaryLocales({});
+        }, /locales must be non empty string array with no duplicate elements/);
+        
+        assert.throws(function() {
+            sut.setPrimaryLocales(['es_ES', 'nothing']);
+        }, /nothing not loaded/);
+        
+        assert.throws(function() {
+            sut.setPrimaryLocales(['es_ES', 'es_ES']);
+        }, /locales must be non empty string array with no duplicate elements/);
+        
+        done();
+    });
+});
+
+
+/**
  * setPrimaryLanguage
  */
 QUnit.test("setPrimaryLanguage", function(assert){
@@ -851,6 +926,81 @@ QUnit.test("setPrimaryLanguage-repeated-languages", function(assert){
         assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['es_ES', 'en_US', 'en_GB']));
         assert.ok(ArrayUtils.isEqualTo(sut.languages(), ['es', 'en', 'en']));
         assert.strictEqual(sut.get('LOGIN'), 'acceder');
+        
+        done();
+    });
+});
+
+
+/**
+ * setPrimaryLanguages
+ */
+QUnit.test("setPrimaryLanguages", function(assert){
+    
+    assert.throws(function() {
+        sut.setPrimaryLanguages(["en"]);
+    }, /en not loaded/);
+    
+    var done = assert.async(1);
+    
+    var bundles = [{
+        path: window.basePath + '/test-locales/$locale/$bundle.json',
+        bundles: ['Locales']
+    }];
+    
+    sut.initialize(new HTTPManager(), ['es_ES', 'en_US', 'fr_FR'], bundles, function(errors){
+
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['es_ES', 'en_US', 'fr_FR']));
+        assert.ok(ArrayUtils.isEqualTo(sut.languages(), ['es', 'en', 'fr']));
+        
+        sut.setPrimaryLanguages(['en']);
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['en_US', 'es_ES', 'fr_FR']));
+        assert.ok(ArrayUtils.isEqualTo(sut.languages(), ['en', 'es', 'fr']));
+        
+        sut.setPrimaryLanguages(['fr']);
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['fr_FR', 'en_US', 'es_ES']));
+        assert.ok(ArrayUtils.isEqualTo(sut.languages(), ['fr', 'en', 'es']));
+
+        sut.setPrimaryLanguages(['es']);
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['es_ES', 'fr_FR', 'en_US']));
+        assert.ok(ArrayUtils.isEqualTo(sut.languages(), ['es', 'fr', 'en']));
+
+        sut.setPrimaryLanguages(['en', 'fr']);
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['en_US', 'fr_FR', 'es_ES']));
+        assert.ok(ArrayUtils.isEqualTo(sut.languages(), ['en', 'fr', 'es']));
+
+        sut.setPrimaryLanguages(['es', 'en', 'fr']);
+        assert.ok(ArrayUtils.isEqualTo(sut.locales(), ['es_ES', 'en_US', 'fr_FR']));
+        assert.ok(ArrayUtils.isEqualTo(sut.languages(), ['es', 'en', 'fr']));
+
+        // Test exceptions
+        assert.throws(function() {
+            sut.setPrimaryLanguages([]);
+        }, /languages must be non empty string array with no duplicate elements/);
+        
+        assert.throws(function() {
+            sut.setPrimaryLanguages([1]);
+        }, /1 not loaded/);
+        
+        assert.throws(function() {
+            sut.setPrimaryLanguages(123);
+        }, /languages must be non empty string array with no duplicate elements/);
+        
+        assert.throws(function() {
+            sut.setPrimaryLanguages(["LOGIN"]);
+        }, /LOGIN not loaded/);
+        
+        assert.throws(function() {
+            sut.setPrimaryLanguages({});
+        }, /languages must be non empty string array with no duplicate elements/);
+                
+        assert.throws(function() {
+            sut.setPrimaryLanguages(['es', 'nothing']);
+        }, /nothing not loaded/);
+        
+        assert.throws(function() {
+            sut.setPrimaryLanguages(['es', 'es']);
+        }, /languages must be non empty string array with no duplicate elements/);
         
         done();
     });

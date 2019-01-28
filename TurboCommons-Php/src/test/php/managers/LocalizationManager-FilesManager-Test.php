@@ -889,6 +889,103 @@ class LocalizationManagerTest extends TestCase {
 
 
     /**
+     * testSetPrimaryLocales
+     *
+     * @return void
+     */
+    public function testSetPrimaryLocales(){
+
+        try {
+            $this->sut->setPrimaryLocales('en_US');
+            $this->exceptionMessage = 'setPrimaryLocales did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        $bundles = [[
+            'path' => $this->basePath.'/test-locales/$locale/$bundle.json',
+            'bundles' => ['Locales']
+        ]];
+
+        $this->sut->initialize(new FilesManager(), ['es_ES', 'en_US', 'fr_FR'], $bundles, function($errors){
+
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->locales(), ['es_ES', 'en_US', 'fr_FR']));
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->languages(), ['es', 'en', 'fr']));
+
+            $this->sut->setPrimaryLocales(['en_US']);
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->locales(), ['en_US', 'es_ES', 'fr_FR']));
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->languages(), ['en', 'es', 'fr']));
+
+            $this->sut->setPrimaryLocales(['fr_FR']);
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->locales(), ['fr_FR', 'en_US', 'es_ES']));
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->languages(), ['fr', 'en', 'es']));
+
+            $this->sut->setPrimaryLocales(['es_ES']);
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->locales(), ['es_ES', 'fr_FR', 'en_US']));
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->languages(), ['es', 'fr', 'en']));
+
+            $this->sut->setPrimaryLocales(['en_US', 'fr_FR']);
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->locales(), ['en_US', 'fr_FR', 'es_ES']));
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->languages(), ['en', 'fr', 'es']));
+
+            $this->sut->setPrimaryLocales(['es_ES', 'en_US', 'fr_FR']);
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->locales(), ['es_ES', 'en_US', 'fr_FR']));
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->languages(), ['es', 'en', 'fr']));
+
+            // Test exceptions
+            try {
+                $this->sut->setPrimaryLocales([]);
+                $this->exceptionMessage = '[] did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            try {
+                $this->sut->setPrimaryLocales([1]);
+                $this->exceptionMessage = '[1] did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            try {
+                $this->sut->setPrimaryLocales(123);
+                $this->exceptionMessage = '123 did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            try {
+                $this->sut->setPrimaryLocales(["LOGIN"]);
+                $this->exceptionMessage = '["LOGIN"] did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            try {
+                $this->sut->setPrimaryLocales(new stdClass());
+                $this->exceptionMessage = 'new stdClass() did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            try {
+                $this->sut->setPrimaryLocales(['es_ES', 'nothing']);
+                $this->exceptionMessage = '["es_ES", "nothing"] did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            try {
+                $this->sut->setPrimaryLocales(['es_ES', 'es_ES']);
+                $this->exceptionMessage = '["es_ES", "es_ES"] did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+        });
+    }
+
+
+    /**
      * testSetPrimaryLanguage
      *
      * @return void
@@ -985,6 +1082,103 @@ class LocalizationManagerTest extends TestCase {
             $this->assertTrue(ArrayUtils::isEqualTo($this->sut->locales(), ['es_ES', 'en_US', 'en_GB']));
             $this->assertTrue(ArrayUtils::isEqualTo($this->sut->languages(), ['es', 'en', 'en']));
             $this->assertSame($this->sut->get('LOGIN'), 'acceder');
+        });
+    }
+
+
+    /**
+     * testSetPrimaryLanguages
+     *
+     * @return void
+     */
+    public function testSetPrimaryLanguages(){
+
+        try {
+            $this->sut->setPrimaryLanguages('en');
+            $this->exceptionMessage = 'setPrimaryLanguages did not cause exception';
+        } catch (Throwable $e) {
+            // We expect an exception to happen
+        }
+
+        $bundles = [[
+            'path' => $this->basePath.'/test-locales/$locale/$bundle.json',
+            'bundles' => ['Locales']
+        ]];
+
+        $this->sut->initialize(new FilesManager(), ['es_ES', 'en_US', 'fr_FR'], $bundles, function($errors){
+
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->locales(), ['es_ES', 'en_US', 'fr_FR']));
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->languages(), ['es', 'en', 'fr']));
+
+            $this->sut->setPrimaryLanguages(['en']);
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->locales(), ['en_US', 'es_ES', 'fr_FR']));
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->languages(), ['en', 'es', 'fr']));
+
+            $this->sut->setPrimaryLanguages(['fr']);
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->locales(), ['fr_FR', 'en_US', 'es_ES']));
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->languages(), ['fr', 'en', 'es']));
+
+            $this->sut->setPrimaryLanguages(['es']);
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->locales(), ['es_ES', 'fr_FR', 'en_US']));
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->languages(), ['es', 'fr', 'en']));
+
+            $this->sut->setPrimaryLanguages(['en', 'fr']);
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->locales(), ['en_US', 'fr_FR', 'es_ES']));
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->languages(), ['en', 'fr', 'es']));
+
+            $this->sut->setPrimaryLanguages(['es', 'en', 'fr']);
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->locales(), ['es_ES', 'en_US', 'fr_FR']));
+            $this->assertTrue(ArrayUtils::isEqualTo($this->sut->languages(), ['es', 'en', 'fr']));
+
+            // Test exceptions
+            try {
+                $this->sut->setPrimaryLanguages([]);
+                $this->exceptionMessage = '[] did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            try {
+                $this->sut->setPrimaryLanguages([1]);
+                $this->exceptionMessage = '[1] did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            try {
+                $this->sut->setPrimaryLanguages(123);
+                $this->exceptionMessage = '123 did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            try {
+                $this->sut->setPrimaryLanguages(["LOGIN"]);
+                $this->exceptionMessage = '["LOGIN"] did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            try {
+                $this->sut->setPrimaryLanguages(new stdClass());
+                $this->exceptionMessage = 'new stdClass() did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            try {
+                $this->sut->setPrimaryLanguages(['es', 'nothing']);
+                $this->exceptionMessage = '["es", "nothing"] did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
+
+            try {
+                $this->sut->setPrimaryLanguages(['es', 'es']);
+                $this->exceptionMessage = '["es", "es"] did not cause exception';
+            } catch (Throwable $e) {
+                // We expect an exception to happen
+            }
         });
     }
 
