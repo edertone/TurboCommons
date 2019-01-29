@@ -158,11 +158,11 @@ export class BrowserManager{
      * Deletes the specified cookie from browser. Note that the cookie will only be deleted if belongs to the same path as specified.
      * 
      * @param key The name of the cookie we want to delete
-     * @param path Define the path where the cookie is set. By default it is the whole domain: '/'. If the cookie is not set on this path, we must pass the cookie domain or the delete will fail.
+     * @param path Define the path where the cookie is set. By default it is the whole domain: '/'. If the cookie is not set on this path, we must pass the right one or the delete will fail.
      * 
      * @returns True if cookie was deleted or false if cookie could not be deleted or was not found.
      */
-    deleteCookie(key:string, path:string){
+    deleteCookie(key:string, path:string = '/'){
 
         // Empty key means an exception
         if(!StringUtils.isString(key) || StringUtils.isEmpty(key)){
