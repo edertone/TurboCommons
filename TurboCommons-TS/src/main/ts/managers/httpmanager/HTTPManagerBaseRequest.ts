@@ -35,14 +35,18 @@ export abstract class HTTPManagerBaseRequest{
     
 
     /**
-     * A method to be executed inmediately after this request execution finishes successfully.
-     * The response parameter will contain the request result data
+     * A method to be executed inmediately after the request execution finishes successfully.
+     * The callback function must have the following signature:
+     * (response: string) => void
      */
     successCallback: (response: string) => void = () => {};
     
     
     /**
      * A method to be executed if an error happens to the request execution.
+     * The callback function must have the following signature:
+     * (errorMsg:string, errorCode:number) => void
+     *
      * errorMsg will contain the error text and errorCode will contain the numeric error http value
      */
     errorCallback: (errorMsg:string, errorCode:number) => void = () => {};

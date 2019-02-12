@@ -364,13 +364,13 @@ QUnit.test("isInternetAvailable", function(assert){
             
             assert.throws(function() {
                 sut.isInternetAvailable(function(){}, function(){});
-            });
+            }, /invalid check url : hello bad url/);
             
             sut.internetCheckLocations = [];
             
             assert.throws(function() {
                 sut.isInternetAvailable(function(){}, function(){});
-            });
+            }, /no check locations specified/);
             
             done();
             
@@ -558,6 +558,7 @@ QUnit.test("execute - requests with string urls", function(assert){
         
     }, function(completedUrl, totalRequests) {
         
+        assert.ok(completedUrl.length > 3);
         assert.strictEqual(totalRequests, 3);
         multiErrProgressCount ++;
     });
@@ -591,6 +592,7 @@ QUnit.test("execute - requests with string urls", function(assert){
         
     }, function(completedUrl, totalRequests) {
         
+        assert.ok(completedUrl.length > 3);
         assert.strictEqual(totalRequests, 3);
         multiProgressCount ++;
     });

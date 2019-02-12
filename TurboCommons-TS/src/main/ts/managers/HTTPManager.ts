@@ -26,7 +26,7 @@ export class HTTPManager{
     /** 
      * Defines if the http comunications made by this class will be synchronous (code execution will be stopped while 
      * waiting for the response) or asynchronous (execution flow will continue and response will be processed once received)
-     * Note: Synchronous requests are normally NOT, NOT a good idea 
+     * Note: Synchronous requests are normally NOT, NOT a good idea on client side languages 
      */
     asynchronous = true;
     
@@ -70,13 +70,13 @@ export class HTTPManager{
      * Class that contains functionalities related to the HTTP protocol and its most common requests
      * 
      * @param asynchronous Specify if the HTTP manager instance will work in asynchronous or synchronous mode. 
-     * (Synchronous mode is NOT recommended)
+     * (Synchronous mode is NOT recommended on client side languages)
      */
     constructor(asynchronous = true){
         
         if(typeof asynchronous !== 'boolean'){
             
-            throw new Error("asynchronous is not boolean");
+            throw new Error('asynchronous is not boolean');
         }
         
         this.asynchronous = asynchronous;
@@ -116,7 +116,7 @@ export class HTTPManager{
      * 
      * @see this.queue()
      * 
-     * @returns The number of existing queues
+     * @return The number of existing queues
      */
     countQueues(){
         
@@ -131,7 +131,7 @@ export class HTTPManager{
      * 
      * @see this.queue()
      * 
-     * @returns boolean True if the specified queue is actually running its http requests
+     * @return boolean True if the specified queue is actually running its http requests
      */
     isQueueRunning(name: string){
         
@@ -160,7 +160,7 @@ export class HTTPManager{
      * 
      * @see this.queue()
      * 
-     * @returns void
+     * @return void
      */
     deleteQueue(name: string){
         
@@ -199,7 +199,7 @@ export class HTTPManager{
      * @see https://en.wikipedia.org/wiki/Query_string
      * @see HashMapObject
      *
-     * @returns A valid query string that can be used with any url: http://www.url.com?query_string (Note that ? symbol is not included)
+     * @return A valid query string that can be used with any url: http://www.url.com?query_string (Note that ? symbol is not included)
      */
     generateUrlQueryString(keyValuePairs: { [key: string]: string } | HashMapObject){
         
@@ -248,12 +248,12 @@ export class HTTPManager{
         
         if(typeof yesCallback  !== 'function' || typeof noCallback !== 'function'){
             
-            throw new Error("params must be functions");
+            throw new Error('params must be functions');
         }
         
         if(this.internetCheckLocations.length <= 0){
             
-            throw new Error("no check locations specified");
+            throw new Error('no check locations specified');
         }
         
         // A recursive function that will loop all the defined list of urls to check
@@ -299,7 +299,7 @@ export class HTTPManager{
      * Note that crossdomain security rules may prevent this method from working correctly if you try
      * to check the existence of an url that does not allow CORS outside your application domain.
      * 
-     * @param url An full valid internet address to check
+     * @param url A full valid internet address to check
      * @param yesCallback Executed if the url exists
      * @param noCallback Executed if the url does not exist (or is not accessible).
      *
@@ -309,12 +309,12 @@ export class HTTPManager{
     
         if(!StringUtils.isString(url)){
 
-            throw new Error("url must be a string");
+            throw new Error('url must be a string');
         }
         
         if(typeof yesCallback  !== 'function' || typeof noCallback !== 'function'){
             
-            throw new Error("params must be functions");
+            throw new Error('params must be functions');
         }
 
         if(!StringUtils.isUrl(url)){
@@ -351,17 +351,17 @@ export class HTTPManager{
     
         if(!StringUtils.isString(url)){
 
-            throw new Error("url must be a string");
+            throw new Error('url must be a string');
         }
         
         if(typeof successCallback  !== 'function' || typeof errorCallback !== 'function'){
             
-            throw new Error("params must be functions");
+            throw new Error('params must be functions');
         }
 
         if(!StringUtils.isUrl(url)){
 
-            throw new Error("invalid url " + url);
+            throw new Error('invalid url ' + url);
         }
         
         let xmlHttprequest = new XMLHttpRequest();
@@ -394,7 +394,7 @@ export class HTTPManager{
      * @param progressCallback Executed after each one of the urls finishes (either successfully or with an error). A string with the requested url and
      *        the total requests to perform will be passed to this method.
      *        
-     * @returns void
+     * @return void
      */
     execute(requests: string|string[]|HTTPManagerBaseRequest|HTTPManagerBaseRequest[],
             finishedCallback: ((results: {url:string, response:string, isError:boolean, errorMsg:string, errorCode:number}[], anyError:boolean) => void) | null = null,
@@ -545,9 +545,17 @@ export class HTTPManager{
                 throw new Error('No requests to execute');
             }
             
-            requestsList = StringUtils.isString((requests as Array<any>)[0]) ?
-                    (requests as string[]).map((url) => new HTTPManagerGetRequest(url)) :
-                    (requests as HTTPManagerBaseRequest[]);
+            for (let requestItem of (requests as Array<any>)) {
+
+                if(StringUtils.isString(requestItem)){
+
+                    requestsList.push(new HTTPManagerGetRequest(requestItem));
+
+                }else{
+
+                    requestsList.push(requestItem);
+                }
+            }
                         
         }else{
             
@@ -557,7 +565,7 @@ export class HTTPManager{
                 
             } else if (requests instanceof HTTPManagerBaseRequest){
                 
-                requestsList = [requests as HTTPManagerBaseRequest]
+                requestsList = [requests as HTTPManagerBaseRequest];
             
             }else{
                 
