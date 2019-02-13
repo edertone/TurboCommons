@@ -335,6 +335,7 @@ class HTTPManager extends BaseStrictClass {
                             $progressCallback = null){
 
         $requestsList = $this->_generateValidRequestsList($requests);
+        $requestsListCount = count($requestsList);
 
         // Validate callbacks are ok
         if(($finishedCallback !== null && !is_callable($finishedCallback)) ||
@@ -352,7 +353,7 @@ class HTTPManager extends BaseStrictClass {
                                             string $response,
                                             bool $isError = false,
                                             string $errorMsg = '',
-                                            int $errorCode = -1) use ($requestsList, $progressCallback, $finishedCallback,
+                                            int $errorCode = -1) use ($requestsList, $progressCallback, $finishedCallback, $requestsListCount,
                                                                       &$finishedCount, &$finishedAnyError, &$finishedResults) {
 
             $request = $requestWithIndex['request'];
@@ -374,7 +375,7 @@ class HTTPManager extends BaseStrictClass {
 
             if($progressCallback !== null){
 
-                $progressCallback($request->url, count($requestsList));
+                $progressCallback($request->url, $requestsListCount);
             }
 
             if($finishedCount >= count($requestsList) && $finishedCallback !== null){
@@ -384,9 +385,15 @@ class HTTPManager extends BaseStrictClass {
         };
 
         // Execute each one of the received requests and process their results
-        for($i = 0, $l = count($requestsList); $i < $l; $i++){
+        if(!extension_loaded('curl')){
 
-            $requestWithIndex = ['index' => $i, 'request' => $requestsList[$i]];
+            throw new UnexpectedValueException('Could not initialize curl. Make sure it is available on your php system');
+        }
+
+        $curlInstances = [];
+        $curlHandle = curl_multi_init();
+
+        for($i = 0; $i < $requestsListCount; $i++){
 
             if(!is_object($requestsList[$i]) || !property_exists($requestsList[$i], 'url') ||
                !StringUtils::isString($requestsList[$i]->url) || StringUtils::isEmpty($requestsList[$i]->url)){
@@ -394,21 +401,15 @@ class HTTPManager extends BaseStrictClass {
                 throw new UnexpectedValueException('url '.$i.' must be a non empty string');
             }
 
-            if(!extension_loaded('curl')){
-
-                throw new UnexpectedValueException('Could not initialize curl. Make sure it is available on your php system');
-            }
-
-            $curl = curl_init($requestsList[$i]->url);
-
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($curl, CURLOPT_FAILONERROR, true);
-            curl_setopt($curl, CURLOPT_FOLLOWLOCATION, false);
+            $curlInstances[$i] = curl_init($requestsList[$i]->url);
+            curl_setopt($curlInstances[$i], CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curlInstances[$i], CURLOPT_FAILONERROR, true);
+            curl_setopt($curlInstances[$i], CURLOPT_FOLLOWLOCATION, false);
 
             // Define the request timeout if specified on the request or the httpmanager class
             if($requestsList[$i]->timeout > 0 || $this->timeout > 0){
 
-                curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $requestsList[$i]->timeout > 0 ? $requestsList[$i]->timeout : $this->timeout);
+                curl_setopt($curlInstances[$i], CURLOPT_CONNECTTIMEOUT, $requestsList[$i]->timeout > 0 ? $requestsList[$i]->timeout : $this->timeout);
             }
 
             // Detect the request type
@@ -418,8 +419,6 @@ class HTTPManager extends BaseStrictClass {
             if($requestType === 'GET'){
 
                 // TODO - implement the GET request params
-
-                $result = curl_exec($curl);
             }
 
             // Encode the POST request parameters if any and run the request
@@ -429,35 +428,49 @@ class HTTPManager extends BaseStrictClass {
 
                     $requestPostParams = $this->generateUrlQueryString($requestsList[$i]->parameters);
 
-                    curl_setopt($curl, CURLOPT_POST, true);
-                    curl_setopt($curl, CURLOPT_POSTFIELDS, $requestPostParams);
-
-                    $result = curl_exec($curl);
+                    curl_setopt($curlInstances[$i], CURLOPT_POST, true);
+                    curl_setopt($curlInstances[$i], CURLOPT_POSTFIELDS, $requestPostParams);
 
                 } catch (Exception $e) {
 
-                    $result = curl_exec($curl);
+                    // Nothing to do
                 }
             }
 
-            if (curl_error($curl)) {
-
-                if(curl_errno($curl) === 28){
-
-                    $processFinishedRequest($requestWithIndex, '', true, $this->timeout.$this->ERROR_TIMEOUT, 408);
-
-                }else{
-
-                    $processFinishedRequest($requestWithIndex, '', true, curl_error($curl), curl_getinfo($curl, CURLINFO_HTTP_CODE));
-                }
-
-            }else{
-
-                $processFinishedRequest($requestWithIndex, $result);
-            }
-
-            curl_close($curl);
+            curl_multi_add_handle($curlHandle, $curlInstances[$i]);
         }
+
+        // Execute all the requests asynchronously
+        $stillRunning = 0;
+
+        do {
+
+            curl_multi_exec($curlHandle, $stillRunning);
+
+        } while($stillRunning > 0);
+
+        // Obtain the results for all the requests
+        for($i = 0; $i < $requestsListCount; $i++){
+
+            $requestWithIndex = ['index' => $i, 'request' => $requestsList[$i]];
+
+            if(curl_errno($curlInstances[$i]) === 28){
+
+                $processFinishedRequest($requestWithIndex, '', true, $this->timeout.$this->ERROR_TIMEOUT, 408);
+
+            } else if (curl_error($curlInstances[$i])) {
+
+                $processFinishedRequest($requestWithIndex, '', true, curl_error($curlInstances[$i]), curl_getinfo($curlInstances[$i], CURLINFO_HTTP_CODE));
+
+            } else {
+
+                $processFinishedRequest($requestWithIndex, curl_multi_getcontent($curlInstances[$i]));
+            }
+
+            curl_multi_remove_handle($curlHandle, $curlInstances[$i]);
+        }
+
+        curl_multi_close($curlHandle);
     }
 
 
