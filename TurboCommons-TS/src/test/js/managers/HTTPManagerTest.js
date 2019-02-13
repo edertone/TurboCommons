@@ -28,6 +28,7 @@ QUnit.module("HTTPManagerTest", {
         window.sut.timeout = 3000;
         
         window.basePath = './resources/managers/httpManager';
+        window.existantUrl = browserManager.getCurrentUrl();
         window.nonExistantUrl = browserManager.getCurrentUrl() + '3453453454435dgdfg.html';
     },
 
@@ -418,7 +419,7 @@ QUnit.test("urlExists", function(assert){
     // Test ok values    
     var done = assert.async(2);
     
-    sut.urlExists(browserManager.getCurrentUrl(), function(){
+    sut.urlExists(existantUrl, function(){
         
         assert.ok(true);
         done();
@@ -531,7 +532,7 @@ QUnit.test("execute - requests with string urls", function(assert){
     });
     
     // Single url without error
-    sut.execute(browserManager.getCurrentUrl(), function(results, anyError){
+    sut.execute(existantUrl, function(results, anyError){
 
         assert.ok(!StringUtils.isEmpty(results[0].response));
         assert.ok(results[0].response.length > 5);
@@ -563,7 +564,7 @@ QUnit.test("execute - requests with string urls", function(assert){
         multiErrProgressCount ++;
     });
     
-    sut.execute([browserManager.getCurrentUrl(), 'invalidUrl2', browserManager.getCurrentUrl()], function(results, anyError){
+    sut.execute([existantUrl, 'invalidUrl2', existantUrl], function(results, anyError){
 
         assert.strictEqual(anyError, true);
         assert.strictEqual(results[0].isError, false);
