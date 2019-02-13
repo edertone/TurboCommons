@@ -320,7 +320,7 @@ class HTTPManager extends BaseStrictClass {
     /**
      * Launch one or more http requests without caring about their execution order.
      *
-     * @param string|array|HTTPManagerBaseRequest| $requests One or more requests to be inmediately launched (at the same time if possible). Each request can be defined as a string
+     * @param string|array|HTTPManagerBaseRequest $requests One or more requests to be inmediately launched (at the same time if possible). Each request can be defined as a string
      *        that will be used as a GET request url, or as an HTTPManagerBaseRequest instance in case we want to define parameters and callbacks.
      * @param callable $finishedCallback A method to be executed once all the http requests have finished (either succesfully or with errors). The callback will
      *        receive two parameters: results (an array with information about each request result in the same order as provided to this method) and
