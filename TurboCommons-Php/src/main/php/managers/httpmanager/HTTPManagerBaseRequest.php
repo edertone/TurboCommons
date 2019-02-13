@@ -1,3 +1,5 @@
+<?php
+
 /**
  * TurboCommons is a general purpose and cross-language library that implements frequently used and generic software development tasks.
  *
@@ -7,41 +9,49 @@
  * CopyRight : -> Copyright 2015 Edertone Advanded Solutions (08211 Castellar del Vallès, Barcelona). http://www.edertone.com
  */
 
+namespace org\turbocommons\src\main\php\managers\httpmanager;
+
+use org\turbocommons\src\main\php\model\BaseStrictClass;
+
 
 /**
  * Class that defines the base http request to be used with http manager
- */ 
-export abstract class HTTPManagerBaseRequest{
+ */
+class HTTPManagerBaseRequest extends BaseStrictClass {
 
-    
+
     /**
      * The url that will be called as part of this request
      */
-    url:string;
+    public $url;
 
 
     /**
      * Defines how much miliseconds will the http requests wait before failing with a timeout.
      * If set to 0, no value will be specifically defined, so the httpmanager default will be used.
      */
-    timeout:number;
+    public $timeout;
 
-    
-    constructor(url: string, timeout = 0) {
 
-        this.url = url;        
-        this.timeout = timeout;
+    public function __construct(string $url, int $timeout = 0){
+
+        $this->url = $url;
+        $this->timeout = $timeout;
+
+        $this->successCallback = function() {};
+        $this->errorCallback = function() {};
+        $this->finallyCallback = function() {};
     }
-    
+
 
     /**
      * A method to be executed inmediately after the request execution finishes successfully.
      * The callback function must have the following signature:
      * (response: string) => void
      */
-    successCallback: (response: string) => void = () => {};
-    
-    
+    public $successCallback = null;
+
+
     /**
      * A method to be executed if an error happens to the request execution.
      * The callback function must have the following signature:
@@ -49,13 +59,13 @@ export abstract class HTTPManagerBaseRequest{
      *
      * errorMsg will contain the error text and errorCode will contain the numeric error http value
      */
-    errorCallback: (errorMsg:string, errorCode:number) => void = () => {};
-    
-    
+    public $errorCallback = null;
+
+
     /**
      * A method to be executed always when the request finishes, even successfully or with an error.
      * The callback function must have the following signature:
      * () => void
      */
-    finallyCallback: () => void = () => {};  
+    public $finallyCallback = null;
 }
