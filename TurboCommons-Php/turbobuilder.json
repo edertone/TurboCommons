@@ -12,20 +12,29 @@
 	   "projectStructure" : {                    
             "readmeFileMandatory": false
         },
-	    "phpNamespaces" : {
-	        "enabled": true,
-	        "mandatory": true,
-	        "mustContain": ["org\\turbocommons\\src\\$path"],
-	        "excludes": ["autoloader.php", "index.php"]
-	    },
-	    "copyrightHeaders": [
-	    	{
-	    		"path": "extras/copyright headers/TurboCommons-Php.txt",
-	    		"appliesTo": "src",
-	    		"includes": ["php"],
-	    		"excludes": []
-	    	}
-	    ]
+        "filesContent" : {
+            "tabsForbidden": {
+                "enabled": true,
+                "appliesTo": ["src", "extras"],
+                "excludes": [".svg", ".properties"]
+            },
+            "copyrightHeaders": [
+                {
+                    "path": "extras/copyright headers/TurboCommons-Php.txt",
+                    "appliesTo": "src",
+                    "includes": ["php"],
+                    "excludes": []
+                }
+            ]
+        },
+        "php": {
+            "namespaces" : {
+                "enabled": true,
+                "mandatory": true,
+                "mustContain": ["org\\turbocommons\\src\\$path"],
+                "excludes": ["autoloader.php", "index.php"]
+            }
+        }
     },
     
     "build": {

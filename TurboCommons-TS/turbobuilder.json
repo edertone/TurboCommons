@@ -12,20 +12,22 @@
 	    "projectStructure" : {                    
             "readmeFileMandatory": false
         },
-	    "copyrightHeaders": [
-	    	{
-	    		"path": "extras/copyright headers/TsFiles-Header.txt",
-	    		"appliesTo": "src",
-	    		"includes": ["ts"],
-	    		"excludes": []
-	    	},
-	    	{
-	    		"path": "extras/copyright headers/JsFiles-Header.txt",
-	    		"appliesTo": "src",
-	    		"includes": ["js"],
-	    		"excludes": []
-	    	}
-	    ]
+        "filesContent" : {
+    	    "copyrightHeaders": [
+    	    	{
+    	    		"path": "extras/copyright headers/TsFiles-Header.txt",
+    	    		"appliesTo": "src",
+    	    		"includes": ["ts"],
+    	    		"excludes": []
+    	    	},
+    	    	{
+    	    		"path": "extras/copyright headers/JsFiles-Header.txt",
+    	    		"appliesTo": "src",
+    	    		"includes": ["js"],
+    	    		"excludes": []
+    	    	}
+    	    ]
+        }
     },
     
     "build": {
