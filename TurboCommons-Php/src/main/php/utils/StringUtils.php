@@ -1099,6 +1099,7 @@ class StringUtils {
      * @param array $charSet Defines the list of possible characters to be generated. Each element of charSet must be a string containing
      *                the possible characters like 'a1kjuhAO' or a range like 'a-z', 'A-D', '0-5', ... etc.
      *                Note that - character must be escaped \- when not specified as part of a range
+     *                Default charset is alphanumeric ['0-9', 'a-z', 'A-Z']
      *
      * @return string A randomly generated string
      */
