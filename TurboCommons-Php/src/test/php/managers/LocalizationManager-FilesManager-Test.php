@@ -15,7 +15,7 @@ use stdClass;
 use Throwable;
 use PHPUnit\Framework\TestCase;
 use org\turbocommons\src\main\php\managers\LocalizationManager;
-use org\turbocommons\src\main\php\managers\FilesManager;
+use org\turbodepot\src\main\php\managers\FilesManager;
 use org\turbocommons\src\main\php\utils\ArrayUtils;
 
 

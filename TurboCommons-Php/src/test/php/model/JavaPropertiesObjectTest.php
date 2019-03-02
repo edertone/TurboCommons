@@ -15,7 +15,7 @@ use Throwable;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use org\turbocommons\src\main\php\model\JavaPropertiesObject;
-use org\turbocommons\src\main\php\managers\FilesManager;
+use org\turbodepot\src\main\php\managers\FilesManager;
 
 
 /**

@@ -102,7 +102,9 @@ class LocalizationManager extends BaseStrictClass{
 
 
     /**
-     * A files manager instance used to load the data when paths are from file system
+     * A files manager instance used to load the data when paths are from file system.
+     *
+     * (Note that FilesManager class is part of the TurboDepot library)
      */
     private $_filesManager = null;
 
@@ -161,6 +163,7 @@ class LocalizationManager extends BaseStrictClass{
      *
      * @param pathsManager An instance of HTTPManager or FilesManager that will be used to load the provided paths. If we are working
      *        with paths that are urls, we will pass here an HTTPManager. If we are working with file system paths, we will pass a FilesManager.
+     *        (Note that FilesManager class is part of the TurboDepot library)
      * @param array $locales List of languages for which we want to load the translations. The list also defines the preferred
      *        translation order when a specified key is not found for a locale.
      * @param array $bundles A structure containing a list with the association between paths and their respective bundles.

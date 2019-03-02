@@ -16,13 +16,13 @@
     	    "copyrightHeaders": [
     	    	{
     	    		"path": "extras/copyright headers/TsFiles-Header.txt",
-    	    		"appliesTo": "src",
+    	    		"affectedPaths": ["src"],
     	    		"includes": ["ts"],
     	    		"excludes": []
     	    	},
     	    	{
     	    		"path": "extras/copyright headers/JsFiles-Header.txt",
-    	    		"appliesTo": "src",
+    	    		"affectedPaths": ["src"],
     	    		"includes": ["js"],
     	    		"excludes": []
     	    	}

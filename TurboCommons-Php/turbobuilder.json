@@ -15,13 +15,13 @@
         "filesContent" : {
             "tabsForbidden": {
                 "enabled": true,
-                "appliesTo": ["src", "extras"],
+                "affectedPaths": ["src", "extras"],
                 "excludes": [".svg", ".properties"]
             },
             "copyrightHeaders": [
                 {
                     "path": "extras/copyright headers/TurboCommons-Php.txt",
-                    "appliesTo": "src",
+                    "affectedPaths": ["src"],
                     "includes": ["php"],
                     "excludes": []
                 }
