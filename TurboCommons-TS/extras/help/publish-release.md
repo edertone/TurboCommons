@@ -7,7 +7,7 @@
 3 - Review git changelog to decide the new version value based on the GIT changes: minor, major, ...
 
 4 - Make sure the git tag is updated with the new project version we want to publish
-    (Either in git local and remote repos)
+    (First in remote GIT repo and then in our Local by performing a fetch)
 
 5 - Generate a release build executing tests (tb -crt)
 
