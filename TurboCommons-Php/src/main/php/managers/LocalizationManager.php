@@ -575,7 +575,8 @@ class LocalizationManager extends BaseStrictClass{
      * @see LocalizationManager::setPrimaryLocale()
      *
      * @param array $locales A list of locales to be moved to the beginning of the translation priority. First locales item will be the prefered
-     *              locale for translation, second will be the next one in case some key is not translated for the firs one and so.
+     *        locale for translation, second will be the next one in case some key is not translated for the first one and so. If any of the
+     *        specified locales is not currently loaded, an exception will happen.
      *
      * @return void
      */
@@ -602,7 +603,7 @@ class LocalizationManager extends BaseStrictClass{
      *
      * @param string $language A 2 digit language code that matches with any of the currently loaded locales, which will
      *        be moved to the first position of the loaded locales list. If the specified language does not match with
-     *        a locale that is not currently loaded, an exception will happen.
+     *        a locale that is currently loaded, an exception will happen.
      *
      * @return void
      */
@@ -627,7 +628,8 @@ class LocalizationManager extends BaseStrictClass{
      * @see LocalizationManager::setPrimaryLocale()
      * @see LocalizationManager::setPrimaryLanguage()
      *
-     * @param array $languages A list of 2 digit language codes to be moved to the beginning of the translation priority.
+     * @param array $languages A list of 2 digit language codes to be moved to the beginning of the translation priority. If any of the
+     *        specified languages does not match with a locale that is currently loaded, an exception will happen.
      *
      * @return void
      */
