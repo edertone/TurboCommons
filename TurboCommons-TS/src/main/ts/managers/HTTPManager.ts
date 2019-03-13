@@ -24,6 +24,15 @@ export class HTTPManager{
     
     
     /** 
+     * If we want to use relative urls on all the requests that are executed by this class, we can define here a root
+     * url. All the request urls will then be composed as baseUrl + requestUrl.
+     * 
+     * This property is useful when all the requests in our application share the same root url, which can be defined here.
+     */
+    baseUrl = '';
+    
+    
+    /** 
      * Defines if the http comunications made by this class will be synchronous (code execution will be stopped while 
      * waiting for the response) or asynchronous (execution flow will continue and response will be processed once received)
      * Note: Synchronous requests are normally NOT, NOT a good idea on client side languages 
@@ -307,7 +316,9 @@ export class HTTPManager{
      */
     urlExists(url:string, yesCallback: () => void, noCallback: () => void){
     
-        if(!StringUtils.isString(url)){
+        let composedUrl = this._composeUrl(this.baseUrl, url);
+        
+        if(!StringUtils.isString(composedUrl)){
 
             throw new Error('url must be a string');
         }
@@ -317,14 +328,14 @@ export class HTTPManager{
             throw new Error('params must be functions');
         }
 
-        if(!StringUtils.isUrl(url)){
+        if(!StringUtils.isUrl(composedUrl)){
 
             noCallback();
             
             return;
         }
         
-        let request = new HTTPManagerGetRequest(url);
+        let request = new HTTPManagerGetRequest(composedUrl);
         
         request.successCallback = () => yesCallback(); 
         request.errorCallback = () => noCallback();
@@ -349,7 +360,9 @@ export class HTTPManager{
                   successCallback: (headersArray:string[]) => void,
                   errorCallback: (errorMsg:string, errorCode:number) => void){
     
-        if(!StringUtils.isString(url)){
+        let composedUrl = this._composeUrl(this.baseUrl, url);
+        
+        if(!StringUtils.isString(composedUrl)){
 
             throw new Error('url must be a string');
         }
@@ -359,9 +372,9 @@ export class HTTPManager{
             throw new Error('params must be functions');
         }
 
-        if(!StringUtils.isUrl(url)){
+        if(!StringUtils.isUrl(composedUrl)){
 
-            throw new Error('invalid url ' + url);
+            throw new Error('invalid url ' + composedUrl);
         }
         
         let xmlHttprequest = new XMLHttpRequest();
@@ -371,7 +384,7 @@ export class HTTPManager{
             xmlHttprequest.timeout = this.timeout;
         }
         
-        xmlHttprequest.open('GET', url, this.asynchronous);
+        xmlHttprequest.open('GET', composedUrl, this.asynchronous);
         
         xmlHttprequest.onload = () => successCallback(xmlHttprequest.getAllResponseHeaders().split("\n"));
 
@@ -421,9 +434,14 @@ export class HTTPManager{
                                         errorCode:number = -1) => {
             
             let request = requestWithIndex.request;
+            let composedUrl = this._composeUrl(this.baseUrl, request.url);
             
             finishedCount ++;
-            finishedResults[requestWithIndex.index] = {url:request.url, response:response, isError:isError, errorMsg:errorMsg, errorCode:errorCode};
+            finishedResults[requestWithIndex.index] = {url:composedUrl,
+                                                       response:response,
+                                                       isError:isError,
+                                                       errorMsg:errorMsg,
+                                                       errorCode:errorCode};
             
             if(isError){
                 
@@ -439,7 +457,7 @@ export class HTTPManager{
             
             if(progressCallback !== null){
                 
-                progressCallback(request.url, requestsList.length);
+                progressCallback(composedUrl, requestsList.length);
             }
             
             if(finishedCount >= requestsList.length && finishedCallback !== null){
@@ -478,7 +496,7 @@ export class HTTPManager{
             // Detect the request type
             let requestType = requestsList[i] instanceof HTTPManagerGetRequest ? 'GET' : 'POST';
             
-            xmlHttprequest.open(requestType, requestsList[i].url, this.asynchronous);
+            xmlHttprequest.open(requestType, this._composeUrl(this.baseUrl, requestsList[i].url), this.asynchronous);
             
             xmlHttprequest.onload = () => {
             
@@ -703,21 +721,22 @@ export class HTTPManager{
     
     
     /**
-     * Given a url that contains a list of resources (files), this method will perform a request for each one of them and
-     * store the whole file contents inside an array. After all the process completes, the array containing all the loaded
-     * data will be available.
+     * Given a url with a list of resources (normally files), this method will perform a request for each one of them and
+     * store the whole file contents as an element of a result array. After all the process completes, the array containing all the loaded
+     * data will be available by the successCallback method.
      * 
-     * This method implements a technique that allows us to read a big list of files from an http server without needing to
-     * write much code. We simply put the files on the server, create a list with all the file names, and call this method.
-     * When the process succeeds, we will have all the files data loaded and ready to be used. We have also a progress callback
+     * This is a technique that allows us to read a big list of files from an http server without needing to
+     * write much code. We simply put the files on the server, create a list with all the file names, provide the base url for all the files,
+     * and call this method. When the process succeeds, we will have all the files data loaded and ready to be used. We have also a progress callback
      * that will notify us when each one of the files is correctly loaded.
      * 
-     * @param urlToResourcesList A url that contains the list of resources that will be loaded. It normally contains a list of file names
-     * @param basePath A url that will be used as the root for all the files of the list when the load is performed. This usually is the path
-     *                 to the folder that contains the files
+     * @param urlToListOfResources An url that gives us the list of resources to be loaded (normally a plain list of file names)
+     * @param baseUrl A url that will be used as the root for all the files of the list when the load is performed. This usually is the path
+     *                 to the url folder that contains the files. Each request to a file will be composed with this baseUrl + the respective entry of the file
+     *                 on urlToListOfResources
      * @param successCallback Executed once all the resources have been loaded. Two parameters will be passed to this method: An array with
-     *                        The list of resources as they are defined on the urlToResourcesList, and an array containing all the data for each
-     *                        one of the loaded resources. 
+     *                        The list of resources as they are defined on the urlToListOfResources, and an array containing all the data for each
+     *                        one of these resources. 
      * @param errorCallback Executed if a failure happens on any of the requests. The url that caused the error,
      *                      the error description and the error code will be passed to this method.
      * @param progressCallback Executed after each one of the resources is correctly loaded. A string with the correctly
@@ -725,37 +744,36 @@ export class HTTPManager{
      * 
      * @returns void
      */
-    loadResourcesFromList(urlToResourcesList: string,
-                          basePath: string,
+    loadResourcesFromList(urlToListOfResources: string,
+                          baseUrl: string,
                           successCallback: (resourcesList: string[], resourcesData: string[]) => void,
                           errorCallback: (errorUrl:string, errorMsg:string, errorCode:number) => void,
                           progressCallback: ((completedUrl: string) => void) | null = null){
         
-        if(!StringUtils.isString(urlToResourcesList) || StringUtils.isEmpty(urlToResourcesList)){
+        if(!StringUtils.isString(urlToListOfResources) || StringUtils.isEmpty(urlToListOfResources)){
             
-            throw new Error('urlToResourcesList must be a non empty string');
+            throw new Error('urlToListOfResources must be a non empty string');
         }
         
-        if(!StringUtils.isString(basePath) || StringUtils.isEmpty(basePath)){
+        if(!StringUtils.isString(baseUrl) || StringUtils.isEmpty(baseUrl)){
             
-            throw new Error('basePath must be a non empty string');
+            throw new Error('baseUrl must be a non empty string');
         }
         
-        this.execute(urlToResourcesList, (results, _anyError) => {
+        this.execute(urlToListOfResources, (results, _anyError) => {
             
             if(results[0].isError){
                 
-                return errorCallback(urlToResourcesList, results[0].errorMsg, results[0].errorCode);
+                return errorCallback(urlToListOfResources, results[0].errorMsg, results[0].errorCode);
             }
             
             let resourcesFullUrls: string[] = [];
-            let basePathWithSlash = basePath + ((basePath.charAt(basePath.length - 1) === '/') ? '' : '/');
-        
+            
             var resourcesList = StringUtils.getLines(results[0].response);
             
             for (var resource of resourcesList){
                 
-                resourcesFullUrls.push(StringUtils.formatPath(basePathWithSlash + resource, '/'));  
+                resourcesFullUrls.push(StringUtils.formatPath(this._composeUrl(baseUrl, resource), '/'));  
             }
             
             this.execute(resourcesFullUrls, (results, _anyError) => {
@@ -777,4 +795,24 @@ export class HTTPManager{
             }, progressCallback);
         });
     }
+    
+    
+    /**
+     * Auxiliary method to join two urls: A base one, and a relative one
+     * 
+     * If a full absolute url is passed to the relativeUrl variable, the result of this method will be the relative one, ignoring
+     * any possible value on baseUrl.
+     */
+    private _composeUrl(baseUrl: string, relativeUrl: string){
+        
+        if (StringUtils.isEmpty(baseUrl) ||
+            relativeUrl.substr(0, 5) === 'http:') {
+            
+            return relativeUrl;
+        }
+        
+        const result = StringUtils.formatPath(baseUrl + '/' + relativeUrl, '/');
+
+        return StringUtils.replace(result, ['http:/', 'https:/'], ['http://', 'https://'], 1);
+    }   
 }

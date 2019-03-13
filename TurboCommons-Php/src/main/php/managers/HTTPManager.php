@@ -27,6 +27,15 @@ class HTTPManager extends BaseStrictClass {
 
 
     /**
+     * If we want to use relative urls on all the requests that are executed by this class, we can define here a root
+     * url. All the request urls will then be composed as baseUrl + requestUrl.
+     *
+     * This property is useful when all the requests in our application share the same root url, which can be defined here.
+     */
+    public $baseUrl = '';
+
+
+    /**
      * Defines if the http comunications made by this class will be synchronous (code execution will be stopped while
      * waiting for the response) or asynchronous (execution flow will continue and response will be processed once received)
      * Note: Synchronous requests are normally NOT, NOT a good idea on client side languages
@@ -271,7 +280,9 @@ class HTTPManager extends BaseStrictClass {
      */
     public function urlExists($url, $yesCallback, $noCallback){
 
-        if(!StringUtils::isString($url)){
+        $composedUrl = $this->_composeUrl($this->baseUrl, $url);
+
+        if(!StringUtils::isString($composedUrl)){
 
             throw new UnexpectedValueException('url must be a string');
         }
@@ -281,14 +292,14 @@ class HTTPManager extends BaseStrictClass {
             throw new UnexpectedValueException('params must be functions');
         }
 
-        if(!StringUtils::isUrl($url)){
+        if(!StringUtils::isUrl($composedUrl)){
 
             $noCallback();
 
             return;
         }
 
-        $request = new HTTPManagerGetRequest($url);
+        $request = new HTTPManagerGetRequest($composedUrl);
 
         $request->successCallback = function () use ($yesCallback) { $yesCallback(); };
         $request->errorCallback = function () use ($noCallback) { $noCallback(); };
@@ -357,9 +368,14 @@ class HTTPManager extends BaseStrictClass {
                                                                       &$finishedCount, &$finishedAnyError, &$finishedResults) {
 
             $request = $requestWithIndex['request'];
+            $composedUrl = $this->_composeUrl($this->baseUrl, $request->url);
 
             $finishedCount ++;
-            $finishedResults[$requestWithIndex['index']] = ['url' => $request->url, 'response' => $response, 'isError' => $isError, 'errorMsg' => $errorMsg, 'errorCode' => $errorCode];
+            $finishedResults[$requestWithIndex['index']] = ['url' => $composedUrl,
+                                                            'response' => $response,
+                                                            'isError' => $isError,
+                                                            'errorMsg' => $errorMsg,
+                                                            'errorCode' => $errorCode];
 
             if($isError){
 
@@ -375,7 +391,7 @@ class HTTPManager extends BaseStrictClass {
 
             if($progressCallback !== null){
 
-                $progressCallback($request->url, $requestsListCount);
+                $progressCallback($composedUrl, $requestsListCount);
             }
 
             if($finishedCount >= count($requestsList) && $finishedCallback !== null){
@@ -401,7 +417,8 @@ class HTTPManager extends BaseStrictClass {
                 throw new UnexpectedValueException('url '.$i.' must be a non empty string');
             }
 
-            $curlInstances[$i] = curl_init($requestsList[$i]->url);
+            $curlInstances[$i] = curl_init($this->_composeUrl($this->baseUrl, $requestsList[$i]->url));
+
             curl_setopt($curlInstances[$i], CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curlInstances[$i], CURLOPT_FAILONERROR, true);
             curl_setopt($curlInstances[$i], CURLOPT_FOLLOWLOCATION, false);
@@ -536,6 +553,26 @@ class HTTPManager extends BaseStrictClass {
     public function loadResourcesFromList($todo){
 
         // TODO - translate from TS
+    }
+
+
+    /**
+     * Auxiliary method to join two urls: A base one, and a relative one
+     *
+     * If a full absolute url is passed to the relativeUrl variable, the result of this method will be the relative one, ignoring
+     * any possible value on baseUrl.
+     */
+    private function _composeUrl($baseUrl, $relativeUrl){
+
+        if (StringUtils::isEmpty($baseUrl) ||
+            substr($relativeUrl, 0, 5) === 'http:') {
+
+            return $relativeUrl;
+        }
+
+        $result = StringUtils::formatPath($baseUrl.'/'.$relativeUrl, '/');
+
+        return StringUtils::replace($result, ['http:/', 'https:/'], ['http://', 'https://'], 1);
     }
 }
 

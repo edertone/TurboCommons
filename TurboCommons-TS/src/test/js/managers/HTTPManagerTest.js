@@ -718,6 +718,48 @@ QUnit.test("execute - single HTTPManagerGetRequest without errors", function(ass
 /**
  * execute
  */
+QUnit.test("execute - single HTTPManagerGetRequest without errors and using baseUrl", function(assert){
+
+    var done = assert.async();
+    
+    var successCalled = false;
+    var errorCalled = false;
+    var finallyCalled = false;
+    
+    var request = new HTTPManagerGetRequest('file1.txt');
+    
+    request.successCallback = (response) => {
+        assert.strictEqual(response, 'text1');
+        successCalled = true;
+    }
+
+    request.errorCallback = (errorMsg, errorCode) => errorCalled = true;
+    
+    request.finallyCallback = () => finallyCalled = true;
+    
+    sut.baseUrl = basePath;
+    
+    sut.execute(request, function(results, anyError){
+
+        assert.strictEqual(successCalled, true);
+        assert.strictEqual(errorCalled, false);
+        assert.strictEqual(finallyCalled, true);
+        
+        assert.strictEqual(anyError, false);
+        assert.strictEqual(results[0].url, basePath + '/file1.txt');
+        assert.strictEqual(results[0].response, 'text1');
+        assert.strictEqual(results[0].isError, false);
+        assert.strictEqual(results[0].errorMsg, '');
+        assert.strictEqual(results[0].errorCode, -1);
+        done();
+    
+    });
+});
+
+
+/**
+ * execute
+ */
 QUnit.test("execute - multiple HTTPManagerGetRequest with errors", function(assert){
     
     var done = assert.async();
@@ -947,11 +989,11 @@ QUnit.test("loadResourcesFromList", function(assert){
         
         assert.throws(function() {
             sut.loadResourcesFromList(emptyValues[i], 'somepath');
-        }, /urlToResourcesList must be a non empty string/);
+        }, /urlToListOfResources must be a non empty string/);
         
         assert.throws(function() {
             sut.loadResourcesFromList('somepath', emptyValues[i]);
-        }, /basePath must be a non empty string/);
+        }, /baseUrl must be a non empty string/);
     } 
 
     // Test ok values

@@ -702,6 +702,47 @@ class HTTPManagerTest extends TestCase {
 
 
     /**
+     * testExecuteSingleHTTPManagerGetRequestWithoutErrorsAndUsingBaseUrl
+     *
+     * @return void
+     */
+    public function testExecuteSingleHTTPManagerGetRequestWithoutErrorsAndUsingBaseUrl(){
+
+        $successCalled = false;
+        $errorCalled = false;
+        $finallyCalled = false;
+
+        $request = new HTTPManagerGetRequest('HTTPManager.php');
+
+        $request->successCallback = function ($response) use (&$successCalled) {
+            $this->assertContains('class HTTPManager extends BaseStrictClass', $response);
+            $successCalled = true;
+        };
+
+        $request->errorCallback = function ($errorMsg, $errorCode) use (&$errorCalled) { $errorCalled = true; };
+
+        $request->finallyCallback = function () use (&$finallyCalled) { $finallyCalled = true; };
+
+        $this->sut->baseUrl = $this->basePath;
+
+        $this->sut->execute($request, function($results, $anyError) use (&$successCalled, &$errorCalled, &$finallyCalled) {
+
+            $this->assertSame($successCalled, true);
+            $this->assertSame($errorCalled, false);
+            $this->assertSame($finallyCalled, true);
+
+            $this->assertSame($anyError, false);
+            $this->assertSame($results[0]['url'], $this->basePath.'/HTTPManager.php');
+            $this->assertContains('class HTTPManager extends BaseStrictClass', $results[0]['response']);
+            $this->assertSame($results[0]['isError'], false);
+            $this->assertSame($results[0]['errorMsg'], '');
+            $this->assertSame($results[0]['errorCode'], -1);
+
+        });
+    }
+
+
+    /**
      * testTODO
      *
      * @return void
