@@ -51,6 +51,13 @@ class HTTPManager extends BaseStrictClass {
 
 
     /**
+     * If this flag is enabled, any request that is made by this service which uses http:// instead of https:// will throw
+     * an exception. When disabled, non secure http:// requests will be allowed
+     */
+    public $isOnlyHttps = true;
+
+
+    /**
      * Defines a list with internet urls that will be used to test network availability by the
      * isInternetAvailable() method. We mainly use globally available CDN urls, cause these are
      * not blocked by cross-orining policies on the browsers and are widely available and replicated.
@@ -280,9 +287,7 @@ class HTTPManager extends BaseStrictClass {
      */
     public function urlExists($url, $yesCallback, $noCallback){
 
-        $composedUrl = $this->_composeUrl($this->baseUrl, $url);
-
-        if(!StringUtils::isString($composedUrl)){
+        if(!StringUtils::isString($url)){
 
             throw new UnexpectedValueException('url must be a string');
         }
@@ -291,6 +296,8 @@ class HTTPManager extends BaseStrictClass {
 
             throw new UnexpectedValueException('params must be functions');
         }
+
+        $composedUrl = $this->_composeUrl($this->baseUrl, $url);
 
         if(!StringUtils::isUrl($composedUrl)){
 
@@ -564,15 +571,27 @@ class HTTPManager extends BaseStrictClass {
      */
     private function _composeUrl($baseUrl, $relativeUrl){
 
-        if (StringUtils::isEmpty($baseUrl) ||
-            substr($relativeUrl, 0, 5) === 'http:') {
+        $composedUrl = '';
 
-            return $relativeUrl;
+        if (StringUtils::isEmpty($baseUrl) ||
+            substr($relativeUrl, 0, 5) === 'http:' ||
+            substr($relativeUrl, 0, 6) === 'https:') {
+
+            $composedUrl = $relativeUrl;
+
+        } else {
+
+            $composedUrl = StringUtils::replace(StringUtils::formatPath($baseUrl.'/'.$relativeUrl, '/'),
+                ['http:/', 'https:/'],
+                ['http://', 'https://'], 1);
         }
 
-        $result = StringUtils::formatPath($baseUrl.'/'.$relativeUrl, '/');
+        if($this->isOnlyHttps && strtolower(substr($composedUrl, 0, 5)) === 'http:'){
 
-        return StringUtils::replace($result, ['http:/', 'https:/'], ['http://', 'https://'], 1);
+            throw new UnexpectedValueException('Non secure http requests are forbidden. Set isOnlyHttps=false to allow '.$composedUrl);
+        }
+
+        return $composedUrl;
     }
 }
 

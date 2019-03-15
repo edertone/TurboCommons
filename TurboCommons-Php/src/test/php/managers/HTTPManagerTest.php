@@ -440,6 +440,15 @@ class HTTPManagerTest extends TestCase {
         }
 
         // Test ok values
+        try {
+            $this->sut->urlExists($this->nonExistantUrl, function(){}, function(){});
+            $this->exceptionMessage = 'nonExistantUrl did not cause exception';
+        } catch (Throwable $e) {
+            $this->assertRegExp('/Non secure http requests are forbidden/', $e->getMessage());
+        }
+
+        $this->sut->isOnlyHttps = false;
+
         $this->sut->urlExists($this->existantUrl, function(){
 
             $this->assertTrue(true);
@@ -512,7 +521,9 @@ class HTTPManagerTest extends TestCase {
         });
 
         // Single url without error
-            $this->sut->execute($this->existantUrl, function($results, $anyError){
+        $this->sut->isOnlyHttps = false;
+
+        $this->sut->execute($this->existantUrl, function($results, $anyError){
 
             $this->assertTrue(!StringUtils::isEmpty($results[0]['response']));
             $this->assertTrue(strlen($results[0]['response']) > 5);

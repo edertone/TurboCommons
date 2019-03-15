@@ -46,6 +46,13 @@ export class HTTPManager{
      */
     timeout = 0;
     
+    
+    /** 
+     * If this flag is enabled, any request that is made by this service which uses http:// instead of https:// will throw
+     * an exception. When disabled, non secure http:// requests will be allowed
+     */
+    isOnlyHttps = true;
+    
 
     /** 
      * Defines a list with internet urls that will be used to test network availability by the 
@@ -316,9 +323,7 @@ export class HTTPManager{
      */
     urlExists(url:string, yesCallback: () => void, noCallback: () => void){
     
-        let composedUrl = this._composeUrl(this.baseUrl, url);
-        
-        if(!StringUtils.isString(composedUrl)){
+        if(!StringUtils.isString(url)){
 
             throw new Error('url must be a string');
         }
@@ -328,6 +333,8 @@ export class HTTPManager{
             throw new Error('params must be functions');
         }
 
+        let composedUrl = this._composeUrl(this.baseUrl, url);
+        
         if(!StringUtils.isUrl(composedUrl)){
 
             noCallback();
@@ -805,14 +812,26 @@ export class HTTPManager{
      */
     private _composeUrl(baseUrl: string, relativeUrl: string){
         
+        let composedUrl = '';
+        
         if (StringUtils.isEmpty(baseUrl) ||
-            relativeUrl.substr(0, 5) === 'http:') {
+            relativeUrl.substr(0, 5) === 'http:' ||
+            relativeUrl.substr(0, 6) === 'https:') {
             
-            return relativeUrl;
+            composedUrl = relativeUrl;
+        
+        } else {
+            
+            composedUrl = StringUtils.replace(StringUtils.formatPath(baseUrl + '/' + relativeUrl, '/'),
+                ['http:/', 'https:/'],
+                ['http://', 'https://'], 1);
         }
         
-        const result = StringUtils.formatPath(baseUrl + '/' + relativeUrl, '/');
-
-        return StringUtils.replace(result, ['http:/', 'https:/'], ['http://', 'https://'], 1);
+        if(this.isOnlyHttps && composedUrl.substr(0, 5).toLowerCase() === 'http:'){
+            
+            throw new Error('Non secure http requests are forbidden. Set isOnlyHttps=false to allow ' + composedUrl);
+        }
+        
+        return composedUrl;
     }   
 }

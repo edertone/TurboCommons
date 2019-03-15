@@ -350,6 +350,8 @@ QUnit.test("isInternetAvailable", function(assert){
     // Test ok values    
     var done = assert.async();
     
+    sut.isOnlyHttps = false;
+    
     sut.isInternetAvailable(function(){
         
         assert.ok(sut.internetCheckLocations.length === 3);
@@ -419,6 +421,12 @@ QUnit.test("urlExists", function(assert){
     // Test ok values    
     var done = assert.async(2);
     
+    assert.throws(function() {
+        sut.urlExists(nonExistantUrl, function(){}, function(){});
+    }, /Non secure http requests are forbidden/);
+    
+    sut.isOnlyHttps = false;
+    
     sut.urlExists(existantUrl, function(){
         
         assert.ok(true);
@@ -470,6 +478,12 @@ QUnit.test("getUrlHeaders", function(assert){
 
     // Test ok values
     var done = assert.async(2);
+    
+    assert.throws(function() {
+        sut.getUrlHeaders(browserManager.getCurrentUrl(), function(data){}, function(){});
+    }, /Non secure http requests are forbidden/);
+    
+    sut.isOnlyHttps = false;
     
     sut.getUrlHeaders(browserManager.getCurrentUrl(), function(data){
         
@@ -532,6 +546,8 @@ QUnit.test("execute - requests with string urls", function(assert){
     });
     
     // Single url without error
+    sut.isOnlyHttps = false;
+    
     sut.execute(existantUrl, function(results, anyError){
 
         assert.ok(!StringUtils.isEmpty(results[0].response));
@@ -999,6 +1015,8 @@ QUnit.test("loadResourcesFromList", function(assert){
     // Test ok values
     var done = assert.async(3);
 
+    sut.isOnlyHttps = false;
+    
     sut.loadResourcesFromList(basePath + '/files-list.txt', basePath, function(resourcesList, resourcesData){
 
         assert.strictEqual(resourcesList.length, 3);
