@@ -4,7 +4,7 @@ Devs around the world do the same things every day with different languages. The
 
 Why must they learn new ways of doing the same thing every time they move to a new language?
 
-TurboCommons tries to standarize all those common operations so they are performed the same way across all possible languages. It is a library that uses the same methods and classes across all the implemented languages.
+TurboCommons tries to standardize all those common operations so they are performed the same way across all possible languages. It is a library that uses the same methods and classes across all the implemented languages.
 
 ### Documentation
 
@@ -62,7 +62,7 @@ var n = StringUtils.countWords("word1 word2 word3");
 - Javascript 5
 - Javascript 6
 
-We want to increase this list. So! if you want to translate the library to your language of choice, please contact us and help us build the most standard cross language development library in the world! We're starting so we need your help to port this library to as many languages as possible, and more important, we need to code the SAME unit tests across all the implemented languages. This is the only way to guarantee that TurboCommons delivers exactly the same behaviour everywhere.
+We want to increase this list. So! if you want to translate the library to your language of choice, please contact us! We need your help to port this library to as many languages as possible, and more important, we need to code the SAME unit tests across all the implemented languages. This is the only way to guarantee that the library delivers exactly the same behavior everywhere.
 
 ### Dependencies
 
