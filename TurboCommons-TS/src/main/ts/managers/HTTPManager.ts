@@ -491,7 +491,7 @@ export class HTTPManager{
 
             } catch (e) {
 
-                throw new Error("Could not initialize XMLHttpRequest. If you are running node, it is not natively available. We recommend using the npm xhr2 library which emulates XMLHttpRequest for node apps");
+                throw new Error("Could not initialize XMLHttpRequest. If running node, it is not natively available. We recommend npm xhr2 library that emulates XMLHttpRequest on node apps (global.XMLHttpRequest = require('xhr2'))");
             }
             
             // Define the request timeout if specified on the request or the httpmanager class
