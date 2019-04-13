@@ -13,6 +13,20 @@
             "readmeFileMandatory": false
         },
         "filesContent" : {
+            "copyPasteDetect":[
+                {
+                    "path": "src/main",
+                    "maxPercentErrorLevel": 1,
+                    "maxPercentErrorDifference": 1,
+                    "report": "html"
+                },
+                {
+                    "path": "src/test",
+                    "maxPercentErrorLevel": 1,
+                    "maxPercentErrorDifference": 1,
+                    "report": "html"
+                }
+            ],
     	    "copyrightHeaders": [
     	    	{
     	    		"path": "extras/copyright headers/TsFiles-Header.txt",

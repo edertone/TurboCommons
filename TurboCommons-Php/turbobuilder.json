@@ -18,6 +18,20 @@
                 "affectedPaths": ["src", "extras"],
                 "excludes": [".svg", ".properties"]
             },
+            "copyPasteDetect":[
+                {
+                    "path": "src/main",
+                    "maxPercentErrorLevel": 0.5,
+                    "maxPercentErrorDifference": 1,
+                    "report": "html"
+                },
+                {
+                    "path": "src/test",
+                    "maxPercentErrorLevel": 3.5,
+                    "maxPercentErrorDifference": 1,
+                    "report": "html"
+                }
+            ],
             "copyrightHeaders": [
                 {
                     "path": "extras/copyright headers/TurboCommons-Php.txt",
