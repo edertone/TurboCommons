@@ -89,16 +89,22 @@ class LocalizationManager extends BaseStrictClass{
 
 
     /**
-     * Stores the latest path that's been used to read a localized value
-     * This is used by default when calling get without a path value
+     * Stores the label for the latest location that's been used to read a localized value
+     * This is used by default when calling get without a location value
      */
-    private $_activePath = '';
+    private $_activeLocation = '';
 
 
     /**
-     * Stores all the loaded localization data by path, bundle and locales
+     * Stores all the provided location definitions
      */
-    protected $_loadedData = [];
+    private $_definedLocations = [];
+
+
+    /**
+     * Stores all the loaded localization data by location name, locales, bundle and key
+     */
+    protected $_loadedTranslations = [];
 
 
     /**
@@ -156,55 +162,73 @@ class LocalizationManager extends BaseStrictClass{
 
 
     /**
-     * Performs the initial data load by looking for resource bundles on all the specified paths.
+     * Performs the initial data load by looking for resource bundles on all the specified locations.
      * All the translations will be loaded for each of the specified locales.
      *
      * Calling this method is mandatory before starting to use this class.
      *
-     * @param pathsManager An instance of HTTPManager or FilesManager that will be used to load the provided paths. If we are working
+     * @param mixed $locationsLoader An instance of HTTPManager or FilesManager that will be used to load the provided locations. If we are working
      *        with paths that are urls, we will pass here an HTTPManager. If we are working with file system paths, we will pass a FilesManager.
      *        (Note that FilesManager class is part of the TurboDepot library)
      * @param array $locales List of languages for which we want to load the translations. The list also defines the preferred
      *        translation order when a specified key is not found for a locale.
-     * @param array $bundles A structure containing a list with the association between paths and their respective bundles.
-     *        Each path is a relative or absolute string that defines a location where resourcebundles reside and must contain
-     *        wildcards to define how locales and bundles are structured:
+     * @param array $locations A list (sorted by preference) where each item defines a translations location and must have three properties:
+     *        - label: A name that will be used to reference the location
+     *        - path: A relative or absolute string that defines a location where resourcebundles reside. It must contain some wildcards:
      *          - $locale wildcard will be replaced by each specific locale when trying to reach a path
      *          - $bundle wildcard will be replaced by each specific bundle name when trying to reach a path
-     *
-     *          Example1: 'myFolder/$locale/$bundle.txt' will resolve to
-     *                    'myFolder/en_US/Customers.txt' when trying to load the Customers bundle for US english locale.
-     *
-     *          Example2: 'myFolder/$bundle_$locale.properties' will resolve to
-     *                    'myFolder/Customers_en_US.properties' when trying to load the Customers bundle for US english locale.
+     *              Example1: 'myFolder/$locale/$bundle.txt' will resolve to
+     *                        'myFolder/en_US/Customers.txt' when trying to load the Customers bundle for US english locale.
+     *              Example2: 'myFolder/$bundle_$locale.properties' will resolve to
+     *                        'myFolder/Customers_en_US.properties' when trying to load the Customers bundle for US english locale.
+     *        - bundles: The list of bundles to be loaded from the specified path
      * @param callable $finishedCallback A method that will be executed once the initialization ends. An errors variable will be passed
      *        to this method containing an array with information on errors that may have happened while loading the data.
      * @param callable $progressCallback A method that can be used to track the loading progress when lots of bundles and locales are used.
      *
      * @return void
      */
-    public function initialize($pathsManager,
-                               array $locales,
-                               array $bundles,
+    public function initialize($locationsLoader,
+                               $locales,
+                               $locations,
                                callable $finishedCallback = null,
-                               $progressCallback = null) {
+                               callable $progressCallback = null) {
 
-        if(StringUtils::getPathElement(get_class($pathsManager)) === 'HTTPManager'){
+        if(StringUtils::getPathElement(get_class($locationsLoader)) === 'HTTPManager'){
 
-            $this->_httpManager = $pathsManager;
+            $this->_httpManager = $locationsLoader;
 
         }else{
 
-            $this->_filesManager = $pathsManager;
+            $this->_filesManager = $locationsLoader;
         }
 
         $this->_locales = [];
         $this->_languages = [];
         $this->_activeBundle = '';
-        $this->_activePath = '';
-        $this->_loadedData = [];
+        $this->_activeLocation = '';
+        $this->_definedLocations = $locations;
+        $this->_loadedTranslations = [];
 
-        $this->_loadData($locales, $bundles, function ($errors) use ($finishedCallback) {
+        // Validate the locations are correctly defined
+        if(!ArrayUtils::isArray($locations) || count($locations) <= 0){
+
+            throw new UnexpectedValueException('Locations must be an array of objects');
+        }
+
+        foreach ($locations as $location) {
+
+            if(!isset($location['label']) || StringUtils::isEmpty($location['label']) ||
+               !isset($location['path']) || StringUtils::isEmpty($location['path']) ||
+               !isset($location['bundles']) || !ArrayUtils::isArray($location['bundles'])){
+
+                    throw new UnexpectedValueException('Invalid locations specified');
+            }
+        }
+
+        $this->_loadData($locales,
+            array_map(function ($l) {return ['label' => $l['label'], 'bundles' => $l['bundles']];}, $locations),
+            function ($errors) use ($finishedCallback) {
 
             $this->_initialized = true;
 
@@ -220,49 +244,39 @@ class LocalizationManager extends BaseStrictClass{
     /**
      * Adds extra locales to the end of the list of currently active locales and load its related translation data.
      *
-     * This method can only be called after the class has been initialized in case we need to add more translations. If any of the provided new locales
-     * is already loaded, its translation data will be refreshed
+     * This method can only be called after the class has been initialized in case we need to load the translations for more languages.
+     * If any of the provided new locales is already loaded, its translation data will be refreshed
      *
      * @param array $locales List of languages for which we want to load the translations. The list will be appended at the end of any previously
-     *        loaded locales and included in the preferred translation order.
+     *        loaded locales and included in the preferred translation order. The translation data will be loaded from all the currently defined locations.
      * @param callable $finishedCallback A method that will be executed once the load ends. An errors variable will be passed
      *        to this method containing an array with information on errors that may have happened while loading the data.
      * @param callable $progressCallback A method that can be used to track the loading progress when lots of bundles and locales are used.
      *
      * @return void
      */
-    public function loadLocales(array $locales, callable $finishedCallback = null, callable $progressCallback = null){
+    public function loadLocales(array $locales,
+                                callable $finishedCallback = null,
+                                callable $progressCallback = null){
 
         if(!$this->_initialized){
 
             throw new UnexpectedValueException('LocalizationManager not initialized. Call initialize() before loading more locales');
         }
 
-        $bundles = [];
-
-        foreach (array_keys($this->_loadedData) as $path) {
-
-            $bundleNames = [];
-
-            foreach ($this->_loadedData[$path] as $localeData) {
-
-                $bundleNames = array_merge($bundleNames, array_keys($localeData));
-            }
-
-            $bundles[] = ['path' => $path, 'bundles' => ArrayUtils::removeDuplicateElements($bundleNames)];
-        }
-
-        $this->_loadData($locales, $bundles, $finishedCallback, $progressCallback);
+        $this->_loadData($locales,
+            array_map(function ($l) {return ['label' => $l['label'], 'bundles' => $l['bundles']];}, $this->_definedLocations),
+            $finishedCallback,
+            $progressCallback);
     }
 
 
     /**
-     * Adds extra bundles to the currently loaded translation data
+     * Loads on the specified location the translation data for the specified bundles.
+     * This method can only be called after the class has been initialized in case we need to refresh or add more bundles to an already loaded location.
      *
-     * This method can only be called after the class has been initialized in case we need to add more bundles to the loaded translations.
-     *
-     * @param string $path The path where the extra bundles to load are located. See initialize method for information about the path format.
-     * @param array $bundles List of bundles to load from the specified path
+     * @param string $location The label for an already defined location. The extra bundles translation data will be added to the already loaded ones.
+     * @param array $bundles List of bundles to load from the specified location
      * @param callable $finishedCallback A method that will be executed once the load ends. An errors variable will be passed
      *        to this method containing an array with information on errors that may have happened while loading the data.
      * @param callable $progressCallback A method that can be used to track the loading progress when lots of bundles and locales are used.
@@ -271,35 +285,38 @@ class LocalizationManager extends BaseStrictClass{
      *
      * @return void
      */
-    public function loadBundles(string $path, array $bundles, callable $finishedCallback = null, callable $progressCallback = null){
+    public function loadBundles(string $location,
+                                array $bundles,
+                                callable $finishedCallback = null,
+                                callable $progressCallback = null){
 
         if(!ArrayUtils::isArray($bundles) || count($bundles) === 0){
 
-            throw new UnexpectedValueException('no bundles specified for path: '.$path);
+            throw new UnexpectedValueException('no bundles specified to load on '.$location.' location');
         }
 
         if(!$this->_initialized){
 
-            throw new UnexpectedValueException('LocalizationManager not initialized. Call initialize() before loading more bundles');
+            throw new UnexpectedValueException('LocalizationManager not initialized. Call initialize() before loading more bundles to a location');
         }
 
-        $this->_loadData($this->_locales, [['path' => $path, 'bundles' => $bundles]], $finishedCallback, $progressCallback);
+        $this->_loadData($this->_locales, [['label' => $location, 'bundles' => $bundles]], $finishedCallback, $progressCallback);
     }
 
 
     /**
-     * Auxiliary method used by the initialize and load methods to perform the data load for the locales and bundles
+     * Auxiliary method used to perform the translation data load
      *
      * @see LocalizationManager::initialize()
      *
      * @param array $locales List of locales to load
-     * @param array $bundles Information relative to paths and the bundles they contain
+     * @param array $locations A list of locations and respective bundles to be loaded
      * @param callable $finishedCallback A method that will be executed once the load ends. An errors variable will be passed
      *        to this method containing an array with information on errors that may have happened while loading the data.
      * @param callable $progressCallback Executed after each request is performed
      */
-    private function _loadData(array $locales,
-                               array $bundles,
+    private function _loadData($locales,
+                               $locations,
                                callable $finishedCallback = null,
                                callable $progressCallback = null){
 
@@ -308,29 +325,44 @@ class LocalizationManager extends BaseStrictClass{
             throw new UnexpectedValueException('no locales defined');
         }
 
-        if(!ArrayUtils::isArray($bundles) || count($bundles) <= 0){
-
-            throw new UnexpectedValueException('bundles must be an array of objects');
-        }
-
         // Generate the list of paths to be loaded
         $pathsToLoad = [];
         $pathsToLoadInfo = [];
 
-        foreach ($bundles as $data) {
+        foreach ($locations as $location) {
 
-            foreach ($data['bundles'] as $bundle) {
+            foreach ($location['bundles'] as $bundle) {
 
                 foreach ($locales as $locale) {
 
-                    $pathsToLoadInfo[] = ['locale' => $locale, 'bundle' => $bundle, 'path' => $data['path']];
+                    $locationFound = false;
 
-                    $pathsToLoad[] = StringUtils::replace($data['path'], ['$locale', '$bundle'], [$locale, $bundle]);
+                    foreach ($this->_definedLocations as $definedLocation) {
+
+                        if($definedLocation['label'] === $location['label']){
+
+                            $locationFound = true;
+
+                            $pathsToLoadInfo[] = ['locale' => $locale, 'bundle' => $bundle, 'location' => $location['label']];
+
+                            $pathsToLoad[] = StringUtils::replace($definedLocation['path'], ['$locale', '$bundle'], [$locale, $bundle]);
+
+                            break;
+                        }
+                    }
+
+                    if(!$locationFound){
+
+                        throw new UnexpectedValueException('Undefined location: '.$location['label']);
+                    }
                 }
             }
         }
 
         $this->_locales = array_merge($this->_locales, $locales);
+
+        $this->_locales = ArrayUtils::removeDuplicateElements($this->_locales);
+        $this->_languages = array_map(function ($l) {return substr($l, 0, 2);}, $this->_locales);
 
         if($this->_filesManager !== null){
 
@@ -356,9 +388,6 @@ class LocalizationManager extends BaseStrictClass{
                                         callable $finishedCallback = null,
                                         callable $progressCallback = null){
 
-        $this->_locales = ArrayUtils::removeDuplicateElements($this->_locales);
-        $this->_languages = array_map(function ($l) {return substr($l, 0, 2);}, $this->_locales);
-
         $errors = [];
 
         for ($i = 0, $l = count($pathsToLoad); $i < $l; $i++) {
@@ -369,20 +398,20 @@ class LocalizationManager extends BaseStrictClass{
 
                 $locale = $pathsToLoadInfo[$i]['locale'];
                 $bundle = $pathsToLoadInfo[$i]['bundle'];
-                $path = $pathsToLoadInfo[$i]['path'];
+                $location = $pathsToLoadInfo[$i]['location'];
                 $bundleFormat = StringUtils::getPathExtension($pathsToLoad[$i]);
 
-                if (!array_key_exists($path, $this->_loadedData)) {
+                if (!array_key_exists($location, $this->_loadedTranslations)) {
 
-                    $this->_loadedData[$path] = [];
+                    $this->_loadedTranslations[$location] = [];
                 }
 
-                if (!array_key_exists($locale, $this->_loadedData[$path])) {
+                if (!array_key_exists($locale, $this->_loadedTranslations[$location])) {
 
-                    $this->_loadedData[$path][$locale] = [];
+                    $this->_loadedTranslations[$location][$locale] = [];
                 }
 
-                $this->_loadedData[$path][$locale][$bundle] = $bundleFormat === 'json' ?
+                $this->_loadedTranslations[$location][$locale][$bundle] = $bundleFormat === 'json' ?
                 $this->parseJson($fileContents) :
                 $this->parseProperties($fileContents);
 
@@ -404,7 +433,7 @@ class LocalizationManager extends BaseStrictClass{
         if(count($pathsToLoadInfo) > 0){
 
             $this->_activeBundle = $pathsToLoadInfo[count($pathsToLoadInfo) - 1]['bundle'];
-            $this->_activePath = $pathsToLoadInfo[count($pathsToLoadInfo) - 1]['path'];
+            $this->_activeLocation = $pathsToLoadInfo[count($pathsToLoadInfo) - 1]['location'];
         }
 
         if($finishedCallback !== null){
@@ -517,14 +546,14 @@ class LocalizationManager extends BaseStrictClass{
      */
     public function setActiveBundle(string $bundle){
 
-        foreach (array_keys($this->_loadedData) as $path) {
+        foreach (array_keys($this->_loadedTranslations) as $location) {
 
-            foreach ($this->_loadedData[$path] as $localeData) {
+            foreach (array_keys($this->_loadedTranslations[$location]) as $locale) {
 
-                if(in_array($bundle, array_keys($localeData))){
+                if(in_array($bundle, array_keys($this->_loadedTranslations[$location][$locale]))){
 
                     $this->_activeBundle = $bundle;
-                    $this->_activePath = $path;
+                    $this->_activeLocation = $location;
                     return;
                 }
             }
@@ -678,14 +707,14 @@ class LocalizationManager extends BaseStrictClass{
 
 
     /**
-     * Get the translation for the given key, bundle and path
+     * Get the translation for the given key, bundle and location
      *
      * @param string $key The key we want to read from the specified resource bundle and path
      * @param string $bundle The name for the resource bundle file. If not specified, the value
      *        that was used on the inmediate previous call of this method will be used. This can save us lots of typing
      *        if we are reading multiple consecutive keys from the same bundle.
-     * @param string $path In case we have multiple bundles with the same name on different paths, we can set this parameter with
-     *        the path value to uniquely reference the bundle and resolve the conflict. If all of our bundles have different
+     * @param string $location In case we have multiple bundles with the same name on different locations, we can set this parameter with
+     *        the location label to uniquely reference the bundle and resolve the conflict. If all of our bundles have different
      *        names, this parameter can be ignored. Just like the bundle parameter, this one is remembered between get() calls.
      * @param mixed $toReplace A list of values that will replace the wildcards that are found on the translated text. Each wildcard
      *        will be replaced with the element whose index on the list matches it. Check the documentation for this.wildCardsFormat
@@ -693,17 +722,17 @@ class LocalizationManager extends BaseStrictClass{
      *
      * @return string The localized text
      */
-    public function get(string $key, string $bundle = '', string $path = '', $toReplace = []) {
+    public function get($key, string $bundle = '', string $location = '', $toReplace = []) {
 
         if(!$this->_initialized){
 
             throw new UnexpectedValueException('LocalizationManager not initialized. Call initialize() before requesting translated texts');
         }
 
-        // If no path specified, autodetect it or use the last one
-        if ($path === '') {
+        // If no location specified, autodetect it or use the last one
+        if ($location === '') {
 
-            $path = $this->_activePath;
+            $location = $this->_activeLocation;
         }
 
         // If no bundle is specified, the last one will be used
@@ -717,28 +746,28 @@ class LocalizationManager extends BaseStrictClass{
             $bundle = $this->_activeBundle;
         }
 
-        if (!in_array($path, array_keys($this->_loadedData))) {
+        if (!in_array($location, array_keys($this->_loadedTranslations))) {
 
-            throw new UnexpectedValueException('Path <'.$path.'> not loaded');
+            throw new UnexpectedValueException('Location <'.$location.'> not loaded');
         }
 
         // Loop all the locales to find the first one with a value for the specified key
         foreach ($this->_locales as $locale) {
 
-            if (in_array($locale, array_keys($this->_loadedData[$path]))) {
+            if (in_array($locale, array_keys($this->_loadedTranslations[$location]))) {
 
-                if (!in_array($bundle, array_keys($this->_loadedData[$path][$locale]))) {
+                if (!in_array($bundle, array_keys($this->_loadedTranslations[$location][$locale]))) {
 
                     throw new UnexpectedValueException('Bundle <'.$bundle.'> not loaded');
                 }
 
-                if(in_array($key, ObjectUtils::getKeys($this->_loadedData[$path][$locale][$bundle]))){
+                if(in_array($key, ObjectUtils::getKeys($this->_loadedTranslations[$location][$locale][$bundle]))){
 
                     // Store the specified bundle name and path as the lasts that have been used till now
                     $this->_activeBundle = $bundle;
-                    $this->_activePath = $path;
+                    $this->_activeLocation = $location;
 
-                    $result = $this->_loadedData[$path][$locale][$bundle]->$key;
+                    $result = $this->_loadedTranslations[$location][$locale][$bundle]->$key;
 
                     // Replace all wildcards on the text with the specified replacements if any
                     $replacements = is_String($toReplace) ? [$toReplace] : $toReplace;
@@ -757,7 +786,7 @@ class LocalizationManager extends BaseStrictClass{
 
         if (strpos($this->missingKeyFormat, '$exception') !== false) {
 
-            throw new UnexpectedValueException('key <'.$key.'> not found on '.$bundle.' - '.$path);
+            throw new UnexpectedValueException('key <'.$key.'> not found on '.$bundle.' - '.$location);
         }
 
         return StringUtils::replace($this->missingKeyFormat, '$key', $key);
@@ -773,9 +802,9 @@ class LocalizationManager extends BaseStrictClass{
      *
      * @returns string The localized and case formatted text
      */
-    public function getStartCase(string $key, string $bundle = '', string $path = '', $toReplace = []) {
+    public function getStartCase(string $key, string $bundle = '', string $location = '', $toReplace = []) {
 
-        return StringUtils::formatCase($this->get($key, $bundle, $path, $toReplace), StringUtils::FORMAT_START_CASE);
+        return StringUtils::formatCase($this->get($key, $bundle, $location, $toReplace), StringUtils::FORMAT_START_CASE);
     }
 
 
@@ -787,9 +816,9 @@ class LocalizationManager extends BaseStrictClass{
      *
      * @returns string The localized and case formatted text
      */
-    public function getAllUpperCase(string $key, string $bundle = '', string $path = '', $toReplace = []) {
+    public function getAllUpperCase(string $key, string $bundle = '', string $location = '', $toReplace = []) {
 
-        return StringUtils::formatCase($this->get($key, $bundle, $path, $toReplace), StringUtils::FORMAT_ALL_UPPER_CASE);
+        return StringUtils::formatCase($this->get($key, $bundle, $location, $toReplace), StringUtils::FORMAT_ALL_UPPER_CASE);
     }
 
 
@@ -801,9 +830,9 @@ class LocalizationManager extends BaseStrictClass{
      *
      * @returns string The localized and case formatted text
      */
-    public function getAllLowerCase(string $key, string $bundle = '', string $path = '', $toReplace = []) {
+    public function getAllLowerCase(string $key, string $bundle = '', string $location = '', $toReplace = []) {
 
-        return StringUtils::formatCase($this->get($key, $bundle, $path, $toReplace), StringUtils::FORMAT_ALL_LOWER_CASE);
+        return StringUtils::formatCase($this->get($key, $bundle, $location, $toReplace), StringUtils::FORMAT_ALL_LOWER_CASE);
     }
 
 
@@ -816,9 +845,9 @@ class LocalizationManager extends BaseStrictClass{
      *
      * @returns string The localized and case formatted text
      */
-    public function getFirstUpperRestLower(string $key, string $bundle = '', string $path = '', $toReplace = []){
+    public function getFirstUpperRestLower(string $key, string $bundle = '', string $location = '', $toReplace = []){
 
-        return StringUtils::formatCase($this->get($key, $bundle, $path, $toReplace), StringUtils::FORMAT_FIRST_UPPER_REST_LOWER);
+        return StringUtils::formatCase($this->get($key, $bundle, $location, $toReplace), StringUtils::FORMAT_FIRST_UPPER_REST_LOWER);
     }
 
 

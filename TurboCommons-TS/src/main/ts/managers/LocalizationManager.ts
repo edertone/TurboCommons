@@ -81,16 +81,22 @@ export class LocalizationManager {
     
     
     /**
-     * Stores the latest path that's been used to read a localized value
-     * This is used by default when calling get without a path value
+     * Stores the label for the latest location that's been used to read a localized value
+     * This is used by default when calling get without a location value
      */
-    private _activePath = '';
+    private _activeLocation = '';
     
     
     /**
-     * Stores all the loaded localization data by path, bundle and locales
+     * Stores all the provided location definitions
      */
-    protected _loadedData: {[path:string]: {[locale: string]: {[bundle: string]: {[key:string]: string}}}} = {};
+    private _definedLocations: {label: string, path: string, bundles: string[]}[] = [];
+
+    
+    /**
+     * Stores all the loaded localization data by location name, locales, bundle and key
+     */
+    protected _loadedTranslations: {[location:string]: {[locale: string]: {[bundle: string]: {[key:string]: string}}}} = {};
 
     
     /**
@@ -148,55 +154,73 @@ export class LocalizationManager {
     
     
     /**
-     * Performs the initial data load by looking for resource bundles on all the specified paths.
+     * Performs the initial data load by looking for resource bundles on all the specified locations.
      * All the translations will be loaded for each of the specified locales.
      * 
      * Calling this method is mandatory before starting to use this class.
      * 
-     * @param pathsManager An instance of HTTPManager or FilesManager that will be used to load the provided paths. If we are working
+     * @param locationsLoader An instance of HTTPManager or FilesManager that will be used to load the provided locations. If we are working
      *        with paths that are urls, we will pass here an HTTPManager. If we are working with file system paths, we will pass a FilesManager.
      *        (Note that FilesManager class is part of the TurboDepot library) 
      * @param locales List of languages for which we want to load the translations. The list also defines the preferred
      *        translation order when a specified key is not found for a locale.
-     * @param bundles A structure containing a list with the association between paths and their respective bundles.
-     *        Each path is a relative or absolute string that defines a location where resourcebundles reside and must contain
-     *        wildcards to define how locales and bundles are structured:
+     * @param locations A list (sorted by preference) where each item defines a translations location and must have three properties:
+     *        - label: A name that will be used to reference the location
+     *        - path: A relative or absolute string that defines a location where resourcebundles reside. It must contain some wildcards:
      *          - $locale wildcard will be replaced by each specific locale when trying to reach a path
      *          - $bundle wildcard will be replaced by each specific bundle name when trying to reach a path
-     *
-     *          Example1: 'myFolder/$locale/$bundle.txt' will resolve to
-     *                    'myFolder/en_US/Customers.txt' when trying to load the Customers bundle for US english locale.
-     *
-     *          Example2: 'myFolder/$bundle_$locale.properties' will resolve to
-     *                    'myFolder/Customers_en_US.properties' when trying to load the Customers bundle for US english locale.
+     *              Example1: 'myFolder/$locale/$bundle.txt' will resolve to
+     *                        'myFolder/en_US/Customers.txt' when trying to load the Customers bundle for US english locale.
+     *              Example2: 'myFolder/$bundle_$locale.properties' will resolve to
+     *                        'myFolder/Customers_en_US.properties' when trying to load the Customers bundle for US english locale.
+     *        - bundles: The list of bundles to be loaded from the specified path
      * @param finishedCallback A method that will be executed once the initialization ends. An errors variable will be passed
      *        to this method containing an array with information on errors that may have happened while loading the data.
      * @param progressCallback A method that can be used to track the loading progress when lots of bundles and locales are used.
      * 
      * @return void
      */
-    initialize(pathsManager:any,
+    initialize(locationsLoader:any,
                locales: string[],
-               bundles: {path: string, bundles: string[]}[],
+               locations: {label: string, path: string, bundles: string[]}[],
                finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void) | null = null,
                progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null) {
 
-        if(pathsManager as HTTPManager){
+        if(locationsLoader as HTTPManager){
             
-            this._httpManager = pathsManager;
+            this._httpManager = locationsLoader;
         
         }else{
             
-            this._filesManager = pathsManager;
+            this._filesManager = locationsLoader;
         }
         
         this._locales = [];
         this._languages = [];
         this._activeBundle = '';
-        this._activePath = '';
-        this._loadedData = {};
+        this._activeLocation = '';
+        this._definedLocations = locations;
+        this._loadedTranslations = {};
         
-        this._loadData(locales, bundles, (errors) => {
+        // Validate the locations are correctly defined
+        if(!ArrayUtils.isArray(locations) || locations.length <= 0){
+            
+            throw new Error('Locations must be an array of objects');
+        }
+        
+        for (let location of locations) {
+
+            if(!location.label || StringUtils.isEmpty(location.label) ||
+               !location.path || StringUtils.isEmpty(location.path) ||
+               !location.bundles || !ArrayUtils.isArray(location.bundles)){
+                
+                throw new Error('Invalid locations specified');
+            }
+        }
+
+        this._loadData(locales,
+            locations.map((l:any) => {return {label: l.label, bundles: l.bundles}}),
+            (errors) => {
             
             this._initialized = true;
             
@@ -212,11 +236,11 @@ export class LocalizationManager {
     /**
      * Adds extra locales to the end of the list of currently active locales and load its related translation data.
      *
-     * This method can only be called after the class has been initialized in case we need to add more translations. If any of the provided new locales
-     * is already loaded, its translation data will be refreshed
+     * This method can only be called after the class has been initialized in case we need to load the translations for more languages.
+     * If any of the provided new locales is already loaded, its translation data will be refreshed
      *
      * @param locales List of languages for which we want to load the translations. The list will be appended at the end of any previously
-     *        loaded locales and included in the preferred translation order.
+     *        loaded locales and included in the preferred translation order. The translation data will be loaded from all the currently defined locations.
      * @param finishedCallback A method that will be executed once the load ends. An errors variable will be passed
      *        to this method containing an array with information on errors that may have happened while loading the data.
      * @param progressCallback A method that can be used to track the loading progress when lots of bundles and locales are used.
@@ -232,31 +256,19 @@ export class LocalizationManager {
             throw new Error('LocalizationManager not initialized. Call initialize() before loading more locales');
         }
         
-        let bundles:any[] = [];
-        
-        for (let path of Object.keys(this._loadedData)) {
-
-            let bundleNames:string[] = [];
-
-            for (let locale of Object.keys(this._loadedData[path])) {
-            
-                bundleNames = bundleNames.concat(Object.keys(this._loadedData[path][locale]));
-            }
-
-            bundles.push({path: path, bundles: ArrayUtils.removeDuplicateElements(bundleNames)});
-        }
-        
-        this._loadData(locales, bundles, finishedCallback, progressCallback);   
+        this._loadData(locales,
+                this._definedLocations.map((l:any) => {return {label: l.label, bundles: l.bundles}}),
+                finishedCallback,
+                progressCallback);   
     }
     
     
     /**
-     * Adds extra bundles to the currently loaded translation data
+     * Loads on the specified location the translation data for the specified bundles.
+     * This method can only be called after the class has been initialized in case we need to refresh or add more bundles to an already loaded location.
      * 
-     * This method can only be called after the class has been initialized in case we need to add more bundles to the loaded translations.
-     * 
-     * @param path The path where the extra bundles to load are located. See initialize method for information about the path format.
-     * @param bundles List of bundles to load from the specified path
+     * @param location The label for an already defined location. The extra bundles translation data will be added to the already loaded ones.
+     * @param bundles List of bundles to load from the specified location
      * @param finishedCallback A method that will be executed once the load ends. An errors variable will be passed
      *        to this method containing an array with information on errors that may have happened while loading the data.
      * @param progressCallback A method that can be used to track the loading progress when lots of bundles and locales are used.
@@ -265,38 +277,38 @@ export class LocalizationManager {
      * 
      * @return void
      */
-    loadBundles(path: string,
+    loadBundles(location: string,
                 bundles: string[],
                 finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void) | null = null,
                 progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null){
         
         if(!ArrayUtils.isArray(bundles) || bundles.length === 0){
 
-            throw new Error('no bundles specified for path: ' + path);
+            throw new Error('no bundles specified to load on ' + location + ' location');
         }
         
         if(!this._initialized){
             
-            throw new Error('LocalizationManager not initialized. Call initialize() before loading more bundles');
+            throw new Error('LocalizationManager not initialized. Call initialize() before loading more bundles to a location');
         }
 
-        this._loadData(this._locales, [{path: path, bundles: bundles}], finishedCallback, progressCallback);   
+        this._loadData(this._locales, [{label: location, bundles: bundles}], finishedCallback, progressCallback);   
     }
     
     
     /**
-     * Auxiliary method used by the initialize and load methods to perform the data load for the locales and bundles
+     * Auxiliary method used to perform the translation data load
      * 
      * @see this.initialize()
      * 
      * @param locales List of locales to load
-     * @param bundles Information relative to paths and the bundles they contain
+     * @param locations A list of locations and respective bundles to be loaded
      * @param finishedCallback A method that will be executed once the load ends. An errors variable will be passed
      *        to this method containing an array with information on errors that may have happened while loading the data.
      * @param progressCallback Executed after each request is performed
      */
     private _loadData(locales: string[],
-                      bundles: {path: string, bundles: string[]}[],
+                      locations: {label: string, bundles: string[]}[],
                       finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void) | null = null,
                       progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null){
         
@@ -305,29 +317,44 @@ export class LocalizationManager {
             throw new Error('no locales defined');
         }
         
-        if(!ArrayUtils.isArray(bundles) || bundles.length <= 0){
-            
-            throw new Error('bundles must be an array of objects');
-        }
-        
         // Generate the list of paths to be loaded
         let pathsToLoad: string[] = [];
         let pathsToLoadInfo: any[] = [];
         
-        for (let data of bundles) {
+        for (let location of locations) {
     
-            for (let bundle of data.bundles){
+            for (let bundle of location.bundles){
                 
                 for (let locale of locales) {
                     
-                    pathsToLoadInfo.push({locale: locale, bundle: bundle, path: data.path});
+                    let locationFound = false;
                     
-                    pathsToLoad.push(StringUtils.replace(data.path, ['$locale', '$bundle'], [locale, bundle]));
+                    for (let definedLocation of this._definedLocations) {
+                        
+                        if(definedLocation.label === location.label){
+                            
+                            locationFound = true;
+                            
+                            pathsToLoadInfo.push({locale: locale, bundle: bundle, location: location.label});
+                            
+                            pathsToLoad.push(StringUtils.replace(definedLocation.path, ['$locale', '$bundle'], [locale, bundle]));
+                            
+                            break;
+                        }
+                    }
+                    
+                    if(!locationFound){
+                        
+                        throw new Error('Undefined location: ' + location.label);
+                    }
                 }
             }
         }
         
         this._locales = this._locales.concat(locales);
+        
+        this._locales = ArrayUtils.removeDuplicateElements(this._locales);
+        this._languages = this._locales.map(l => l.substr(0, 2));
         
         if(this._filesManager !== null){
             
@@ -371,16 +398,13 @@ export class LocalizationManager {
                               finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void) | null = null,
                               progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null){
         
-        this._locales = ArrayUtils.removeDuplicateElements(this._locales);
-        this._languages = this._locales.map(l => l.substr(0, 2));
-        
         // Aux method to execute when data load is done
         let processWhenDone = (errors: {path:string, errorMsg:string, errorCode:number}[] = []) => {
             
             if(pathsToLoadInfo.length > 0){
                 
                 this._activeBundle = pathsToLoadInfo[pathsToLoadInfo.length - 1].bundle;
-                this._activePath = pathsToLoadInfo[pathsToLoadInfo.length - 1].path;
+                this._activeLocation = pathsToLoadInfo[pathsToLoadInfo.length - 1].location;
             }
 
             if(finishedCallback !== null){
@@ -413,20 +437,20 @@ export class LocalizationManager {
                     
                     let locale = pathsToLoadInfo[i].locale;
                     let bundle = pathsToLoadInfo[i].bundle;
-                    let path = pathsToLoadInfo[i].path;
+                    let location = pathsToLoadInfo[i].location;
                     let bundleFormat = StringUtils.getPathExtension(pathsToLoad[i]);
 
-                    if (!this._loadedData.hasOwnProperty(path)) {
+                    if (!this._loadedTranslations.hasOwnProperty(location)) {
 
-                        this._loadedData[path] = {};
+                        this._loadedTranslations[location] = {};
                     }
                     
-                    if (!this._loadedData[path].hasOwnProperty(locale)) {
+                    if (!this._loadedTranslations[location].hasOwnProperty(locale)) {
 
-                        this._loadedData[path][locale] = {};
+                        this._loadedTranslations[location][locale] = {};
                     }
                     
-                    this._loadedData[path][locale][bundle] = bundleFormat === 'json' ?
+                    this._loadedTranslations[location][locale][bundle] = bundleFormat === 'json' ?
                             this.parseJson(results[i].response) :
                             this.parseProperties(results[i].response);
                 }
@@ -529,14 +553,14 @@ export class LocalizationManager {
      */
     setActiveBundle(bundle: string){
 
-        for (let path of Object.keys(this._loadedData)) {
+        for (let location of Object.keys(this._loadedTranslations)) {
             
-            for (let locale of Object.keys(this._loadedData[path])) {
+            for (let locale of Object.keys(this._loadedTranslations[location])) {
             
-                if(Object.keys(this._loadedData[path][locale]).indexOf(bundle) >= 0){
+                if(Object.keys(this._loadedTranslations[location][locale]).indexOf(bundle) >= 0){
                     
                     this._activeBundle = bundle;
-                    this._activePath = path;
+                    this._activeLocation = location;
                     return;
                 }
             }
@@ -700,14 +724,14 @@ export class LocalizationManager {
     
     
     /**
-     * Get the translation for the given key, bundle and path
+     * Get the translation for the given key, bundle and location
      *
      * @param key The key we want to read from the specified resource bundle and path
      * @param bundle The name for the resource bundle file. If not specified, the value
      *        that was used on the inmediate previous call of this method will be used. This can save us lots of typing
      *        if we are reading multiple consecutive keys from the same bundle.
-     * @param path In case we have multiple bundles with the same name on different paths, we can set this parameter with
-     *        the path value to uniquely reference the bundle and resolve the conflict. If all of our bundles have different
+     * @param location In case we have multiple bundles with the same name on different locations, we can set this parameter with
+     *        the location label to uniquely reference the bundle and resolve the conflict. If all of our bundles have different
      *        names, this parameter can be ignored. Just like the bundle parameter, this one is remembered between get() calls.
      * @param toReplace A list of values that will replace the wildcards that are found on the translated text. Each wildcard
      *        will be replaced with the element whose index on the list matches it. Check the documentation for this.wildCardsFormat
@@ -715,17 +739,17 @@ export class LocalizationManager {
      * 
      * @returns The localized text
      */
-    get(key: string, bundle = '', path = '', toReplace: string|string[] = []) {
+    get(key: string, bundle = '', location = '', toReplace: string|string[] = []) {
 
         if(!this._initialized){
             
             throw new Error('LocalizationManager not initialized. Call initialize() before requesting translated texts');
         }
         
-        // If no path specified, autodetect it or use the last one
-        if (path === '') {
+        // If no location specified, autodetect it or use the last one
+        if (location === '') {
 
-            path = this._activePath;
+            location = this._activeLocation;
         }
 
         // If no bundle is specified, the last one will be used
@@ -739,28 +763,28 @@ export class LocalizationManager {
             bundle = this._activeBundle;
         }
         
-        if (Object.keys(this._loadedData).indexOf(path) === -1) {
+        if (Object.keys(this._loadedTranslations).indexOf(location) === -1) {
 
-            throw new Error('Path <' + path + '> not loaded');
+            throw new Error('Location <' + location + '> not loaded');
         }
         
         // Loop all the locales to find the first one with a value for the specified key
         for (const locale of this._locales) {
 
-            if (Object.keys(this._loadedData[path]).indexOf(locale) >= 0) {
+            if (Object.keys(this._loadedTranslations[location]).indexOf(locale) >= 0) {
 
-                if (Object.keys(this._loadedData[path][locale]).indexOf(bundle) === -1) {
+                if (Object.keys(this._loadedTranslations[location][locale]).indexOf(bundle) === -1) {
 
                     throw new Error('Bundle <' + bundle + '> not loaded');
                 }
                 
-                if(Object.keys(this._loadedData[path][locale][bundle]).indexOf(key) >= 0){
+                if(Object.keys(this._loadedTranslations[location][locale][bundle]).indexOf(key) >= 0){
 
                     // Store the specified bundle name and path as the lasts that have been used till now
                     this._activeBundle = bundle;
-                    this._activePath = path;
+                    this._activeLocation = location;
                     
-                    let result = this._loadedData[path][locale][bundle][key];
+                    let result = this._loadedTranslations[location][locale][bundle][key];
                     
                     // Replace all wildcards on the text with the specified replacements if any
                     let replacements = StringUtils.isString(toReplace) ? [String(toReplace)] : toReplace;
@@ -779,7 +803,7 @@ export class LocalizationManager {
 
         if (this.missingKeyFormat.indexOf('$exception') >= 0) {
 
-            throw new Error('key <' + key + '> not found on ' + bundle + ' - ' + path);
+            throw new Error('key <' + key + '> not found on ' + bundle + ' - ' + location);
         }
 
         return this.missingKeyFormat.replace('$key', key);
@@ -795,9 +819,9 @@ export class LocalizationManager {
      *
      * @returns The localized and case formatted text
      */
-    getStartCase(key: string, bundle = '', path = '', toReplace: string|string[] = []) {
+    getStartCase(key: string, bundle = '', location = '', toReplace: string|string[] = []) {
 
-        return StringUtils.formatCase(this.get(key, bundle, path, toReplace), StringUtils.FORMAT_START_CASE);
+        return StringUtils.formatCase(this.get(key, bundle, location, toReplace), StringUtils.FORMAT_START_CASE);
     }
 
 
@@ -809,9 +833,9 @@ export class LocalizationManager {
      *
      * @returns The localized and case formatted text
      */
-    getAllUpperCase(key: string, bundle = '', path = '', toReplace: string|string[] = []) {
+    getAllUpperCase(key: string, bundle = '', location = '', toReplace: string|string[] = []) {
 
-        return StringUtils.formatCase(this.get(key, bundle, path, toReplace), StringUtils.FORMAT_ALL_UPPER_CASE);
+        return StringUtils.formatCase(this.get(key, bundle, location, toReplace), StringUtils.FORMAT_ALL_UPPER_CASE);
     }
 
 
@@ -823,9 +847,9 @@ export class LocalizationManager {
      *
      * @returns The localized and case formatted text
      */
-    getAllLowerCase(key: string, bundle = '', path = '', toReplace: string|string[] = []) {
+    getAllLowerCase(key: string, bundle = '', location = '', toReplace: string|string[] = []) {
 
-        return StringUtils.formatCase(this.get(key, bundle, path, toReplace), StringUtils.FORMAT_ALL_LOWER_CASE);
+        return StringUtils.formatCase(this.get(key, bundle, location, toReplace), StringUtils.FORMAT_ALL_LOWER_CASE);
     }
     
     
@@ -838,9 +862,9 @@ export class LocalizationManager {
      *
      * @returns The localized and case formatted text
      */
-    getFirstUpperRestLower(key: string, bundle = '', path = '', toReplace: string|string[] = []){
+    getFirstUpperRestLower(key: string, bundle = '', location = '', toReplace: string|string[] = []){
         
-        return StringUtils.formatCase(this.get(key, bundle, path, toReplace), StringUtils.FORMAT_FIRST_UPPER_REST_LOWER);
+        return StringUtils.formatCase(this.get(key, bundle, location, toReplace), StringUtils.FORMAT_FIRST_UPPER_REST_LOWER);
     }
 
 
