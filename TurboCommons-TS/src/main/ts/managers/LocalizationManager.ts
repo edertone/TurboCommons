@@ -267,8 +267,9 @@ export class LocalizationManager {
      * Loads on the specified location the translation data for the specified bundles.
      * This method can only be called after the class has been initialized in case we need to refresh or add more bundles to an already loaded location.
      * 
-     * @param location The label for an already defined location. The extra bundles translation data will be added to the already loaded ones.
      * @param bundles List of bundles to load from the specified location
+     * @param location The label for an already defined location. The extra bundles translation data will be added to the already loaded ones. If not defined,
+     *        the current active location will be used.
      * @param finishedCallback A method that will be executed once the load ends. An errors variable will be passed
      *        to this method containing an array with information on errors that may have happened while loading the data.
      * @param progressCallback A method that can be used to track the loading progress when lots of bundles and locales are used.
@@ -277,8 +278,8 @@ export class LocalizationManager {
      * 
      * @return void
      */
-    loadBundles(location: string,
-                bundles: string[],
+    loadBundles(bundles: string[],
+                location = '',
                 finishedCallback: ((errors: {path:string, errorMsg:string, errorCode:number}[]) => void) | null = null,
                 progressCallback: ((completedUrl: string, totalUrls: number) => void) | null = null){
         
@@ -292,6 +293,12 @@ export class LocalizationManager {
             throw new Error('LocalizationManager not initialized. Call initialize() before loading more bundles to a location');
         }
 
+        // If no location specified, use the active one
+        if (location === '') {
+
+            location = this._activeLocation;
+        }
+        
         this._loadData(this._locales, [{label: location, bundles: bundles}], finishedCallback, progressCallback);   
     }
     
@@ -356,6 +363,11 @@ export class LocalizationManager {
         this._locales = ArrayUtils.removeDuplicateElements(this._locales);
         this._languages = this._locales.map(l => l.substr(0, 2));
         
+        if(this._activeLocation === ''){
+            
+            this._activeLocation = locations[locations.length - 1].label;
+        }
+        
         if(this._filesManager !== null){
             
             // TODO this._loadDataFromFiles(pathsToLoad, pathsToLoadInfo, finishedCallback, progressCallback);
@@ -404,7 +416,6 @@ export class LocalizationManager {
             if(pathsToLoadInfo.length > 0){
                 
                 this._activeBundle = pathsToLoadInfo[pathsToLoadInfo.length - 1].bundle;
-                this._activeLocation = pathsToLoadInfo[pathsToLoadInfo.length - 1].location;
             }
 
             if(finishedCallback !== null){
@@ -746,7 +757,7 @@ export class LocalizationManager {
             throw new Error('LocalizationManager not initialized. Call initialize() before requesting translated texts');
         }
         
-        // If no location specified, autodetect it or use the last one
+        // If no location specified, use the active one
         if (location === '') {
 
             location = this._activeLocation;
@@ -780,7 +791,7 @@ export class LocalizationManager {
                 
                 if(Object.keys(this._loadedTranslations[location][locale][bundle]).indexOf(key) >= 0){
 
-                    // Store the specified bundle name and path as the lasts that have been used till now
+                    // Store the specified bundle name and location as the lasts that have been used till now
                     this._activeBundle = bundle;
                     this._activeLocation = location;
                     

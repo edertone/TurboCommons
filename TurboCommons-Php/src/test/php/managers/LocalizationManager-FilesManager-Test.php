@@ -554,7 +554,7 @@ class LocalizationManagerTest extends TestCase {
     public function testLoadBundles_empty_values(){
 
         try {
-            $this->sut->loadBundles('somelocation', []);
+            $this->sut->loadBundles([], 'somelocation');
             $this->exceptionMessage = 'somelocation did not cause exception';
         } catch (Throwable $e) {
             $this->assertRegExp('/no bundles specified to load on somelocation location/', $e->getMessage());
@@ -567,7 +567,7 @@ class LocalizationManagerTest extends TestCase {
         ]];
 
         try {
-            $this->sut->loadBundles('test-loadBundles', $locations[0]['bundles']);
+            $this->sut->loadBundles($locations[0]['bundles'], 'test-loadBundles');
             $this->exceptionMessage = 'test-loadBundles did not cause exception';
         } catch (Throwable $e) {
             $this->assertRegExp('/LocalizationManager not initialized/', $e->getMessage());
@@ -608,11 +608,37 @@ class LocalizationManagerTest extends TestCase {
 
         $this->sut->initialize(new FilesManager(), ['en_US'], $locations, function($errors){
 
-            $this->sut->loadBundles('test-loadBundles', ['MoreLocales'], function($errors){
+            $this->sut->loadBundles(['MoreLocales'], 'test-loadBundles', function($errors){
 
                 $this->assertSame(count($errors), 0);
                 $this->assertSame(count($this->sut->locales()), 1);
                 $this->assertSame($this->sut->locales()[0], 'en_US');
+            });
+        });
+    }
+
+
+    /**
+     * testLoadBundles_after_init_location_without_bundles
+     *
+     * @return void
+     */
+    public function testLoadBundles_after_init_location_without_bundles(){
+
+        $locations = [[
+            'label' => 'test-loadBundles',
+            'path' => $this->basePath.'/test-loadBundles/$locale/$bundle.json',
+            'bundles' => []
+        ]];
+
+        $this->sut->initialize(new FilesManager(), ['en_US'], $locations, function($errors){
+
+            $this->sut->loadBundles(['Locales'], '', function($errors){
+
+                $this->assertSame(count($errors), 0);
+                $this->assertSame(count($this->sut->locales()), 1);
+                $this->assertSame($this->sut->locales()[0], 'en_US');
+                $this->assertSame($this->sut->get('LOGIN'), 'Login');
             });
         });
     }
@@ -636,7 +662,7 @@ class LocalizationManagerTest extends TestCase {
         $this->assertSame(count($this->sut->locales()), 1);
         $this->assertSame($this->sut->locales()[0], 'en_US');
 
-        $this->sut->loadBundles('test-loadBundles', ['MoreLocales']);
+        $this->sut->loadBundles(['MoreLocales'], 'test-loadBundles');
 
         $this->assertSame(count($this->sut->locales()), 1);
         $this->assertSame($this->sut->locales()[0], 'en_US');
@@ -658,13 +684,13 @@ class LocalizationManagerTest extends TestCase {
 
         $this->sut->initialize(new FilesManager(), ['en_US'], $locations, function($errors){
 
-            $this->sut->loadBundles('test-loadBundles', ['nonexistant'], function($errors){
+            $this->sut->loadBundles(['nonexistant'], 'test-loadBundles', function($errors){
 
                 $this->assertSame(count($errors), 1);
             });
 
             try {
-                $this->sut->loadBundles('nonexistant', ['MoreLocales'], function($errors){});
+                $this->sut->loadBundles(['MoreLocales'], 'nonexistant', function($errors){});
                 $this->exceptionMessage = 'nonexistant did not cause exception';
             } catch (Throwable $e) {
                 $this->assertRegExp('/Undefined location: nonexistant/', $e->getMessage());

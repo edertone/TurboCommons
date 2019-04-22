@@ -452,7 +452,7 @@ QUnit.test("loadLocales-duplicate-locales", function(assert){
 QUnit.test("loadBundles-empty-values", function(assert){
 
     assert.throws(function() {
-        sut.loadBundles('somelocation', []);
+        sut.loadBundles([], 'somelocation');
     }, /no bundles specified to load on somelocation location/);
     
     var done = assert.async(1);
@@ -464,7 +464,7 @@ QUnit.test("loadBundles-empty-values", function(assert){
     }];
     
     assert.throws(function() {
-        sut.loadBundles('test-loadBundles', locations[0].bundles);
+        sut.loadBundles(locations[0].bundles, 'test-loadBundles');
     }, /LocalizationManager not initialized/);
     
     sut.initialize(new HTTPManager(), ['en_US'], locations, function(errors){
@@ -501,11 +501,38 @@ QUnit.test("loadBundles-ok-values", function(assert){
     
     sut.initialize(new HTTPManager(), ['en_US'], locations, function(errors){
 
-        sut.loadBundles('test-loadBundles', ['MoreLocales'], function(errors){
+        sut.loadBundles(['MoreLocales'], 'test-loadBundles', function(errors){
 
             assert.strictEqual(errors.length, 0);
             assert.strictEqual(sut.locales().length, 1);
             assert.strictEqual(sut.locales()[0], 'en_US');  
+            done();        
+        });
+    }); 
+});
+
+
+/**
+ * loadBundles-after-init-location-without-bundles
+ */
+QUnit.test("loadBundles-after-init-location-without-bundles", function(assert){
+    
+    var done = assert.async(1);
+    
+    var locations = [{
+        label: 'test-loadBundles',
+        path: window.basePath + '/test-loadBundles/$locale/$bundle.json',
+        bundles: []
+    }];
+    
+    sut.initialize(new HTTPManager(), ['en_US'], locations, function(errors){
+
+        sut.loadBundles(['Locales'], '', function(errors){
+
+            assert.strictEqual(errors.length, 0);
+            assert.strictEqual(sut.locales().length, 1);
+            assert.strictEqual(sut.locales()[0], 'en_US');  
+            assert.strictEqual(sut.get('LOGIN'), 'Login');
             done();        
         });
     }); 
@@ -538,7 +565,7 @@ QUnit.test("loadBundles-nonexistant-bundles-or-locations", function(assert){
     
     sut.initialize(new HTTPManager(), ['en_US'], locations, function(errors){
 
-        sut.loadBundles('test-loadBundles', ['nonexistant'], function(errors){
+        sut.loadBundles(['nonexistant'], 'test-loadBundles', function(errors){
 
             assert.strictEqual(errors.length, 1);
             done();
@@ -546,7 +573,7 @@ QUnit.test("loadBundles-nonexistant-bundles-or-locations", function(assert){
         
         assert.throws(function() {
             
-            sut.loadBundles('nonexistant', ['MoreLocales'], function(errors){});
+            sut.loadBundles(['MoreLocales'], 'nonexistant', function(errors){});
             
         }, /Undefined location: nonexistant/);
     }); 

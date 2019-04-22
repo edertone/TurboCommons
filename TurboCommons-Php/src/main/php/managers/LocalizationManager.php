@@ -275,8 +275,9 @@ class LocalizationManager extends BaseStrictClass{
      * Loads on the specified location the translation data for the specified bundles.
      * This method can only be called after the class has been initialized in case we need to refresh or add more bundles to an already loaded location.
      *
-     * @param string $location The label for an already defined location. The extra bundles translation data will be added to the already loaded ones.
      * @param array $bundles List of bundles to load from the specified location
+     * @param string $location The label for an already defined location. The extra bundles translation data will be added to the already loaded ones. If not defined,
+     *        the current active location will be used.
      * @param callable $finishedCallback A method that will be executed once the load ends. An errors variable will be passed
      *        to this method containing an array with information on errors that may have happened while loading the data.
      * @param callable $progressCallback A method that can be used to track the loading progress when lots of bundles and locales are used.
@@ -285,8 +286,8 @@ class LocalizationManager extends BaseStrictClass{
      *
      * @return void
      */
-    public function loadBundles(string $location,
-                                array $bundles,
+    public function loadBundles(array $bundles,
+                                string $location = '',
                                 callable $finishedCallback = null,
                                 callable $progressCallback = null){
 
@@ -298,6 +299,12 @@ class LocalizationManager extends BaseStrictClass{
         if(!$this->_initialized){
 
             throw new UnexpectedValueException('LocalizationManager not initialized. Call initialize() before loading more bundles to a location');
+        }
+
+        // If no location specified, use the active one
+        if ($location === '') {
+
+            $location = $this->_activeLocation;
         }
 
         $this->_loadData($this->_locales, [['label' => $location, 'bundles' => $bundles]], $finishedCallback, $progressCallback);
@@ -316,7 +323,7 @@ class LocalizationManager extends BaseStrictClass{
      * @param callable $progressCallback Executed after each request is performed
      */
     private function _loadData($locales,
-                               $locations,
+                               array $locations,
                                callable $finishedCallback = null,
                                callable $progressCallback = null){
 
@@ -363,6 +370,11 @@ class LocalizationManager extends BaseStrictClass{
 
         $this->_locales = ArrayUtils::removeDuplicateElements($this->_locales);
         $this->_languages = array_map(function ($l) {return substr($l, 0, 2);}, $this->_locales);
+
+        if($this->_activeLocation === ''){
+
+            $this->_activeLocation = $locations[count($locations) - 1]['label'];
+        }
 
         if($this->_filesManager !== null){
 
@@ -433,7 +445,6 @@ class LocalizationManager extends BaseStrictClass{
         if(count($pathsToLoadInfo) > 0){
 
             $this->_activeBundle = $pathsToLoadInfo[count($pathsToLoadInfo) - 1]['bundle'];
-            $this->_activeLocation = $pathsToLoadInfo[count($pathsToLoadInfo) - 1]['location'];
         }
 
         if($finishedCallback !== null){
@@ -729,7 +740,7 @@ class LocalizationManager extends BaseStrictClass{
             throw new UnexpectedValueException('LocalizationManager not initialized. Call initialize() before requesting translated texts');
         }
 
-        // If no location specified, autodetect it or use the last one
+        // If no location specified, use the active one
         if ($location === '') {
 
             $location = $this->_activeLocation;
@@ -763,7 +774,7 @@ class LocalizationManager extends BaseStrictClass{
 
                 if(in_array($key, ObjectUtils::getKeys($this->_loadedTranslations[$location][$locale][$bundle]))){
 
-                    // Store the specified bundle name and path as the lasts that have been used till now
+                    // Store the specified bundle name and location as the lasts that have been used till now
                     $this->_activeBundle = $bundle;
                     $this->_activeLocation = $location;
 
