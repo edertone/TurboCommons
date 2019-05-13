@@ -54,6 +54,8 @@ export abstract class HTTPManagerBaseRequest{
     
     /**
      * A method to be executed always when the request finishes, even successfully or with an error.
+     * (This will be the very last method to be executed, allways after success or error callbacks).
+     *
      * The callback function must have the following signature:
      * () => void
      */
