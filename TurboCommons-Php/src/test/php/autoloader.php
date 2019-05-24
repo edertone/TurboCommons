@@ -11,7 +11,7 @@
 
 
 require_once __DIR__.'/../../main/php/autoloader.php';
-require_once __DIR__.'/../../test/php/libs/turbodepot-php-0.0.0.phar';
+require_once __DIR__.'/../../test/php/libs/turbodepot-php-3.1.0.phar';
 
 
 // Register the autoload method that will locate and automatically load the library classes
