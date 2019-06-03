@@ -727,7 +727,7 @@ class LocalizationManager extends BaseStrictClass{
      * @param string $location In case we have multiple bundles with the same name on different locations, we can set this parameter with
      *        the location label to uniquely reference the bundle and resolve the conflict. If all of our bundles have different
      *        names, this parameter can be ignored. Just like the bundle parameter, this one is remembered between get() calls.
-     * @param mixed $toReplace A list of values that will replace the wildcards that are found on the translated text. Each wildcard
+     * @param string|array $toReplace A list of values that will replace the wildcards that are found on the translated text. Each wildcard
      *        will be replaced with the element whose index on the list matches it. Check the documentation for this.wildCardsFormat
      *        property to know more about how to setup wildcards.
      *
