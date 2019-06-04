@@ -615,10 +615,11 @@ class StringUtils {
      *
      * @param string $path A string containing some arbitrary path.
      * @param int $elementsToRemove (one by default) The number of elements that we want to remove from the right side of the path.
+     * @param string $separator The character to use as the element divider for the returned path. Only slash '/' or backslash '\' are allowed.
      *
-     * @retur string The received path without the specified number of elements
+     * @return string The received path without the specified number of elements and correctly formatted
      */
-    public static function getPath($path, int $elementsToRemove = 1){
+    public static function getPath($path, int $elementsToRemove = 1, string $separator = '/'){
 
         if(StringUtils::isEmpty($path)){
 
@@ -626,6 +627,11 @@ class StringUtils {
         }
 
         $path = StringUtils::formatPath($path, '/');
+
+        if($path === '/'){
+
+            return $path;
+        }
 
         $processedPath = (strpos($path, '/') === 0) ? substr($path, 1) : $path;
 
@@ -649,7 +655,7 @@ class StringUtils {
             return $path;
         }
 
-        return StringUtils::formatPath(substr($path, 0, max(0, strlen($path) - strlen(implode('/', $arrayToRemove)) - 1)), '/');
+        return StringUtils::formatPath(substr($path, 0, max(0, strlen($path) - strlen(implode('/', $arrayToRemove)) - 1)), $separator);
     }
 
 
@@ -919,16 +925,10 @@ class StringUtils {
      *
      * @param string $path A raw path to be formatted
      * @param string $separator The character to use as the element divider. Only slash '/' or backslash '\' are allowed.
-     *                          if not specified, the current OS separator will be used when possible.
      *
      * @return string The correctly formatted path without any trailing separator
      */
-    public static function formatPath($path, string $separator = DIRECTORY_SEPARATOR){
-
-        if($path === null){
-
-            return '';
-        }
+    public static function formatPath($path, string $separator = '/'){
 
         if(!is_string($path)){
 
@@ -950,10 +950,12 @@ class StringUtils {
             $path = str_replace($separator.$separator, $separator, $path);
         }
 
-        // Remove the last separator only if it exists
-        if(substr($path, strlen($path) - 1) == $separator){
+        // Remove the last separator only if it exists and is not the only character of the path
+        $pathLen = strlen($path);
 
-            $path = substr($path, 0, strlen($path) - 1);
+        if($pathLen > 1 && substr($path, $pathLen - 1) === $separator){
+
+            $path = substr($path, 0, $pathLen - 1);
         }
 
         return $path;

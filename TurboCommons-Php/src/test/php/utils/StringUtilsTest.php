@@ -706,7 +706,13 @@ class StringUtilsTest extends TestCase {
     public function testCountPathElements(){
 
         // Test empty values
-        $this->assertSame(StringUtils::countPathElements(null), 0);
+        try {
+            StringUtils::countPathElements(null);
+            $this->exceptionMessage = 'null did not cause exception';
+        } catch (Throwable $e) {
+            $this->assertRegExp('/path must be a string/', $e->getMessage());
+        }
+
         $this->assertSame(StringUtils::countPathElements(''), 0);
         $this->assertSame(StringUtils::countPathElements('       '), 1);
 
@@ -900,9 +906,9 @@ class StringUtilsTest extends TestCase {
         // Test ok values
 
         // With 0 elements removed
-        $this->assertSame(StringUtils::getPath('/', 0), '');
-        $this->assertSame(StringUtils::getPath('///////', 0), '');
-        $this->assertSame(StringUtils::getPath('\\', 0), '');
+        $this->assertSame(StringUtils::getPath('/', 0), '/');
+        $this->assertSame(StringUtils::getPath('///////', 0), '/');
+        $this->assertSame(StringUtils::getPath('\\', 0), '/');
         $this->assertSame(StringUtils::getPath('c:/', 0), 'c:');
         $this->assertSame(StringUtils::getPath('c:/', 0), 'c:');
         $this->assertSame(StringUtils::getPath('c:\\', 0), 'c:');
@@ -916,9 +922,9 @@ class StringUtilsTest extends TestCase {
         $this->assertSame(StringUtils::getPath('https://www.google.es/search?q=zero+latency', 0), 'https:/www.google.es/search?q=zero+latency');
 
         // With 1 element removed
-        $this->assertSame(StringUtils::getPath('/', 1), '');
-        $this->assertSame(StringUtils::getPath('///////', 1), '');
-        $this->assertSame(StringUtils::getPath('\\', 1), '');
+        $this->assertSame(StringUtils::getPath('/', 1), '/');
+        $this->assertSame(StringUtils::getPath('///////', 1), '/');
+        $this->assertSame(StringUtils::getPath('\\', 1), '/');
         $this->assertSame(StringUtils::getPath('c:/', 1), '');
         $this->assertSame(StringUtils::getPath('c:/', 1), '');
         $this->assertSame(StringUtils::getPath('c:\\', 1), '');
@@ -937,9 +943,9 @@ class StringUtilsTest extends TestCase {
         $this->assertSame(StringUtils::getPath('https://www.google.es/search?q=zero+latency', 1), 'https:/www.google.es');
 
         // With 2 element removed
-        $this->assertSame(StringUtils::getPath('/', 2), '');
-        $this->assertSame(StringUtils::getPath('///////', 2), '');
-        $this->assertSame(StringUtils::getPath('\\', 2), '');
+        $this->assertSame(StringUtils::getPath('/', 2), '/');
+        $this->assertSame(StringUtils::getPath('///////', 2), '/');
+        $this->assertSame(StringUtils::getPath('\\', 2), '/');
         $this->assertSame(StringUtils::getPath('c:/', 2), '');
         $this->assertSame(StringUtils::getPath('c:/', 2), '');
         $this->assertSame(StringUtils::getPath('c:\\', 2), '');
@@ -958,9 +964,9 @@ class StringUtilsTest extends TestCase {
         $this->assertSame(StringUtils::getPath('https://www.google.es/search?q=zero+latency', 2), 'https:');
 
         // With many element removed
-        $this->assertSame(StringUtils::getPath('/', 3), '');
-        $this->assertSame(StringUtils::getPath('///////', 4), '');
-        $this->assertSame(StringUtils::getPath('\\', 5), '');
+        $this->assertSame(StringUtils::getPath('/', 3), '/');
+        $this->assertSame(StringUtils::getPath('///////', 4), '/');
+        $this->assertSame(StringUtils::getPath('\\', 5), '/');
         $this->assertSame(StringUtils::getPath('c:/', 10), '');
         $this->assertSame(StringUtils::getPath('c:/', 20), '');
         $this->assertSame(StringUtils::getPath('c:\\', 40), '');
@@ -1206,6 +1212,9 @@ class StringUtilsTest extends TestCase {
         $this->assertTrue(StringUtils::getPathExtension([]) === '');
 
         // Test ok values
+        $this->assertTrue(StringUtils::getPathExtension('/') === '');
+        $this->assertTrue(StringUtils::getPathExtension('////') === '');
+        $this->assertTrue(StringUtils::getPathExtension('/a') === '');
         $this->assertTrue(StringUtils::getPathExtension('C:\Program Files\\CCleaner') == '');
         $this->assertTrue(StringUtils::getPathExtension('C:\Program Files\\CCleaner\\CCleaner64.exe') == 'exe');
         $this->assertTrue(StringUtils::getPathExtension('\\Files/CCleaner/CCleaner64.exe') == 'exe');
@@ -1547,7 +1556,13 @@ class StringUtilsTest extends TestCase {
     public function testFormatPath(){
 
         // Test empty values
-        $this->assertSame(StringUtils::formatPath(null), '');
+        try {
+            StringUtils::formatPath(null);
+            $this->exceptionMessage = 'null did not cause exception';
+        } catch (Throwable $e) {
+            $this->assertRegExp('/path must be a string/', $e->getMessage());
+        }
+
         $this->assertSame(StringUtils::formatPath(''), '');
         $this->assertSame(StringUtils::formatPath('       '), '       ');
         $this->assertSame(StringUtils::formatPath("\n\n\n\n"), "\n\n\n\n");
@@ -1588,23 +1603,34 @@ class StringUtilsTest extends TestCase {
         }
 
         // Test ok values
-        $this->assertSame(StringUtils::formatPath('test//test/'), 'test'.DIRECTORY_SEPARATOR.'test');
-        $this->assertSame(StringUtils::formatPath('////test//////test////'), DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'test');
-        $this->assertSame(StringUtils::formatPath('\\\\////test//test/'), DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'test');
-        $this->assertSame(StringUtils::formatPath('test\\test/hello\\\\'), 'test'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'hello');
-        $this->assertSame(StringUtils::formatPath('someutf8_//转注字\\\\轉注/字'), 'someutf8_'.DIRECTORY_SEPARATOR.'转注字'.DIRECTORY_SEPARATOR.'轉注'.DIRECTORY_SEPARATOR.'字');
+        $this->assertSame('/', StringUtils::formatPath('/'));
+        $this->assertSame('/a', StringUtils::formatPath('/a'));
+        $this->assertSame('/', StringUtils::formatPath('///////'));
+        $this->assertSame(StringUtils::formatPath('test//test/'), 'test/test');
+        $this->assertSame(StringUtils::formatPath('////test//////test////'), '/test/test');
+        $this->assertSame(StringUtils::formatPath('\\\\////test//test/'), '/test/test');
+        $this->assertSame(StringUtils::formatPath('test\\test/hello\\\\'), 'test/test/hello');
+        $this->assertSame(StringUtils::formatPath('someutf8_//转注字\\\\轉注/字'), 'someutf8_/转注字/轉注/字');
 
-        $this->assertSame(StringUtils::formatPath('test//test', '/'), 'test'.'/'.'test');
-        $this->assertSame(StringUtils::formatPath('////test//////test', '/'), '/'.'test'.'/'.'test');
-        $this->assertSame(StringUtils::formatPath('\\\\////test//test', '/'), '/'.'test'.'/'.'test');
+        $this->assertSame(StringUtils::formatPath('test//test', '/'), 'test/test');
+        $this->assertSame(StringUtils::formatPath('////test//////test', '/'), '/test/test');
+        $this->assertSame(StringUtils::formatPath('\\\\////test//test', '/'), '/test/test');
         $this->assertSame(StringUtils::formatPath('C:\\Users///someuser\\git\\\\project/newProject', '/'), 'C:/Users/someuser/git/project/newProject');
         $this->assertSame(StringUtils::formatPath('someutf8_//转注字\\\\轉注/字', '/'), 'someutf8_/转注字/轉注/字');
 
-        $this->assertSame(StringUtils::formatPath('test//test/', '\\'), 'test'.'\\'.'test');
-        $this->assertSame(StringUtils::formatPath('////test//////test////', '\\'), '\\'.'test'.'\\'.'test');
-        $this->assertSame(StringUtils::formatPath('\\\\////test//test/', '\\'), '\\'.'test'.'\\'.'test');
+        $this->assertSame(StringUtils::formatPath('test//test/', '\\'), 'test\\test');
+        $this->assertSame(StringUtils::formatPath('////test//////test////', '\\'), '\\test\\test');
+        $this->assertSame(StringUtils::formatPath('\\\\////test//test/', '\\'), '\\test\\test');
         $this->assertSame(StringUtils::formatPath('C:\\Users///someuser\\git\\\\project/newProject', '\\'), 'C:\\Users\\someuser\\git\\project\\newProject');
         $this->assertSame(StringUtils::formatPath('someutf8_//转注字\\\\轉注/字', '\\'), 'someutf8_\\转注字\\轉注\\字');
+
+        $this->assertSame('\\', StringUtils::formatPath('/', '\\'));
+        $this->assertSame('\\a', StringUtils::formatPath('/a', '\\'));
+        $this->assertSame('\\', StringUtils::formatPath('///////', '\\'));
+        $this->assertSame('test\\test', StringUtils::formatPath('test//test/', '\\'));
+        $this->assertSame('\\test\\test', StringUtils::formatPath('\\\\////test//test/', '\\'));
+        $this->assertSame('test\\test\\hello', StringUtils::formatPath('test\\test/hello\\\\', '\\'));
+        $this->assertSame('someutf8_\\转注字\\轉注\\字', StringUtils::formatPath('someutf8_//转注字\\\\轉注/字', '\\'));
 
         // Test wrong values
         $this->assertSame(StringUtils::formatPath('!"(&%"·$|||'), '!"(&%"·$|||');

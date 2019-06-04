@@ -529,7 +529,10 @@ QUnit.test("countWords", function(assert) {
 QUnit.test("testCountPathElements", function(assert) {
 
     // Test empty values
-    assert.strictEqual(StringUtils.countPathElements(null), 0);
+    assert.throws(function() {
+        StringUtils.countPathElements(null);
+    }, /path must be a string/);
+    
     assert.strictEqual(StringUtils.countPathElements(''), 0);
     assert.strictEqual(StringUtils.countPathElements('       '), 1);
     
@@ -718,9 +721,9 @@ QUnit.test("getPath", function(assert) {
     // Test ok values
     
     // With 0 elements removed
-    assert.strictEqual(StringUtils.getPath('/', 0), '');
-    assert.strictEqual(StringUtils.getPath('///////', 0), '');
-    assert.strictEqual(StringUtils.getPath('\\', 0), '');
+    assert.strictEqual(StringUtils.getPath('/', 0), '/');
+    assert.strictEqual(StringUtils.getPath('///////', 0), '/');
+    assert.strictEqual(StringUtils.getPath('\\', 0), '/');
     assert.strictEqual(StringUtils.getPath('c:/', 0), 'c:');
     assert.strictEqual(StringUtils.getPath('c:/', 0), 'c:');
     assert.strictEqual(StringUtils.getPath('c:\\', 0), 'c:');
@@ -734,9 +737,9 @@ QUnit.test("getPath", function(assert) {
     assert.strictEqual(StringUtils.getPath('https://www.google.es/search?q=zero+latency', 0), 'https:/www.google.es/search?q=zero+latency');
     
     // With 1 element removed
-    assert.strictEqual(StringUtils.getPath('/', 1), '');
-    assert.strictEqual(StringUtils.getPath('///////', 1), '');
-    assert.strictEqual(StringUtils.getPath('\\', 1), '');
+    assert.strictEqual(StringUtils.getPath('/', 1), '/');
+    assert.strictEqual(StringUtils.getPath('///////', 1), '/');
+    assert.strictEqual(StringUtils.getPath('\\', 1), '/');
     assert.strictEqual(StringUtils.getPath('c:/', 1), '');
     assert.strictEqual(StringUtils.getPath('c:/', 1), '');
     assert.strictEqual(StringUtils.getPath('c:\\', 1), '');
@@ -755,9 +758,9 @@ QUnit.test("getPath", function(assert) {
     assert.strictEqual(StringUtils.getPath('https://www.google.es/search?q=zero+latency', 1), 'https:/www.google.es');
     
     // With 2 element removed
-    assert.strictEqual(StringUtils.getPath('/', 2), '');
-    assert.strictEqual(StringUtils.getPath('///////', 2), '');
-    assert.strictEqual(StringUtils.getPath('\\', 2), '');
+    assert.strictEqual(StringUtils.getPath('/', 2), '/');
+    assert.strictEqual(StringUtils.getPath('///////', 2), '/');
+    assert.strictEqual(StringUtils.getPath('\\', 2), '/');
     assert.strictEqual(StringUtils.getPath('c:/', 2), '');
     assert.strictEqual(StringUtils.getPath('c:/', 2), '');
     assert.strictEqual(StringUtils.getPath('c:\\', 2), '');
@@ -776,9 +779,9 @@ QUnit.test("getPath", function(assert) {
     assert.strictEqual(StringUtils.getPath('https://www.google.es/search?q=zero+latency', 2), 'https:');
 
     // With many element removed
-    assert.strictEqual(StringUtils.getPath('/', 3), '');
-    assert.strictEqual(StringUtils.getPath('///////', 4), '');
-    assert.strictEqual(StringUtils.getPath('\\', 5), '');
+    assert.strictEqual(StringUtils.getPath('/', 3), '/');
+    assert.strictEqual(StringUtils.getPath('///////', 4), '/');
+    assert.strictEqual(StringUtils.getPath('\\', 5), '/');
     assert.strictEqual(StringUtils.getPath('c:/', 10), '');
     assert.strictEqual(StringUtils.getPath('c:/', 20), '');
     assert.strictEqual(StringUtils.getPath('c:\\', 40), '');
@@ -973,6 +976,9 @@ QUnit.test("getPathExtension", function(assert) {
     assert.ok(StringUtils.getPathExtension([]) === '');
 
     // Test ok values
+    assert.ok(StringUtils.getPathExtension('/') === '');
+    assert.ok(StringUtils.getPathExtension('////') === '');
+    assert.ok(StringUtils.getPathExtension('/a') === '');
     assert.ok(StringUtils.getPathExtension('C:\Program Files\\CCleaner') == '');
     assert.ok(StringUtils.getPathExtension('C:\Program Files\\CCleaner\\CCleaner64.exe') == 'exe');
     assert.ok(StringUtils.getPathExtension('\\Files/CCleaner/CCleaner64.exe') == 'exe');
@@ -1236,10 +1242,11 @@ QUnit.test("formatCase", function(assert) {
  */
 QUnit.test("formatPath", function(assert) {
 
-    var osSeparator = '/';
-    
     // Test empty values
-    assert.strictEqual(StringUtils.formatPath(null), '');
+    assert.throws(function() {
+        StringUtils.formatPath(null);
+    }, /path must be a string/);
+    
     assert.strictEqual(StringUtils.formatPath(''), '');
     assert.strictEqual(StringUtils.formatPath('       '), '       ');
     assert.strictEqual(StringUtils.formatPath("\n\n\n\n"), "\n\n\n\n");
@@ -1265,23 +1272,34 @@ QUnit.test("formatPath", function(assert) {
     }, /separator must be a slash or backslash/);
 
     // Test ok values
-    assert.strictEqual(StringUtils.formatPath('test//test/'), 'test' + osSeparator + 'test');
-    assert.strictEqual(StringUtils.formatPath('////test//////test////'), osSeparator + 'test' + osSeparator + 'test');
-    assert.strictEqual(StringUtils.formatPath('\\\\////test//test/'), osSeparator + 'test' + osSeparator + 'test');
-    assert.strictEqual(StringUtils.formatPath('test\\test/hello\\\\'), 'test' + osSeparator + 'test' + osSeparator + 'hello');
-    assert.strictEqual(StringUtils.formatPath('someutf8_//转注字\\\\轉注/字'), 'someutf8_' + osSeparator + '转注字' + osSeparator + '轉注' + osSeparator + '字');
+    assert.strictEqual('/', StringUtils.formatPath('/'));
+    assert.strictEqual('/a', StringUtils.formatPath('/a'));
+    assert.strictEqual('/', StringUtils.formatPath('///////'));
+    assert.strictEqual(StringUtils.formatPath('test//test/'), 'test/test');
+    assert.strictEqual(StringUtils.formatPath('////test//////test////'), '/test/test');
+    assert.strictEqual(StringUtils.formatPath('\\\\////test//test/'), '/test/test');
+    assert.strictEqual(StringUtils.formatPath('test\\test/hello\\\\'), 'test/test/hello');
+    assert.strictEqual(StringUtils.formatPath('someutf8_//转注字\\\\轉注/字'), 'someutf8_/转注字/轉注/字');
 
-    assert.strictEqual(StringUtils.formatPath('test//test', '/'), 'test' + '/' + 'test');
-    assert.strictEqual(StringUtils.formatPath('////test//////test', '/'), '/' + 'test' + '/' + 'test');
-    assert.strictEqual(StringUtils.formatPath('\\\\////test//test', '/'), '/' + 'test' + '/' + 'test');
+    assert.strictEqual(StringUtils.formatPath('test//test', '/'), 'test/test');
+    assert.strictEqual(StringUtils.formatPath('////test//////test', '/'), '/test/test');
+    assert.strictEqual(StringUtils.formatPath('\\\\////test//test', '/'), '/test/test');
     assert.strictEqual(StringUtils.formatPath('C:\\Users///someuser\\git\\\\project/newProject', '/'), 'C:/Users/someuser/git/project/newProject');
     assert.strictEqual(StringUtils.formatPath('someutf8_//转注字\\\\轉注/字', '/'), 'someutf8_/转注字/轉注/字');
 
-    assert.strictEqual(StringUtils.formatPath('test//test/', '\\'), 'test' + '\\' + 'test');
-    assert.strictEqual(StringUtils.formatPath('////test//////test////', '\\'), '\\' + 'test' + '\\' + 'test');
-    assert.strictEqual(StringUtils.formatPath('\\\\////test//test/', '\\'), '\\' + 'test' + '\\' + 'test');
+    assert.strictEqual(StringUtils.formatPath('test//test/', '\\'), 'test\\test');
+    assert.strictEqual(StringUtils.formatPath('////test//////test////', '\\'), '\\test\\test');
+    assert.strictEqual(StringUtils.formatPath('\\\\////test//test/', '\\'), '\\test\\test');
     assert.strictEqual(StringUtils.formatPath('C:\\Users///someuser\\git\\\\project/newProject', '\\'), 'C:\\Users\\someuser\\git\\project\\newProject');
     assert.strictEqual(StringUtils.formatPath('someutf8_//转注字\\\\轉注/字', '\\'), 'someutf8_\\转注字\\轉注\\字');
+
+    assert.strictEqual('\\', StringUtils.formatPath('/', '\\'));
+    assert.strictEqual('\\a', StringUtils.formatPath('/a', '\\'));
+    assert.strictEqual('\\', StringUtils.formatPath('///////', '\\'));
+    assert.strictEqual('test\\test', StringUtils.formatPath('test//test/', '\\'));
+    assert.strictEqual('\\test\\test', StringUtils.formatPath('\\\\////test//test/', '\\'));
+    assert.strictEqual('test\\test\\hello', StringUtils.formatPath('test\\test/hello\\\\', '\\'));
+    assert.strictEqual('someutf8_\\转注字\\轉注\\字', StringUtils.formatPath('someutf8_//转注字\\\\轉注/字', '\\'));
 
     // Test wrong values
     assert.strictEqual(StringUtils.formatPath('!"(&%"·$|||'), '!"(&%"·$|||');
@@ -1312,8 +1330,14 @@ QUnit.test("formatPath", function(assert) {
  */
 QUnit.test("formatUrl", function(assert) {
 
-    assert.ok(StringUtils.formatUrl(null) === '');
-    assert.ok(StringUtils.formatUrl(undefined) === '');
+    assert.throws(function() {
+        StringUtils.formatUrl(null);
+    }, /url must be a string/);
+    
+    assert.throws(function() {
+        StringUtils.formatUrl(undefined);
+    }, /url must be a string/);
+    
     assert.ok(StringUtils.formatUrl('') === '');
 
     // Format correct urls

@@ -569,10 +569,11 @@ export class StringUtils {
      * 
      * @param path A string containing some arbitrary path.
      * @param elementsToRemove (one by default) The number of elements that we want to remove from the right side of the path.
+     * @param separator The character to use as the element divider for the returned path. Only slash '/' or backslash '\' are allowed.
      *
-     * @return The received path without the specified number of elements
+     * @return The received path without the specified number of elements and correctly formatted
      */
-    public static getPath(path:string, elementsToRemove = 1){
+    public static getPath(path:string, elementsToRemove = 1, separator = '/'){
         
         if(StringUtils.isEmpty(path)){
 
@@ -581,6 +582,11 @@ export class StringUtils {
 
         path = StringUtils.formatPath(path, '/');
 
+        if(path === '/'){
+
+            return path;
+        }
+        
         let processedPath = (path.indexOf('/') === 0) ? path.substr(1) : path;
 
         let elements = processedPath.split('/');
@@ -602,7 +608,7 @@ export class StringUtils {
             return path;
         }
         
-        return StringUtils.formatPath(path.substring(0, path.length - arrayToRemove.join('/').length - 1), '/');
+        return StringUtils.formatPath(path.substring(0, path.length - arrayToRemove.join('/').length - 1), separator);
     }
     
     
@@ -850,17 +856,11 @@ export class StringUtils {
      *
      * @param path A raw path to be formatted
      * @param separator The character to use as the element divider. Only slash '/' or backslash '\' are allowed.
-     *                  if not specified, the current OS separator will be used when possible.
      *
      * @return The correctly formatted path without any trailing separator
      */
     public static formatPath(path:any, separator = '/'):string {
     
-        if(path === null || path === undefined){
-
-            return '';
-        }
-
         if(!StringUtils.isString(path)){
 
             throw new Error('path must be a string');
@@ -881,11 +881,11 @@ export class StringUtils {
             path = path.replace(separator + separator, separator);
         }
 
-        // Remove the last separator only if it exists
-        if(path.substr(path.length - 1) == separator){
+        // Remove the last separator only if it exists and is not the only character of the path
+        if(path.length > 1 && path.substr(path.length - 1) === separator){
 
             path = path.substr(0, path.length - 1);
-        }
+        }     
 
         return path;
     }
@@ -908,14 +908,14 @@ export class StringUtils {
         
         var urlSeparator:string = '/';
         
-        if(url == null || url == undefined || url == ''){
+        if(url == ''){
 
             return '';
         }
 
         if(!StringUtils.isString(url)){
 
-            throw new Error("Specified value must be a string");
+            throw new Error("url must be a string");
         }
 
         if(StringUtils.isEmpty(url)){
