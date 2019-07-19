@@ -662,17 +662,22 @@ class StringUtils {
     /**
      * Given a string with a list of elements separated by '/' or '\' that represent some arbitrary path structure,
      * this method will return the element that is located at the requested position. If no position is defined,
-     * the last element of the path will be returned (the most to the right one).
+     * by default the last element of the path will be returned (the most to the right one).
      *
      * This method can be used with Operating system file paths, urls, or any other string that uses the 'slash separated'
      * format to encode a path.
      *
-     * @example "//folder/folder2/folder3/file.txt" -> results in "file.txt" if no position is defined<br>
-     *          "//folder/folder2\folder3\file.txt" -> results in "folder3" if position 2 is defined
+     * @example "//folder/folder2/folder3/file.txt" -> results in "file.txt" if (-1) position is defined<br>
+     *          "//folder/folder2\folder3\file.txt" -> results in "folder" if position 0 is defined<br>
+     *          "//folder/folder2\folder3\file.txt" -> results in "folder3" if position 2 is defined<br>
+     *          "//folder/folder2\folder3\file.txt" -> results in "folder3" if position -2 is defined<br>
+     *          "//folder/folder2\folder3\file.txt" -> results in "folder2" if position -3 is defined
      *
      * @param string $path A string containing some arbitrary path.
-     * @param integer $position The index for the element that we want to extract from the path. If not specified, the
-     *                          last one will be returned. (Positions go from left to right)
+     * @param integer $position The index for the element that we want to extract from the path. Positive values will get path elements
+     *        starting from the left side, being 0 the first most to the left one. Negative values will get path elements starting from
+     *        the right side, being -1 the last path element (or the first most to the right one).
+     *        If not specified, the last one will be returned.
      *
      * @return string The element at the specified path position or the last one if no position is defined
      */
@@ -690,12 +695,12 @@ class StringUtils {
         $elements = explode('/', $path);
         $elementsCount = count($elements);
 
-        if($position >= $elementsCount || $position < -1){
+        if($position >= $elementsCount || $position < -$elementsCount){
 
             throw new InvalidArgumentException('Invalid position specified');
         }
 
-        return $position === -1 ? $elements[$elementsCount - 1] : $elements[$position];
+        return $position < 0 ? $elements[$elementsCount + $position] : $elements[$position];
     }
 
 

@@ -1066,26 +1066,56 @@ class StringUtilsTest extends TestCase {
         $this->assertSame(StringUtils::getPathElement('https:\\www.google.es/search?q=zero\\+latency', 2), 'search?q=zero');
         $this->assertSame(StringUtils::getPathElement('https:\\www.google.es/search?q=zero\\+latency', 3), '+latency');
 
+        $this->assertSame(StringUtils::getPathElement("folder1\\\\folder2//folder3///\\\\folder4", -1), 'folder4');
+        $this->assertSame(StringUtils::getPathElement("folder1\\\\folder2//folder3///\\\\folder4", -2), 'folder3');
+        $this->assertSame(StringUtils::getPathElement("folder1\\\\folder2//folder3///\\\\folder4", -3), 'folder2');
+        $this->assertSame(StringUtils::getPathElement("folder1\\\\folder2//folder3///\\\\folder4", -4), 'folder1');
+        $this->assertSame(StringUtils::getPathElement('//folder/folder2/folder3/file.txt', -1), 'file.txt');
+        $this->assertSame(StringUtils::getPathElement('//folder/folder2/folder3/file.txt', -2), 'folder3');
+        $this->assertSame(StringUtils::getPathElement('//folder/folder2/folder3/file.txt', -3), 'folder2');
+        $this->assertSame(StringUtils::getPathElement('//folder/folder2/folder3/file.txt', -4), 'folder');
+        $this->assertSame(StringUtils::getPathElement('https://www.google.es/search?q=zero+latency', -1), 'search?q=zero+latency');
+        $this->assertSame(StringUtils::getPathElement('https://www.google.es/search?q=zero+latency', -2), 'www.google.es');
+        $this->assertSame(StringUtils::getPathElement('https://www.google.es/search?q=zero+latency', -3), 'https:');
+        $this->assertSame(StringUtils::getPathElement('https:\\www.google.es/search?q=zero\\+latency', -1), '+latency');
+        $this->assertSame(StringUtils::getPathElement('https:\\www.google.es/search?q=zero\\+latency', -2), 'search?q=zero');
+        $this->assertSame(StringUtils::getPathElement('https:\\www.google.es/search?q=zero\\+latency', -3), 'www.google.es');
+        $this->assertSame(StringUtils::getPathElement('https:\\www.google.es/search?q=zero\\+latency', -4), 'https:');
+
         // Test wrong values
         try {
             StringUtils::getPathElement('//folder/folder2/folder3/file.txt', 4);
             $this->exceptionMessage = 'index 4 did not cause exception';
         } catch (Throwable $e) {
-            // We expect an exception to happen
+            $this->assertRegExp('/Invalid position specified/', $e->getMessage());
         }
 
         try {
             StringUtils::getPathElement('//folder/folder2/folder3/file.txt', 100);
             $this->exceptionMessage = 'index 100 did not cause exception';
         } catch (Throwable $e) {
-            // We expect an exception to happen
+            $this->assertRegExp('/Invalid position specified/', $e->getMessage());
+        }
+
+        try {
+            StringUtils::getPathElement('//folder/folder2/folder3/file.txt', -5);
+            $this->exceptionMessage = 'index -5 did not cause exception';
+        } catch (Throwable $e) {
+            $this->assertRegExp('/Invalid position specified/', $e->getMessage());
         }
 
         try {
             StringUtils::getPathElement('//folder/folder2/folder3/file.txt', -10);
             $this->exceptionMessage = 'index -10 did not cause exception';
         } catch (Throwable $e) {
-            // We expect an exception to happen
+            $this->assertRegExp('/Invalid position specified/', $e->getMessage());
+        }
+
+        try {
+            StringUtils::getPathElement('//folder/folder2/folder3/file.txt', -100);
+            $this->exceptionMessage = 'index -100 did not cause exception';
+        } catch (Throwable $e) {
+            $this->assertRegExp('/Invalid position specified/', $e->getMessage());
         }
 
         // Test exceptions
@@ -1093,21 +1123,21 @@ class StringUtilsTest extends TestCase {
             StringUtils::getPathElement(['//folder/folder2/folder3/file.txt']);
             $this->exceptionMessage = 'array did not cause exception';
         } catch (Throwable $e) {
-            // We expect an exception to happen
+            $this->assertRegExp('/value is not a string/', $e->getMessage());
         }
 
         try {
             StringUtils::getPathElement(125);
             $this->exceptionMessage = '125 did not cause exception';
         } catch (Throwable $e) {
-            // We expect an exception to happen
+            $this->assertRegExp('/value is not a string/', $e->getMessage());
         }
 
         try {
             StringUtils::getPathElement(new stdClass());
             $this->exceptionMessage = 'new stdClass() did not cause exception';
         } catch (Throwable $e) {
-            // We expect an exception to happen
+            $this->assertRegExp('/value is not a string/', $e->getMessage());
         }
     }
 

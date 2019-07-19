@@ -870,6 +870,22 @@ QUnit.test("getPathElement", function(assert) {
     assert.strictEqual(StringUtils.getPathElement('https:\\www.google.es/search?q=zero\\+latency', 2), 'search?q=zero');
     assert.strictEqual(StringUtils.getPathElement('https:\\www.google.es/search?q=zero\\+latency', 3), '+latency');
 
+    assert.strictEqual(StringUtils.getPathElement("folder1\\\\folder2//folder3///\\\\folder4", -1), 'folder4');
+    assert.strictEqual(StringUtils.getPathElement("folder1\\\\folder2//folder3///\\\\folder4", -2), 'folder3');
+    assert.strictEqual(StringUtils.getPathElement("folder1\\\\folder2//folder3///\\\\folder4", -3), 'folder2');
+    assert.strictEqual(StringUtils.getPathElement("folder1\\\\folder2//folder3///\\\\folder4", -4), 'folder1');
+    assert.strictEqual(StringUtils.getPathElement('//folder/folder2/folder3/file.txt', -1), 'file.txt');
+    assert.strictEqual(StringUtils.getPathElement('//folder/folder2/folder3/file.txt', -2), 'folder3');
+    assert.strictEqual(StringUtils.getPathElement('//folder/folder2/folder3/file.txt', -3), 'folder2');
+    assert.strictEqual(StringUtils.getPathElement('//folder/folder2/folder3/file.txt', -4), 'folder');
+    assert.strictEqual(StringUtils.getPathElement('https://www.google.es/search?q=zero+latency', -1), 'search?q=zero+latency');
+    assert.strictEqual(StringUtils.getPathElement('https://www.google.es/search?q=zero+latency', -2), 'www.google.es');
+    assert.strictEqual(StringUtils.getPathElement('https://www.google.es/search?q=zero+latency', -3), 'https:');
+    assert.strictEqual(StringUtils.getPathElement('https:\\www.google.es/search?q=zero\\+latency', -1), '+latency');
+    assert.strictEqual(StringUtils.getPathElement('https:\\www.google.es/search?q=zero\\+latency', -2), 'search?q=zero');
+    assert.strictEqual(StringUtils.getPathElement('https:\\www.google.es/search?q=zero\\+latency', -3), 'www.google.es');
+    assert.strictEqual(StringUtils.getPathElement('https:\\www.google.es/search?q=zero\\+latency', -4), 'https:');
+        
     // Test wrong values
     assert.throws(function() {
         StringUtils.getPathElement('//folder/folder2/folder3/file.txt', 4);
@@ -878,9 +894,17 @@ QUnit.test("getPathElement", function(assert) {
     assert.throws(function() {
         StringUtils.getPathElement('//folder/folder2/folder3/file.txt', 100);
     }, /Invalid position specified/);
+    
+    assert.throws(function() {
+        StringUtils.getPathElement('//folder/folder2/folder3/file.txt', -5);
+    }, /Invalid position specified/);
 
     assert.throws(function() {
         StringUtils.getPathElement('//folder/folder2/folder3/file.txt', -10);
+    }, /Invalid position specified/);
+    
+    assert.throws(function() {
+        StringUtils.getPathElement('//folder/folder2/folder3/file.txt', -100);
     }, /Invalid position specified/);
 
     // Test exceptions

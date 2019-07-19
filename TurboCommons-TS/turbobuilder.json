@@ -5,7 +5,7 @@
 	"metadata": {
 		"name": "turbocommons-ts",
 		"description": "General purpose library that implements frequently used and generic software development tasks",
-		"builderVersion": "2.0.0"
+		"builderVersion": "2.1.0"
 	},
 	
 	"validate": {
