@@ -25,18 +25,14 @@ import { StringUtils } from './StringUtils';
  * var result2 = ns.ConversionUtils.base64ToString('somebase64text');
  * ...
  * </code></pre>
- * 
- * @class
  */
 export class ConversionUtils {
 
 
     /**
-     * Encode a string to base64<br><br> 
-     * Found at: http://www.webtoolkit.info/<br>
-     *              http://www.webtoolkit.info/javascript-base64.html#.VO3gzjSG9AY
-     * 
-     * @static
+     * Encode a string to base64 (Which contains only numbers, uppercase, lowercase, forward slash, plus and equal signs) 
+     * Found at: http://www.webtoolkit.info/
+     *           http://www.webtoolkit.info/javascript-base64.html#.VO3gzjSG9AY
      *  
      * @param {string} string The input string to be converted
      * @returns {string} The input string as base 64 
@@ -126,12 +122,10 @@ export class ConversionUtils {
 
 
     /**
-     * Decode a string from base64<br><br> 
-     * Found at: http://www.webtoolkit.info/<br>
-     *              http://www.webtoolkit.info/javascript-base64.html#.VO3gzjSG9AY
+     * Decode a string from base64 (Which contains only numbers, uppercase, lowercase, forward slash, plus and equal signs)
+     * Found at: http://www.webtoolkit.info/
+     *           http://www.webtoolkit.info/javascript-base64.html#.VO3gzjSG9AY
      *
-     * @static
-     *  
      * @param {string} string a base64 string
      * 
      * @returns {string} The base64 decoded as its original string

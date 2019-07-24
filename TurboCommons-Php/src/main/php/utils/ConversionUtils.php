@@ -23,7 +23,7 @@ class ConversionUtils {
 
 
     /**
-     * Encode a string to base64
+     * Encode a string to base64 (Which contains only numbers, uppercase, lowercase, forward slash, plus and equal signs)
      *
      * @param string $string The input string to be converted
      *
@@ -48,7 +48,7 @@ class ConversionUtils {
 
 
     /**
-     * Decode a string from base64
+     * Decode a string from base64 (Which contains only numbers, uppercase, lowercase, forward slash, plus and equal signs)
      *
      * @param string $string a base64 string
      *
