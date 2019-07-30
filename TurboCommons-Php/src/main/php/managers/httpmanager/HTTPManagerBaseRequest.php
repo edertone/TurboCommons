@@ -45,7 +45,7 @@ class HTTPManagerBaseRequest extends BaseStrictClass {
 
 
     /**
-     * A method to be executed inmediately after the request execution finishes successfully.
+     * A method to be executed inmediately after the request execution finishes successfully (200 ok code).
      * The callback function must have the following signature:
      * (response: string) => void
      */
@@ -55,9 +55,10 @@ class HTTPManagerBaseRequest extends BaseStrictClass {
     /**
      * A method to be executed if an error happens to the request execution.
      * The callback function must have the following signature:
-     * (errorMsg:string, errorCode:number) => void
+     * (errorMsg:string, errorCode:number, response: string) => void
      *
-     * errorMsg will contain the error text and errorCode will contain the numeric error http value
+     * errorMsg will contain the error text, errorCode will contain the numeric error http value and response will contain
+     * the main request response body
      */
     public $errorCallback = null;
 

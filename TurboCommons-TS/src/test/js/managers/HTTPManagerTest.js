@@ -499,7 +499,7 @@ QUnit.test("getUrlHeaders", function(assert){
     // Test wrong values
     sut.getUrlHeaders('https://www.google.com', function(){
         
-        assert.ok(false);
+        assert.ok(false, "Browser was able to read google.com headers but it shouldn't due to CORS restrictions. Make sure your browser is correctly blocking CORS and run tests again");
         done();
         
     }, function(msg, code){
@@ -540,8 +540,11 @@ QUnit.test("execute - requests with string urls", function(assert){
     sut.execute('some invalid url', function(results, anyError){
 
         assert.strictEqual(anyError, true);
+        assert.strictEqual(results[0].url, 'some invalid url');
+        assert.strictEqual(results[0].response, '');
         assert.strictEqual(results[0].isError, true);
         assert.ok(results[0].errorMsg.length > 3);
+        assert.strictEqual(results[0].code, 404);
         done();
     });
     
@@ -550,11 +553,14 @@ QUnit.test("execute - requests with string urls", function(assert){
     
     sut.execute(existantUrl, function(results, anyError){
 
-        assert.ok(!StringUtils.isEmpty(results[0].response));
-        assert.ok(results[0].response.length > 5);
-        
         assert.strictEqual(anyError, false);
+
+        assert.strictEqual(results[0].url, existantUrl);
+        assert.ok(!StringUtils.isEmpty(results[0].response));
+        assert.ok(results[0].response.length > 5);        
         assert.strictEqual(results[0].isError, false);
+        assert.strictEqual(results[0].errorMsg, '');
+        assert.strictEqual(results[0].code, 200);
         done();
     });
     
@@ -565,12 +571,16 @@ QUnit.test("execute - requests with string urls", function(assert){
 
         assert.strictEqual(multiErrProgressCount, 3);
         assert.strictEqual(anyError, true);
-        assert.strictEqual(results[0].isError, true);
-        assert.ok(results[0].errorMsg.length > 3);
-        assert.strictEqual(results[1].isError, true);
-        assert.ok(results[1].errorMsg.length > 3);
-        assert.strictEqual(results[2].isError, true);
-        assert.ok(results[2].errorMsg.length > 3);
+        
+        for (var i = 0; i < 3; i++) {
+        
+            assert.strictEqual(results[i].url, 'invalidUrl' + String(i + 1));
+            assert.strictEqual(results[i].response, '');
+            assert.strictEqual(results[i].isError, true);
+            assert.ok(results[i].errorMsg.length > 3);
+            assert.strictEqual(results[i].code, 404);
+        }
+        
         done();
         
     }, function(completedUrl, totalRequests) {
@@ -583,12 +593,28 @@ QUnit.test("execute - requests with string urls", function(assert){
     sut.execute([existantUrl, 'invalidUrl2', existantUrl], function(results, anyError){
 
         assert.strictEqual(anyError, true);
+        
+        assert.strictEqual(results[0].url, existantUrl);
+        assert.ok(!StringUtils.isEmpty(results[0].response));
+        assert.ok(results[0].response.length > 5);        
         assert.strictEqual(results[0].isError, false);
         assert.strictEqual(results[0].errorMsg, '');
+        assert.strictEqual(results[0].code, 200);
+                
+                
+        assert.strictEqual(results[1].url, 'invalidUrl2');
+        assert.strictEqual(results[1].response, '');
         assert.strictEqual(results[1].isError, true);
         assert.ok(results[1].errorMsg.length > 3);
+        assert.strictEqual(results[1].code, 404);
+        
+        assert.strictEqual(results[2].url, existantUrl);
+        assert.ok(!StringUtils.isEmpty(results[2].response));
+        assert.ok(results[2].response.length > 5);        
         assert.strictEqual(results[2].isError, false);
         assert.strictEqual(results[2].errorMsg, '');
+        assert.strictEqual(results[2].code, 200);
+        
         done();
     });
     
@@ -599,12 +625,16 @@ QUnit.test("execute - requests with string urls", function(assert){
 
         assert.strictEqual(multiProgressCount, 3);
         assert.strictEqual(anyError, false);
-        assert.strictEqual(results[0].isError, false);
-        assert.strictEqual(results[0].errorMsg, '');
-        assert.strictEqual(results[1].isError, false);
-        assert.strictEqual(results[1].errorMsg, '');
-        assert.strictEqual(results[2].isError, false);
-        assert.strictEqual(results[2].errorMsg, '');
+        
+        for (var i = 0; i < 3; i++) {
+
+            assert.ok(!StringUtils.isEmpty(results[i].response));
+            assert.ok(results[i].response.length > 4);        
+            assert.strictEqual(results[i].isError, false);
+            assert.strictEqual(results[i].errorMsg, '');
+            assert.strictEqual(results[i].code, 200);    
+        }
+        
         done();
         
     }, function(completedUrl, totalRequests) {
@@ -652,9 +682,10 @@ QUnit.test("execute - single HTTPManagerGetRequest with errors", function(assert
     
     request.successCallback = (response) => successCalled = true;
 
-    request.errorCallback = (errorMsg, errorCode) => {
+    request.errorCallback = (errorMsg, errorCode, response) => {
         assert.ok(errorMsg.length > 3);
         assert.strictEqual(errorCode, 404);
+        assert.strictEqual(response, '');
         errorCalled = true;
     };
     
@@ -672,7 +703,7 @@ QUnit.test("execute - single HTTPManagerGetRequest with errors", function(assert
         assert.strictEqual(results[0].response, '');
         assert.strictEqual(results[0].isError, true);
         assert.ok(results[0].errorMsg.length > 3);
-        assert.ok(results[0].errorCode > 0);
+        assert.ok(results[0].code > 300);
         done();
         
     }, function(completedUrl, totalRequests) {
@@ -703,7 +734,7 @@ QUnit.test("execute - single HTTPManagerGetRequest without errors", function(ass
         successCalled = true;
     }
 
-    request.errorCallback = (errorMsg, errorCode) => errorCalled = true;
+    request.errorCallback = (errorMsg, errorCode, response) => errorCalled = true;
     
     request.finallyCallback = () => finallyCalled = true;
     
@@ -719,7 +750,7 @@ QUnit.test("execute - single HTTPManagerGetRequest without errors", function(ass
         assert.strictEqual(results[0].response, 'text1');
         assert.strictEqual(results[0].isError, false);
         assert.strictEqual(results[0].errorMsg, '');
-        assert.strictEqual(results[0].errorCode, -1);
+        assert.strictEqual(results[0].code, 200);
         done();
     
     }, function(completedUrl, totalRequests) {
@@ -749,7 +780,7 @@ QUnit.test("execute - single HTTPManagerGetRequest without errors and using base
         successCalled = true;
     }
 
-    request.errorCallback = (errorMsg, errorCode) => errorCalled = true;
+    request.errorCallback = (errorMsg, errorCode, response) => errorCalled = true;
     
     request.finallyCallback = () => finallyCalled = true;
     
@@ -766,7 +797,7 @@ QUnit.test("execute - single HTTPManagerGetRequest without errors and using base
         assert.strictEqual(results[0].response, 'text1');
         assert.strictEqual(results[0].isError, false);
         assert.strictEqual(results[0].errorMsg, '');
-        assert.strictEqual(results[0].errorCode, -1);
+        assert.strictEqual(results[0].code, 200);
         done();
     
     });
@@ -793,7 +824,7 @@ QUnit.test("execute - multiple HTTPManagerGetRequest with errors", function(asse
         successCalledCount ++;
     }
 
-    request1.errorCallback = (errorMsg, errorCode) => errorCalledCount ++;
+    request1.errorCallback = (errorMsg, errorCode, response) => errorCalledCount ++;
     
     request1.finallyCallback = () => finallyCalledCount ++;
     
@@ -802,7 +833,7 @@ QUnit.test("execute - multiple HTTPManagerGetRequest with errors", function(asse
     
     request2.successCallback = (response) => successCalledCount ++;
 
-    request2.errorCallback = (errorMsg, errorCode) => {
+    request2.errorCallback = (errorMsg, errorCode, response) => {
         assert.ok(errorMsg.length > 3);
         assert.strictEqual(errorCode, 404);
         errorCalledCount ++;
@@ -815,7 +846,7 @@ QUnit.test("execute - multiple HTTPManagerGetRequest with errors", function(asse
     
     request3.successCallback = (response) => successCalledCount ++;
 
-    request3.errorCallback = (errorMsg, errorCode) => {
+    request3.errorCallback = (errorMsg, errorCode, response) => {
         assert.ok(errorMsg.length > 3);
         assert.strictEqual(errorCode, 404);
         errorCalledCount ++;
@@ -841,7 +872,7 @@ QUnit.test("execute - multiple HTTPManagerGetRequest with errors", function(asse
             assert.strictEqual(results[i].response, '');
             assert.strictEqual(results[i].isError, true);
             assert.ok(results[i].errorMsg.length > 3);
-            assert.ok(results[i].errorCode > 0);
+            assert.ok(results[i].code > 300);
         }
         
         done();
@@ -874,7 +905,7 @@ QUnit.test("execute - multiple HTTPManagerGetRequest without errors", function(a
         successCalledCount ++;
     }
 
-    request1.errorCallback = (errorMsg, errorCode) => errorCalledCount ++;
+    request1.errorCallback = (errorMsg, errorCode, response) => errorCalledCount ++;
     
     request1.finallyCallback = () => finallyCalledCount ++;
     
@@ -886,7 +917,7 @@ QUnit.test("execute - multiple HTTPManagerGetRequest without errors", function(a
         successCalledCount ++;
     }
 
-    request2.errorCallback = (errorMsg, errorCode) => errorCalledCount ++;
+    request2.errorCallback = (errorMsg, errorCode, response) => errorCalledCount ++;
     
     request2.finallyCallback = () => finallyCalledCount ++;
     
@@ -898,7 +929,7 @@ QUnit.test("execute - multiple HTTPManagerGetRequest without errors", function(a
         successCalledCount ++;
     }
 
-    request3.errorCallback = (errorMsg, errorCode) => errorCalledCount ++;
+    request3.errorCallback = (errorMsg, errorCode, response) => errorCalledCount ++;
     
     request3.finallyCallback = () => finallyCalledCount ++;
     
@@ -923,7 +954,7 @@ QUnit.test("execute - multiple HTTPManagerGetRequest without errors", function(a
             
             assert.strictEqual(results[i].isError, false);
             assert.strictEqual(results[i].errorMsg, '');
-            assert.strictEqual(results[i].errorCode, -1);
+            assert.strictEqual(results[i].code, 200);
         }
         
         done();
@@ -931,6 +962,59 @@ QUnit.test("execute - multiple HTTPManagerGetRequest without errors", function(a
     }, function(completedUrl, totalRequests) {
         
         assert.strictEqual(totalRequests, 3);
+        progressCount ++;
+    });
+});
+
+
+/**
+ * execute
+ */
+QUnit.test("execute - single HTTPManagerGetRequest with bad request 400 error", function(assert){
+    
+    var done = assert.async();
+    
+    var progressCount = 0;
+    var successCalledCount = 0;
+    var errorCalledCount = 0;
+    var finallyCalledCount = 0;
+    
+    // This request will generate a 400 bad request due to the ending %.
+    var request = new HTTPManagerGetRequest('/%');
+    
+    request.successCallback = (response) => successCalledCount ++;
+
+    request.errorCallback = (errorMsg, errorCode, response) => {
+        
+        assert.ok(errorMsg.toLowerCase().indexOf('bad request') >= 0);
+        assert.strictEqual(errorCode, 400);
+        assert.ok(response.toLowerCase().indexOf('bad request') >= 0);
+        errorCalledCount ++;
+    }
+    
+    request.finallyCallback = () => finallyCalledCount ++;
+    
+    // Launch the request and process the results
+    sut.execute(request, function(results, anyError){
+
+        assert.strictEqual(progressCount, 1);
+        assert.strictEqual(successCalledCount, 0);
+        assert.strictEqual(errorCalledCount, 1);
+        assert.strictEqual(finallyCalledCount, 1);
+        
+        assert.strictEqual(anyError, true);
+        
+        assert.strictEqual(results[0].url, '/%');
+        assert.ok(results[0].response.toLowerCase().indexOf('bad request') >= 0);
+        assert.strictEqual(results[0].isError, true);
+        assert.ok(results[0].errorMsg.toLowerCase().indexOf('bad request') >= 0);
+        assert.strictEqual(results[0].code, 400);
+                
+        done();
+        
+    }, function(completedUrl, totalRequests) {
+        
+        assert.strictEqual(totalRequests, 1);
         progressCount ++;
     });
 });
@@ -971,6 +1055,14 @@ QUnit.todo("execute - multiple HTTPManagerPostRequest without errors", function(
     // TODO
 });
 
+
+/**
+ * execute
+ */
+QUnit.todo("execute - single HTTPManagerPostRequest with bad request 400 error", function(assert){
+    
+    // TODO
+});
 
 /**
  * execute

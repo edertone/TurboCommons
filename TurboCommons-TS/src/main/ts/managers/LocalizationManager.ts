@@ -441,7 +441,7 @@ export class LocalizationManager {
                     errors.push({
                         path: results[i].url,
                         errorMsg: results[i].errorMsg,
-                        errorCode: results[i].errorCode 
+                        errorCode: results[i].code 
                     });
                     
                 }else{

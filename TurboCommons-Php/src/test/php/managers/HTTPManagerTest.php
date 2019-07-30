@@ -516,8 +516,11 @@ class HTTPManagerTest extends TestCase {
         $this->sut->execute('some invalid url', function($results, $anyError){
 
             $this->assertSame($anyError, true);
+            $this->assertSame($results[0]['url'], 'some invalid url');
+            $this->assertSame($results[0]['response'], '');
             $this->assertSame($results[0]['isError'], true);
             $this->assertTrue(strlen($results[0]['errorMsg']) > 3);
+            $this->assertSame($results[0]['code'], 0);
         });
 
         // Single url without error
@@ -525,11 +528,14 @@ class HTTPManagerTest extends TestCase {
 
         $this->sut->execute($this->existantUrl, function($results, $anyError){
 
+            $this->assertSame($anyError, false);
+
+            $this->assertSame($results[0]['url'], $this->existantUrl);
             $this->assertTrue(!StringUtils::isEmpty($results[0]['response']));
             $this->assertTrue(strlen($results[0]['response']) > 5);
-
-            $this->assertSame($anyError, false);
             $this->assertSame($results[0]['isError'], false);
+            $this->assertSame($results[0]['errorMsg'], '');
+            $this->assertSame($results[0]['code'], 200);
         });
 
         // Multiple urls with errors
@@ -539,12 +545,15 @@ class HTTPManagerTest extends TestCase {
 
             $this->assertSame($multiErrProgressCount, 3);
             $this->assertSame($anyError, true);
-            $this->assertSame($results[0]['isError'], true);
-            $this->assertTrue(strlen($results[0]['errorMsg']) > 3);
-            $this->assertSame($results[1]['isError'], true);
-            $this->assertTrue(strlen($results[1]['errorMsg']) > 3);
-            $this->assertSame($results[2]['isError'], true);
-            $this->assertTrue(strlen($results[2]['errorMsg']) > 3);
+
+            for ($i = 0; $i < 3; $i++) {
+
+                $this->assertSame($results[$i]['url'], 'invalidUrl'.($i + 1));
+                $this->assertSame($results[$i]['response'], '');
+                $this->assertSame($results[$i]['isError'], true);
+                $this->assertTrue(strlen($results[$i]['errorMsg']) > 3);
+                $this->assertSame($results[$i]['code'], 0);
+            }
 
         }, function($completedUrl, $totalRequests) use (&$multiErrProgressCount) {
 
@@ -553,15 +562,29 @@ class HTTPManagerTest extends TestCase {
             $multiErrProgressCount ++;
         });
 
-            $this->sut->execute([$this->existantUrl, 'invalidUrl2', $this->existantUrl], function($results, $anyError){
+        $this->sut->execute([$this->existantUrl, 'invalidUrl2', $this->existantUrl], function($results, $anyError){
 
             $this->assertSame($anyError, true);
+
+            $this->assertSame($results[0]['url'], $this->existantUrl);
+            $this->assertTrue(!StringUtils::isEmpty($results[0]['response']));
+            $this->assertTrue(strlen($results[0]['response']) > 5);
             $this->assertSame($results[0]['isError'], false);
             $this->assertSame($results[0]['errorMsg'], '');
+            $this->assertSame($results[0]['code'], 200);
+
+            $this->assertSame($results[1]['url'], 'invalidUrl2');
+            $this->assertSame($results[1]['response'], '');
             $this->assertSame($results[1]['isError'], true);
             $this->assertTrue(strlen($results[1]['errorMsg']) > 3);
+            $this->assertSame($results[1]['code'], 0);
+
+            $this->assertSame($results[2]['url'], $this->existantUrl);
+            $this->assertTrue(!StringUtils::isEmpty($results[2]['response']));
+            $this->assertTrue(strlen($results[2]['response']) > 5);
             $this->assertSame($results[2]['isError'], false);
             $this->assertSame($results[2]['errorMsg'], '');
+            $this->assertSame($results[2]['code'], 200);
         });
 
         // Multiple urls without errors
@@ -571,12 +594,15 @@ class HTTPManagerTest extends TestCase {
 
             $this->assertSame($multiProgressCount, 3);
             $this->assertSame($anyError, false);
-            $this->assertSame($results[0]['isError'], false);
-            $this->assertSame($results[0]['errorMsg'], '');
-            $this->assertSame($results[1]['isError'], false);
-            $this->assertSame($results[1]['errorMsg'], '');
-            $this->assertSame($results[2]['isError'], false);
-            $this->assertSame($results[2]['errorMsg'], '');
+
+            for ($i = 0; $i < 3; $i++) {
+
+                $this->assertTrue(!StringUtils::isEmpty($results[$i]['response']));
+                $this->assertTrue(strlen($results[$i]['response']) > 4);
+                $this->assertSame($results[$i]['isError'], false);
+                $this->assertSame($results[$i]['errorMsg'], '');
+                $this->assertSame($results[$i]['code'], 200);
+            }
 
         }, function($completedUrl, $totalRequests) use (&$multiProgressCount){
 
@@ -635,9 +661,10 @@ class HTTPManagerTest extends TestCase {
 
         $request->successCallback = function ($response) use(&$successCalled) { $successCalled = true; };
 
-        $request->errorCallback = function ($errorMsg, $errorCode) use(&$errorCalled) {
+        $request->errorCallback = function ($errorMsg, $errorCode, $response) use(&$errorCalled) {
             $this->assertTrue(strlen($errorMsg) > 3);
             $this->assertSame($errorCode, 0);
+            $this->assertSame($response, '');
             $errorCalled = true;
         };
 
@@ -655,7 +682,7 @@ class HTTPManagerTest extends TestCase {
             $this->assertSame($results[0]['response'], '');
             $this->assertSame($results[0]['isError'], true);
             $this->assertTrue(strlen($results[0]['errorMsg']) > 3);
-            $this->assertTrue($results[0]['errorCode'] === 0);
+            $this->assertTrue($results[0]['code'] === 0);
 
         }, function($completedUrl, $totalRequests) use(&$progressCount) {
 
@@ -685,7 +712,7 @@ class HTTPManagerTest extends TestCase {
             $successCalled = true;
         };
 
-        $request->errorCallback = function ($errorMsg, $errorCode) use (&$errorCalled) { $errorCalled = true; };
+        $request->errorCallback = function ($errorMsg, $errorCode, $response) use (&$errorCalled) { $errorCalled = true; };
 
         $request->finallyCallback = function () use (&$finallyCalled) { $finallyCalled = true; };
 
@@ -701,7 +728,7 @@ class HTTPManagerTest extends TestCase {
             $this->assertContains('class HTTPManager extends BaseStrictClass', $results[0]['response']);
             $this->assertSame($results[0]['isError'], false);
             $this->assertSame($results[0]['errorMsg'], '');
-            $this->assertSame($results[0]['errorCode'], -1);
+            $this->assertSame($results[0]['code'], 200);
 
         }, function($completedUrl, $totalRequests) use (&$progressCount) {
 
@@ -730,7 +757,7 @@ class HTTPManagerTest extends TestCase {
             $successCalled = true;
         };
 
-        $request->errorCallback = function ($errorMsg, $errorCode) use (&$errorCalled) { $errorCalled = true; };
+        $request->errorCallback = function ($errorMsg, $errorCode, $response) use (&$errorCalled) { $errorCalled = true; };
 
         $request->finallyCallback = function () use (&$finallyCalled) { $finallyCalled = true; };
 
@@ -747,8 +774,7 @@ class HTTPManagerTest extends TestCase {
             $this->assertContains('class HTTPManager extends BaseStrictClass', $results[0]['response']);
             $this->assertSame($results[0]['isError'], false);
             $this->assertSame($results[0]['errorMsg'], '');
-            $this->assertSame($results[0]['errorCode'], -1);
-
+            $this->assertSame($results[0]['code'], 200);
         });
     }
 

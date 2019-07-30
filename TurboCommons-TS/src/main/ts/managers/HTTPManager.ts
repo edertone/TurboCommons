@@ -417,7 +417,7 @@ export class HTTPManager{
      * @return void
      */
     execute(requests: string|string[]|HTTPManagerBaseRequest|HTTPManagerBaseRequest[],
-            finishedCallback: ((results: {url:string, response:string, isError:boolean, errorMsg:string, errorCode:number}[], anyError:boolean) => void) | null = null,
+            finishedCallback: ((results: {url:string, response:string, isError:boolean, errorMsg:string, code:number}[], anyError:boolean) => void) | null = null,
             progressCallback: null | ((completedUrl: string, totalRequests: number) => void) = null){
         
         let requestsList = this._generateValidRequestsList(requests);
@@ -431,14 +431,14 @@ export class HTTPManager{
         
         let finishedCount = 0;
         let finishedAnyError = false;
-        let finishedResults:{url:string, response:string, isError:boolean, errorMsg:string, errorCode:number}[] = [];
+        let finishedResults:{url:string, response:string, isError:boolean, errorMsg:string, code:number}[] = [];
         
         // A method that will be executed every time a request is finished (even successfully or with errors)
         const processFinishedRequest = (requestWithIndex:{index:number, request:HTTPManagerBaseRequest},
                                         response:string,
-                                        isError:boolean = false,
-                                        errorMsg:string = '',
-                                        errorCode:number = -1) => {
+                                        isError:boolean,
+                                        errorMsg:string,
+                                        code:number) => {
             
             let request = requestWithIndex.request;
             let composedUrl = this._composeUrl(this.baseUrl, request.url);
@@ -448,12 +448,12 @@ export class HTTPManager{
                                                        response:response,
                                                        isError:isError,
                                                        errorMsg:errorMsg,
-                                                       errorCode:errorCode};
+                                                       code:code};
             
             if(isError){
                 
                 finishedAnyError = true;
-                request.errorCallback(errorMsg, errorCode);
+                request.errorCallback(errorMsg, code, response);
             
             }else{
                 
@@ -509,22 +509,22 @@ export class HTTPManager{
             
                 if (xmlHttprequest.status >= 200 && xmlHttprequest.status < 400) {
                 
-                    processFinishedRequest(requestWithIndex, xmlHttprequest.responseText);
+                    processFinishedRequest(requestWithIndex, xmlHttprequest.responseText, false, '', xmlHttprequest.status);
                 
                 } else {
                 
-                    processFinishedRequest(requestWithIndex, '', true, xmlHttprequest.statusText, xmlHttprequest.status);
+                    processFinishedRequest(requestWithIndex, xmlHttprequest.responseText, true, xmlHttprequest.statusText, xmlHttprequest.status);
                 }
             };
 
             xmlHttprequest.onerror = () => {
 
-                processFinishedRequest(requestWithIndex, '', true, xmlHttprequest.statusText, xmlHttprequest.status);
+                processFinishedRequest(requestWithIndex, xmlHttprequest.responseText, true, xmlHttprequest.statusText, xmlHttprequest.status);
             };
             
             xmlHttprequest.ontimeout = () => {
                 
-                processFinishedRequest(requestWithIndex, '', true, this.timeout + HTTPManager.ERROR_TIMEOUT, 408);
+                processFinishedRequest(requestWithIndex, xmlHttprequest.responseText, true, this.timeout + HTTPManager.ERROR_TIMEOUT, 408);
             };
             
             // Encode the GET request parameters if any and run the request
@@ -771,7 +771,7 @@ export class HTTPManager{
             
             if(results[0].isError){
                 
-                return errorCallback(urlToListOfResources, results[0].errorMsg, results[0].errorCode);
+                return errorCallback(urlToListOfResources, results[0].errorMsg, results[0].code);
             }
             
             let resourcesFullUrls: string[] = [];
@@ -791,7 +791,7 @@ export class HTTPManager{
 
                     if(result.isError){
                 
-                        return errorCallback(result.url, result.errorMsg, result.errorCode);
+                        return errorCallback(result.url, result.errorMsg, result.code);
                     }
                     
                     resultsData.push(result.response);

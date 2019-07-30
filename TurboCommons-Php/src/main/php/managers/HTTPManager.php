@@ -369,10 +369,10 @@ class HTTPManager extends BaseStrictClass {
         // A method that will be executed every time a request is finished (even successfully or with errors)
         $processFinishedRequest = function (array $requestWithIndex,
                                             string $response,
-                                            bool $isError = false,
-                                            string $errorMsg = '',
-                                            int $errorCode = -1) use ($requestsList, $progressCallback, $finishedCallback, $requestsListCount,
-                                                                      &$finishedCount, &$finishedAnyError, &$finishedResults) {
+                                            bool $isError,
+                                            string $errorMsg,
+                                            int $code) use ($requestsList, $progressCallback, $finishedCallback, $requestsListCount,
+                                                            &$finishedCount, &$finishedAnyError, &$finishedResults) {
 
             $request = $requestWithIndex['request'];
             $composedUrl = $this->_composeUrl($this->baseUrl, $request->url);
@@ -382,12 +382,12 @@ class HTTPManager extends BaseStrictClass {
                                                             'response' => $response,
                                                             'isError' => $isError,
                                                             'errorMsg' => $errorMsg,
-                                                            'errorCode' => $errorCode];
+                                                            'code' => $code];
 
             if($isError){
 
                 $finishedAnyError = true;
-                call_user_func($request->errorCallback, $errorMsg, $errorCode);
+                call_user_func($request->errorCallback, $errorMsg, $code, $response);
 
             }else{
 
@@ -480,15 +480,15 @@ class HTTPManager extends BaseStrictClass {
 
             if(curl_errno($curlInstances[$i]) === 28){
 
-                $processFinishedRequest($requestWithIndex, '', true, $this->timeout.$this->ERROR_TIMEOUT, 408);
+                $processFinishedRequest($requestWithIndex, curl_multi_getcontent($curlInstances[$i]), true, $this->timeout.$this->ERROR_TIMEOUT, 408);
 
             } else if (curl_error($curlInstances[$i])) {
 
-                $processFinishedRequest($requestWithIndex, '', true, curl_error($curlInstances[$i]), curl_getinfo($curlInstances[$i], CURLINFO_HTTP_CODE));
+                $processFinishedRequest($requestWithIndex, curl_multi_getcontent($curlInstances[$i]), true, curl_error($curlInstances[$i]), curl_getinfo($curlInstances[$i], CURLINFO_RESPONSE_CODE));
 
             } else {
 
-                $processFinishedRequest($requestWithIndex, curl_multi_getcontent($curlInstances[$i]));
+                $processFinishedRequest($requestWithIndex, curl_multi_getcontent($curlInstances[$i]), false, '', curl_getinfo($curlInstances[$i], CURLINFO_HTTP_CODE));
             }
 
             curl_multi_remove_handle($curlHandle, $curlInstances[$i]);
