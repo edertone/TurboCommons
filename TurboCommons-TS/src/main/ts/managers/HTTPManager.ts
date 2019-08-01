@@ -399,7 +399,7 @@ export class HTTPManager{
         
         xmlHttprequest.ontimeout = () => errorCallback(this.timeout + HTTPManager.ERROR_TIMEOUT, 408);
         
-        xmlHttprequest.send();
+        this._executeXmlHttprequestSend(xmlHttprequest, composedUrl);
     }
        
     
@@ -501,9 +501,10 @@ export class HTTPManager{
             }
             
             // Detect the request type
+            let composedUrl = this._composeUrl(this.baseUrl, requestsList[i].url);
             let requestType = requestsList[i] instanceof HTTPManagerGetRequest ? 'GET' : 'POST';
             
-            xmlHttprequest.open(requestType, this._composeUrl(this.baseUrl, requestsList[i].url), this.asynchronous);
+            xmlHttprequest.open(requestType, composedUrl, this.asynchronous);
             
             xmlHttprequest.onload = () => {
             
@@ -532,7 +533,7 @@ export class HTTPManager{
                 
                 // TODO - implement the GET request params
                 
-                xmlHttprequest.send();
+                this._executeXmlHttprequestSend(xmlHttprequest, composedUrl);
             }
 
             // Encode the POST request parameters if any and run the request
@@ -548,9 +549,27 @@ export class HTTPManager{
                     
                 } catch (e) {
                     
-                    xmlHttprequest.send();
+                    this._executeXmlHttprequestSend(xmlHttprequest, composedUrl);
                 }
             }
+        }
+    }
+    
+    
+    /**
+     * Auxiliary method to call the send method for an XMLHttpRequest with more explanatory error checking
+     * 
+     * NOTE: this method is exclusive for the typescript / javascript versions of turbocommons
+     */
+    private _executeXmlHttprequestSend(xmlHttprequest: XMLHttpRequest, url: string){
+        
+        try {
+
+            xmlHttprequest.send();
+        
+        } catch (e) {
+        
+            throw new Error('HTTPManager could not execute request to ' + url + '\n' + e.toString());
         }
     }
     
