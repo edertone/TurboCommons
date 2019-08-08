@@ -211,7 +211,8 @@ class HTTPManager extends BaseStrictClass {
      * A query string is the part of an url that contains the GET parameters. It is placed after
      * the ? symbol and contains a list of parameters and values that are sent to the url.
      *
-     * @param array|HashMapObject $keyValuePairs An associative array or a HashMapObject containing key/value pairs that will be used to construct the query string
+     * @param array|HashMapObject $keyValuePairs An associative array or a HashMapObject containing key/value pairs that will be used to construct the query string.
+     *        Note that when a value is an object or array, it will be encoded as a JSON string on the resulting query
      *
      * @see https://en.wikipedia.org/wiki/Query_string
      * @see HashMapObject
@@ -253,7 +254,8 @@ class HTTPManager extends BaseStrictClass {
 
         for($i = 0, $l = count($keys); $i < $l; $i++){
 
-            $result .= '&'.$encodeURIComponent($keys[$i]).'='.$encodeURIComponent($values[$i]);
+            $result .= '&'.$encodeURIComponent($keys[$i]).'='.$encodeURIComponent(
+                StringUtils::isString($values[$i]) ? $values[$i] : json_encode($values[$i]));
         }
 
         return substr($result, 1, strlen($result) - 1);

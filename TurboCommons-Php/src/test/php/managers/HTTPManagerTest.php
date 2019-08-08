@@ -336,6 +336,8 @@ class HTTPManagerTest extends TestCase {
         $this->assertSame($this->sut->generateUrlQueryString(['a' => "h&b", 'b' => '-_.*=']), 'a=h%26b&b=-_.*%3D');
         $this->assertSame($this->sut->generateUrlQueryString(['/&%$·#&=' => "1"]), '%2F%26%25%24%C2%B7%23%26%3D=1');
         $this->assertSame($this->sut->generateUrlQueryString(["%" => "%"]), '%25=%25');
+        $this->assertSame($this->sut->generateUrlQueryString(['a' => 1, 'b' => [1,2,3]]), 'a=1&b=%5B1%2C2%2C3%5D');
+        $this->assertSame($this->sut->generateUrlQueryString(['a' => 1, 'b' => (object)['c' => 1]]), 'a=1&b=%7B%22c%22%3A1%7D');
 
         // Test ok values with HashMapObjects
         $hashMapObject = new HashMapObject();

@@ -210,14 +210,15 @@ export class HTTPManager{
      * A query string is the part of an url that contains the GET parameters. It is placed after
      * the ? symbol and contains a list of parameters and values that are sent to the url.
      * 
-     * @param keyValuePairs An object or a HashMapObject containing key/value pairs that will be used to construct the query string
+     * @param keyValuePairs An object or a HashMapObject containing key/value pairs that will be used to construct the query string.
+     *        Note that when a value is an object or array, it will be encoded as a JSON string on the resulting query
      * 
      * @see https://en.wikipedia.org/wiki/Query_string
      * @see HashMapObject
      *
      * @return A valid query string that can be used with any url: http://www.url.com?query_string (Note that ? symbol is not included)
      */
-    generateUrlQueryString(keyValuePairs: { [key: string]: string } | HashMapObject){
+    generateUrlQueryString(keyValuePairs: { [key: string]: any } | HashMapObject){
         
         let result = '';
         let keys:string[] = [];
@@ -242,7 +243,8 @@ export class HTTPManager{
             
             for (var i = 0; i < keys.length; i++) {
                 
-                result += '&' + encodeURIComponent(keys[i]) + '=' + encodeURIComponent(values[i]);
+                result += '&' + encodeURIComponent(keys[i]) + '=' + encodeURIComponent(
+                        StringUtils.isString(values[i]) ? values[i] : JSON.stringify(values[i]));
             }
 
             return result.substring(1, result.length);        
