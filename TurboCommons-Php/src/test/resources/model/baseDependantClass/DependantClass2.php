@@ -9,7 +9,7 @@
  * CopyRight : -> Copyright 2015 Edertone Advanded Solutions (08211 Castellar del Vallès, Barcelona). http://www.edertone.com
  */
 
-namespace org\turbocommons\src\test\php\resources\model\baseDependantClass;
+namespace org\turbocommons\src\test\resources\model\baseDependantClass;
 
 use org\turbocommons\src\main\php\model\BaseDependantClass;
 

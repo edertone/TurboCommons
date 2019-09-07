@@ -46,7 +46,7 @@ class LocalizationManagerTest extends TestCase {
     protected function setUp(){
 
         $this->exceptionMessage = '';
-        $this->basePath = __DIR__.'/../resources/managers/localizationManager';
+        $this->basePath = __DIR__.'/../../resources/managers/localizationManager';
 
         $this->emptyValues = [null, '', [], new stdClass(), '     ', "\n\n\n", 0];
         $this->emptyValuesCount = count($this->emptyValues);

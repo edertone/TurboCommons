@@ -21,7 +21,10 @@ class HTTPManagerPostRequest extends HTTPManagerBaseRequest{
 
 
     /**
-     * A list of key / value pairs that will be used as parameters for this request
+     * A list of key / value pairs that will be sent as POST parameters for the request.
+     *
+     * String is the default format for these values, so if any of the parameters specified here is not a string, it will be
+     * passed through a JSON encoder to obtaion the string that will be sent to the request.
      *
      * @var array|HashMapObject
      */

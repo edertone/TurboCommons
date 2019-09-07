@@ -38,7 +38,7 @@ class JavaPropertiesObjectTest extends TestCase {
      */
     public static function setUpBeforeClass(){
 
-        self::$basePath = __DIR__.'/../resources/model/javaPropertiesObject';
+        self::$basePath = __DIR__.'/../../resources/model/javaPropertiesObject';
 
         // Load all the properties files data
         self::$propertiesFiles = [];

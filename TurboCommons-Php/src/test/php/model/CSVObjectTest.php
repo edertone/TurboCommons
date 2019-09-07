@@ -44,7 +44,7 @@ class CSVObjectTest extends TestCase {
      */
     public static function setUpBeforeClass(){
 
-        self::$basePath = __DIR__.'/../resources/model/csvObject';
+        self::$basePath = __DIR__.'/../../resources/model/csvObject';
 
         // Load all the csv and properties files data
         self::$csvFiles = [];

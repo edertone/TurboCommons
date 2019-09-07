@@ -11,8 +11,8 @@
 
 namespace org\turbocommons\src\test\php\model;
 
-use org\turbocommons\src\test\php\resources\model\baseDependantClass\DependantClass2;
-use org\turbocommons\src\test\php\resources\model\baseDependantClass\DependantClass;
+use org\turbocommons\src\test\resources\model\baseDependantClass\DependantClass2;
+use org\turbocommons\src\test\resources\model\baseDependantClass\DependantClass;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
