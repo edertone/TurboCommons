@@ -64,7 +64,7 @@
     "test": [
     	{
 	    	"type": "qunit",
-	    	"testsRoot": "src/test/js",
+	    	"testsRoot": "src/test",
 	        "httpServerPort": "8185",
 	        "targets": ["es5", "es6"],
 	        "browsers": {"chrome": true, "firefox": true, "iexplore": false}
