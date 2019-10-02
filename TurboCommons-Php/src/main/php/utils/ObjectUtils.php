@@ -48,7 +48,7 @@ class ObjectUtils {
 
         if(!ObjectUtils::isObject($object)){
 
-            throw new UnexpectedValueException('ObjectUtils->getKeys: parameter must be an object');
+            throw new UnexpectedValueException('parameter must be an object');
         }
 
         foreach($object as $key => $value){
@@ -78,7 +78,7 @@ class ObjectUtils {
         // Both provided values must be objects or an exception will be launched
         if(!$validationManager->isObject($object1) || !$validationManager->isObject($object2)){
 
-            throw new UnexpectedValueException('ObjectUtils->isEqualTo: parameters must be objects');
+            throw new UnexpectedValueException('parameters must be objects');
         }
 
         $keys1 = self::getKeys($object1);
@@ -108,6 +108,13 @@ class ObjectUtils {
         }
 
         return true;
+    }
+
+
+    // TODO - translate from TS
+    public static function isStringFound(){
+
+        // TODO - translate from TS
     }
 
 

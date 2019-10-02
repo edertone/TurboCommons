@@ -13,11 +13,13 @@ QUnit.module("ArrayUtilsTest", {
     beforeEach : function() {
 
         window.ArrayUtils = org_turbocommons.ArrayUtils;
+        window.StringUtils = org_turbocommons.StringUtils;
     },
 
     afterEach : function() {
 
         delete window.ArrayUtils;
+        delete window.StringUtils;
     }
 });
 
@@ -119,6 +121,88 @@ QUnit.test("isEqualTo", function(assert) {
             b : [1, 2, 3],
             c : 'hello'
         }]));
+});
+
+
+/**
+ * isStringFound
+ */
+QUnit.test("isStringFound", function(assert) {
+    
+    // Test empty values
+    let emptyValues = [null, undefined, 0, {}, '', '    ', "\n\n\n\n"];
+    
+    for(var i = 0; i < emptyValues.length; i++){
+       
+        assert.throws(function() {
+            ArrayUtils.isStringFound(emptyValues[i], '');
+        }, /parameter must be an array/);
+        
+        if(StringUtils.isString(emptyValues[i])){
+            
+            assert.notOk(ArrayUtils.isStringFound([], emptyValues[i]));
+        
+        }else{
+            
+            assert.throws(function() {
+                ArrayUtils.isStringFound([], emptyValues[i]);
+            }, /str is not a string/);
+        }
+    }
+
+    // Test ok values
+    assert.ok(ArrayUtils.isStringFound([''], ''));
+    assert.ok(ArrayUtils.isStringFound(['hello'], ''));
+    assert.ok(ArrayUtils.isStringFound(['hello'], 'hello'));
+    assert.ok(ArrayUtils.isStringFound(['hello world'], 'hello'));
+    assert.ok(ArrayUtils.isStringFound(['', 'hello world'], 'hello'));
+    assert.ok(ArrayUtils.isStringFound(['string', 1000, 'hello world'], 'hello'));
+    assert.ok(ArrayUtils.isStringFound(['string', 1000, [1,2,3], 'hello world'], 'hello'));
+    assert.ok(ArrayUtils.isStringFound(['string', {a: 129, b: 'string2'}, [1,2,3], 'hello world'], 'world'));
+    assert.ok(ArrayUtils.isStringFound(['string', {a: 129, b: 'string2'}, [1,2,3], 'hello world'], 'string2'));
+    assert.ok(ArrayUtils.isStringFound(['string', 1000, [1,2,'found'], 'hello world'], 'found'));
+    assert.ok(ArrayUtils.isStringFound(['string', 1000, [1,{a: 10, b: 'found'},3], 'hello world'], 'found'));
+    assert.ok(ArrayUtils.isStringFound([1, 1000, [1,{a: 10, b: 'hello'},3], 'string'], 'string'));
+    
+    assert.notOk(ArrayUtils.isStringFound([''], ' '));
+    assert.notOk(ArrayUtils.isStringFound([1234], ''));
+    assert.notOk(ArrayUtils.isStringFound(['hello'], 'Hello'));
+    assert.notOk(ArrayUtils.isStringFound(['hello world'], 'Hello'));
+    assert.notOk(ArrayUtils.isStringFound(['', 'hello world'], 'Hello'));
+    assert.notOk(ArrayUtils.isStringFound(['string', 1000, 'hello world'], 'Hello'));
+    assert.notOk(ArrayUtils.isStringFound(['string', 1000, [1,2,3], 'hello world'], 'Hello'));
+    assert.notOk(ArrayUtils.isStringFound(['string', 1000, [1,2,3], 'hello world'], 'notfound'));
+    
+    assert.ok(ArrayUtils.isStringFound([''], '', false));
+    assert.ok(ArrayUtils.isStringFound(['hello'], 'hello', false));
+    assert.ok(ArrayUtils.isStringFound(['hello world'], 'hello', false));
+    assert.ok(ArrayUtils.isStringFound(['', 'hello world'], 'hello', false));
+    assert.ok(ArrayUtils.isStringFound(['string', 1000, 'hello world'], 'hello', false));
+    assert.ok(ArrayUtils.isStringFound(['string', 1000, [1,2,3], 'hello world'], 'hello', false));
+    assert.notOk(ArrayUtils.isStringFound([''], ' ', false));
+    assert.ok(ArrayUtils.isStringFound(['hello'], 'Hello', false));
+    assert.ok(ArrayUtils.isStringFound(['hello world'], 'Hello', false));
+    assert.ok(ArrayUtils.isStringFound(['', 'hello world'], 'Hello', false));
+    assert.ok(ArrayUtils.isStringFound(['string', 1000, 'hello world'], 'Hello', false));
+    assert.ok(ArrayUtils.isStringFound(['string', 1000, [1,2,3], 'hello world'], 'Hello', false));
+    
+    // Test wrong values
+    // Test exceptions
+    assert.throws(function() {
+        ArrayUtils.isStringFound(1234, '');
+    }, /parameter must be an array/);
+    
+    assert.throws(function() {
+        ArrayUtils.isStringFound({a: ''}, '');
+    }, /parameter must be an array/);
+    
+    assert.throws(function() {
+        ArrayUtils.isStringFound([''], 123456);
+    }, /str is not a string/);
+    
+    assert.throws(function() {
+        ArrayUtils.isStringFound([''], [1,2]);
+    }, /str is not a string/);    
 });
 
 

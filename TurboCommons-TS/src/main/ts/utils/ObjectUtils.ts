@@ -9,6 +9,7 @@
 
 
 import { ArrayUtils } from './ArrayUtils';
+import { StringUtils } from "./StringUtils";
 import { ValidationManager } from '../managers/ValidationManager';
 
 
@@ -44,7 +45,7 @@ export class ObjectUtils {
 
         if(!ObjectUtils.isObject(object)){
 
-            throw new Error("ObjectUtils.getKeys: parameter must be an object");
+            throw new Error("parameter must be an object");
         }
 
         return Object.keys(object);
@@ -69,7 +70,7 @@ export class ObjectUtils {
         // Both provided values must be objects or an exception will be launched
         if(!ObjectUtils.isObject(object1) || !ObjectUtils.isObject(object2)){
 
-            throw new Error("ObjectUtils.isEqualTo: parameters must be objects");
+            throw new Error("parameters must be objects");
         }
 
         var keys1:string[] = ObjectUtils.getKeys(object1).sort();
@@ -91,6 +92,56 @@ export class ObjectUtils {
         }
 
         return true;
+    }
+    
+    
+    /**
+     * Check if the provided string is found inside the provided object structure.
+     * This method will recursively search inside all the provided object properties and test if the provided string is found.
+     * Search will be performed inside any object structures like arrays or other objects. Result will be positive even if 
+     * any string on the object contains the searched text as a substring.
+     * 
+     * @param object The object where the string will be looked for
+     * @param str The string that will be searched on the object
+     * @param caseSensitive True (default) to perform a case sensitive search, false otherwise
+     * 
+     * @returns True if the string is found anywhere inside the provided object, false otherwise 
+     */
+    public static isStringFound(object:any, str:string, caseSensitive = true):boolean{
+        
+        if(!ObjectUtils.isObject(object)){
+
+            throw new Error("parameter must be an object");
+        }
+        
+        if(!StringUtils.isString(str)){
+
+            throw new Error("str is not a string");
+        }
+        
+        const keys = ObjectUtils.getKeys(object);
+
+        for (const key of keys) {
+
+            if (StringUtils.isString(object[key]) &&
+                ((caseSensitive && object[key].indexOf(str) >= 0) ||
+                (!caseSensitive && object[key].toLowerCase().indexOf(str.toLowerCase()) >= 0))) {
+
+                return true;
+            }
+            
+            if(ArrayUtils.isArray(object[key]) && ArrayUtils.isStringFound(object[key], str, caseSensitive)){
+                
+                return true;
+            }
+            
+            if(ObjectUtils.isObject(object[key]) && ObjectUtils.isStringFound(object[key], str, caseSensitive)){
+                
+                return true;
+            }
+        }
+
+        return false;
     }
     
     

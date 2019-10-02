@@ -43,17 +43,13 @@ class ArrayUtils {
      */
     public static function isEqualTo(array $array1, array $array2){
 
-        $validationManager = new ValidationManager();
-
         // Compare lengths can save a lot of time
         if(count($array1) != count($array2)){
 
             return false;
         }
 
-        $array1Count = count($array1);
-
-        for($i = 0, $l = $array1Count; $i < $l; $i++){
+        for($i = 0, $l = count($array1); $i < $l; $i++){
 
             // Check if we have nested arrays
             if(self::isArray($array1[$i]) && self::isArray($array2[$i])){
@@ -80,6 +76,13 @@ class ArrayUtils {
         }
 
         return true;
+    }
+
+
+    // TODO - translate from TS
+    public static function isStringFound(){
+
+        // TODO - translate from TS
     }
 
 

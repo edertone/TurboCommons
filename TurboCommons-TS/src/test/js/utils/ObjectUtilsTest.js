@@ -14,12 +14,14 @@ QUnit.module("ObjectUtilsTest", {
 
         window.ArrayUtils = org_turbocommons.ArrayUtils;
         window.ObjectUtils = org_turbocommons.ObjectUtils;
+        window.StringUtils = org_turbocommons.StringUtils;
     },
 
     afterEach : function() {
 
         delete window.ArrayUtils;
         delete window.ObjectUtils;
+        delete window.StringUtils;
     }
 });
 
@@ -231,6 +233,88 @@ QUnit.test("isEqualTo", function(assert) {
     });
 });
 
+
+/**
+ * isStringFound
+ */
+QUnit.test("isStringFound", function(assert) {
+    
+    // Test empty values
+    let emptyValues = [null, undefined, 0, [], '', '    ', "\n\n\n\n"];
+    
+    for(var i = 0; i < emptyValues.length; i++){
+       
+        assert.throws(function() {
+            ObjectUtils.isStringFound(emptyValues[i], '');
+        }, /parameter must be an object/);
+        
+        if(StringUtils.isString(emptyValues[i])){
+            
+            assert.notOk(ObjectUtils.isStringFound({}, emptyValues[i]));
+        
+        }else{
+            
+            assert.throws(function() {
+                ObjectUtils.isStringFound({}, emptyValues[i]);
+            }, /str is not a string/);
+        }
+    }
+
+    // Test ok values
+    assert.ok(ObjectUtils.isStringFound({a: ''}, ''));
+    assert.ok(ObjectUtils.isStringFound({a: 'hello'}, ''));
+    assert.ok(ObjectUtils.isStringFound({a: 'hello'}, 'hello'));
+    assert.ok(ObjectUtils.isStringFound({a: 'hello world'}, 'hello'));
+    assert.ok(ObjectUtils.isStringFound({a: '', b: 'hello world'}, 'hello'));
+    assert.ok(ObjectUtils.isStringFound({a: 'string', b: 1000, c: 'hello world'}, 'hello'));
+    assert.ok(ObjectUtils.isStringFound({a: 'string', b: 1000, c: [1,2,3], d: 'hello world'}, 'hello'));
+    assert.ok(ObjectUtils.isStringFound({a: 'string', b: {a: 129, b: 'string2'}, c: [1,2,3], d: 'hello world'}, 'world'));
+    assert.ok(ObjectUtils.isStringFound({a: 'string', b: {a: 129, b: 'string2'}, c: [1,2,3], d: 'hello world'}, 'string2'));
+    assert.ok(ObjectUtils.isStringFound({a: 'string', b: 1000, c: [1,2,'found'], d: 'hello world'}, 'found'));
+    assert.ok(ObjectUtils.isStringFound({a: 'string', b: 1000, c: [1,{a: 10, b: 'found'},3], d: 'hello world'}, 'found'));
+    assert.ok(ObjectUtils.isStringFound({a: 1, b: 1000, c: [1,{a: 10, b: 'hello'},3], d: 'string'}, 'string'));
+    
+    assert.notOk(ObjectUtils.isStringFound({a: ''}, ' '));
+    assert.notOk(ObjectUtils.isStringFound({a: 1234}, ''));
+    assert.notOk(ObjectUtils.isStringFound({a: 'hello'}, 'Hello'));
+    assert.notOk(ObjectUtils.isStringFound({a: 'hello world'}, 'Hello'));
+    assert.notOk(ObjectUtils.isStringFound({a: '', b: 'hello world'}, 'Hello'));
+    assert.notOk(ObjectUtils.isStringFound({a: 'string', b: 1000, c: 'hello world'}, 'Hello'));
+    assert.notOk(ObjectUtils.isStringFound({a: 'string', b: 1000, c: [1,2,3], d: 'hello world'}, 'Hello'));
+    assert.notOk(ObjectUtils.isStringFound({a: 'string', b: 1000, c: [1,2,3], d: 'hello world'}, 'notfound'));
+    
+    assert.ok(ObjectUtils.isStringFound({a: ''}, '', false));
+    assert.ok(ObjectUtils.isStringFound({a: 'hello'}, 'hello', false));
+    assert.ok(ObjectUtils.isStringFound({a: 'hello world'}, 'hello', false));
+    assert.ok(ObjectUtils.isStringFound({a: '', b: 'hello world'}, 'hello', false));
+    assert.ok(ObjectUtils.isStringFound({a: 'string', b: 1000, c: 'hello world'}, 'hello', false));
+    assert.ok(ObjectUtils.isStringFound({a: 'string', b: 1000, c: [1,2,3], d: 'hello world'}, 'hello', false));
+    assert.notOk(ObjectUtils.isStringFound({a: ''}, ' ', false));
+    assert.ok(ObjectUtils.isStringFound({a: 'hello'}, 'Hello', false));
+    assert.ok(ObjectUtils.isStringFound({a: 'hello world'}, 'Hello', false));
+    assert.ok(ObjectUtils.isStringFound({a: '', b: 'hello world'}, 'Hello', false));
+    assert.ok(ObjectUtils.isStringFound({a: 'string', b: 1000, c: 'hello world'}, 'Hello', false));
+    assert.ok(ObjectUtils.isStringFound({a: 'string', b: 1000, c: [1,2,3], d: 'hello world'}, 'Hello', false));
+    
+    // Test wrong values
+    // Test exceptions
+    assert.throws(function() {
+        ObjectUtils.isStringFound(1234, '');
+    }, /parameter must be an object/);
+    
+    assert.throws(function() {
+        ObjectUtils.isStringFound([1,2,3], '');
+    }, /parameter must be an object/);
+    
+    assert.throws(function() {
+        ObjectUtils.isStringFound({a: ''}, 123456);
+    }, /str is not a string/);
+    
+    assert.throws(function() {
+        ObjectUtils.isStringFound({a: ''}, [1,2]);
+    }, /str is not a string/);
+});
+   
 
 /**
  * merge

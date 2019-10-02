@@ -9,6 +9,7 @@
     
     
 import { ObjectUtils } from './ObjectUtils';
+import { StringUtils } from "./StringUtils";
 import { ValidationManager } from "../managers/ValidationManager";
 
 
@@ -44,7 +45,7 @@ export class ArrayUtils {
         // Both provided values must be arrays or an exception will be launched
         if(!ArrayUtils.isArray(array1) || !ArrayUtils.isArray(array2)){
 
-            throw new Error("ArrayUtils.isEqualTo: Provided parameters must be arrays");
+            throw new Error('parameters must be arrays');
         }
 
         // Compare lengths can save a lot of time 
@@ -81,6 +82,54 @@ export class ArrayUtils {
 
         return true;
     }
+    
+    
+    /**
+     * Check if the provided string is found inside the provided array structure.
+     * This method will recursively search inside all the provided array elements and test if the provided string is found.
+     * Search will be performed inside any array structures like arrays or other objects. Result will be positive even if 
+     * any string on the array contains the searched text as a substring.
+     * 
+     * @param array The array where the string will be looked for
+     * @param str The string that will be searched on the array
+     * @param caseSensitive True (default) to perform a case sensitive search, false otherwise
+     * 
+     * @returns True if the string is found anywhere inside the provided array, false otherwise 
+     */
+    public static isStringFound(array:any[], str:string, caseSensitive = true):boolean{
+        
+        if(!ArrayUtils.isArray(array)){
+
+            throw new Error("parameter must be an array");
+        }
+        
+        if(!StringUtils.isString(str)){
+
+            throw new Error("str is not a string");
+        }
+        
+        for (var i = 0; i < array.length; i++) {
+    
+            if (StringUtils.isString(array[i]) &&
+                ((caseSensitive && array[i].indexOf(str) >= 0) ||
+                (!caseSensitive && array[i].toLowerCase().indexOf(str.toLowerCase()) >= 0))) {
+
+                return true;
+            }
+            
+            if(ArrayUtils.isArray(array[i]) && ArrayUtils.isStringFound(array[i], str, caseSensitive)){
+                
+                return true;
+            }
+            
+            if(ObjectUtils.isObject(array[i]) && ObjectUtils.isStringFound(array[i], str, caseSensitive)){
+                
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 
     /**
@@ -96,7 +145,7 @@ export class ArrayUtils {
         // Provided array must be an array
         if(!ArrayUtils.isArray(array)){
 
-            throw new Error("ArrayUtils.removeElement: Provided parameter must be an array");
+            throw new Error('parameter must be an array');
         }
 
         var res:any[] = [];
@@ -146,7 +195,7 @@ export class ArrayUtils {
         // Provided array must be an array
         if(!ArrayUtils.isArray(array)){
 
-            throw new Error("ArrayUtils.removeDuplicateElements: Provided parameter must be an array");
+            throw new Error('parameter must be an array');
         }
         
         let result = [];
@@ -192,7 +241,7 @@ export class ArrayUtils {
         // Provided array must be an array
         if(!ArrayUtils.isArray(array)){
 
-            throw new Error("ArrayUtils.hasDuplicateElements: Provided parameter must be an array");
+            throw new Error('parameter must be an array');
         }
         
         let numElements = array.length;
@@ -227,7 +276,7 @@ export class ArrayUtils {
         // Provided array must be an array
         if(!ArrayUtils.isArray(array)){
 
-            throw new Error("ArrayUtils.getDuplicateElements: Provided parameter must be an array");
+            throw new Error('parameter must be an array');
         }
         
         let result = [];

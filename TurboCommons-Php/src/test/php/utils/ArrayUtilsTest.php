@@ -181,6 +181,29 @@ class ArrayUtilsTest extends TestCase {
         ]]));
     }
 
+
+    /**
+     * testIsStringFound
+     *
+     * @return void
+     */
+    public function testIsStringFound(){
+
+        // Test empty values
+        // TODO - translate from ts
+
+        // Test ok values
+        // TODO - translate from ts
+
+        // Test wrong values
+        // TODO - translate from ts
+
+        // Test exceptions
+        // TODO - translate from ts
+        $this->markTestIncomplete('This test has not been implemented yet.');
+    }
+
+
     /**
      * testRemoveElement
      *
