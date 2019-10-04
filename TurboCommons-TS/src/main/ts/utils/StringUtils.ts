@@ -135,13 +135,16 @@ export class StringUtils {
     
     
     /**
-     * Tells if a specified string is empty. The string may contain empty spaces, and new line characters but have some length, and therefore be EMPTY.
-     * This method checks all these different conditions that can tell us that a string is empty.
-     * 
-     * @param string String to check
-     * @param emptyChars List of strings that will be also considered as empty characters. For example, if we also want to define 'NULL' and '_' as empty string values, we can set this to ['NULL', '_']
+     * Tells if a specified string is semantically empty, which applies to any string that is comprised of empty spaces, new line characters, tabulations or any other
+     * characters without a visually semantic value to the user.
      *
-     * @returns false if the string is not empty, true if the string contains only spaces, newlines or any other characters defined as "empty" values
+     * Example1: Following strings are considered as empty: "     ", "", "    \n\n\n", "    \t\t\n"
+     * Example2: Following strings are not considered as empty: "hello", "   a", "    \n\nB"
+     *
+     * @param string The text to check
+     * @param emptyChars Custom list of strings that will be also considered as empty characters. For example, we can define 'NULL' and '_' as empty string values by setting this to ['NULL', '_']
+     *
+     * @return false if the string is not empty, true if the string contains non semantically valuable characters or any other characters defined as "empty" values
      */
     public static isEmpty(string:string, emptyChars:string[] = []) {
     
