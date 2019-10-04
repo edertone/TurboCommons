@@ -10,7 +10,7 @@
  */
 
 
-require_once __DIR__.'/../libs/turbodepot-php-3.1.0.phar';
+require_once __DIR__.'/../libs/turbodepot-php-6.0.0.phar';
 require_once __DIR__.'/../../main/php/autoloader.php';
 
 
