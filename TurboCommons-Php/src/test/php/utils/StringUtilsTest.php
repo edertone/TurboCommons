@@ -1793,6 +1793,8 @@ class StringUtilsTest extends TestCase {
         $this->assertSame(4, StringUtils::compareByLevenshtein("èéöÖ", "eèöOu"));
 
         $this->assertSame(3, StringUtils::compareByLevenshtein("HONDA", "HYUNDAI"));
+        $this->assertSame(1, StringUtils::compareByLevenshtein("Honda", "honda"));
+        $this->assertSame(5, StringUtils::compareByLevenshtein("honda", "HONDA"));
         $this->assertSame(3, StringUtils::compareByLevenshtein("kitten", "sitting"));
 
         $this->assertSame(1, StringUtils::compareByLevenshtein("形声字 / 形聲字", "形声字 A 形聲字"));

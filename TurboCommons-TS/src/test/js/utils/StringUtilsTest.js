@@ -1461,6 +1461,8 @@ QUnit.test("compareByLevenshtein", function(assert) {
     assert.strictEqual(4, StringUtils.compareByLevenshtein("èéöÖ", "eèöOu"));
 
     assert.strictEqual(3, StringUtils.compareByLevenshtein("HONDA", "HYUNDAI"));
+    assert.strictEqual(1, StringUtils.compareByLevenshtein("Honda", "honda"));
+    assert.strictEqual(5, StringUtils.compareByLevenshtein("honda", "HONDA"));
     assert.strictEqual(3, StringUtils.compareByLevenshtein("kitten", "sitting"));
 
     assert.strictEqual(1, StringUtils.compareByLevenshtein("形声字 / 形聲字", "形声字 A 形聲字"));
