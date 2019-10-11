@@ -17,6 +17,7 @@ use Throwable;
 use stdClass;
 use Exception;
 use PHPUnit\Framework\TestCase;
+use org\turbotesting\src\main\php\utils\AssertUtils;
 
 
 /**
@@ -2067,6 +2068,94 @@ class StringUtilsTest extends TestCase {
         } catch (Throwable $e) {
             // We expect an exception to happen
         }
+    }
+
+
+    /**
+     * testFindMostSimilarString
+     *
+     * @return void
+     */
+    public function testFindMostSimilarString(){
+
+        // Test empty values
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString(null, []); }, '/expected a string/');
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString('', null); }, '/must be of the type array, null given/');
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString('', []); }, '/listOfStrings is empty/');
+
+        $this->assertSame("   ", StringUtils::findMostSimilarString("   ", ["   "]));
+
+        // Test ok values
+
+        $this->assertSame("", StringUtils::findMostSimilarString("a", [""]));
+        $this->assertSame("", StringUtils::findMostSimilarString("a", ["", ""]));
+        $this->assertSame("", StringUtils::findMostSimilarString("a", ["", "  "]));
+        $this->assertSame("a", StringUtils::findMostSimilarString("a", ["", "  ", "a"]));
+        $this->assertSame("b", StringUtils::findMostSimilarString("", ["b", "c", "a"]));
+        $this->assertSame("a", StringUtils::findMostSimilarString("a", ["b", "c", "a"]));
+        $this->assertSame("a", StringUtils::findMostSimilarString("a", ["a", "b", "c"]));
+        $this->assertSame("a", StringUtils::findMostSimilarString("abc", ["a", "b", "c"]));
+        $this->assertSame("b", StringUtils::findMostSimilarString("abc", ["b", "a", "c"]));
+        $this->assertSame("hello", StringUtils::findMostSimilarString("hello", ["b", "a", "c", "hello"]));
+        $this->assertSame("hello", StringUtils::findMostSimilarString("hello", ["a", "he", "hell", "hello"]));
+        $this->assertSame("hallo", StringUtils::findMostSimilarString("hello", ["hallo", "hillo", "hell", "hellow"]));
+        $this->assertSame("hell", StringUtils::findMostSimilarString("hell", ["hallo", "hillo", "hell", "hellow"]));
+        $this->assertSame("xabxcxefxgx", StringUtils::findMostSimilarString("abcdefg", ["xabxcxefxgx", "xabcdxxefxgx", "xabxcefxgx", "xabxefxgx"]));
+        $this->assertSame("samples", StringUtils::findMostSimilarString("example", ["xabxcxefxgx", "samples", "xabxcefxgx", "examplified"]));
+        $this->assertSame("èéöÖU", StringUtils::findMostSimilarString("èéöÖU", ["xabxcxefxgx", "eéöU", "èéöÖU", "eeoOU"]));
+        $this->assertSame("èéöU", StringUtils::findMostSimilarString("èéöÖU", ["xabxcxefxgx", "eöÖU", "èéöU", "eeoOU"]));
+
+        // Test wrong values
+        // Test exceptions
+
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString(1234, 1234); }, '/must be of the type array, integer given/');
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString("", 1234); }, '/must be of the type array, integer given/');
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString([1, 2, 3, 4], [2, 4, 5, 6]); }, '/expected a string/');
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString(new Exception(), new Exception()); }, '/must be of the type array, object given/');
+    }
+
+
+    /**
+     * testFindMostSimilarStringIndex
+     *
+     * @return void
+     */
+    public function testFindMostSimilarStringIndex(){
+
+        // Test empty values
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex(null, []); }, '/expected a string/');
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex('', null); }, '/must be of the type array, null given/');
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex('', []); }, '/listOfStrings is empty/');
+
+        $this->assertSame(0, StringUtils::findMostSimilarStringIndex("   ", ["   "]));
+
+        // Test ok values
+
+        $this->assertSame(0, StringUtils::findMostSimilarStringIndex("a", [""]));
+        $this->assertSame(0, StringUtils::findMostSimilarStringIndex("a", ["", ""]));
+        $this->assertSame(0, StringUtils::findMostSimilarStringIndex("a", ["", "  "]));
+        $this->assertSame(2, StringUtils::findMostSimilarStringIndex("a", ["", "  ", "a"]));
+        $this->assertSame(0, StringUtils::findMostSimilarStringIndex("", ["b", "c", "a"]));
+        $this->assertSame(2, StringUtils::findMostSimilarStringIndex("a", ["b", "c", "a"]));
+        $this->assertSame(0, StringUtils::findMostSimilarStringIndex("a", ["a", "b", "c"]));
+        $this->assertSame(0, StringUtils::findMostSimilarStringIndex("abc", ["a", "b", "c"]));
+        $this->assertSame(0, StringUtils::findMostSimilarStringIndex("abc", ["b", "a", "c"]));
+        $this->assertSame(3, StringUtils::findMostSimilarStringIndex("hello", ["b", "a", "c", "hello"]));
+        $this->assertSame(3, StringUtils::findMostSimilarStringIndex("hello", ["a", "he", "hell", "hello"]));
+        $this->assertSame(0, StringUtils::findMostSimilarStringIndex("hello", ["hallo", "hillo", "hell", "hellow"]));
+        $this->assertSame(2, StringUtils::findMostSimilarStringIndex("hell", ["hallo", "hillo", "hell", "hellow"]));
+        $this->assertSame(0, StringUtils::findMostSimilarStringIndex("abcdefg", ["xabxcxefxgx", "xabcdxxefxgx", "xabxcefxgx", "xabxefxgx"]));
+        $this->assertSame(1, StringUtils::findMostSimilarStringIndex("example", ["xabxcxefxgx", "samples", "xabxcefxgx", "examplified"]));
+        $this->assertSame(2, StringUtils::findMostSimilarStringIndex("èéöÖU", ["xabxcxefxgx", "eéöU", "èéöÖU", "eeoOU"]));
+        $this->assertSame(2, StringUtils::findMostSimilarStringIndex("èéöÖU", ["xabxcxefxgx", "eöÖU", "èéöU", "eeoOU"]));
+
+        // Test wrong values
+        // Test exceptions
+
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex(1234, 1234); }, '/must be of the type array, integer given/');
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex("", 1234); }, '/must be of the type array, integer given/');
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex([1, 2, 3, 4], [2, 4, 5, 6]); }, '/expected a string/');
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex(new Exception(), new Exception()); }, '/must be of the type array, object given/');
     }
 
 

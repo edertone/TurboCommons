@@ -1147,6 +1147,18 @@ export class StringUtils {
 
         return result;
     }
+        
+        
+    public static findMostSimilarString() {
+        
+        // TODO: translate from php
+    }
+        
+        
+    public static findMostSimilarStringIndex() {
+        
+        // TODO: translate from php
+    }
     
     
     public static removeNewLineCharacters() {

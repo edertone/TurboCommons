@@ -1690,6 +1690,24 @@ QUnit.test("generateRandom", function(assert) {
 
 
 /**
+ * testFindMostSimilarString
+ */
+QUnit.todo("testFindMostSimilarString", function(assert) {
+
+    // TODO: copy tests from PHP
+});
+
+
+/**
+ * testFindMostSimilarStringIndex
+ */
+QUnit.todo("testFindMostSimilarStringIndex", function(assert) {
+
+    // TODO: copy tests from PHP
+});
+
+
+/**
  * testRemoveNewLineCharacters
  */
 QUnit.todo("testRemoveNewLineCharacters", function(assert) {

@@ -1186,6 +1186,66 @@ class StringUtils {
 
 
     /**
+     * Find the string that is most similar to a provided one inside an array of strings.
+     *
+     * NOTE: The strings are compared by using the Levenshtein method.
+     *
+     * @see StringUtils::compareByLevenshtein
+     *
+     * @param string $string The string that we want to compare with all of the provided array
+     * @param array $listOfStrings An array of strings with all the strings we want to compare
+     *
+     * @return string The string that was found to be more similar to the provided one
+     */
+    public static function findMostSimilarString($string, array $listOfStrings){
+
+        return $listOfStrings[StringUtils::findMostSimilarStringIndex($string, $listOfStrings)];
+    }
+
+
+    /**
+     * Find the array index that contains the string that is most similar to a provided one inside an array of strings.
+     *
+     * NOTE: The strings are compared by using the Levenshtein method.
+     *
+     * @see StringUtils::compareByLevenshtein
+     *
+     * @param string $string The string that we want to compare with all of the provided array
+     * @param array $listOfStrings An array of strings with all the strings we want to compare
+     *
+     * @return int The array index for the string that was found to be more similar to the provided one
+     */
+    public static function findMostSimilarStringIndex($string, array $listOfStrings){
+
+        if(!is_string($string)){
+
+            throw new InvalidArgumentException('expected a string');
+        }
+
+        if(count($listOfStrings) <= 0){
+
+            throw new InvalidArgumentException('listOfStrings is empty');
+        }
+
+        $mostSimilarIndex = 0;
+        $mostSimilarLevenshteinValue = StringUtils::compareByLevenshtein($string, $listOfStrings[0]);
+
+        for ($i = 1, $l = count($listOfStrings); $i < $l; $i++) {
+
+            $similarityValue = StringUtils::compareByLevenshtein($string, $listOfStrings[$i]);
+
+            if($similarityValue < $mostSimilarLevenshteinValue){
+
+                $mostSimilarIndex = $i;
+                $mostSimilarLevenshteinValue = $similarityValue;
+            }
+        }
+
+        return $mostSimilarIndex;
+    }
+
+
+    /**
      * Deletes all new line characters from the given string
      *
      * @param string $string The string to process
