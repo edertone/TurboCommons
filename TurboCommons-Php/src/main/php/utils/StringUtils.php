@@ -1228,16 +1228,16 @@ class StringUtils {
         }
 
         $mostSimilarIndex = 0;
-        $mostSimilarLevenshteinValue = StringUtils::compareByLevenshtein($string, $listOfStrings[0]);
+        $mostSimilarPercentage = StringUtils::compareSimilarityPercent($string, $listOfStrings[0]);
 
         for ($i = 1, $l = count($listOfStrings); $i < $l; $i++) {
 
-            $similarityValue = StringUtils::compareByLevenshtein($string, $listOfStrings[$i]);
+            $similarityPercent = StringUtils::compareSimilarityPercent($string, $listOfStrings[$i]);
 
-            if($similarityValue < $mostSimilarLevenshteinValue){
+            if($similarityPercent > $mostSimilarPercentage){
 
                 $mostSimilarIndex = $i;
-                $mostSimilarLevenshteinValue = $similarityValue;
+                $mostSimilarPercentage = $similarityPercent;
             }
         }
 

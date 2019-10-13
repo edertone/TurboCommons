@@ -2098,12 +2098,13 @@ class StringUtilsTest extends TestCase {
         $this->assertSame("b", StringUtils::findMostSimilarString("abc", ["b", "a", "c"]));
         $this->assertSame("hello", StringUtils::findMostSimilarString("hello", ["b", "a", "c", "hello"]));
         $this->assertSame("hello", StringUtils::findMostSimilarString("hello", ["a", "he", "hell", "hello"]));
-        $this->assertSame("hallo", StringUtils::findMostSimilarString("hello", ["hallo", "hillo", "hell", "hellow"]));
+        $this->assertSame("hellow", StringUtils::findMostSimilarString("hello", ["hallo", "hillo", "hell", "hellow"]));
         $this->assertSame("hell", StringUtils::findMostSimilarString("hell", ["hallo", "hillo", "hell", "hellow"]));
-        $this->assertSame("xabxcxefxgx", StringUtils::findMostSimilarString("abcdefg", ["xabxcxefxgx", "xabcdxxefxgx", "xabxcefxgx", "xabxefxgx"]));
-        $this->assertSame("samples", StringUtils::findMostSimilarString("example", ["xabxcxefxgx", "samples", "xabxcefxgx", "examplified"]));
+        $this->assertSame("xabcdxxefxgx", StringUtils::findMostSimilarString("abcdefg", ["xabxcxefxgx", "xabcdxxefxgx", "xabxcefxgx", "xabxefxgx"]));
+        $this->assertSame("examplified", StringUtils::findMostSimilarString("example", ["xabxcxefxgx", "samples", "xabxcefxgx", "examplified"]));
         $this->assertSame("èéöÖU", StringUtils::findMostSimilarString("èéöÖU", ["xabxcxefxgx", "eéöU", "èéöÖU", "eeoOU"]));
         $this->assertSame("èéöU", StringUtils::findMostSimilarString("èéöÖU", ["xabxcxefxgx", "eöÖU", "èéöU", "eeoOU"]));
+        $this->assertSame("compare-similarity-between-two-strings", StringUtils::findMostSimilarString("compare-similar", ["convert-text-to-camel-case", "compare-similarity-between-two-strings"]));
 
         // Test wrong values
         // Test exceptions
@@ -2142,12 +2143,13 @@ class StringUtilsTest extends TestCase {
         $this->assertSame(0, StringUtils::findMostSimilarStringIndex("abc", ["b", "a", "c"]));
         $this->assertSame(3, StringUtils::findMostSimilarStringIndex("hello", ["b", "a", "c", "hello"]));
         $this->assertSame(3, StringUtils::findMostSimilarStringIndex("hello", ["a", "he", "hell", "hello"]));
-        $this->assertSame(0, StringUtils::findMostSimilarStringIndex("hello", ["hallo", "hillo", "hell", "hellow"]));
+        $this->assertSame(3, StringUtils::findMostSimilarStringIndex("hello", ["hallo", "hillo", "hell", "hellow"]));
         $this->assertSame(2, StringUtils::findMostSimilarStringIndex("hell", ["hallo", "hillo", "hell", "hellow"]));
-        $this->assertSame(0, StringUtils::findMostSimilarStringIndex("abcdefg", ["xabxcxefxgx", "xabcdxxefxgx", "xabxcefxgx", "xabxefxgx"]));
-        $this->assertSame(1, StringUtils::findMostSimilarStringIndex("example", ["xabxcxefxgx", "samples", "xabxcefxgx", "examplified"]));
+        $this->assertSame(1, StringUtils::findMostSimilarStringIndex("abcdefg", ["xabxcxefxgx", "xabcdxxefxgx", "xabxcefxgx", "xabxefxgx"]));
+        $this->assertSame(3, StringUtils::findMostSimilarStringIndex("example", ["xabxcxefxgx", "samples", "xabxcefxgx", "examplified"]));
         $this->assertSame(2, StringUtils::findMostSimilarStringIndex("èéöÖU", ["xabxcxefxgx", "eéöU", "èéöÖU", "eeoOU"]));
         $this->assertSame(2, StringUtils::findMostSimilarStringIndex("èéöÖU", ["xabxcxefxgx", "eöÖU", "èéöU", "eeoOU"]));
+        $this->assertSame(1, StringUtils::findMostSimilarStringIndex("compare-similar", ["convert-text-to-camel-case", "compare-similarity-between-two-strings"]));
 
         // Test wrong values
         // Test exceptions
