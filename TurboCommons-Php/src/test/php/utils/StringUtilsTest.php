@@ -633,47 +633,66 @@ class StringUtilsTest extends TestCase {
         $this->assertSame(StringUtils::countStringOccurences("helló bàbÝ\n   whats Up Todäy? are you feeling better? GOOD!", 'T'), 1);
 
         // Test exceptions
-        try {
-            StringUtils::countStringOccurences(null, null);
-            $this->exceptionMessage = 'null did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            StringUtils::countStringOccurences('', '');
-            $this->exceptionMessage = '"" did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            StringUtils::countStringOccurences('  ', '');
-            $this->exceptionMessage = '"" did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
+        AssertUtils::throwsException(function(){ StringUtils::countStringOccurences(null, null); }, '/value is not a string/');
+        AssertUtils::throwsException(function(){ StringUtils::countStringOccurences('', ''); }, '/cannot count occurences for an empty string/');
+        AssertUtils::throwsException(function(){ StringUtils::countStringOccurences('  ', ''); }, '/cannot count occurences for an empty string/');
     }
 
 
     /**
-     * testCountCapitalLetters
+     * testCountByCase
      *
      * @return void
      */
-    public function testCountCapitalLetters(){
+    public function testCountByCase(){
 
-        $this->assertTrue(StringUtils::countCapitalLetters(null) == 0);
-        $this->assertTrue(StringUtils::countCapitalLetters('') == 0);
-        $this->assertTrue(StringUtils::countCapitalLetters('  ') == 0);
-        $this->assertTrue(StringUtils::countCapitalLetters('       ') == 0);
-        $this->assertTrue(StringUtils::countCapitalLetters('hello') == 0);
-        $this->assertTrue(StringUtils::countCapitalLetters('hello baby') == 0);
-        $this->assertTrue(StringUtils::countCapitalLetters("tRy\nto\r\n\t\ngo\r\nUP") == 3);
-        $this->assertTrue(StringUtils::countCapitalLetters("     \n      \r\n") == 0);
-        $this->assertTrue(StringUtils::countCapitalLetters(" AEÉÜ    \n   1   \r\nÍË") == 6);
-        $this->assertTrue(StringUtils::countCapitalLetters("heLLo Baby\nhellÓ agaiN and go\n\n\r\nUp!") == 6);
-        $this->assertTrue(StringUtils::countCapitalLetters("helló bàbÝ\n   whats Up todäy? are you feeling better? GOOD!") == 6);
+        // Test empty values
+        AssertUtils::throwsException(function(){ StringUtils::countByCase(null); }, '/value is not a string/');
+        AssertUtils::throwsException(function(){ StringUtils::countByCase(null, StringUtils::FORMAT_ALL_LOWER_CASE); }, '/value is not a string/');
+
+        $this->assertSame(0, StringUtils::countByCase(''));
+        $this->assertSame(0, StringUtils::countByCase('  '));
+        $this->assertSame(0, StringUtils::countByCase('       '));
+        $this->assertSame(0, StringUtils::countByCase("     \n      \r\n"));
+
+        $this->assertSame(0, StringUtils::countByCase('', StringUtils::FORMAT_ALL_LOWER_CASE));
+        $this->assertSame(0, StringUtils::countByCase('  ', StringUtils::FORMAT_ALL_LOWER_CASE));
+        $this->assertSame(0, StringUtils::countByCase('       ', StringUtils::FORMAT_ALL_LOWER_CASE));
+        $this->assertSame(0, StringUtils::countByCase("     \n      \r\n", StringUtils::FORMAT_ALL_LOWER_CASE));
+
+        // Test ok values
+        $this->assertSame(0, StringUtils::countByCase('hello'));
+        $this->assertSame(0, StringUtils::countByCase('hello baby'));
+        $this->assertSame(0, StringUtils::countByCase('123123123123123'));
+        $this->assertSame(3, StringUtils::countByCase("tRy\nto\r\n\t\ngo\r\nUP"));
+        $this->assertSame(6, StringUtils::countByCase(" AEÉÜ    \n   1   \r\nÍË"));
+        $this->assertSame(6, StringUtils::countByCase("heLLo Baby\nhellÓ agaiN and go\n\n\r\nUp!"));
+        $this->assertSame(6, StringUtils::countByCase("helló bàbÝ\n   whats Up todäy? are you feeling better? GOOD!"));
+        $this->assertSame(0, StringUtils::countByCase("形声字 / 形聲字"));
+        $this->assertSame(1, StringUtils::countByCase("形声字A形聲字"));
+        $this->assertSame(2, StringUtils::countByCase("A形声字A形聲字a"));
+        $this->assertSame(6, StringUtils::countByCase("AaÁáBéEéÉË"));
+        $this->assertSame(1, StringUtils::countByCase("1234A567"));
+        $this->assertSame(2, StringUtils::countByCase('1声A字43B45-_*[]', StringUtils::FORMAT_ALL_UPPER_CASE));
+
+        $this->assertSame(5, StringUtils::countByCase('hello', StringUtils::FORMAT_ALL_LOWER_CASE));
+        $this->assertSame(9, StringUtils::countByCase('hello baby', StringUtils::FORMAT_ALL_LOWER_CASE));
+        $this->assertSame(6, StringUtils::countByCase("tRy\nto\r\n\t\ngo\r\nUP", StringUtils::FORMAT_ALL_LOWER_CASE));
+        $this->assertSame(0, StringUtils::countByCase(" AEÉÜ    \n   1   \r\nÍË", StringUtils::FORMAT_ALL_LOWER_CASE));
+        $this->assertSame(20, StringUtils::countByCase("heLLo Baby\nhellÓ agaiN and go\n\n\r\nUp!", StringUtils::FORMAT_ALL_LOWER_CASE));
+        $this->assertSame(38, StringUtils::countByCase("helló bàbÝ\n   whats Up todäy? are you feeling better? GOOD!", StringUtils::FORMAT_ALL_LOWER_CASE));
+        $this->assertSame(0, StringUtils::countByCase("形声字 / 形聲字", StringUtils::FORMAT_ALL_LOWER_CASE));
+        $this->assertSame(0, StringUtils::countByCase("形声字A形聲字", StringUtils::FORMAT_ALL_LOWER_CASE));
+        $this->assertSame(1, StringUtils::countByCase("A形声字A形聲字a", StringUtils::FORMAT_ALL_LOWER_CASE));
+        $this->assertSame(5, StringUtils::countByCase("AaÁáBéEéÉë", StringUtils::FORMAT_ALL_LOWER_CASE));
+        $this->assertSame(0, StringUtils::countByCase('1声A字43B45-_*[]', StringUtils::FORMAT_ALL_LOWER_CASE));
+        $this->assertSame(1, StringUtils::countByCase('1声A字43B45a-_*[]', StringUtils::FORMAT_ALL_LOWER_CASE));
+
+        // Test wrong values
+        AssertUtils::throwsException(function(){ StringUtils::countByCase(123123); }, '/value is not a string/');
+
+        // Test exceptions
+        AssertUtils::throwsException(function(){ StringUtils::countByCase("hello", 'invalid format'); }, '/invalid case value/');
     }
 
 
@@ -1718,10 +1737,20 @@ class StringUtilsTest extends TestCase {
      */
     public function testFormatForFullTextSearch(){
 
-        $this->assertTrue(StringUtils::formatForFullTextSearch(null) === '');
-        $this->assertTrue(StringUtils::formatForFullTextSearch('') === '');
+        // Test empty values
+        AssertUtils::throwsException(function(){ StringUtils::formatForFullTextSearch(null); }, '/value is not a string/');
 
-        // TODO!!
+        $this->assertSame('', StringUtils::formatForFullTextSearch(''));
+
+        // Test ok values
+        // TODO
+
+        // Test wrong values
+        // TODO
+
+        // Test exceptions
+        // TODO
+
         $this->markTestIncomplete('This test has not been implemented yet.');
 
     }
@@ -2226,9 +2255,13 @@ class StringUtilsTest extends TestCase {
      */
     public function testRemoveAccents(){
 
-        $this->assertTrue(StringUtils::removeAccents(null) === '');
+        // Test empty values
+        AssertUtils::throwsException(function(){ StringUtils::removeAccents(null); }, '/value is not a string/');
+
         $this->assertTrue(StringUtils::removeAccents('') === '');
         $this->assertTrue(StringUtils::removeAccents('        ') === '        ');
+
+        // Test ok values
         $this->assertTrue(StringUtils::removeAccents('Fó Bår') === 'Fo Bar');
         $this->assertTrue(StringUtils::removeAccents("|!€%'''") === "|!€%'''");
         $this->assertTrue(StringUtils::removeAccents('hiweury asb fsuyr weqr') === 'hiweury asb fsuyr weqr');
@@ -2240,6 +2273,9 @@ class StringUtilsTest extends TestCase {
         $this->assertTrue(StringUtils::removeAccents('óíéàùú hello') === 'oieauu hello');
         $this->assertTrue(StringUtils::removeAccents("óóó èèè\núùúùioler    \r\noughúíééanh hello") === "ooo eee\nuuuuioler    \r\noughuieeanh hello");
         $this->assertTrue(StringUtils::removeAccents('öïüíúóèà go!!.;') === 'oiuiuoea go!!.;');
+
+        // Test wrong values
+        // Test exceptions
     }
 
 

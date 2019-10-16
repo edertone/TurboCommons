@@ -355,9 +355,30 @@ export class StringUtils {
     }
     
     
-    public static countCapitalLetters() {
-        
-        // TODO - translate from php
+    /**
+     * Count the number of characters that match the given letter case on the given string
+     *
+     * @param string The string which case matching characters will be counted
+     * @param letterCase Defines which letter case are we looking for: StringUtils.FORMAT_ALL_UPPER_CASE or
+     *        StringUtils.FORMAT_ALL_LOWER_CASE
+     *
+     * @return The number of characters with the specified letter case that are present on the string
+     */
+    public static countByCase(string: string, letterCase = StringUtils.FORMAT_ALL_UPPER_CASE){
+
+        string = StringUtils.removeAccents(string);
+
+        if(letterCase === StringUtils.FORMAT_ALL_UPPER_CASE){
+
+            return string.replace(/[^A-Z]+/g, '').length;
+        }
+
+        if(letterCase === StringUtils.FORMAT_ALL_LOWER_CASE){
+
+            return string.replace(/[^a-z]+/g, '').length;
+        }
+
+        throw new Error('invalid case value');
     }
     
     
@@ -1179,9 +1200,9 @@ export class StringUtils {
      */
     public static removeAccents(string:string) {
     
-        if(string == null){
+        if(!StringUtils.isString(string)){
 
-            return '';
+            throw new Error('value is not a string');
         }
 
         var defaultDiacriticsRemovalMap:any[] = [{

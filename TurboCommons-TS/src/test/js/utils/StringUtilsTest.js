@@ -480,26 +480,64 @@ QUnit.test("countStringOccurences", function(assert) {
     assert.strictEqual(StringUtils.countStringOccurences("helló bàbÝ\n   whats Up Todäy? are you feeling better? GOOD!", 'T'), 1);
 
     // Test exceptions
-    assert.throws(function() {
-        StringUtils.countStringOccurences(null, null);
-    }, /value is not a string/);
-
-    assert.throws(function() {
-        StringUtils.countStringOccurences('', '');
-    }, /cannot count occurences for an empty string/);
-
-    assert.throws(function() {
-        StringUtils.countStringOccurences('  ', '');
-    }, /cannot count occurences for an empty string/);
+    assert.throws(function() { StringUtils.countStringOccurences(null, null); }, /value is not a string/);
+    assert.throws(function() { StringUtils.countStringOccurences('', ''); }, /cannot count occurences for an empty string/);
+    assert.throws(function() { StringUtils.countStringOccurences('  ', ''); }, /cannot count occurences for an empty string/);
 });
 
 
 /**
- * countCapitalLetters
+ * testCountByCase
  */
-QUnit.todo("countCapitalLetters", function(assert) {
+QUnit.test("testCountByCase", function(assert) {
 
-    // TODO: copy tests from PHP
+    // Test empty values
+    assert.throws(function(){ StringUtils.countByCase(null); }, /value is not a string/);
+    assert.throws(function(){ StringUtils.countByCase(null, StringUtils.FORMAT_ALL_LOWER_CASE); }, /value is not a string/);
+
+    assert.strictEqual(0, StringUtils.countByCase(''));
+    assert.strictEqual(0, StringUtils.countByCase('  '));
+    assert.strictEqual(0, StringUtils.countByCase('       '));
+    assert.strictEqual(0, StringUtils.countByCase("     \n      \r\n"));
+
+    assert.strictEqual(0, StringUtils.countByCase('', StringUtils.FORMAT_ALL_LOWER_CASE));
+    assert.strictEqual(0, StringUtils.countByCase('  ', StringUtils.FORMAT_ALL_LOWER_CASE));
+    assert.strictEqual(0, StringUtils.countByCase('       ', StringUtils.FORMAT_ALL_LOWER_CASE));
+    assert.strictEqual(0, StringUtils.countByCase("     \n      \r\n", StringUtils.FORMAT_ALL_LOWER_CASE));
+
+    // Test ok values
+    assert.strictEqual(0, StringUtils.countByCase('hello'));
+    assert.strictEqual(0, StringUtils.countByCase('hello baby'));
+    assert.strictEqual(0, StringUtils.countByCase('123123123123123'));
+    assert.strictEqual(3, StringUtils.countByCase("tRy\nto\r\n\t\ngo\r\nUP"));
+    assert.strictEqual(6, StringUtils.countByCase(" AEÉÜ    \n   1   \r\nÍË"));
+    assert.strictEqual(6, StringUtils.countByCase("heLLo Baby\nhellÓ agaiN and go\n\n\r\nUp!"));
+    assert.strictEqual(6, StringUtils.countByCase("helló bàbÝ\n   whats Up todäy? are you feeling better? GOOD!"));
+    assert.strictEqual(0, StringUtils.countByCase("形声字 / 形聲字"));
+    assert.strictEqual(1, StringUtils.countByCase("形声字A形聲字"));
+    assert.strictEqual(2, StringUtils.countByCase("A形声字A形聲字a"));
+    assert.strictEqual(6, StringUtils.countByCase("AaÁáBéEéÉË"));
+    assert.strictEqual(1, StringUtils.countByCase("1234A567"));
+    assert.strictEqual(2, StringUtils.countByCase('1声A字43B45-_*[]', StringUtils.FORMAT_ALL_UPPER_CASE));
+
+    assert.strictEqual(5, StringUtils.countByCase('hello', StringUtils.FORMAT_ALL_LOWER_CASE));
+    assert.strictEqual(9, StringUtils.countByCase('hello baby', StringUtils.FORMAT_ALL_LOWER_CASE));
+    assert.strictEqual(6, StringUtils.countByCase("tRy\nto\r\n\t\ngo\r\nUP", StringUtils.FORMAT_ALL_LOWER_CASE));
+    assert.strictEqual(0, StringUtils.countByCase(" AEÉÜ    \n   1   \r\nÍË", StringUtils.FORMAT_ALL_LOWER_CASE));
+    assert.strictEqual(20, StringUtils.countByCase("heLLo Baby\nhellÓ agaiN and go\n\n\r\nUp!", StringUtils.FORMAT_ALL_LOWER_CASE));
+    assert.strictEqual(38, StringUtils.countByCase("helló bàbÝ\n   whats Up todäy? are you feeling better? GOOD!", StringUtils.FORMAT_ALL_LOWER_CASE));
+    assert.strictEqual(0, StringUtils.countByCase("形声字 / 形聲字", StringUtils.FORMAT_ALL_LOWER_CASE));
+    assert.strictEqual(0, StringUtils.countByCase("形声字A形聲字", StringUtils.FORMAT_ALL_LOWER_CASE));
+    assert.strictEqual(1, StringUtils.countByCase("A形声字A形聲字a", StringUtils.FORMAT_ALL_LOWER_CASE));
+    assert.strictEqual(5, StringUtils.countByCase("AaÁáBéEéÉë", StringUtils.FORMAT_ALL_LOWER_CASE));
+    assert.strictEqual(0, StringUtils.countByCase('1声A字43B45-_*[]', StringUtils.FORMAT_ALL_LOWER_CASE));
+    assert.strictEqual(1, StringUtils.countByCase('1声A字43B45a-_*[]', StringUtils.FORMAT_ALL_LOWER_CASE));
+
+    // Test wrong values
+    assert.throws(function(){ StringUtils.countByCase(123123); }, /value is not a string/);
+
+    // Test exceptions
+    assert.throws(function(){ StringUtils.countByCase("hello", 'invalid format'); }, /invalid case value/);
 });
 
 
@@ -1721,9 +1759,13 @@ QUnit.todo("testRemoveNewLineCharacters", function(assert) {
  */
 QUnit.test("removeAccents", function(assert) {
 
-    assert.ok(StringUtils.removeAccents(null) === '');
+    // Test empty values
+    assert.throws(function(){ StringUtils.removeAccents(null); }, /value is not a string/);
+    
     assert.ok(StringUtils.removeAccents('') === '');
     assert.ok(StringUtils.removeAccents('        ') === '        ');
+    
+    // Test ok values
     assert.ok(StringUtils.removeAccents('Fó Bår') === 'Fo Bar');
     assert.ok(StringUtils.removeAccents("|!€%'''") === "|!€%'''");
     assert.ok(StringUtils.removeAccents('hiweury asb fsuyr weqr') === 'hiweury asb fsuyr weqr');
@@ -1735,6 +1777,9 @@ QUnit.test("removeAccents", function(assert) {
     assert.ok(StringUtils.removeAccents('óíéàùú hello') === 'oieauu hello');
     assert.ok(StringUtils.removeAccents("óóó èèè\núùúùioler    \r\noughúíééanh hello") === "ooo eee\nuuuuioler    \r\noughuieeanh hello");
     assert.ok(StringUtils.removeAccents('öïüíúóèà go!!.;') === 'oiuiuoea go!!.;');
+    
+    // Test wrong values
+    // Test exceptions
 });
 
 

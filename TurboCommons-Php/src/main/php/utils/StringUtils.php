@@ -363,7 +363,7 @@ class StringUtils {
      *
      * @return int The number of times that $findMe appears on $string
      */
-    public static function countStringOccurences($string, string $findMe){
+    public static function countStringOccurences($string, $findMe){
 
         if(!is_string($string) || !is_string($findMe)){
 
@@ -380,17 +380,29 @@ class StringUtils {
 
 
     /**
-     * Count the number of capital letters on the given string
+     * Count the number of characters that match the given letter case on the given string
      *
-     * @param string $string The string which capital letters will be counted
+     * @param string $string The string which case matching characters will be counted
+     * @param string $letterCase Defines which letter case are we looking for: StringUtils::FORMAT_ALL_UPPER_CASE or
+     *        StringUtils::FORMAT_ALL_LOWER_CASE
      *
-     * @return int The number of capital letters that are present on the string
+     * @return int The number of characters with the specified letter case that are present on the string
      */
-    public static function countCapitalLetters($string){
+    public static function countByCase($string, $letterCase = self::FORMAT_ALL_UPPER_CASE){
 
-        $lowerCase = mb_strtolower($string);
+        $string = self::removeAccents($string);
 
-        return strlen($lowerCase) - similar_text($string, $lowerCase);
+        if($letterCase === self::FORMAT_ALL_UPPER_CASE){
+
+            return mb_strlen(preg_replace('![^A-Z]+!', '', $string));
+        }
+
+        if($letterCase === self::FORMAT_ALL_LOWER_CASE){
+
+            return mb_strlen(preg_replace('![^a-z]+!', '', $string));
+        }
+
+        throw new InvalidArgumentException('invalid case value');
     }
 
 
@@ -862,7 +874,7 @@ class StringUtils {
             $processedString = null;
 
             // Check if string is accepted as camel case or a raw string
-            if(self::isCamelCase($string) && self::countCapitalLetters($string, ' ') > 0){
+            if(self::isCamelCase($string) && self::countByCase($string) > 0){
 
                 preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $string, $processedString);
 
@@ -1280,9 +1292,9 @@ class StringUtils {
      */
     public static function removeAccents($string){
 
-        if($string == null){
+        if(!is_string($string)){
 
-            return '';
+            throw new InvalidArgumentException('value is not a string');
         }
 
         if(!preg_match('/[\x80-\xff]/', $string)){
