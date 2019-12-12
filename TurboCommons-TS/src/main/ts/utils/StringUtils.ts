@@ -148,28 +148,19 @@ export class StringUtils {
      */
     public static isEmpty(string:string, emptyChars:string[] = []) {
     
-        // Empty or null value is considered empty
-        if(string == null || string == ""){
-
-            return true;
-        }
-
         // Throw exception if non string value was received
         if(!StringUtils.isString(string)){
 
+            // Empty or null value is considered empty
+            if(string == null || string == ''){
+    
+                return true;
+            }
+            
             throw new Error("value is not a string");
         }
 
-        let aux = '';
-
-        // Replace all empty spaces and new line characters
-        if((aux = StringUtils.replace(string, [' ', "\n", "\r", "\t"], '')) == ''){
-
-            return true;
-        }
-
-        // Replace all extra empty characters
-        return StringUtils.replace(aux, emptyChars, '') === '';
+        return  StringUtils.replace(string, emptyChars.concat([' ', "\n", "\r", "\t"]), '') === '';
     }
     
     

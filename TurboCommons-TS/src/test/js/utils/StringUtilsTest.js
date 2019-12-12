@@ -1166,15 +1166,15 @@ QUnit.test("formatCase", function(assert) {
     // TODO - translate from PHP
     
     // Test FORMAT_START_CASE values
-    assert.ok(StringUtils.formatCase('h', StringUtils.FORMAT_START_CASE) === 'H');
-    assert.ok(StringUtils.formatCase('HI', StringUtils.FORMAT_START_CASE) === 'Hi');
-    assert.ok(StringUtils.formatCase('hello', StringUtils.FORMAT_START_CASE) === 'Hello');
-    assert.ok(StringUtils.formatCase('helló. únder Ü??', StringUtils.FORMAT_START_CASE) === 'Helló. Únder Ü??');
-    assert.ok(StringUtils.formatCase('óyeà!!! üst??', StringUtils.FORMAT_START_CASE) === 'Óyeà!!! Üst??');
-    assert.ok(StringUtils.formatCase('Hello people', StringUtils.FORMAT_START_CASE) === 'Hello People');
-    assert.ok(StringUtils.formatCase('Hello pEOPLE', StringUtils.FORMAT_START_CASE) === 'Hello People');
-    assert.ok(StringUtils.formatCase("över! còmpléx.   \n\n\n\t\t   ís test!is?for!?!? you.!  ", StringUtils.FORMAT_START_CASE) === "Över! Còmpléx.   \n\n\n\t\t   Ís Test!is?for!?!? You.!  ");
-    assert.ok(StringUtils.formatCase('形声字 / 形聲字', StringUtils.FORMAT_START_CASE) === '形声字 / 形聲字');
+    assert.strictEqual(StringUtils.formatCase('h', StringUtils.FORMAT_START_CASE), 'H');
+    assert.strictEqual(StringUtils.formatCase('HI', StringUtils.FORMAT_START_CASE), 'Hi');
+    assert.strictEqual(StringUtils.formatCase('hello', StringUtils.FORMAT_START_CASE), 'Hello');
+    assert.strictEqual(StringUtils.formatCase('helló. únder Ü??', StringUtils.FORMAT_START_CASE), 'Helló. Únder Ü??');
+    assert.strictEqual(StringUtils.formatCase('óyeà!!! üst??', StringUtils.FORMAT_START_CASE), 'Óyeà!!! Üst??');
+    assert.strictEqual(StringUtils.formatCase('Hello people', StringUtils.FORMAT_START_CASE), 'Hello People');
+    assert.strictEqual(StringUtils.formatCase('Hello pEOPLE', StringUtils.FORMAT_START_CASE), 'Hello People');
+    assert.strictEqual(StringUtils.formatCase("över! còmpléx.   \n\n\n\t\t   ís test! is? for!?!? you.!  ", StringUtils.FORMAT_START_CASE), "Över! Còmpléx.   \n\n\n\t\t   Ís Test! Is? For!?!? You.!  ");
+    assert.strictEqual(StringUtils.formatCase('形声字 / 形聲字', StringUtils.FORMAT_START_CASE), '形声字 / 形聲字');
     
     // Test FORMAT_ALL_UPPER_CASE values
     assert.ok(StringUtils.formatCase('h', StringUtils.FORMAT_ALL_UPPER_CASE) === 'H');

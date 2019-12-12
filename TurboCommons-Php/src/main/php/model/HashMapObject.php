@@ -72,7 +72,7 @@ class HashMapObject{
      */
     public function __construct(array $data = null){
 
-        if(($dataCount = count($data)) > 0){
+        if(is_array($data) && ($dataCount = count($data)) > 0){
 
             $isAssociative = array_keys($data) !== range(0, $dataCount - 1);
 

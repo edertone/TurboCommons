@@ -160,28 +160,19 @@ class StringUtils {
      */
     public static function isEmpty($string, array $emptyChars = []){
 
-        // Null value is considered empty
-        if($string == null){
-
-            return true;
-        }
-
         // Throw exception if non string value was received
         if(!is_string($string)){
+
+            // Null value is considered empty
+            if($string == null){
+
+                return true;
+            }
 
             throw new InvalidArgumentException('value is not a string');
         }
 
-        $aux = '';
-
-        // Replace all empty spaces and new line characters
-        if(($aux = str_replace([' ', "\n", "\r", "\t"], '', $string)) == ''){
-
-            return true;
-        }
-
-        // Replace all extra empty characters
-        return str_replace($emptyChars, '', $aux) === '';
+        return str_replace(array_merge($emptyChars, [' ', "\n", "\r", "\t"]), '', $string) === '';
     }
 
 

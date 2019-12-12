@@ -1410,15 +1410,15 @@ class StringUtilsTest extends TestCase {
         $this->assertTrue(StringUtils::formatCase("heLLo.\n\npEoPle\t\t.no!way!!", StringUtils::FORMAT_SENTENCE_CASE) === "HeLLo.\n\nPEoPle\t\t.No!Way!!");
 
         // Test FORMAT_START_CASE values
-        $this->assertTrue(StringUtils::formatCase('h', StringUtils::FORMAT_START_CASE) === 'H');
-        $this->assertTrue(StringUtils::formatCase('HI', StringUtils::FORMAT_START_CASE) === 'Hi');
-        $this->assertTrue(StringUtils::formatCase('hello', StringUtils::FORMAT_START_CASE) === 'Hello');
-        $this->assertTrue(StringUtils::formatCase('helló. únder Ü??', StringUtils::FORMAT_START_CASE) === 'Helló. Únder Ü??');
-        $this->assertTrue(StringUtils::formatCase('óyeà!!! üst??', StringUtils::FORMAT_START_CASE) === 'Óyeà!!! Üst??');
-        $this->assertTrue(StringUtils::formatCase('Hello people', StringUtils::FORMAT_START_CASE) === 'Hello People');
-        $this->assertTrue(StringUtils::formatCase('Hello pEOPLE', StringUtils::FORMAT_START_CASE) === 'Hello People');
-        $this->assertTrue(StringUtils::formatCase("över! còmpléx.   \n\n\n\t\t   ís test!is?for!?!? you.!  ", StringUtils::FORMAT_START_CASE) === "Över! Còmpléx.   \n\n\n\t\t   Ís Test!is?for!?!? You.!  ");
-        $this->assertTrue(StringUtils::formatCase('形声字 / 形聲字', StringUtils::FORMAT_START_CASE) === '形声字 / 形聲字');
+        $this->assertSame('H', StringUtils::formatCase('h', StringUtils::FORMAT_START_CASE));
+        $this->assertSame('Hi', StringUtils::formatCase('HI', StringUtils::FORMAT_START_CASE));
+        $this->assertSame('Hello', StringUtils::formatCase('hello', StringUtils::FORMAT_START_CASE));
+        $this->assertSame('Helló. Únder Ü??', StringUtils::formatCase('helló. únder Ü??', StringUtils::FORMAT_START_CASE));
+        $this->assertSame('Óyeà!!! Üst??', StringUtils::formatCase('óyeà!!! üst??', StringUtils::FORMAT_START_CASE));
+        $this->assertSame('Hello People', StringUtils::formatCase('Hello people', StringUtils::FORMAT_START_CASE));
+        $this->assertSame('Hello People', StringUtils::formatCase('Hello pEOPLE', StringUtils::FORMAT_START_CASE));
+        $this->assertSame("Över! Còmpléx.   \n\n\n\t\t   Ís Test! Is? For!?!? You.!  ", StringUtils::formatCase("över! còmpléx.   \n\n\n\t\t   ís test! is? for!?!? you.!  ", StringUtils::FORMAT_START_CASE));
+        $this->assertSame('形声字 / 形聲字', StringUtils::formatCase('形声字 / 形聲字', StringUtils::FORMAT_START_CASE));
 
         // Test FORMAT_ALL_UPPER_CASE values
         $this->assertTrue(StringUtils::formatCase('h', StringUtils::FORMAT_ALL_UPPER_CASE) === 'H');
@@ -2138,8 +2138,8 @@ class StringUtilsTest extends TestCase {
         // Test wrong values
         // Test exceptions
 
-        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString(1234, 1234); }, '/must be of the type array, integer given/');
-        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString("", 1234); }, '/must be of the type array, integer given/');
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString(1234, 1234); }, '/must be of the type array, int(eger)? given/');
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString("", 1234); }, '/must be of the type array, int(eger)? given/');
         AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString([1, 2, 3, 4], [2, 4, 5, 6]); }, '/expected a string/');
         AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString(new Exception(), new Exception()); }, '/must be of the type array, object given/');
     }
@@ -2183,8 +2183,8 @@ class StringUtilsTest extends TestCase {
         // Test wrong values
         // Test exceptions
 
-        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex(1234, 1234); }, '/must be of the type array, integer given/');
-        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex("", 1234); }, '/must be of the type array, integer given/');
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex(1234, 1234); }, '/must be of the type array, int given/');
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex("", 1234); }, '/must be of the type array, int given/');
         AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex([1, 2, 3, 4], [2, 4, 5, 6]); }, '/expected a string/');
         AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex(new Exception(), new Exception()); }, '/must be of the type array, object given/');
     }
