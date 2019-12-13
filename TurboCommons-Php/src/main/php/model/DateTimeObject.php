@@ -41,7 +41,7 @@ class DateTimeObject{
 
 
     /**
-     * Object that represents a date and time value and its related operations.
+     * Object that represents a date and time value with timezone and its related operations.
      *
      * All the class methods are based and expect values that follow the ISO 8601 format, which is the international standard for the
      * representation of dates and times. Any other date/time format will be considered as invalid.<br><br>
@@ -55,12 +55,16 @@ class DateTimeObject{
      * - UUU is an arbitrary number of digits decimal seconds fraction value<br>
      * - +TT:TT is the timezone offset value, like +03:00
      *
-     * @param string $dateTimeString A string containing a valid ISO 8601 date/time value that will be used to initialize this instance.
-     * If string is empty, the current system date/time and timezone will be used. If string is incomplete, all missing parts will be filled
-     * with the lowest possible value. If timezone offset is missing, the timezone that is currently defined on the system will be used.
+     * IMPORTANT: It is highly recommended to always physically store your datetime values as UTC,(aka 00 timezone offset).
+     * The timezone offset should be applied only when showing the datetime values to the user. All the other date and time usages of your application
+     * should be performed with UTC values.
      *
-     * @example '1996' Will create a DateTimeObject with the value '1996-01-01T00:00:00.000000+XX:XX' based on the current system defined timezone
-     * @example '1996-12' Will create a DateTimeObject with the value '1996-12-01T00:00:00.000000+XX:XX' based on the current system defined timezone
+     * @param string $dateTimeString A string containing a valid ISO 8601 date/time value that will be used to initialize this instance.
+     * If string is empty, the current system date/time WITH UTC TIMEZONE will be used. If string is incomplete, all missing parts will be filled
+     * with the lowest possible value. If timezone offset is missing, UTC will be used.
+     *
+     * @example '1996' Will create a DateTimeObject with the value '1996-01-01T00:00:00.000000+00:00' based on the UTC 00 timezone
+     * @example '1996-12' Will create a DateTimeObject with the value '1996-12-01T00:00:00.000000+00:00' based on the UTC 00 timezone
      * @example This is a fully valid ISO 8601 string value: '2017-10-14T17:55:25.163583+02:00'
      *
      * @see https://es.wikipedia.org/wiki/ISO_8601
@@ -71,21 +75,21 @@ class DateTimeObject{
 
         if(StringUtils::isEmpty($dateTimeString)){
 
-            $this->_dateTimeString = (new DateTime())->format($this->_iso8601FormatString);
+            $this->_dateTimeString = (new DateTime(null, new DateTimeZone('UTC')))->format($this->_iso8601FormatString);
 
             return;
         }
 
         if(!DateTimeObject::isValidDateTime($dateTimeString)){
 
-            throw new UnexpectedValueException('DateTimeObject->__construct : Provided value is not a valid ISO 8601 date time format');
+            throw new UnexpectedValueException('Provided value is not a valid ISO 8601 date time format');
         }
 
         $v = $this->_explodeISO8601String($dateTimeString);
 
         $string = $v[0].'-'.$v[1].'-'.$v[2].'T'.$v[3].':'.$v[4].':'.$v[5].'.'.$v[6].$v[7];
 
-        $this->_dateTimeString = (new DateTime($string))->format($this->_iso8601FormatString);
+        $this->_dateTimeString = (new DateTime($string, $v[7] === '' ? new DateTimeZone('UTC') : null))->format($this->_iso8601FormatString);
     }
 
 
@@ -153,7 +157,7 @@ class DateTimeObject{
 
         if(!NumericUtils::isNumeric($month) || $month > 12 || $month < 1){
 
-            throw new UnexpectedValueException('DateTimeObject->getMonthName : Provided value is not a valid month number between 1 and 12');
+            throw new UnexpectedValueException('Provided value is not a valid month number between 1 and 12');
         }
 
         $months = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
@@ -174,7 +178,7 @@ class DateTimeObject{
 
         if(!NumericUtils::isNumeric($day) || $day > 7 || $day < 1){
 
-            throw new UnexpectedValueException('DateTimeObject->getDayName : Provided value is not a valid day number between 1 and 7');
+            throw new UnexpectedValueException('Provided value is not a valid day number between 1 and 7');
         }
 
         $days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
@@ -285,17 +289,6 @@ class DateTimeObject{
 
 
     /**
-     * Get the timezone name based on current system date and timezone
-     *
-     * @return string The timezone name
-     */
-    public static function getCurrentTimeZoneName(){
-
-        return timezone_name_from_abbr('', self::getCurrentTimeZoneOffset(), 0);
-    }
-
-
-    /**
      * Get the timezone offset based on current system date and timezone as a numeric value (in seconds)
      *
      * @return int The timezone offset as a numeric value in seconds
@@ -350,7 +343,7 @@ class DateTimeObject{
             return ($sortedDates[0] == $date1) ? 2 : 1;
         }
 
-        throw new UnexpectedValueException('DateTimeObject->compare : Provided value is not a valid ISO 8601 date time format');
+        throw new UnexpectedValueException('Provided value is not a valid ISO 8601 date time format');
     }
 
 
@@ -462,43 +455,6 @@ class DateTimeObject{
 
 
     /**
-     * Get this instance's defined timezone name
-     *
-     * @return string The UTC timezone name or empty string if no timezone name could be found
-     */
-    public function getTimeZoneName(){
-
-        $isDst = date('I');
-        $offset = $this->getTimeZoneOffset();
-        $name = timezone_name_from_abbr('', $offset, $isDst);
-
-        // This code is based on an example found at
-        // http://www.php.net/manual/en/function.timezone-name-from-abbr.php#89155
-        if ($name === false){
-
-            foreach (timezone_abbreviations_list() as $abbr){
-
-                foreach ($abbr as $city){
-
-                    if ((bool)$city['dst'] === (bool)$isDst && strlen($city['timezone_id']) > 0 && $city['offset'] == $offset){
-
-                        $name = $city['timezone_id'];
-                        break;
-                    }
-                }
-
-                if ($name !== false){
-
-                    break;
-                }
-            }
-        }
-
-        return $name;
-    }
-
-
-    /**
      * Get this instance's defined timezone offset as a numeric value (in seconds)
      *
      * @return int The UTC timezone offset in seconds
@@ -555,7 +511,7 @@ class DateTimeObject{
     /**
      * Convert the current instance date and time values to the UTC zero timezone offset.
      *
-     * @example If this instance contains a +02:00 timezone offset, after calling this method the offset will be +00:00
+     * @example If this instance contains a +02:00 timezone offset, after calling this method the offset will be +00:00 (date and time will be updated accordingly)
      *
      * @return DateTimeObject This object instance
      */
@@ -572,7 +528,7 @@ class DateTimeObject{
 
 
     /**
-     * Output the current dateTime instance data as a custom formatted string.
+     * Output the current dateTime instance data as a custom formatted string (by default a full ISO 8601 string).
      *
      * @param string $formatString A string containing the output format like 'd/m/Y' or 'm-d-y'
      * where the following characters will be automatically replaced:<br><br>
@@ -685,35 +641,35 @@ class DateTimeObject{
                 break;
 
             case 'months':
-                throw new UnexpectedValueException('DateTimeUtils->add : months type is not implemented yet');
+                throw new UnexpectedValueException('Months type is not implemented yet');
                 break;
 
             case 'days':
-                throw new UnexpectedValueException('DateTimeUtils->add : days type is not implemented yet');
+                throw new UnexpectedValueException('Days type is not implemented yet');
                 break;
 
             case 'hours':
-                throw new UnexpectedValueException('DateTimeUtils->add : hours type is not implemented yet');
+                throw new UnexpectedValueException('Hours type is not implemented yet');
                 break;
 
             case 'minutes':
-                throw new UnexpectedValueException('DateTimeUtils->add : minutes type is not implemented yet');
+                throw new UnexpectedValueException('Minutes type is not implemented yet');
                 break;
 
             case 'seconds':
-                throw new UnexpectedValueException('DateTimeUtils->add : seconds type is not implemented yet');
+                throw new UnexpectedValueException('Seconds type is not implemented yet');
                 break;
 
             case 'miliseconds':
-                throw new UnexpectedValueException('DateTimeUtils->add : miliseconds type is not implemented yet');
+                throw new UnexpectedValueException('Miliseconds type is not implemented yet');
                 break;
 
             case 'microseconds':
-                throw new UnexpectedValueException('DateTimeUtils->add : microseconds type is not implemented yet');
+                throw new UnexpectedValueException('Microseconds type is not implemented yet');
                 break;
 
             default:
-                throw new UnexpectedValueException('DateTimeUtils->add : Invalid type specified');
+                throw new UnexpectedValueException('Invalid type specified');
         }
 
         return $v[0].'-'.$v[1].'-'.$v[2].'T'.$v[3].':'.$v[4].':'.$v[5].'.'.$v[6].$v[7];
