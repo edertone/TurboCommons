@@ -488,6 +488,10 @@ class HTTPManager extends BaseStrictClass {
 
                 $processFinishedRequest($requestWithIndex, curl_multi_getcontent($curlInstances[$i]), true, curl_error($curlInstances[$i]), curl_getinfo($curlInstances[$i], CURLINFO_RESPONSE_CODE));
 
+            } else if (curl_getinfo($curlInstances[$i], CURLINFO_HTTP_CODE) === 0){
+
+                $processFinishedRequest($requestWithIndex, curl_multi_getcontent($curlInstances[$i]), true, 'Could not connect with url: '.$requestWithIndex['request']->url, 0);
+
             } else {
 
                 $processFinishedRequest($requestWithIndex, curl_multi_getcontent($curlInstances[$i]), false, '', curl_getinfo($curlInstances[$i], CURLINFO_HTTP_CODE));

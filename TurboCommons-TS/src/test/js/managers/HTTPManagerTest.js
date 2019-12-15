@@ -60,9 +60,7 @@ QUnit.test("testConstructor", function(assert){
     // Test empty values
     for (var i = 0; i < emptyValuesCount; i++) {
         
-        assert.throws(function() {
-            sut = new HTTPManager(emptyValues[i]);
-        });
+        assert.throws(function() { new HTTPManager(emptyValues[i]); }, /asynchronous is not boolean/);
     }
 
     // Test ok values
@@ -91,9 +89,7 @@ QUnit.test("createQueue", function(assert){
     // Test empty values
     for (var i = 0; i < emptyValuesCount; i++) {
         
-        assert.throws(function() {
-            sut.createQueue(emptyValues[i]);
-        }, /name must be a non empty string|value is not a string/);
+        assert.throws(function() { sut.createQueue(emptyValues[i]); }, /name must be a non empty string|value is not a string/);
     }
 
     // Test ok values
@@ -111,26 +107,16 @@ QUnit.test("createQueue", function(assert){
     assert.strictEqual(sut.isQueueRunning("third queue"), false);
     
     // Test wrong values
-    assert.throws(function() {
-        sut.createQueue("first queue");
-    }, /queue first queue already exists/);
-
-    assert.throws(function() {
-        sut.createQueue("second queue");
-    }, /queue second queue already exists/);
-
     // Test exceptions
-    assert.throws(function() {
-        sut.createQueue(13435);
-    }, /value is not a string/);
+    assert.throws(function() { sut.createQueue("first queue"); }, /queue first queue already exists/);
+
+    assert.throws(function() { sut.createQueue("second queue"); }, /queue second queue already exists/);
+
+    assert.throws(function() { sut.createQueue(13435); }, /value is not a string/);
     
-    assert.throws(function() {
-        sut.createQueue({hello: 1});
-    }, /value is not a string/);
+    assert.throws(function() { sut.createQueue({hello: 1}); }, /value is not a string/);
     
-    assert.throws(function() {
-        sut.createQueue([1, 2, 3]);
-    }, /value is not a string/);
+    assert.throws(function() { sut.createQueue([1, 2, 3]); }, /value is not a string/);
 });
 
 
@@ -168,9 +154,7 @@ QUnit.test("isQueueRunning", function(assert){
     // Test empty values
     for (var i = 0; i < emptyValuesCount; i++) {
         
-        assert.throws(function() {
-            sut.isQueueRunning(emptyValues[i]);
-        }, /name must be a non empty string|value is not a string/);
+        assert.throws(function() { sut.isQueueRunning(emptyValues[i]); }, /name must be a non empty string|value is not a string/);
     }
 
     // Test ok values
@@ -202,17 +186,11 @@ QUnit.test("isQueueRunning", function(assert){
     // Not necessary
 
     // Test exceptions
-    assert.throws(function() {
-        sut.isQueueRunning(13435);
-    }, /value is not a string/);
+    assert.throws(function() { sut.isQueueRunning(13435); }, /value is not a string/);
     
-    assert.throws(function() {
-        sut.isQueueRunning({hello: 1});
-    }, /value is not a string/);
+    assert.throws(function() { sut.isQueueRunning({hello: 1}); }, /value is not a string/);
     
-    assert.throws(function() {
-        sut.isQueueRunning([1, 2, 3]);
-    }, /value is not a string/);
+    assert.throws(function() { sut.isQueueRunning([1, 2, 3]); }, /value is not a string/);
 });
 
 
@@ -224,9 +202,7 @@ QUnit.test("deleteQueue", function(assert){
     // Test empty values
     for (var i = 0; i < emptyValuesCount; i++) {
         
-        assert.throws(function() {
-            sut.deleteQueue(emptyValues[i]);
-        }, /name must be a non empty string|value is not a string/);
+        assert.throws(function() { sut.deleteQueue(emptyValues[i]); }, /name must be a non empty string|value is not a string/);
     }
 
     // Test ok values
@@ -237,35 +213,23 @@ QUnit.test("deleteQueue", function(assert){
     sut.deleteQueue("queue1");
     assert.strictEqual(sut.countQueues(), 2);
     
-    assert.throws(function() {
-        sut.isQueueRunning("queue1");
-    }, /queue queue1 does not exist/);
+    assert.throws(function() { sut.isQueueRunning("queue1"); }, /queue queue1 does not exist/);
     
     assert.strictEqual(sut.isQueueRunning("queue2"), false);
     sut.deleteQueue("queue2");
     assert.strictEqual(sut.countQueues(), 1);
     
-    assert.throws(function() {
-        sut.isQueueRunning("queue2");
-    }, /queue queue2 does not exist/);
+    assert.throws(function() { sut.isQueueRunning("queue2"); }, /queue queue2 does not exist/);
 
     // Test wrong values
-    assert.throws(function() {
-        sut.deleteQueue("non existant queue");
-    }, /queue non existant queue does not exist/);
+    assert.throws(function() { sut.deleteQueue("non existant queue"); }, /queue non existant queue does not exist/);
 
     // Test exceptions
-    assert.throws(function() {
-        sut.deleteQueue(13435);
-    }, /value is not a string/);
+    assert.throws(function() { sut.deleteQueue(13435); }, /value is not a string/);
     
-    assert.throws(function() {
-        sut.deleteQueue({hello: 1});
-    }, /value is not a string/);
+    assert.throws(function() { sut.deleteQueue({hello: 1}); }, /value is not a string/);
     
-    assert.throws(function() {
-        sut.deleteQueue([1, 2, 3]);
-    }, /value is not a string/);
+    assert.throws(function() { sut.deleteQueue([1, 2, 3]); }, /value is not a string/);
 });
 
 
@@ -277,9 +241,7 @@ QUnit.test("generateUrlQueryString", function(assert){
     // Test empty values
     for (var i = 0; i < emptyValuesCount; i++) {
           
-        assert.throws(function() {
-            sut.generateUrlQueryString(emptyValues[i]);
-        }, /keyValuePairs must be a HashMapObject or a non empty Object/);
+        assert.throws(function() { sut.generateUrlQueryString(emptyValues[i]); }, /keyValuePairs must be a HashMapObject or a non empty Object/);
     }
 
     // Test ok values with objects
@@ -310,25 +272,15 @@ QUnit.test("generateUrlQueryString", function(assert){
     // Tested with exceptions
 
     // Test exceptions
-    assert.throws(function() {
-        sut.generateUrlQueryString("hello");
-    }, /keyValuePairs must be a HashMapObject or a non empty Object/);
+    assert.throws(function() { sut.generateUrlQueryString("hello"); }, /keyValuePairs must be a HashMapObject or a non empty Object/);
     
-    assert.throws(function() {
-        sut.generateUrlQueryString([1,2,3,4]);
-    }, /keyValuePairs must be a HashMapObject or a non empty Object/);
+    assert.throws(function() { sut.generateUrlQueryString([1,2,3,4]); }, /keyValuePairs must be a HashMapObject or a non empty Object/);
     
-    assert.throws(function() {
-        sut.generateUrlQueryString(new Error());
-    }, /keyValuePairs must be a HashMapObject or a non empty Object/);
+    assert.throws(function() { sut.generateUrlQueryString(new Error()); }, /keyValuePairs must be a HashMapObject or a non empty Object/);
     
-    assert.throws(function() {
-        sut.generateUrlQueryString(10);
-    }, /keyValuePairs must be a HashMapObject or a non empty Object/);
+    assert.throws(function() { sut.generateUrlQueryString(10); }, /keyValuePairs must be a HashMapObject or a non empty Object/);
     
-    assert.throws(function() {
-        sut.generateUrlQueryString(true);
-    }, /keyValuePairs must be a HashMapObject or a non empty Object/);
+    assert.throws(function() { sut.generateUrlQueryString(true); }, /keyValuePairs must be a HashMapObject or a non empty Object/);
 });
 
 
@@ -340,13 +292,9 @@ QUnit.test("isInternetAvailable", function(assert){
     // Test empty values
     for (var i = 0; i < emptyValuesCount; i++) {
         
-        assert.throws(function() {
-            sut.isInternetAvailable(emptyValues[i]);
-        });
+        assert.throws(function() { sut.isInternetAvailable(emptyValues[i]); });
         
-        assert.throws(function() {
-            sut.isInternetAvailable(emptyValues[i], emptyValues[i]);
-        });
+        assert.throws(function() { sut.isInternetAvailable(emptyValues[i], emptyValues[i]); });
     }
 
     // Test ok values    
@@ -367,15 +315,11 @@ QUnit.test("isInternetAvailable", function(assert){
             // Test exceptions
             sut.internetCheckLocations = ['hello bad url'];
             
-            assert.throws(function() {
-                sut.isInternetAvailable(function(){}, function(){});
-            }, /invalid check url : hello bad url/);
+            assert.throws(function() { sut.isInternetAvailable(function(){}, function(){}); }, /invalid check url : hello bad url/);
             
             sut.internetCheckLocations = [];
             
-            assert.throws(function() {
-                sut.isInternetAvailable(function(){}, function(){});
-            }, /no check locations specified/);
+            assert.throws(function() { sut.isInternetAvailable(function(){}, function(){}); }, /no check locations specified/);
             
             done();
             
@@ -406,26 +350,18 @@ QUnit.test("urlExists", function(assert){
         
         if(!StringUtils.isString(emptyValues[i])){
             
-            assert.throws(function() {
-                sut.urlExists(emptyValues[i], function(){}, function(){});
-            }, /url must be a string/);            
+            assert.throws(function() { sut.urlExists(emptyValues[i], function(){}, function(){}); }, /url must be a string/);            
         }
 
-        assert.throws(function() {
-            sut.urlExists('https://www.google.com', emptyValues[i]);
-        }, /params must be functions/);
+        assert.throws(function() { sut.urlExists('https://www.google.com', emptyValues[i]); }, /params must be functions/);
         
-        assert.throws(function() {
-            sut.urlExists('https://www.google.com', function(){}, emptyValues[i]);
-        }, /params must be functions/);
+        assert.throws(function() { sut.urlExists('https://www.google.com', function(){}, emptyValues[i]); }, /params must be functions/);
     }
 
     // Test ok values    
     var done = assert.async(2);
     
-    assert.throws(function() {
-        sut.urlExists(nonExistantUrl, function(){}, function(){});
-    }, /Non secure http requests are forbidden/);
+    assert.throws(function() { sut.urlExists(nonExistantUrl, function(){}, function(){}); }, /Non secure http requests are forbidden/);
     
     sut.isOnlyHttps = false;
     
@@ -465,25 +401,17 @@ QUnit.test("getUrlHeaders", function(assert){
     // Test empty values
     for (var i = 0; i < emptyValuesCount; i++) {
         
-        assert.throws(function() {
-            sut.getUrlHeaders(emptyValues[i], function(){}, function(){});
-        });
+        assert.throws(function() { sut.getUrlHeaders(emptyValues[i], function(){}, function(){}); });
         
-        assert.throws(function() {
-            sut.getUrlHeaders('https://www.google.com', emptyValues[i]);
-        }, /params must be functions/);
+        assert.throws(function() { sut.getUrlHeaders('https://www.google.com', emptyValues[i]); }, /params must be functions/);
         
-        assert.throws(function() {
-            sut.getUrlHeaders('https://www.google.com', function(){}, emptyValues[i]);
-        }, /params must be functions/);
+        assert.throws(function() { sut.getUrlHeaders('https://www.google.com', function(){}, emptyValues[i]); }, /params must be functions/);
     }
 
     // Test ok values
     var done = assert.async(2);
     
-    assert.throws(function() {
-        sut.getUrlHeaders(browserManager.getCurrentUrl(), function(data){}, function(){});
-    }, /Non secure http requests are forbidden/);
+    assert.throws(function() { sut.getUrlHeaders(browserManager.getCurrentUrl(), function(data){}, function(){}); }, /Non secure http requests are forbidden/);
     
     sut.isOnlyHttps = false;
     
@@ -530,9 +458,7 @@ QUnit.test("execute - requests with string urls", function(assert){
             expectedError = /No requests to execute/;
         }
         
-        assert.throws(function() {
-            sut.execute(emptyValues[i]);
-        }, expectedError);
+        assert.throws(function() { sut.execute(emptyValues[i]); }, expectedError);
     }
 
     // Test ok values
@@ -602,8 +528,7 @@ QUnit.test("execute - requests with string urls", function(assert){
         assert.strictEqual(results[0].isError, false);
         assert.strictEqual(results[0].errorMsg, '');
         assert.strictEqual(results[0].code, 200);
-                
-                
+                                
         assert.strictEqual(results[1].url, 'invalidUrl2');
         assert.strictEqual(results[1].response, '');
         assert.strictEqual(results[1].isError, true);
@@ -650,21 +575,13 @@ QUnit.test("execute - requests with string urls", function(assert){
     // Not necessary
 
     // Test exceptions
-    assert.throws(function() {
-        sut.execute(basePath + '/file1.txt', ['hello'], () => {});
-    }, /finishedCallback and progressCallback must be functions/);
+    assert.throws(function() { sut.execute(basePath + '/file1.txt', ['hello'], () => {}); }, /finishedCallback and progressCallback must be functions/);
     
-    assert.throws(function() {
-        sut.execute(basePath + '/file1.txt', () => {}, ['hello']);
-    }, /finishedCallback and progressCallback must be functions/);
+    assert.throws(function() { sut.execute(basePath + '/file1.txt', () => {}, ['hello']); }, /finishedCallback and progressCallback must be functions/);
     
-    assert.throws(function() {
-        sut.execute([1, 2], () => {}, () => {});
-    }, /url 0 must be a non empty string/);
+    assert.throws(function() { sut.execute([1, 2], () => {}, () => {}); }, /url 0 must be a non empty string/);
     
-    assert.throws(function() {
-        sut.execute(["1", 2], () => {}, () => {});
-    }, /url 1 must be a non empty string/);
+    assert.throws(function() { sut.execute(["1", 2], () => {}, () => {}); }, /url 1 must be a non empty string/);
 });
 
 
@@ -1097,13 +1014,9 @@ QUnit.test("loadResourcesFromList", function(assert){
     // Test empty values
     for (var i = 0; i < emptyValuesCount; i++) {
         
-        assert.throws(function() {
-            sut.loadResourcesFromList(emptyValues[i], 'somepath');
-        }, /urlToListOfResources must be a non empty string/);
+        assert.throws(function() { sut.loadResourcesFromList(emptyValues[i], 'somepath'); }, /urlToListOfResources must be a non empty string/);
         
-        assert.throws(function() {
-            sut.loadResourcesFromList('somepath', emptyValues[i]);
-        }, /baseUrl must be a non empty string/);
+        assert.throws(function() { sut.loadResourcesFromList('somepath', emptyValues[i]); }, /baseUrl must be a non empty string/);
     } 
 
     // Test ok values

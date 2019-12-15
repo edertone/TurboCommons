@@ -11,7 +11,6 @@
 
 namespace org\turbocommons\src\test\php\managers;
 
-use Throwable;
 use Exception;
 use stdClass;
 use PHPUnit\Framework\TestCase;
@@ -21,6 +20,7 @@ use org\turbocommons\src\main\php\model\HashMapObject;
 use org\turbocommons\src\main\php\utils\ArrayUtils;
 use org\turbocommons\src\main\php\utils\StringUtils;
 use org\turbocommons\src\main\php\managers\httpmanager\HTTPManagerGetRequest;
+use org\turbotesting\src\main\php\utils\AssertUtils;
 
 
 /**
@@ -59,8 +59,6 @@ class HTTPManagerTest extends TestCase {
         $this->basePath = 'https://raw.githubusercontent.com/edertone/TurboCommons/master/TurboCommons-Php/src/main/php/managers';
         $this->existantUrl = 'https://www.google.com';
         $this->nonExistantUrl = 'http://werwerwerwerwerwerwe.345345/3453453454435dgdfg.html';
-
-        $this->exceptionMessage = '';
     }
 
 
@@ -71,10 +69,7 @@ class HTTPManagerTest extends TestCase {
      */
     protected function tearDown(){
 
-        if($this->exceptionMessage != ''){
-
-            $this->fail($this->exceptionMessage);
-        }
+        // Nothing necessary here
     }
 
 
@@ -99,12 +94,7 @@ class HTTPManagerTest extends TestCase {
         // Test empty values
         for ($i = 0; $i < $this->emptyValuesCount; $i++) {
 
-            try {
-                $this->sut = new HTTPManager($this->emptyValues[$i]);
-                $this->exceptionMessage = 'new HTTPManager did not cause exception';
-            } catch (Throwable $e) {
-                // We expect an exception to happen
-            }
+            AssertUtils::throwsException(function() use ($i) { new HTTPManager($this->emptyValues[$i]); }, '/asynchronous is not boolean/');
         }
 
         // Test ok values
@@ -135,12 +125,7 @@ class HTTPManagerTest extends TestCase {
         // Test empty values
         for ($i = 0; $i < $this->emptyValuesCount; $i++) {
 
-            try {
-                $this->sut->createQueue($this->emptyValues[$i]);
-                $this->exceptionMessage = '$this->emptyValues did not cause exception';
-            } catch (Throwable $e) {
-                $this->assertRegExp('/name must be a non empty string|value is not a string/', $e->getMessage());
-            }
+            AssertUtils::throwsException(function() use ($i) { $this->sut->createQueue($this->emptyValues[$i]); }, '/name must be a non empty string|value is not a string/');
         }
 
         // Test ok values
@@ -158,40 +143,16 @@ class HTTPManagerTest extends TestCase {
         $this->assertSame($this->sut->isQueueRunning("third queue"), false);
 
         // Test wrong values
-        try {
-            $this->sut->createQueue("first queue");
-            $this->exceptionMessage = '"first queue" did not cause exception';
-        } catch (Throwable $e) {
-            $this->assertRegExp('/queue first queue already exists/', $e->getMessage());
-        }
+        // Test exceptions
+        AssertUtils::throwsException(function() { $this->sut->createQueue("first queue"); }, '/queue first queue already exists/');
 
-        try {
-            $this->sut->createQueue("second queue");
-            $this->exceptionMessage = '"second queue" did not cause exception';
-        } catch (Throwable $e) {
-            $this->assertRegExp('/queue second queue already exists/', $e->getMessage());
-        }
+        AssertUtils::throwsException(function() { $this->sut->createQueue("second queue"); }, '/queue second queue already exists/');
 
-        try {
-            $this->sut->createQueue(13435);
-            $this->exceptionMessage = '13435 did not cause exception';
-        } catch (Throwable $e) {
-            $this->assertRegExp('/value is not a string/', $e->getMessage());
-        }
+        AssertUtils::throwsException(function() { $this->sut->createQueue(13435); }, '/value is not a string/');
 
-        try {
-            $this->sut->createQueue(['hello' => 1]);
-            $this->exceptionMessage = '"hello" => 1 did not cause exception';
-        } catch (Throwable $e) {
-            $this->assertRegExp('/value is not a string/', $e->getMessage());
-        }
+        AssertUtils::throwsException(function() { $this->sut->createQueue(['hello' => 1]); }, '/value is not a string/');
 
-        try {
-            $this->sut->createQueue([1, 2, 3]);
-            $this->exceptionMessage = '[1, 2, 3] did not cause exception';
-        } catch (Throwable $e) {
-            $this->assertRegExp('/value is not a string/', $e->getMessage());
-        }
+        AssertUtils::throwsException(function() { $this->sut->createQueue([1, 2, 3]); }, '/value is not a string/');
     }
 
 
@@ -245,12 +206,7 @@ class HTTPManagerTest extends TestCase {
         // Test empty values
         for ($i = 0; $i < $this->emptyValuesCount; $i++) {
 
-            try {
-                $this->sut->deleteQueue($this->emptyValues[$i]);
-                $this->exceptionMessage = '$this->emptyValues did not cause exception';
-            } catch (Throwable $e) {
-                $this->assertRegExp('/name must be a non empty string|value is not a string/', $e->getMessage());
-            }
+            AssertUtils::throwsException(function() use ($i) { $this->sut->deleteQueue($this->emptyValues[$i]); }, '/name must be a non empty string|value is not a string/');
         }
 
         // Test ok values
@@ -261,53 +217,23 @@ class HTTPManagerTest extends TestCase {
         $this->sut->deleteQueue("queue1");
         $this->assertSame($this->sut->countQueues(), 2);
 
-        try {
-            $this->sut->isQueueRunning("queue1");
-            $this->exceptionMessage = 'isQueueRunning queue1 did not cause exception';
-        } catch (Throwable $e) {
-            $this->assertRegExp('/queue queue1 does not exist/', $e->getMessage());
-        }
+        AssertUtils::throwsException(function() { $this->sut->isQueueRunning("queue1"); }, '/queue queue1 does not exist/');
 
         $this->assertSame($this->sut->isQueueRunning("queue2"), false);
         $this->sut->deleteQueue("queue2");
         $this->assertSame($this->sut->countQueues(), 1);
 
-        try {
-            $this->sut->isQueueRunning("queue2");
-            $this->exceptionMessage = 'isQueueRunning queue2 did not cause exception';
-        } catch (Throwable $e) {
-            $this->assertRegExp('/queue queue2 does not exist/', $e->getMessage());
-        }
+        AssertUtils::throwsException(function() { $this->sut->isQueueRunning("queue2"); }, '/queue queue2 does not exist/');
 
         // Test wrong values
-        try {
-            $this->sut->deleteQueue("non existant queue");
-            $this->exceptionMessage = 'deleteQueue non existant queue did not cause exception';
-        } catch (Throwable $e) {
-            $this->assertRegExp('/queue non existant queue does not exist/', $e->getMessage());
-        }
+        AssertUtils::throwsException(function() { $this->sut->deleteQueue("non existant queue"); }, '/queue non existant queue does not exist/');
 
         // Test exceptions
-        try {
-            $this->sut->deleteQueue(13435);
-            $this->exceptionMessage = 'deleteQueue 13435 did not cause exception';
-        } catch (Throwable $e) {
-            $this->assertRegExp('/value is not a string/', $e->getMessage());
-        }
+        AssertUtils::throwsException(function() { $this->sut->deleteQueue(13435); }, '/value is not a string/');
 
-        try {
-            $this->sut->deleteQueue(['hello' => 1]);
-            $this->exceptionMessage = 'deleteQueue ["hello" => 1] did not cause exception';
-        } catch (Throwable $e) {
-            $this->assertRegExp('/value is not a string/', $e->getMessage());
-        }
+        AssertUtils::throwsException(function() { $this->sut->deleteQueue(['hello' => 1]); }, '/value is not a string/');
 
-        try {
-            $this->sut->deleteQueue([1, 2, 3]);
-            $this->exceptionMessage = 'deleteQueue [1, 2, 3] did not cause exception';
-        } catch (Throwable $e) {
-            $this->assertRegExp('/value is not a string/', $e->getMessage());
-        }
+        AssertUtils::throwsException(function() { $this->sut->deleteQueue([1, 2, 3]); }, '/value is not a string/');
     }
 
 
@@ -321,12 +247,7 @@ class HTTPManagerTest extends TestCase {
         // Test empty values
         for ($i = 0; $i < $this->emptyValuesCount; $i++) {
 
-            try {
-                $this->sut->generateUrlQueryString($this->emptyValues[$i]);
-                $this->exceptionMessage = '$this->emptyValues did not cause exception';
-            } catch (Throwable $e) {
-                $this->assertRegExp('/keyValuePairs must be a HashMapObject or a non empty associative array/', $e->getMessage());
-            }
+            AssertUtils::throwsException(function() use ($i) { $this->sut->generateUrlQueryString($this->emptyValues[$i]); }, '/keyValuePairs must be a HashMapObject or a non empty associative array/');
         }
 
         // Test ok values with objects
@@ -357,40 +278,15 @@ class HTTPManagerTest extends TestCase {
         // Tested with exceptions
 
         // Test exceptions
-        try {
-            $this->sut->generateUrlQueryString("hello");
-            $this->exceptionMessage = '"hello" did not cause exception';
-        } catch (Throwable $e) {
-            $this->assertRegExp('/keyValuePairs must be a HashMapObject or a non empty associative array/', $e->getMessage());
-        }
+        AssertUtils::throwsException(function() { $this->sut->generateUrlQueryString("hello"); }, '/keyValuePairs must be a HashMapObject or a non empty associative array/');
 
-        try {
-            $this->sut->generateUrlQueryString([1,2,3,4]);
-            $this->exceptionMessage = '[1,2,3,4] did not cause exception';
-        } catch (Throwable $e) {
-            $this->assertRegExp('/keyValuePairs must be a HashMapObject or a non empty associative array/', $e->getMessage());
-        }
+        AssertUtils::throwsException(function() { $this->sut->generateUrlQueryString([1,2,3,4]); }, '/keyValuePairs must be a HashMapObject or a non empty associative array/');
 
-        try {
-            $this->sut->generateUrlQueryString(new Exception());
-            $this->exceptionMessage = 'new Exception() did not cause exception';
-        } catch (Throwable $e) {
-            $this->assertRegExp('/keyValuePairs must be a HashMapObject or a non empty associative array/', $e->getMessage());
-        }
+        AssertUtils::throwsException(function() { $this->sut->generateUrlQueryString(new Exception()); }, '/keyValuePairs must be a HashMapObject or a non empty associative array/');
 
-        try {
-            $this->sut->generateUrlQueryString(10);
-            $this->exceptionMessage = '10 did not cause exception';
-        } catch (Throwable $e) {
-            $this->assertRegExp('/keyValuePairs must be a HashMapObject or a non empty associative array/', $e->getMessage());
-        }
+        AssertUtils::throwsException(function() { $this->sut->generateUrlQueryString(10); }, '/keyValuePairs must be a HashMapObject or a non empty associative array/');
 
-        try {
-            $this->sut->generateUrlQueryString(true);
-            $this->exceptionMessage = 'true did not cause exception';
-        } catch (Throwable $e) {
-            $this->assertRegExp('/keyValuePairs must be a HashMapObject or a non empty associative array/', $e->getMessage());
-        }
+        AssertUtils::throwsException(function() { $this->sut->generateUrlQueryString(true); }, '/keyValuePairs must be a HashMapObject or a non empty associative array/');
     }
 
 
@@ -418,36 +314,16 @@ class HTTPManagerTest extends TestCase {
 
             if(!StringUtils::isString($this->emptyValues[$i])){
 
-                try {
-                    $this->sut->urlExists($this->emptyValues[$i], function(){}, function(){});
-                    $this->exceptionMessage = '$this->emptyValues did not cause exception';
-                } catch (Throwable $e) {
-                    $this->assertRegExp('/url must be a string/', $e->getMessage());
-                }
+                AssertUtils::throwsException(function() use ($i) { $this->sut->urlExists($this->emptyValues[$i], function(){}, function(){}); }, '/url must be a string/');
             }
 
-            try {
-                $this->sut->urlExists('https://www.google.com', $this->emptyValues[$i]);
-                $this->exceptionMessage = '$this->emptyValues 2 did not cause exception';
-            } catch (Throwable $e) {
-                $this->assertRegExp('/params must be functions|Too few arguments to function/', $e->getMessage());
-            }
+            AssertUtils::throwsException(function() use ($i) { $this->sut->urlExists('https://www.google.com', $this->emptyValues[$i]); }, '/params must be functions|Too few arguments to function/');
 
-            try {
-                $this->sut->urlExists('https://www.google.com', function(){}, $this->emptyValues[$i]);
-                $this->exceptionMessage = '$this->emptyValues 3 did not cause exception';
-            } catch (Throwable $e) {
-                $this->assertRegExp('/params must be functions/', $e->getMessage());
-            }
+            AssertUtils::throwsException(function() use ($i) { $this->sut->urlExists('https://www.google.com', function(){}, $this->emptyValues[$i]); }, '/params must be functions/');
         }
 
         // Test ok values
-        try {
-            $this->sut->urlExists($this->nonExistantUrl, function(){}, function(){});
-            $this->exceptionMessage = 'nonExistantUrl did not cause exception';
-        } catch (Throwable $e) {
-            $this->assertRegExp('/Non secure http requests are forbidden/', $e->getMessage());
-        }
+        AssertUtils::throwsException(function() { $this->sut->urlExists($this->nonExistantUrl, function(){}, function(){}); }, '/Non secure http requests are forbidden/');
 
         $this->sut->isOnlyHttps = false;
 
@@ -504,12 +380,7 @@ class HTTPManagerTest extends TestCase {
                 $expectedError = 'No requests to execute';
             }
 
-            try {
-                $this->sut->execute($this->emptyValues[$i]);
-                $this->exceptionMessage = 'expected error : '.$expectedError;
-            } catch (Throwable $e) {
-                $this->assertRegExp('/'.$expectedError.'/', $e->getMessage());
-            }
+            AssertUtils::throwsException(function() use ($i) { $this->sut->execute($this->emptyValues[$i]); }, '/'.$expectedError.'/');
         }
 
         // Test ok values
@@ -617,33 +488,13 @@ class HTTPManagerTest extends TestCase {
         // Not necessary
 
         // Test exceptions
-        try {
-            $this->sut->execute($this->basePath.'/BrowserManager.php', ['hello'], function () {});
-            $this->exceptionMessage = 'BrowserManager.php expected error';
-        } catch (Throwable $e) {
-            $this->assertRegExp('/finishedCallback and progressCallback must be functions/', $e->getMessage());
-        }
+        AssertUtils::throwsException(function() { $this->sut->execute($this->basePath.'/BrowserManager.php', ['hello'], function () {}); }, '/finishedCallback and progressCallback must be functions/');
 
-        try {
-            $this->sut->execute($this->basePath.'/BrowserManager.php', function () {}, ['hello']);
-            $this->exceptionMessage = 'BrowserManager.php expected error';
-        } catch (Throwable $e) {
-            $this->assertRegExp('/finishedCallback and progressCallback must be functions/', $e->getMessage());
-        }
+        AssertUtils::throwsException(function() { $this->sut->execute($this->basePath.'/BrowserManager.php', function () {}, ['hello']); }, '/finishedCallback and progressCallback must be functions/');
 
-        try {
-            $this->sut->execute([1, 2], function () {}, function () {});
-            $this->exceptionMessage = '[1, 2] expected error';
-        } catch (Throwable $e) {
-            $this->assertRegExp('/url 0 must be a non empty string/', $e->getMessage());
-        }
+        AssertUtils::throwsException(function() { $this->sut->execute([1, 2], function () {}, function () {}); }, '/url 0 must be a non empty string/');
 
-        try {
-            $this->sut->execute(["1", 2], function () {}, function () {});
-            $this->exceptionMessage = '["1", 2] expected error';
-        } catch (Throwable $e) {
-            $this->assertRegExp('/url 1 must be a non empty string/', $e->getMessage());
-        }
+        AssertUtils::throwsException(function() { $this->sut->execute(["1", 2], function () {}, function () {}); }, '/url 1 must be a non empty string/');
     }
 
 
