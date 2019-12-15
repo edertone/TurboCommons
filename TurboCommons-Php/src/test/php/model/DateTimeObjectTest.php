@@ -49,8 +49,6 @@ class DateTimeObjectTest extends TestCase {
      */
     protected function setUp(){
 
-        $this->exceptionMessage = '';
-
         // Define a list of values that will be considered as empty string values
         $this->emptyStringValues = [[], null, '', '     ', "\n\n\n", 0];
         $this->emptyStringValuesCount = count($this->emptyStringValues);
@@ -90,10 +88,7 @@ class DateTimeObjectTest extends TestCase {
      */
     protected function tearDown(){
 
-        if($this->exceptionMessage != ''){
-
-            $this->fail($this->exceptionMessage);
-        }
+        // Nothing necessary here
     }
 
 
