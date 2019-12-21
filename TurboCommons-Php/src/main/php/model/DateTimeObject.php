@@ -41,6 +41,15 @@ class DateTimeObject{
 
 
     /**
+     * An exploded version of this instance _dateTimeString ISO string, that is used to improve performance when reading
+     * some of the date values
+     *
+     * @var array
+     */
+    private $_dateTimeStringExploded = [];
+
+
+    /**
      * Object that represents a date and time value with timezone and its related operations.
      *
      * All the class methods are based and expect values that follow the ISO 8601 format, which is the international standard for the
@@ -55,8 +64,8 @@ class DateTimeObject{
      * - UUU is an arbitrary number of digits decimal seconds fraction value<br>
      * - +TT:TT is the timezone offset value, like +03:00
      *
-     * IMPORTANT: It is highly recommended to always physically store your datetime values as UTC,(aka 00 timezone offset).
-     * The timezone offset should be applied only when showing the datetime values to the user. All the other date and time usages of your application
+     * IMPORTANT: It is highly recommended to always physically store your datetime values as UTC (aka 00 timezone offset).
+     * The local timezone offset should be applied only when showing the datetime values to the user. All the other date and time usages of your application
      * should be performed with UTC values.
      *
      * @param string $dateTimeString A string containing a valid ISO 8601 date/time value that will be used to initialize this instance.
@@ -77,6 +86,8 @@ class DateTimeObject{
 
             $this->_dateTimeString = (new DateTime(null, new DateTimeZone('UTC')))->format($this->_iso8601FormatString);
 
+            $this->_dateTimeStringExploded = $this->_explodeISO8601String($this->_dateTimeString);
+
             return;
         }
 
@@ -90,6 +101,8 @@ class DateTimeObject{
         $string = $v[0].'-'.$v[1].'-'.$v[2].'T'.$v[3].':'.$v[4].':'.$v[5].'.'.$v[6].$v[7];
 
         $this->_dateTimeString = (new DateTime($string, $v[7] === '' ? new DateTimeZone('UTC') : null))->format($this->_iso8601FormatString);
+
+        $this->_dateTimeStringExploded = $this->_explodeISO8601String($this->_dateTimeString);
     }
 
 
@@ -325,8 +338,8 @@ class DateTimeObject{
                 $dateTime2 = new DateTimeObject($dateTime2);
             }
 
-            $dateTime1->toUTC();
-            $dateTime2->toUTC();
+            $dateTime1->setUTC();
+            $dateTime2->setUTC();
 
             $date1 = $dateTime1->toString();
             $date2 = $dateTime2->toString();
@@ -354,7 +367,7 @@ class DateTimeObject{
      */
     public function getYear(){
 
-        return (int) self::_explodeISO8601String($this->_dateTimeString)[0];
+        return (int) $this->_dateTimeStringExploded[0];
     }
 
 
@@ -365,7 +378,7 @@ class DateTimeObject{
      */
     public function getMonth(){
 
-        return (int) self::_explodeISO8601String($this->_dateTimeString)[1];
+        return (int) $this->_dateTimeStringExploded[1];
     }
 
 
@@ -376,7 +389,7 @@ class DateTimeObject{
      */
     public function getDay(){
 
-        return (int) self::_explodeISO8601String($this->_dateTimeString)[2];
+        return (int) $this->_dateTimeStringExploded[2];
     }
 
 
@@ -389,7 +402,7 @@ class DateTimeObject{
      */
     public function getDayOfWeek(){
 
-        $v = self::_explodeISO8601String($this->_dateTimeString);
+        $v = $this->_dateTimeStringExploded;
 
         $dateTimeInstance = new DateTime();
 
@@ -406,7 +419,7 @@ class DateTimeObject{
      */
     public function getHour(){
 
-        return (int) self::_explodeISO8601String($this->_dateTimeString)[3];
+        return (int) $this->_dateTimeStringExploded[3];
     }
 
 
@@ -417,7 +430,7 @@ class DateTimeObject{
      */
     public function getMinute(){
 
-        return (int) self::_explodeISO8601String($this->_dateTimeString)[4];
+        return (int) $this->_dateTimeStringExploded[4];
     }
 
 
@@ -428,7 +441,7 @@ class DateTimeObject{
      */
     public function getSecond(){
 
-        return (int) self::_explodeISO8601String($this->_dateTimeString)[5];
+        return (int) $this->_dateTimeStringExploded[5];
     }
 
 
@@ -450,7 +463,7 @@ class DateTimeObject{
      */
     public function getMicroSecond(){
 
-        return (int) self::_explodeISO8601String($this->_dateTimeString)[6];
+        return (int) $this->_dateTimeStringExploded[6];
     }
 
 
@@ -492,19 +505,45 @@ class DateTimeObject{
 
 
     /**
+     * Convert the current instance date and time values to the specified timezone offset.
+     *
+     * @param string $offset One of the supported timezone names or an offset value (+0200, +05:00, -0300, -03:00, etc...)
+     *
+     * @return DateTimeObject This object instance
+     */
+    public function setTimeZoneOffset(string $offset){
+
+        $dateTime = new DateTime($this->_dateTimeString);
+
+        $dateTime->setTimezone(new DateTimeZone($offset));
+
+        $this->_dateTimeString = $dateTime->format($this->_iso8601FormatString);
+
+        $this->_dateTimeStringExploded = $this->_explodeISO8601String($this->_dateTimeString);
+
+        return $this;
+    }
+
+
+    /**
      * Convert the current instance date and time values to the local timezone offset.
      *
      * @return DateTimeObject This object instance
      */
-    public function toLocalTimeZone(){
+    public function setLocalTimeZone(){
 
-        $dateTime = new DateTime($this->_dateTimeString);
+        return $this->setTimeZoneOffset(date_default_timezone_get());
+    }
 
-        $dateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
 
-        $this->_dateTimeString = $dateTime->format($this->_iso8601FormatString);
+    /**
+     * Check if the current instance timezone is the UTC +00:00 value
+     *
+     * @return boolean True if the instance timezone is UTC, false if not
+     */
+    public function isUTC(){
 
-        return $this;
+        return $this->getTimeZoneOffset() === 0;
     }
 
 
@@ -515,13 +554,15 @@ class DateTimeObject{
      *
      * @return DateTimeObject This object instance
      */
-    public function toUTC(){
+    public function setUTC(){
 
         $dateTimeInstance = new DateTime($this->_dateTimeString);
 
         $dateTimeInstance->setTimezone(new DateTimeZone('UTC'));
 
         $this->_dateTimeString = $dateTimeInstance->format($this->_iso8601FormatString);
+
+        $this->_dateTimeStringExploded = $this->_explodeISO8601String($this->_dateTimeString);
 
         return $this;
     }
@@ -546,16 +587,16 @@ class DateTimeObject{
      * - s with a one or two digit seconds value<br>
      * - U with a 6 digit microseconds value<br>
      * - u with a 3 digit miliseconds value<br>
-     * - Offset with the timezone offset value
+     * - Offset with the timezone offset value (including the + or - symbol)
      *
      * @return string The dateTime with the specified format.
      */
-    public function toString($formatString = 'Y-M-DTH:N:S.U+Offset'){
+    public function toString($formatString = 'Y-M-DTH:N:S.UOffset'){
 
-        $exploded = $this->_explodeISO8601String($this->_dateTimeString);
+        $exploded = $this->_dateTimeStringExploded;
 
         // Get the time zone offset
-        $formatString = str_replace('Offset', substr($exploded[7], 1), $formatString);
+        $formatString = str_replace('Offset', substr($exploded[7], 0), $formatString);
 
         // Get the year
         $formatString = str_replace('Y', $exploded[0], $formatString);
@@ -632,7 +673,7 @@ class DateTimeObject{
      */
     public function add(int $value, $type = 'minutes'){
 
-        $v = $this->_explodeISO8601String($this->_dateTimeString);
+        $v = $this->_dateTimeStringExploded;
 
         switch (strtolower($type)) {
 
@@ -676,7 +717,9 @@ class DateTimeObject{
     }
 
 
-    // TODO - This method is pending
+    /**
+     * TODO - this method depends on $this->add for being finished
+     */
     public function substract($value, $type = 'minutes'){
 
         return $this->add(-$value, $type);
