@@ -623,7 +623,7 @@ class DateTimeObject{
         $formatString = str_replace('s', (int)$exploded[5], $formatString);
 
         // Get the milisecond
-        $formatString = str_replace('u', str_pad(round($exploded[6] / 1000), 3, '0', STR_PAD_LEFT), $formatString);
+        $formatString = str_replace('u', str_pad(min(999, round($exploded[6] / 1000)), 3, '0', STR_PAD_LEFT), $formatString);
 
         // Get the microsecond
         return str_replace('U', str_pad($exploded[6], 6, '0', STR_PAD_LEFT), $formatString);
