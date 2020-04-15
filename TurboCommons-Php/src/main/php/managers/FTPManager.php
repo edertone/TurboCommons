@@ -11,6 +11,7 @@
 
 namespace org\turbocommons\src\main\php\managers;
 
+use UnexpectedValueException;
 use org\turbocommons\src\main\php\model\BaseStrictClass;
 use org\turbocommons\src\main\php\utils\StringUtils;
 
@@ -34,7 +35,7 @@ class FTPManager extends BaseStrictClass {
 
 
     /**
-     * Class constructor initializes the FTP connection with the specified parameters
+     * Initialize a new connection to the specified remote FTP location
      *
      * @param string $userName The username for the ftp session we want to start
      * @param string $psw The password for the ftp user
@@ -49,21 +50,15 @@ class FTPManager extends BaseStrictClass {
 
         if(!$this->_connectionId){
 
-            $this->lastError = 'Ftp connection error: Verify host / port parameters and connection is available.';
-
-            trigger_error($this->lastError, E_USER_WARNING);
-
-            return;
+            throw new UnexpectedValueException('Ftp connection error: Verify host / port parameters and connection is available');
         }
 
         // login with username and password
         if(!ftp_login($this->_connectionId, $userName, $psw)){
 
-            $this->lastError = 'Ftp login error: Verify user credentials.';
-
             $this->closeConnection();
 
-            trigger_error($this->lastError, E_USER_WARNING);
+            throw new UnexpectedValueException('Ftp login error: Verify user credentials');
         }
 
     }
@@ -85,12 +80,17 @@ class FTPManager extends BaseStrictClass {
 
         $list = ftp_nlist($this->_connectionId, $path);
 
+        if($list === false){
+
+            throw new UnexpectedValueException('Could not get FTP directory list for '.$path);
+        }
+
         // remove all the folder information from the received files
         $result = [];
 
         foreach($list as $l){
 
-            $result[] = StringUtils::getFilenameWithExtension($l);
+            $result[] = StringUtils::getPathElement($l);
         }
 
         return $result;
@@ -148,12 +148,11 @@ class FTPManager extends BaseStrictClass {
         if (ftp_fget($this->_connectionId, $fh, $ftpPath, $this->transferMode, 0)) {
 
             rewind($fh);
+
             return stream_get_contents($fh);
-
-        } else {
-
-            return '';
         }
+
+        throw new UnexpectedValueException('Error reading FTP file: '.$ftpPath);
     }
 
 
