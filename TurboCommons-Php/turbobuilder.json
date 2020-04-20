@@ -5,7 +5,7 @@
 	"metadata": {
 		"name": "turbocommons-php",
 		"description": "General purpose library that implements frequently used and generic software development tasks",
-		"builderVersion": "3.0.1"		
+		"builderVersion": "4.0.0"		
 	},
 	
 	"validate": {
@@ -36,7 +36,7 @@
                 {
                     "path": "extras/copyright headers/TurboCommons-Php.txt",
                     "affectedPaths": ["src"],
-                    "includes": ["php"],
+                    "includes": [".php"],
                     "excludes": []
                 }
             ]

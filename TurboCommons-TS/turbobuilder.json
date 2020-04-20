@@ -5,7 +5,7 @@
 	"metadata": {
 		"name": "turbocommons-ts",
 		"description": "General purpose library that implements frequently used and generic software development tasks",
-		"builderVersion": "2.2.0"
+		"builderVersion": "4.0.0"
 	},
 	
 	"validate": {
@@ -31,14 +31,14 @@
     	    	{
     	    		"path": "extras/copyright headers/TsFiles-Header.txt",
     	    		"affectedPaths": ["src"],
-    	    		"includes": ["ts"],
+    	    		"includes": [".ts"],
     	    		"excludes": []
     	    	},
     	    	{
     	    		"path": "extras/copyright headers/JsFiles-Header.txt",
     	    		"affectedPaths": ["src"],
-    	    		"includes": ["js"],
-    	    		"excludes": []
+    	    		"includes": [".js"],
+    	    		"excludes": [".json"]
     	    	}
     	    ]
         }
