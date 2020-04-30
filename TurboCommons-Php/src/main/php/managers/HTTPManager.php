@@ -84,6 +84,14 @@ class HTTPManager extends BaseStrictClass {
 
 
     /**
+     * A list of key value pairs that define post parameters that will be sent ALWAYS with all the requests that are
+     * performed by this class. We can use this feature for example to always send a token to web services, or other
+     * globally sent post values
+     */
+    private $_globalPostParams = [];
+
+
+    /**
      * Class that contains functionalities related to the HTTP protocol and its most common requests
      *
      * @param bool $asynchronous Specify if the HTTP manager instance will work in asynchronous or synchronous mode.
@@ -97,6 +105,74 @@ class HTTPManager extends BaseStrictClass {
         }
 
         $this->asynchronous = $asynchronous;
+    }
+
+
+    /**
+     * Set the value for a POST parameter that will be stored as a global POST parameter which will be always
+     * sent with all the http manager requests
+     *
+     * @param string $parameterName The name of the POST parameter that will be always sent to all the http requests
+     * @param string $value The value that the POST parameter will have
+     */
+    public function setGlobalPostParam($parameterName, $value){
+
+        if(StringUtils::isEmpty($parameterName) || StringUtils::isEmpty($value)){
+
+            throw new UnexpectedValueException('parameterName and value must be non empty strings');
+        }
+
+        $this->_globalPostParams[$parameterName] = $value;
+    }
+
+
+    /**
+     * Check if the specified parameter name is defined as a global POST parameter
+     *
+     * @param string $parameterName The name of the POST parameter that we want to check
+     *
+     * @return boolean True if the parameter exists, false otherwise
+     */
+    public function isGlobalPostParam($parameterName){
+
+        if(StringUtils::isEmpty($parameterName)){
+
+            throw new UnexpectedValueException('parameterName must be a non empty string');
+        }
+
+        return in_array($parameterName, array_keys($this->_globalPostParams));
+    }
+
+
+    /**
+     * Get the value for a previously defined global POST parameter
+     *
+     * @param string $parameterName The name of the POST parameter that we want to read
+     *
+     * @return string The parameter value
+     */
+    public function getGlobalPostParam($parameterName){
+
+        if(!$this->isGlobalPostParam($parameterName)){
+
+            throw new UnexpectedValueException('parameterName does not exist: '.$parameterName);
+        }
+
+        return $this->_globalPostParams[$parameterName];
+    }
+
+
+    /**
+     * Delete a previously created global POST parameter so it is not sent with all the http manager requests anymore
+     *
+     * @param string $parameterName The name of the POST parameter that will be deleted
+     */
+    public function deleteGlobalPostParam($parameterName){
+
+        if($this->getGlobalPostParam($parameterName) !== ''){
+
+            unset($this->_globalPostParams[$parameterName]);
+        }
     }
 
 
@@ -448,14 +524,30 @@ class HTTPManager extends BaseStrictClass {
             }
 
             // Encode the POST request parameters if any and run the request
-            if($requestType === 'POST'){
+            if($requestType === 'POST'|| count(array_keys($this->_globalPostParams)) > 0){
 
                 try {
 
-                    $requestPostParams = $this->generateUrlQueryString($requestsList[$i]->parameters);
+                    $postParamsToSend = ($requestType === 'POST') ? $requestsList[$i]->parameters : [];
+
+                    // Add the global post parameters if any has been defined
+                    if($requestsList[$i]->ignoreGlobalPostParams === false){
+
+                        foreach ($this->_globalPostParams as $globalPostParam => $globalPostParamValue) {
+
+                            if(get_class($postParamsToSend) === 'org\\turbocommons\\src\\main\\php\\model\\HashMapObject'){
+
+                                $postParamsToSend->set($globalPostParam, $globalPostParamValue);
+
+                            }else{
+
+                                $postParamsToSend[$globalPostParam] = $globalPostParamValue;
+                            }
+                        }
+                    }
 
                     curl_setopt($curlInstances[$i], CURLOPT_POST, true);
-                    curl_setopt($curlInstances[$i], CURLOPT_POSTFIELDS, $requestPostParams);
+                    curl_setopt($curlInstances[$i], CURLOPT_POSTFIELDS, $this->generateUrlQueryString($postParamsToSend));
 
                 } catch (Exception $e) {
 

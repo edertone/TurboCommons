@@ -81,9 +81,107 @@ QUnit.test("testConstructor", function(assert){
 });
 
 
-/**
- * createQueue
- */
+/** test */
+QUnit.test("setGlobalPostParam", function(assert){
+
+    // Test empty values
+    for (var i = 0; i < emptyValuesCount; i++) {
+        
+        assert.throws(function() { sut.setGlobalPostParam(emptyValues[i], emptyValues[i]); },
+            /parameterName and value must be non empty strings|value is not a string/);
+    }
+    
+    // Test ok values
+    sut.setGlobalPostParam('someparameter', 'somevalue');
+    sut.setGlobalPostParam('someparameter2', 'somevalue2');
+    assert.strictEqual(sut.getGlobalPostParam('someparameter'), 'somevalue');
+    assert.strictEqual(sut.getGlobalPostParam('someparameter2'), 'somevalue2');
+
+    // Test wrong values
+    // Test exceptions
+    assert.throws(function() { sut.setGlobalPostParam(123123, 234234); }, /value is not a string/);
+    assert.throws(function() { sut.setGlobalPostParam([1,2,3], 'hello'); }, /value is not a string/);
+});
+
+
+/** test */
+QUnit.test("isGlobalPostParam", function(assert){
+
+    // Test empty values
+    for (var i = 0; i < emptyValuesCount; i++) {
+        
+        assert.throws(function() { sut.isGlobalPostParam(emptyValues[i]); },
+            /parameterName must be a non empty string|value is not a string/);
+    }
+    
+    // Test ok values
+    sut.setGlobalPostParam('someparameter', '1');
+    sut.setGlobalPostParam('someparameter2', '2');
+    assert.ok(sut.isGlobalPostParam('someparameter'));
+    assert.ok(sut.isGlobalPostParam('someparameter2'));
+    assert.notOk(sut.isGlobalPostParam('nonexistant'));
+    
+    // Test wrong values
+    // Test exceptions
+    assert.throws(function() { sut.isGlobalPostParam(123123); }, /value is not a string/);
+    assert.throws(function() { sut.isGlobalPostParam([1,2,3]); }, /value is not a string/);
+});
+
+
+/** test */
+QUnit.test("getGlobalPostParam", function(assert){
+
+    // Test empty values
+    for (var i = 0; i < emptyValuesCount; i++) {
+        
+        assert.throws(function() { sut.getGlobalPostParam(emptyValues[i]); },
+            /parameterName must be a non empty string|value is not a string/);
+    }
+    
+    // Test ok values
+    sut.setGlobalPostParam('someparameter', '1');
+    sut.setGlobalPostParam('someparameter2', '2');
+    assert.strictEqual(sut.getGlobalPostParam('someparameter'), '1');
+    assert.strictEqual(sut.getGlobalPostParam('someparameter2'), '2');
+    
+    // Test wrong values
+    // Test exceptions
+    assert.throws(function() { sut.getGlobalPostParam(123123); }, /value is not a string/);
+    assert.throws(function() { sut.getGlobalPostParam([1,2,3]); }, /value is not a string/);
+    assert.throws(function() { sut.getGlobalPostParam('nonexistant'); }, /parameterName does not exist: nonexistant/);
+});
+
+
+/** test */
+QUnit.test("deleteGlobalPostParam", function(assert){
+
+    // Test empty values
+    for (var i = 0; i < emptyValuesCount; i++) {
+        
+        assert.throws(function() { sut.deleteGlobalPostParam(emptyValues[i]); },
+            /parameterName must be a non empty string|value is not a string/);
+    }
+    
+    // Test ok values
+    sut.setGlobalPostParam('someparameter', '1');
+    sut.setGlobalPostParam('someparameter2', '2');
+    assert.strictEqual(sut.getGlobalPostParam('someparameter'), '1');
+    assert.strictEqual(sut.getGlobalPostParam('someparameter2'), '2');
+    sut.deleteGlobalPostParam('someparameter');
+    assert.throws(function() { sut.deleteGlobalPostParam('someparameter'); }, /parameterName does not exist: someparameter/);
+    assert.strictEqual(sut.getGlobalPostParam('someparameter2'), '2');
+    sut.deleteGlobalPostParam('someparameter2');
+    assert.throws(function() { sut.deleteGlobalPostParam('someparameter2'); }, /parameterName does not exist: someparameter2/);
+    
+    // Test wrong values
+    // Test exceptions
+    assert.throws(function() { sut.deleteGlobalPostParam(123123); }, /value is not a string/);
+    assert.throws(function() { sut.deleteGlobalPostParam([1,2,3]); }, /value is not a string/);
+    assert.throws(function() { sut.deleteGlobalPostParam('nonexistant'); }, /parameterName does not exist: nonexistant/);
+});
+
+
+/** test */
 QUnit.test("createQueue", function(assert){
 
     // Test empty values
@@ -983,12 +1081,22 @@ QUnit.todo("execute - single HTTPManagerPostRequest with bad request 400 error",
     // TODO
 });
 
+
 /**
  * execute
  */
 QUnit.todo("execute - multiple string, HTTPManagerGetRequest and HTTPManagerPostRequest with and without errors", function(assert){
     
     // TODO - the most complex call possible: strings, HTTPManagerGetRequest, HTTPManagerPostRequest some failing and some not
+});
+
+
+/**
+ * execute
+ */
+QUnit.todo("execute - HTTPManagerPostRequest with global post parameters", function(assert){
+    
+    // TODO - perform a test to make sure that global post parameters do work correctly and are always sent as part of the request
 });
 
 

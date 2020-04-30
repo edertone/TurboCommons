@@ -83,6 +83,14 @@ export class HTTPManager{
     
     
     /**
+     * A list of key value pairs that define post parameters that will be sent ALWAYS with all the requests that are
+     * performed by this class. We can use this feature for example to always send a token to web services, or other
+     * globally sent post values
+     */
+    private _globalPostParams = {};
+    
+
+    /**
      * Class that contains functionalities related to the HTTP protocol and its most common requests
      * 
      * @param asynchronous Specify if the HTTP manager instance will work in asynchronous or synchronous mode. 
@@ -96,6 +104,74 @@ export class HTTPManager{
         }
         
         this.asynchronous = asynchronous;
+    }
+    
+    
+    /**
+     * Set the value for a POST parameter that will be stored as a global POST parameter which will be always
+     * sent with all the http manager requests
+     *
+     * @param parameterName The name of the POST parameter that will be always sent to all the http requests
+     * @param value The value that the POST parameter will have
+     */
+    setGlobalPostParam(parameterName:string, value:string){
+        
+        if(StringUtils.isEmpty(parameterName) || StringUtils.isEmpty(value)){
+        
+            throw new Error('parameterName and value must be non empty strings');
+        }
+        
+        this._globalPostParams[parameterName] = value;       
+    }
+    
+    
+    /**
+     * Check if the specified parameter name is defined as a global POST parameter
+     *
+     * @param parameterName The name of the POST parameter that we want to check
+     *
+     * @return True if the parameter exists, false otherwise
+     */
+    isGlobalPostParam(parameterName:string){
+        
+        if(StringUtils.isEmpty(parameterName)){
+        
+            throw new Error('parameterName must be a non empty string');
+        }
+        
+        return Object.keys(this._globalPostParams).indexOf(parameterName) >= 0;
+    }
+    
+    
+    /**
+     * Get the value for a previously defined global POST parameter
+     *
+     * @param parameterName The name of the POST parameter that we want to read
+     *
+     * @return The parameter value
+     */
+    getGlobalPostParam(parameterName:string){
+        
+        if(!this.isGlobalPostParam(parameterName)){
+            
+            throw new Error('parameterName does not exist: ' + parameterName);
+        }
+        
+        return this._globalPostParams[parameterName];       
+    }
+    
+    
+    /**
+     * Delete a previously created global POST parameter so it is not sent with all the http manager requests anymore
+     *
+     * @param parameterName The name of the POST parameter that will be deleted
+     */
+    deleteGlobalPostParam(parameterName:string){
+        
+        if(this.getGlobalPostParam(parameterName) !== ''){
+
+            delete this._globalPostParams[parameterName];
+        }
     }
     
     
@@ -476,7 +552,7 @@ export class HTTPManager{
         };
         
         // Execute each one of the received requests and process their results
-        for (var i = 0; i < requestsList.length; i++) {
+        for (let i = 0; i < requestsList.length; i++) {
 
             let requestWithIndex = {index: i, request: requestsList[i]};
             
@@ -539,15 +615,30 @@ export class HTTPManager{
             }
 
             // Encode the POST request parameters if any and run the request
-            if(requestType === 'POST'){
+            if(requestType === 'POST' || Object.keys(this._globalPostParams).length > 0){
 
                 try {
+                    
+                    let postParamsToSend = (requestType === 'POST') ? (requestsList[i] as HTTPManagerPostRequest).parameters : {};
+                    
+                    // Add the global post parameters if any has been defined
+                    if(requestsList[i].ignoreGlobalPostParams === false){
+                        
+                        for (let globalPostParam of Object.keys(this._globalPostParams)) {
+    
+                            if(postParamsToSend instanceof HashMapObject){
+                                
+                                postParamsToSend.set(globalPostParam, this._globalPostParams[globalPostParam]);
+                                
+                            }else{
+                                
+                                postParamsToSend[globalPostParam] = this._globalPostParams[globalPostParam];                            
+                            }
+                        }
+                    }
         
-                    let requestPostParams = this.generateUrlQueryString((requestsList[i] as HTTPManagerPostRequest).parameters);
-                    
                     xmlHttprequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                    
-                    xmlHttprequest.send(requestPostParams);
+                    xmlHttprequest.send(this.generateUrlQueryString(postParamsToSend));
                     
                 } catch (e) {
                     

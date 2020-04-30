@@ -25,6 +25,13 @@ export abstract class HTTPManagerBaseRequest{
      * If set to 0, no value will be specifically defined, so the httpmanager default will be used.
      */
     timeout:number;
+    
+    
+    /**
+     * If set to true, any global POST parameters that may be defined by the http manager which executes this request will be ignored.
+     * (exclusively for this request only)
+     */
+    ignoreGlobalPostParams = false;
 
     
     constructor(url: string, timeout = 0) {

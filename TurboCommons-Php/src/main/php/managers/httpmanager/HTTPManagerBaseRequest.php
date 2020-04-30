@@ -33,6 +33,13 @@ class HTTPManagerBaseRequest extends BaseStrictClass {
     public $timeout;
 
 
+    /**
+     * If set to true, any global POST parameters that may be defined by the http manager which executes this request will be ignored.
+     * (exclusively for this request only)
+     */
+    public $ignoreGlobalPostParams = false;
+
+
     public function __construct(string $url, int $timeout = 0){
 
         $this->url = $url;

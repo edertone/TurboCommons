@@ -116,7 +116,119 @@ class HTTPManagerTest extends TestCase {
 
 
     /**
-     * testCreateQueue
+     * test
+     * @return void
+     */
+    public function testSetGlobalPostParam(){
+
+        // Test empty values
+        for ($i = 0; $i < $this->emptyValuesCount; $i++) {
+
+            AssertUtils::throwsException(function() use ($i) { $this->sut->setGlobalPostParam($this->emptyValues[$i], $this->emptyValues[$i]); },
+                '/parameterName and value must be non empty strings|value is not a string/');
+        }
+
+        // Test ok values
+        $this->sut->setGlobalPostParam('someparameter', 'somevalue');
+        $this->sut->setGlobalPostParam('someparameter2', 'somevalue2');
+        $this->assertSame($this->sut->getGlobalPostParam('someparameter'), 'somevalue');
+        $this->assertSame($this->sut->getGlobalPostParam('someparameter2'), 'somevalue2');
+
+        // Test wrong values
+        // Test exceptions
+        AssertUtils::throwsException(function() { $this->sut->setGlobalPostParam(123123, 234234); }, '/value is not a string/');
+        AssertUtils::throwsException(function() { $this->sut->setGlobalPostParam([1,2,3], 'hello'); }, '/value is not a string/');
+    }
+
+
+    /**
+     * test
+     * @return void
+     */
+    public function testIsGlobalPostParam(){
+
+        // Test empty values
+        for ($i = 0; $i < $this->emptyValuesCount; $i++) {
+
+            AssertUtils::throwsException(function() use ($i) { $this->sut->isGlobalPostParam($this->emptyValues[$i]); },
+                '/parameterName must be a non empty string|value is not a string/');
+        }
+
+        // Test ok values
+        $this->sut->setGlobalPostParam('someparameter', '1');
+        $this->sut->setGlobalPostParam('someparameter2', '2');
+        $this->assertTrue($this->sut->isGlobalPostParam('someparameter'));
+        $this->assertTrue($this->sut->isGlobalPostParam('someparameter2'));
+        $this->assertFalse($this->sut->isGlobalPostParam('nonexistant'));
+
+        // Test wrong values
+        // Test exceptions
+        AssertUtils::throwsException(function() { $this->sut->isGlobalPostParam(123123); }, '/value is not a string/');
+        AssertUtils::throwsException(function() { $this->sut->isGlobalPostParam([1,2,3]); }, '/value is not a string/');
+    }
+
+
+    /**
+     * test
+     * @return void
+     */
+    public function testGetGlobalPostParam(){
+
+        // Test empty values
+        for ($i = 0; $i < $this->emptyValuesCount; $i++) {
+
+            AssertUtils::throwsException(function() use ($i) { $this->sut->getGlobalPostParam($this->emptyValues[$i]); },
+                '/parameterName must be a non empty string|value is not a string/');
+        }
+
+        // Test ok values
+        $this->sut->setGlobalPostParam('someparameter', '1');
+        $this->sut->setGlobalPostParam('someparameter2', '2');
+        $this->assertSame($this->sut->getGlobalPostParam('someparameter'), '1');
+        $this->assertSame($this->sut->getGlobalPostParam('someparameter2'), '2');
+
+        // Test wrong values
+        // Test exceptions
+        AssertUtils::throwsException(function() { $this->sut->getGlobalPostParam(123123); }, '/value is not a string/');
+        AssertUtils::throwsException(function() { $this->sut->getGlobalPostParam([1,2,3]); }, '/value is not a string/');
+        AssertUtils::throwsException(function() { $this->sut->getGlobalPostParam('nonexistant'); }, '/parameterName does not exist: nonexistant/');
+    }
+
+
+    /**
+     * test
+     * @return void
+     */
+    public function testDeleteGlobalPostParam(){
+
+        // Test empty values
+        for ($i = 0; $i < $this->emptyValuesCount; $i++) {
+
+            AssertUtils::throwsException(function() use ($i) { $this->sut->deleteGlobalPostParam($this->emptyValues[$i]); },
+                '/parameterName must be a non empty string|value is not a string/');
+        }
+
+        // Test ok values
+        $this->sut->setGlobalPostParam('someparameter', '1');
+        $this->sut->setGlobalPostParam('someparameter2', '2');
+        $this->assertSame($this->sut->getGlobalPostParam('someparameter'), '1');
+        $this->assertSame($this->sut->getGlobalPostParam('someparameter2'), '2');
+        $this->sut->deleteGlobalPostParam('someparameter');
+        AssertUtils::throwsException(function() { $this->sut->deleteGlobalPostParam('someparameter');  }, '/parameterName does not exist: someparameter/');
+        $this->assertSame($this->sut->getGlobalPostParam('someparameter2'), '2');
+        $this->sut->deleteGlobalPostParam('someparameter2');
+        AssertUtils::throwsException(function() { $this->sut->deleteGlobalPostParam('someparameter2');  }, '/parameterName does not exist: someparameter2/');
+
+        // Test wrong values
+        // Test exceptions
+        AssertUtils::throwsException(function() { $this->sut->deleteGlobalPostParam(123123);  }, '/value is not a string/');
+        AssertUtils::throwsException(function() { $this->sut->deleteGlobalPostParam([1,2,3]);  }, '/value is not a string/');
+        AssertUtils::throwsException(function() { $this->sut->deleteGlobalPostParam('nonexistant');  }, '/parameterName does not exist: nonexistant/');
+    }
+
+
+    /**
+     * test
      *
      * @return void
      */
