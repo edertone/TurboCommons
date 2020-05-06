@@ -17,7 +17,30 @@ use org\turbocommons\src\main\php\model\BaseStrictClass;
 /**
  * Class that defines the base http request to be used with http manager
  */
-class HTTPManagerBaseRequest extends BaseStrictClass {
+abstract class HTTPManagerBaseRequest extends BaseStrictClass {
+
+
+    /**
+     * Defines the string format for the result format property.
+     * The result of request with this resultFormat will be returned as a raw string containing the exact request response body.
+     */
+    public const STRING = 'STRING';
+
+
+    /**
+     * Defines the json format for the result format property.
+     * The result of request with this resultFormat will be a native type which will have been decoded from the request response
+     * body (expecting it to be a valid json string).
+     */
+    public const JSON = 'JSON';
+
+
+    /**
+     * Specifies how the result of the request will be transformed. Possible values are:
+     * - HTTPManagerBaseRequest::STRING (See the constant docs for more info)
+     * - HTTPManagerBaseRequest::JSON (See the constant docs for more info)
+     */
+    public $resultFormat = self::STRING;
 
 
     /**
@@ -40,9 +63,10 @@ class HTTPManagerBaseRequest extends BaseStrictClass {
     public $ignoreGlobalPostParams = false;
 
 
-    public function __construct(string $url, int $timeout = 0){
+    public function __construct(string $url, string $resultFormat = 'STRING', int $timeout = 0){
 
         $this->url = $url;
+        $this->resultFormat = $resultFormat;
         $this->timeout = $timeout;
 
         $this->successCallback = function() {};
@@ -54,7 +78,8 @@ class HTTPManagerBaseRequest extends BaseStrictClass {
     /**
      * A method to be executed inmediately after the request execution finishes successfully (200 ok code).
      * The callback function must have the following signature:
-     * (response: string) => void
+     * (response) => void
+     * Where the response will be formatted according to how resultFormat is defined
      */
     public $successCallback = null;
 

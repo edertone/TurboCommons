@@ -495,7 +495,7 @@ export class HTTPManager{
      * @return void
      */
     execute(requests: string|string[]|HTTPManagerBaseRequest|HTTPManagerBaseRequest[],
-            finishedCallback: ((results: {url:string, response:string, isError:boolean, errorMsg:string, code:number}[], anyError:boolean) => void) | null = null,
+            finishedCallback: ((results: {url:string, response:any, isError:boolean, errorMsg:string, code:number}[], anyError:boolean) => void) | null = null,
             progressCallback: null | ((completedUrl: string, totalRequests: number) => void) = null){
         
         let requestsList = this._generateValidRequestsList(requests);
@@ -521,9 +521,12 @@ export class HTTPManager{
             let request = requestWithIndex.request;
             let composedUrl = this._composeUrl(this.baseUrl, request.url);
             
+            let formattedResponse = request.resultFormat === HTTPManagerBaseRequest.JSON ?
+                JSON.parse(response) : response;
+                
             finishedCount ++;
             finishedResults[requestWithIndex.index] = {url:composedUrl,
-                                                       response:response,
+                                                       response:formattedResponse,
                                                        isError:isError,
                                                        errorMsg:errorMsg,
                                                        code:code};
@@ -535,7 +538,7 @@ export class HTTPManager{
             
             }else{
                 
-                request.successCallback(response);
+                request.successCallback(formattedResponse);
             }
             
             request.finallyCallback();

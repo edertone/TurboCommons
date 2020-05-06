@@ -56,7 +56,7 @@ class HTTPManagerTest extends TestCase {
 
         $this->sut->timeout = 3000;
 
-        $this->basePath = 'https://raw.githubusercontent.com/edertone/TurboCommons/master/TurboCommons-Php/src/main/php/managers';
+        $this->basePath = 'https://raw.githubusercontent.com/edertone/TurboCommons/master/TurboCommons-Php/src/test/resources/managers/httpManager';
         $this->existantUrl = 'https://www.google.com';
         $this->nonExistantUrl = 'http://werwerwerwerwerwerwe.345345/3453453454435dgdfg.html';
     }
@@ -476,6 +476,51 @@ class HTTPManagerTest extends TestCase {
 
 
     /**
+     * test
+     *
+     * @return void
+     */
+    public function testExecuteResultFormatSTRINGWorksAsExpected(){
+
+        $this->sut->execute($this->basePath.'/file3.json', function($results, $anyError){
+
+            $this->assertSame($anyError, false);
+            $this->assertSame($results[0]['response'], "{\r\n\"a\": \"1\",\r\n\"b\": 2\r\n}");
+            $this->assertSame($results[0]['isError'], false);
+        });
+
+        $request = new HTTPManagerGetRequest($this->basePath.'/file3.json');
+
+        $this->sut->execute($request, function($results, $anyError){
+
+            $this->assertSame($anyError, false);
+            $this->assertSame($results[0]['response'], "{\r\n\"a\": \"1\",\r\n\"b\": 2\r\n}");
+            $this->assertSame($results[0]['isError'], false);
+        });
+    }
+
+
+    /**
+     * test
+     *
+     * @return void
+     */
+    public function testExecuteResultFormatJSONWorksAsExpected(){
+
+        $request = new HTTPManagerGetRequest($this->basePath.'/file3.json');
+
+        $request->resultFormat = 'JSON';
+
+        $this->sut->execute($request, function($results, $anyError){
+
+            $this->assertSame($anyError, false);
+            $this->assertTrue(ArrayUtils::isEqualTo($results[0]['response'], ['a' => "1", 'b' => 2]));
+            $this->assertSame($results[0]['isError'], false);
+        });
+    }
+
+
+    /**
      * testExecuteRequestsWithStringUrls
      *
      * @return void
@@ -575,7 +620,7 @@ class HTTPManagerTest extends TestCase {
         // Multiple urls without errors
         $multiProgressCount = 0;
 
-        $this->sut->execute([$this->basePath.'/BrowserManager.php', $this->basePath.'/HTTPManager.php', $this->basePath.'/LocalizationManager.php'], function($results, $anyError) use (&$multiProgressCount){
+        $this->sut->execute([$this->basePath.'/file1.txt', $this->basePath.'/file2.xml', $this->basePath.'/file3.json'], function($results, $anyError) use (&$multiProgressCount){
 
             $this->assertSame($multiProgressCount, 3);
             $this->assertSame($anyError, false);
@@ -600,9 +645,9 @@ class HTTPManagerTest extends TestCase {
         // Not necessary
 
         // Test exceptions
-        AssertUtils::throwsException(function() { $this->sut->execute($this->basePath.'/BrowserManager.php', ['hello'], function () {}); }, '/finishedCallback and progressCallback must be functions/');
+        AssertUtils::throwsException(function() { $this->sut->execute($this->basePath.'/file1.txt', ['hello'], function () {}); }, '/finishedCallback and progressCallback must be functions/');
 
-        AssertUtils::throwsException(function() { $this->sut->execute($this->basePath.'/BrowserManager.php', function () {}, ['hello']); }, '/finishedCallback and progressCallback must be functions/');
+        AssertUtils::throwsException(function() { $this->sut->execute($this->basePath.'/file1.txt', function () {}, ['hello']); }, '/finishedCallback and progressCallback must be functions/');
 
         AssertUtils::throwsException(function() { $this->sut->execute([1, 2], function () {}, function () {}); }, '/url 0 must be a non empty string/');
 
@@ -670,10 +715,10 @@ class HTTPManagerTest extends TestCase {
         $errorCalled = false;
         $finallyCalled = false;
 
-        $request = new HTTPManagerGetRequest($this->basePath.'/HTTPManager.php');
+        $request = new HTTPManagerGetRequest($this->basePath.'/file1.txt');
 
         $request->successCallback = function ($response) use (&$successCalled) {
-            $this->assertContains('class HTTPManager extends BaseStrictClass', $response);
+            $this->assertSame($response, 'text1');
             $successCalled = true;
         };
 
@@ -689,15 +734,15 @@ class HTTPManagerTest extends TestCase {
             $this->assertSame($finallyCalled, true);
 
             $this->assertSame($anyError, false);
-            $this->assertSame($results[0]['url'], $this->basePath.'/HTTPManager.php');
-            $this->assertContains('class HTTPManager extends BaseStrictClass', $results[0]['response']);
+            $this->assertSame($results[0]['url'], $this->basePath.'/file1.txt');
+            $this->assertSame($results[0]['response'], 'text1');
             $this->assertSame($results[0]['isError'], false);
             $this->assertSame($results[0]['errorMsg'], '');
             $this->assertSame($results[0]['code'], 200);
 
         }, function($completedUrl, $totalRequests) use (&$progressCount) {
 
-            $this->assertSame($completedUrl, $this->basePath.'/HTTPManager.php');
+            $this->assertSame($completedUrl, $this->basePath.'/file1.txt');
             $this->assertSame($totalRequests, 1);
             $progressCount ++;
         });
@@ -715,10 +760,10 @@ class HTTPManagerTest extends TestCase {
         $errorCalled = false;
         $finallyCalled = false;
 
-        $request = new HTTPManagerGetRequest('HTTPManager.php');
+        $request = new HTTPManagerGetRequest('file1.txt');
 
         $request->successCallback = function ($response) use (&$successCalled) {
-            $this->assertContains('class HTTPManager extends BaseStrictClass', $response);
+            $this->assertSame($response, 'text1');
             $successCalled = true;
         };
 
@@ -735,8 +780,8 @@ class HTTPManagerTest extends TestCase {
             $this->assertSame($finallyCalled, true);
 
             $this->assertSame($anyError, false);
-            $this->assertSame($results[0]['url'], $this->basePath.'/HTTPManager.php');
-            $this->assertContains('class HTTPManager extends BaseStrictClass', $results[0]['response']);
+            $this->assertSame($results[0]['url'], $this->basePath.'/file1.txt');
+            $this->assertSame($results[0]['response'], 'text1');
             $this->assertSame($results[0]['isError'], false);
             $this->assertSame($results[0]['errorMsg'], '');
             $this->assertSame($results[0]['code'], 200);

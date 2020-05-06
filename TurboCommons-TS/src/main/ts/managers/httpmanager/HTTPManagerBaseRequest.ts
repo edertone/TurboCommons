@@ -13,6 +13,29 @@
  */ 
 export abstract class HTTPManagerBaseRequest{
 
+
+    /**
+     * Defines the string format for the result format property.
+     * The result of request with this resultFormat will be returned as a raw string containing the exact request response body.
+     */
+    static readonly STRING = 'STRING';
+
+
+    /**
+     * Defines the json format for the result format property.
+     * The result of request with this resultFormat will be a native type which will have been decoded from the request response
+     * body (expecting it to be a valid json string).
+     */
+    static readonly JSON = 'JSON';
+
+
+    /**
+     * Specifies how the result of the request will be transformed. Possible values are:
+     * - HTTPManagerBaseRequest.STRING (See the constant docs for more info)
+     * - HTTPManagerBaseRequest.JSON (See the constant docs for more info)
+     */
+    resultFormat: typeof HTTPManagerBaseRequest.STRING|typeof HTTPManagerBaseRequest.JSON = HTTPManagerBaseRequest.STRING;
+    
     
     /**
      * The url that will be called as part of this request
@@ -34,9 +57,10 @@ export abstract class HTTPManagerBaseRequest{
     ignoreGlobalPostParams = false;
 
     
-    constructor(url: string, timeout = 0) {
+    constructor(url: string, resultFormat: typeof HTTPManagerBaseRequest.STRING|typeof HTTPManagerBaseRequest.JSON = 'STRING', timeout = 0) {
 
-        this.url = url;        
+        this.url = url;
+        this.resultFormat = resultFormat;
         this.timeout = timeout;
     }
     
@@ -44,9 +68,10 @@ export abstract class HTTPManagerBaseRequest{
     /**
      * A method to be executed inmediately after the request execution finishes successfully (200 ok code).
      * The callback function must have the following signature:
-     * (response: string) => void
+     * (response) => void
+     * Where the response will be formatted according to how resultFormat is defined
      */
-    successCallback: (response: string) => void = () => {};
+    successCallback: (response: any) => void = () => {};
     
     
     /**

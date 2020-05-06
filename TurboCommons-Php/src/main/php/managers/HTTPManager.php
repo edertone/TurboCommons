@@ -455,9 +455,12 @@ class HTTPManager extends BaseStrictClass {
             $request = $requestWithIndex['request'];
             $composedUrl = $this->_composeUrl($this->baseUrl, $request->url);
 
+            $formattedResponse = $request->resultFormat === HTTPManagerBaseRequest::JSON ?
+                json_decode($response, true) : $response;
+
             $finishedCount ++;
             $finishedResults[$requestWithIndex['index']] = ['url' => $composedUrl,
-                                                            'response' => $response,
+                                                            'response' => $formattedResponse,
                                                             'isError' => $isError,
                                                             'errorMsg' => $errorMsg,
                                                             'code' => $code];
@@ -469,7 +472,7 @@ class HTTPManager extends BaseStrictClass {
 
             }else{
 
-                call_user_func($request->successCallback, $response);
+                call_user_func($request->successCallback, $formattedResponse);
             }
 
             call_user_func($request->finallyCallback);

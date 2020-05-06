@@ -49,26 +49,27 @@ class ArrayUtils {
             return false;
         }
 
-        for($i = 0, $l = count($array1); $i < $l; $i++){
+        // Note that php version of this method uses key and value to compare the arrays, cause php also supports associative arrays
+        foreach ($array1 as $key => $value) {
 
             // Check if we have nested arrays
-            if(self::isArray($array1[$i]) && self::isArray($array2[$i])){
+            if(self::isArray($value) && self::isArray($array2[$key])){
 
-                if(!self::isEqualTo($array1[$i], $array2[$i])){
+                if(!self::isEqualTo($value, $array2[$key])){
 
                     return false;
                 }
 
             }else{
 
-                if(ObjectUtils::isObject($array1[$i]) && ObjectUtils::isObject($array2[$i])){
+                if(ObjectUtils::isObject($value) && ObjectUtils::isObject($array2[$key])){
 
-                    if(!ObjectUtils::isEqualTo($array1[$i], $array2[$i])){
+                    if(!ObjectUtils::isEqualTo($value, $array2[$key])){
 
                         return false;
                     }
 
-                }else if($array1[$i] !== $array2[$i]){
+                }else if($value !== $array2[$key]){
 
                     return false;
                 }

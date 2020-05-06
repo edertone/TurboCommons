@@ -544,6 +544,54 @@ QUnit.test("getUrlHeaders", function(assert){
 /**
  * execute
  */
+QUnit.test("execute - check that resultFormat STRING works as expected", function(assert){
+
+    var done = assert.async(2);
+    
+    sut.execute(basePath + '/file3.json', function(results, anyError){
+
+        assert.strictEqual(anyError, false);
+        assert.strictEqual(results[0].response, '{\r\n"a": "1",\r\n"b": 2\r\n}');
+        assert.strictEqual(results[0].isError, false);
+        done();
+    });
+    
+    var request = new HTTPManagerGetRequest(basePath + '/file3.json');
+    
+    sut.execute(request, function(results, anyError){
+
+        assert.strictEqual(anyError, false);
+        assert.strictEqual(results[0].response, '{\r\n"a": "1",\r\n"b": 2\r\n}');
+        assert.strictEqual(results[0].isError, false);
+        done();
+    });
+});
+
+
+/**
+ * execute
+ */
+QUnit.test("execute - check that resultFormat JSON works as expected", function(assert){
+
+    var done = assert.async(1);
+    
+    var request = new HTTPManagerGetRequest(basePath + '/file3.json');
+    
+    request.resultFormat = 'JSON';
+    
+    sut.execute(request, function(results, anyError){
+
+        assert.strictEqual(anyError, false);
+        assert.ok(ObjectUtils.isEqualTo(results[0].response, {a: "1",b: 2}));
+        assert.strictEqual(results[0].isError, false);
+        done();
+    });
+});
+
+
+/**
+ * execute
+ */
 QUnit.test("execute - requests with string urls", function(assert){
     
     // Test empty values
