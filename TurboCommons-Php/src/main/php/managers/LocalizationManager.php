@@ -570,7 +570,7 @@ class LocalizationManager extends BaseStrictClass{
             }
         }
 
-        throw new UnexpectedValueException($bundle.' bundle not loaded');
+        throw new UnexpectedValueException('Bundle <'.$bundle.'> not loaded');
     }
 
 
@@ -742,6 +742,11 @@ class LocalizationManager extends BaseStrictClass{
 
         // If no location specified, use the active one
         if ($location === '') {
+
+            if($bundle !== '' && $bundle !== $this->_activeBundle){
+
+                $this->setActiveBundle($bundle);
+            }
 
             $location = $this->_activeLocation;
         }

@@ -16,6 +16,7 @@ use Throwable;
 use PHPUnit\Framework\TestCase;
 use org\turbocommons\src\main\php\managers\LocalizationManager;
 use org\turbodepot\src\main\php\managers\FilesManager;
+use org\turbotesting\src\main\php\utils\AssertUtils;
 use org\turbocommons\src\main\php\utils\ArrayUtils;
 
 
@@ -383,6 +384,33 @@ class LocalizationManagerTest extends TestCase {
             $this->assertSame(count($errors), 2);
             $this->assertSame(count($this->sut->locales()), 2);
             $this->assertSame(count($this->sut->languages()), 2);
+        });
+    }
+
+
+    /**
+     * test
+     *
+     * @return void
+     */
+    public function testInitialize_two_different_bundles_label_should_not_be_required_when_calling_get(){
+
+        $locations = [[
+            'label' => 'locales1',
+            'path' => $this->basePath.'/test-bundle-bundle-locale-1/$bundle/$bundle_$locale.properties',
+            'bundles' => ['bundle1']
+        ],
+        [
+            'label' => 'locales2',
+            'path' => $this->basePath.'/test-bundle-bundle-locale-2/$bundle/$bundle_$locale.properties',
+            'bundles' => ['bundle3', 'bundle4']
+        ]];
+
+        $this->sut->initialize(new FilesManager(), ['en_US', 'es_ES'], $locations, function($errors){
+
+            $this->assertSame(count($errors), 0);
+            $this->assertSame($this->sut->get('TAG5', 'bundle3'), 'tag5');
+            $this->assertSame($this->sut->get('TAG1', 'bundle1'), 'tag1');
         });
     }
 
@@ -840,12 +868,8 @@ class LocalizationManagerTest extends TestCase {
         // Test empty values
         for($i=0; $i < $this->emptyValuesCount; $i++){
 
-            try {
-                $this->sut->setActiveBundle($this->emptyValues[$i]);
-                $this->exceptionMessage = 'emptyValues did not cause exception';
-            } catch (Throwable $e) {
-                // We expect an exception to happen
-            }
+            AssertUtils::throwsException(function() use ($i) { $this->sut->setActiveBundle($this->emptyValues[$i]); },
+                '/must be of the type string|Bundle .* not loaded/s');
         }
 
         $locations = [[
@@ -865,12 +889,7 @@ class LocalizationManagerTest extends TestCase {
             $this->assertSame($this->sut->get('LOGIN'), 'Login');
 
             // Test wrong values
-            try {
-                $this->sut->setActiveBundle('nonexisting');
-                $this->exceptionMessage = 'nonexisting did not cause exception';
-            } catch (Throwable $e) {
-                // We expect an exception to happen
-            }
+            AssertUtils::throwsException(function() { $this->sut->setActiveBundle('nonexisting'); }, '/Bundle .* not loaded/');
         });
     }
 

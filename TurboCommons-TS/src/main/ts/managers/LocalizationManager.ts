@@ -577,7 +577,7 @@ export class LocalizationManager {
             }
         }
 
-        throw new Error(bundle + ' bundle not loaded');
+        throw new Error('Bundle <' + bundle + '> not loaded');
     }
 
 
@@ -760,6 +760,11 @@ export class LocalizationManager {
         // If no location specified, use the active one
         if (location === '') {
 
+            if(bundle !== '' && bundle !== this._activeBundle){
+
+                this.setActiveBundle(bundle);
+            }
+            
             location = this._activeLocation;
         }
 

@@ -302,6 +302,34 @@ QUnit.test("initialize-non-existing-path", function(assert){
 
 
 /**
+ * test
+ */
+QUnit.test("initialize-two-different-bundles-label-should-not-be-required-when-calling-get", function(assert){
+
+    var done = assert.async(1);
+    
+    var locations = [{
+        'label': 'locales1',
+        'path': window.basePath + '/test-bundle-bundle-locale-1/$bundle/$bundle_$locale.properties',
+        'bundles': ['bundle1']
+    },
+    {
+        'label': 'locales2',
+        'path': window.basePath + '/test-bundle-bundle-locale-2/$bundle/$bundle_$locale.properties',
+        'bundles': ['bundle3', 'bundle4']
+    }];
+
+    sut.initialize(new HTTPManager(), ['en_US', 'es_ES'], locations, function(errors){
+
+        assert.strictEqual(errors.length, 0);
+        assert.strictEqual(sut.get('TAG5', 'bundle3'), 'tag5');
+        assert.strictEqual(sut.get('TAG1', 'bundle1'), 'tag1');
+        done();
+    });
+});
+
+
+/**
  * loadLocales
  */
 QUnit.test("loadLocales-empty-values", function(assert){
@@ -725,9 +753,8 @@ QUnit.test("setActiveBundle", function(assert){
     // Test empty values
     for(var i=0; i < emptyValuesCount; i++){
 
-        assert.throws(function() {
-            sut.setActiveBundle(emptyValues[i]);
-        }, /bundle not loaded/);
+        assert.throws(function() { sut.setActiveBundle(emptyValues[i]); },
+            /must be of the type string|Bundle [\s\S]* not loaded/);
     }
 
     var done = assert.async(1);
@@ -749,9 +776,7 @@ QUnit.test("setActiveBundle", function(assert){
         assert.strictEqual(sut.get('LOGIN'), 'Login');
 
         // Test wrong values
-        assert.throws(function() {
-            sut.setActiveBundle('nonexisting');
-        }, /nonexisting bundle not loaded/);
+        assert.throws(function() { sut.setActiveBundle('nonexisting'); }, /Bundle .* not loaded/);
         
         done();
     });
