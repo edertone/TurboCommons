@@ -279,6 +279,39 @@ export class BrowserManager{
     
     
     /**
+     * Disable the hability for the user to navigate back on browser history. This method does not disable the
+     * browser back button, but it prevents it from leaving the current page.
+     * 
+     * @returns void
+     */
+    disableBackButton(){
+
+        history.pushState(null, null, document.URL);        
+        window.addEventListener('popstate', this._onPopStatePreventBackButton);
+    }
+    
+    
+    /**
+     * Event listener that will prevent the back button when disableBackButton is enabled
+     */
+    private _onPopStatePreventBackButton(){
+        
+        history.pushState(null, null, document.URL);
+    }
+    
+    
+    /**
+     * Restore the back button normal behaviour which was blocked by calling disableBackButton() 
+     * 
+     * @returns void
+     */
+    enableBackButton(){
+
+        window.removeEventListener('popstate', this._onPopStatePreventBackButton);
+    }
+        
+    
+    /**
      * Totally disables the current page scrolling. Useful when creating popups or elements that have an internal scroll, 
      * and we don't want it to interfere with the main document scroll.<br><br>
      * Can be enabled again with enableScroll.<br><br>
