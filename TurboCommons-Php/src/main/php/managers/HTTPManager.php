@@ -455,8 +455,23 @@ class HTTPManager extends BaseStrictClass {
             $request = $requestWithIndex['request'];
             $composedUrl = $this->_composeUrl($this->baseUrl, $request->url);
 
-            $formattedResponse = $request->resultFormat === HTTPManagerBaseRequest::JSON ?
-                json_decode($response, true) : $response;
+            $formattedResponse = $response;
+
+            if($request->resultFormat === HTTPManagerBaseRequest::JSON){
+
+                $formattedResponse = json_decode($response, true);
+
+                if(json_last_error() !== JSON_ERROR_NONE) {
+
+                    $formattedResponse = $response;
+
+                    if(!$isError){
+
+                        $isError = true;
+                        $errorMsg = 'Could not parse request result as a json string';
+                    }
+                }
+            }
 
             $finishedCount ++;
             $finishedResults[$requestWithIndex['index']] = ['url' => $composedUrl,

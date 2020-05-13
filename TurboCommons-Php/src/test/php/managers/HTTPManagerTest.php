@@ -505,7 +505,7 @@ class HTTPManagerTest extends TestCase {
      *
      * @return void
      */
-    public function testExecuteResultFormatJSONWorksAsExpected(){
+    public function test_execute_check_that_resultFormat_JSON_works_as_expected(){
 
         $request = new HTTPManagerGetRequest($this->basePath.'/file3.json');
 
@@ -516,6 +516,51 @@ class HTTPManagerTest extends TestCase {
             $this->assertSame($anyError, false);
             $this->assertTrue(ArrayUtils::isEqualTo($results[0]['response'], ['a' => "1", 'b' => 2]));
             $this->assertSame($results[0]['isError'], false);
+        });
+    }
+
+
+    /**
+     * test
+     *
+     * @return void
+     */
+    public function test_execute_check_that_resultFormat_JSON_marks_the_request_as_having_error_when_a_non_parseable_result_is_returned(){
+
+        $request = new HTTPManagerGetRequest($this->basePath.'/file1.txt');
+
+        $request->resultFormat = 'JSON';
+
+        $this->sut->execute($request, function($results, $anyError){
+
+            $this->assertSame($anyError, true);
+            $this->assertSame($results[0]['response'], 'text1');
+            $this->assertSame($results[0]['isError'], true);
+            $this->assertSame($results[0]['errorMsg'], 'Could not parse request result as a json string');
+        });
+    }
+
+
+    /**
+     * test
+     *
+     * @return void
+     */
+    public function test_execute_check_that_resultFormat_JSON_returns_the_error_code_and_error_message_when_a_request_with_errors_is_performed(){
+
+        $request = new HTTPManagerGetRequest('invalid url');
+
+        $request->resultFormat = 'JSON';
+
+        $this->sut->execute($request, function($results, $anyError){
+
+            $this->assertSame($anyError, true);
+            $this->assertSame($results[0]['url'], 'invalid url');
+            $this->assertSame($results[0]['response'], '');
+            $this->assertSame($results[0]['isError'], true);
+            $this->assertTrue(strlen($results[0]['errorMsg']) > 3);
+            $this->assertSame($results[0]['code'], 0);
+            $this->assertNotSame($results[0]['errorMsg'], 'Could not parse request result as a json string');
         });
     }
 

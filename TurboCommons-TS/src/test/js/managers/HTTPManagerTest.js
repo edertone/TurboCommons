@@ -592,6 +592,53 @@ QUnit.test("execute - check that resultFormat JSON works as expected", function(
 /**
  * execute
  */
+QUnit.test("execute - check that resultFormat JSON marks the request as having error when a non parseable result is returned", function(assert){
+
+    var done = assert.async(1);
+    
+    var request = new HTTPManagerGetRequest(basePath + '/file1.txt');
+    
+    request.resultFormat = 'JSON';
+    
+    sut.execute(request, function(results, anyError){
+
+        assert.strictEqual(anyError, true);
+        assert.strictEqual(results[0].response, 'text1');
+        assert.strictEqual(results[0].isError, true);
+        assert.strictEqual(results[0].errorMsg, 'Could not parse request result as a json string');
+        done();
+    });
+});
+
+
+/**
+ * execute
+ */
+QUnit.test("execute - check that resultFormat JSON returns the error code and error message when a request with errors is performed", function(assert){
+
+    var done = assert.async(1);
+    
+    var request = new HTTPManagerGetRequest('invalid url');
+    
+    request.resultFormat = 'JSON';
+    
+    sut.execute(request, function(results, anyError){
+
+        assert.strictEqual(anyError, true);
+        assert.strictEqual(results[0].url, 'invalid url');
+        assert.strictEqual(results[0].response, '');
+        assert.strictEqual(results[0].isError, true);
+        assert.ok(results[0].errorMsg.length > 3);
+        assert.ok(results[0].code > 300);
+        assert.notStrictEqual(results[0].errorMsg, 'Could not parse request result as a json string');
+        done();
+    });
+});
+
+
+/**
+ * execute
+ */
 QUnit.test("execute - requests with string urls", function(assert){
     
     // Test empty values

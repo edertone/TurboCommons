@@ -521,8 +521,23 @@ export class HTTPManager{
             let request = requestWithIndex.request;
             let composedUrl = this._composeUrl(this.baseUrl, request.url);
             
-            let formattedResponse = request.resultFormat === HTTPManagerBaseRequest.JSON ?
-                JSON.parse(response) : response;
+            let formattedResponse = response;
+            
+            if(request.resultFormat === HTTPManagerBaseRequest.JSON){
+                
+                try{
+                
+                    formattedResponse = JSON.parse(response);
+                
+                } catch (e) {
+                    
+                    if(!isError){
+                        
+                        isError = true;
+                        errorMsg = 'Could not parse request result as a json string';
+                    }
+                }
+            }
                 
             finishedCount ++;
             finishedResults[requestWithIndex.index] = {url:composedUrl,
