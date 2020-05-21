@@ -87,7 +87,7 @@ export class HTTPManager{
      * performed by this class. We can use this feature for example to always send a token to web services, or other
      * globally sent post values
      */
-    private _globalPostParams = {};
+    private _globalPostParams:{[key:string] : any} = {};
     
 
     /**

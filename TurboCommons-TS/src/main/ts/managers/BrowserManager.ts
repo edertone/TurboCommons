@@ -286,7 +286,7 @@ export class BrowserManager{
      */
     disableBackButton(){
 
-        history.pushState(null, null, document.URL);        
+        history.pushState(null, '', document.URL);        
         window.addEventListener('popstate', this._onPopStatePreventBackButton);
     }
     
@@ -296,7 +296,7 @@ export class BrowserManager{
      */
     private _onPopStatePreventBackButton(){
         
-        history.pushState(null, null, document.URL);
+        history.pushState(null, '', document.URL);
     }
     
     

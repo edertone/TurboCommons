@@ -114,7 +114,7 @@ class DateTimeObject{
      *
      * @see DateTimeObject::__construct
      *
-     * @return true if the specified value is ISO 8601 or a DateTimeObject instance, false if value contains invalid information.
+     * @return boolean true if the specified value is ISO 8601 or a DateTimeObject instance, false if value contains invalid information.
      */
     public static function isValidDateTime($dateTime){
 
@@ -353,7 +353,7 @@ class DateTimeObject{
 
             sort($sortedDates, SORT_STRING);
 
-            return ($sortedDates[0] == $date1) ? 2 : 1;
+            return ($sortedDates[0] === $date1) ? 2 : 1;
         }
 
         throw new UnexpectedValueException('Provided value is not a valid ISO 8601 date time format');
