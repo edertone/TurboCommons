@@ -42,6 +42,8 @@ class FTPManager extends BaseStrictClass {
      * @param string $host The FTP server address. This parameter shouldn't have any trailing slashes and shouldn't be prefixed with ftp://.
      * @param int $port This parameter specifies an alternate port to connect to. If it is omitted or set to zero, then the default FTP port, 21, will be used.
      * @param int $timeout This parameter specifies the timeout for all subsequent network operations. If omitted, the default value is 90 seconds. The timeout can be changed and queried at any time
+     *
+     * @throws UnexpectedValueException If connection cannot be established
      */
     public function __construct($userName, $psw, $host, $port = null, $timeout = 90){
 
@@ -60,7 +62,6 @@ class FTPManager extends BaseStrictClass {
 
             throw new UnexpectedValueException('Ftp login error: Verify user credentials');
         }
-
     }
 
 
@@ -98,35 +99,39 @@ class FTPManager extends BaseStrictClass {
     }
 
 
-    // TODO: adaptar la funci� getDirectorySize de FileSystemUtils (si es aplicable)
+    // TODO: adaptar la funcio getDirectorySize de FileSystemUtils (si es aplicable)
 
 
-    // TODO: adaptar la funci� deleteDirectory de FileSystemUtils (si es aplicable)
+    // TODO: adaptar la funcio deleteDirectory de FileSystemUtils (si es aplicable)
 
 
-    // TODO: adaptar la funci� isDirectoryEmpty de FileSystemUtils (si es aplicable)
+    // TODO: adaptar la funcio isDirectoryEmpty de FileSystemUtils (si es aplicable)
 
 
     /**
      * Create a file to the specified ftp path and write the specified data to it.
      *
-     * @param string $ftpPath The full ftp path where the file will be stored, including the full file name
-     * @param string $fileData Information to store on the file (a string, a block of bytes, etc...)
+     * @param string $pathToFtpFile The full ftp path where the file will be stored, including the full file name
+     * @param string $data Information to store on the file (a string, a block of bytes, etc...)
      *
      * @return bool Returns true on success or false on failure.
      */
-    public function createFile($ftpPath, $fileData = ''){
+    public function saveFile($pathToFtpFile, $data = ''){
 
         // To avoid creating a temporary file and then storing it on the ftp, we directly write to the ftp location via a text stream,
         // so no hard drive is used for the operation.
-        $stream = fopen('data://text/plain,'.$fileData, 'r');
+        $stream = fopen('data://text/plain,'.$data, 'r');
 
-        $res = ftp_fput($this->_connectionId, $ftpPath, $stream, FTP_BINARY);
+        if($stream === false){
+
+            throw new UnexpectedValueException('Could not write to file: '.$pathToFtpFile);
+        }
+
+        $res = ftp_fput($this->_connectionId, $pathToFtpFile, $stream, FTP_BINARY);
 
         fclose($stream);
 
         return $res;
-
     }
 
 

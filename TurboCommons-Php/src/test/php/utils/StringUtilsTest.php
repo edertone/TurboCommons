@@ -616,6 +616,62 @@ class StringUtilsTest extends TestCase {
 
 
     /**
+     * testPad
+     *
+     * @return void
+     */
+    public function testPad(){
+
+        // Test empty values
+        AssertUtils::throwsException(function() { StringUtils::pad(null, 0); }, '/string and padString must be strings/');
+        AssertUtils::throwsException(function() { StringUtils::pad(0, 0); }, '/string and padString must be strings/');
+        AssertUtils::throwsException(function() { StringUtils::pad([], 0); }, '/string and padString must be strings/');
+        AssertUtils::throwsException(function() { StringUtils::pad('', ''); }, '/padLength is not an int/');
+        AssertUtils::throwsException(function() { StringUtils::pad('', 0, '', ''); }, '/string and padString must be strings/');
+        AssertUtils::throwsException(function() { StringUtils::pad('', 0, '0', ''); }, '/mode must be LEFT or RIGHT/');
+        $this->assertSame(StringUtils::pad('', 0), "");
+        $this->assertSame(StringUtils::pad('      ', 0), '      ');
+
+        // Test ok values - Padding left
+        $this->assertSame('0', StringUtils::pad('', 1));
+        $this->assertSame('00', StringUtils::pad('', 2));
+        $this->assertSame('0000', StringUtils::pad('', 4));
+        $this->assertSame('hello', StringUtils::pad('hello', 4));
+        $this->assertSame('hello', StringUtils::pad('hello', 5));
+        $this->assertSame('0hello', StringUtils::pad('hello', 6));
+        $this->assertSame('000hello', StringUtils::pad('hello', 8));
+        $this->assertSame('00000hello', StringUtils::pad('hello', 10));
+        $this->assertSame('XXXXXhello', StringUtils::pad('hello', 10, 'X'));
+        $this->assertSame('babababhello', StringUtils::pad('hello', 12, 'ab'));
+        $this->assertSame('abababababhello', StringUtils::pad('hello', 15, 'ab'));
+        $this->assertSame('cabcabcXXX', StringUtils::pad('XXX', 10, 'abc'));
+
+        // Test ok values - Padding right
+        $this->assertSame('0', StringUtils::pad('', 1, '0', 'RIGHT'));
+        $this->assertSame('00', StringUtils::pad('', 2, '0', 'RIGHT'));
+        $this->assertSame('0000', StringUtils::pad('', 4, '0', 'RIGHT'));
+        $this->assertSame('hello', StringUtils::pad('hello', 4, '0', 'RIGHT'));
+        $this->assertSame('hello', StringUtils::pad('hello', 5, '0', 'RIGHT'));
+        $this->assertSame('hello0', StringUtils::pad('hello', 6, '0', 'RIGHT'));
+        $this->assertSame('hello000', StringUtils::pad('hello', 8, '0', 'RIGHT'));
+        $this->assertSame('hello00000', StringUtils::pad('hello', 10, '0', 'RIGHT'));
+        $this->assertSame('helloXXXXX', StringUtils::pad('hello', 10, 'X', 'RIGHT'));
+        $this->assertSame('helloabababa', StringUtils::pad('hello', 12, 'ab', 'RIGHT'));
+        $this->assertSame('helloababababab', StringUtils::pad('hello', 15, 'ab', 'RIGHT'));
+        $this->assertSame('XXXabcabca', StringUtils::pad('XXX', 10, 'abc', 'RIGHT'));
+
+        // Test wrong values
+        // Not necessary
+
+        // Test exceptions
+        AssertUtils::throwsException(function() { StringUtils::pad([1, 2, 3, 4], 0); }, '/string and padString must be strings/');
+        AssertUtils::throwsException(function() { StringUtils::pad(new stdclass(), 0); }, '/string and padString must be strings/');
+        AssertUtils::throwsException(function() { StringUtils::pad(12345, 0); }, '/string and padString must be strings/');
+        AssertUtils::throwsException(function() { StringUtils::pad('1213', 10, 12356); }, '/string and padString must be strings/');
+    }
+
+
+    /**
      * testCountStringOccurences
      *
      * @return void
@@ -634,8 +690,8 @@ class StringUtilsTest extends TestCase {
 
         // Test exceptions
         AssertUtils::throwsException(function(){ StringUtils::countStringOccurences(null, null); }, '/value is not a string/');
-        AssertUtils::throwsException(function(){ StringUtils::countStringOccurences('', ''); }, '/cannot count occurences for an empty string/');
-        AssertUtils::throwsException(function(){ StringUtils::countStringOccurences('  ', ''); }, '/cannot count occurences for an empty string/');
+        AssertUtils::throwsException(function(){ StringUtils::countStringOccurences('', ''); }, '/cannot count empty string occurences/');
+        AssertUtils::throwsException(function(){ StringUtils::countStringOccurences('  ', ''); }, '/cannot count empty string occurences/');
     }
 
 

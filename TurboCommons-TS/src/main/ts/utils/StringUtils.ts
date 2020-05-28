@@ -323,6 +323,54 @@ export class StringUtils {
     
     
     /**
+     * Pad a string to a certain length with another string
+     *
+     * @param string The string to which we want to fill the empty spaces
+     * @param padLength The minimum length that we want for the resulting string to have
+     * @param padString The character or characters which we want to add to the string to match the target length
+     * @param mode LEFT to append the padString to the left of the string, RIGHT to append the padString to the right of the string
+     *
+     * @returns The padded string
+     */
+    public static pad(string: string, padLength: number, padString = '0', mode = 'LEFT') {
+        
+        if(!StringUtils.isString(string) || !StringUtils.isString(padString) || padString.length <= 0){
+            
+            throw new Error('string and padString must be strings');
+        }
+        
+        if(!NumericUtils.isInteger(padLength)){
+            
+            throw new Error('padLength is not an int');
+        }
+        
+        if(mode !== 'LEFT' && mode !== 'RIGHT'){
+            
+            throw new Error('mode must be LEFT or RIGHT');
+        }
+        
+        let result = string;
+        
+        if(mode === 'RIGHT'){
+            
+            while (result.length < padLength) {
+                
+                result = result + padString.substr(0, padLength - result.length);
+            }
+            
+        }else{
+            
+            while (result.length < padLength) {
+                
+                result = padString.substr(-(padLength - result.length)) + result;
+            }
+        }
+                
+        return result;
+    }
+    
+    
+    /**
      * Count the number of times a string is found inside another string
      *
      * @param string The string where we want to search
@@ -339,7 +387,7 @@ export class StringUtils {
         
         if(findMe === ''){
             
-            throw new Error('cannot count occurences for an empty string');
+            throw new Error('cannot count empty string occurences');
         }
 
         return string.split(findMe).length - 1;

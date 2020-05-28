@@ -347,6 +347,54 @@ class StringUtils {
 
 
     /**
+     * Pad a string to a certain length with another string
+     *
+     * @param string $string The string to which we want to fill the empty spaces
+     * @param int $padLength The minimum length that we want for the resulting string to have
+     * @param string $padString The character or characters which we want to add to the string to match the target length
+     * @param string $mode LEFT to append the padString to the left of the string, RIGHT to append the padString to the right of the string
+     *
+     * @return string The padded string
+     */
+    public static function pad($string, $padLength, $padString = '0', $mode = 'LEFT') {
+
+        if(!StringUtils::isString($string) || !StringUtils::isString($padString) || strlen($padString) <= 0){
+
+            throw new InvalidArgumentException('string and padString must be strings');
+        }
+
+        if(!NumericUtils::isInteger($padLength)){
+
+            throw new InvalidArgumentException('padLength is not an int');
+        }
+
+        if($mode !== 'LEFT' && $mode !== 'RIGHT'){
+
+            throw new InvalidArgumentException('mode must be LEFT or RIGHT');
+        }
+
+        $result = $string;
+
+        if($mode === 'RIGHT'){
+
+            while (strlen($result) < $padLength) {
+
+                $result = $result . substr($padString, 0, $padLength - strlen($result));
+            }
+
+        }else{
+
+            while (strlen($result) < $padLength) {
+
+                $result = substr($padString, -($padLength - strlen($result))) . $result;
+            }
+        }
+
+        return $result;
+    }
+
+
+    /**
      * Count the number of times a string is found inside another string
      *
      * @param string $string The string where we want to search
@@ -363,7 +411,7 @@ class StringUtils {
 
         if($findMe === ''){
 
-            throw new InvalidArgumentException('cannot count occurences for an empty string');
+            throw new InvalidArgumentException('cannot count empty string occurences');
         }
 
         return substr_count($string, $findMe);

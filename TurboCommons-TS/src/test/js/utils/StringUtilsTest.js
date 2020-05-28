@@ -465,6 +465,61 @@ QUnit.test("trimRight", function(assert){
 
 
 /**
+ * pad
+ */
+QUnit.test("pad", function(assert){
+
+    // Test empty values
+    assert.throws(function() { StringUtils.pad(undefined, 0); }, /string and padString must be strings/);
+    assert.throws(function() { StringUtils.pad(null, 0); }, /string and padString must be strings/);
+    assert.throws(function() { StringUtils.pad(0, 0); }, /string and padString must be strings/);
+    assert.throws(function() { StringUtils.pad([], 0); }, /string and padString must be strings/);
+    assert.throws(function() { StringUtils.pad('', ''); }, /padLength is not an int/);
+    assert.throws(function() { StringUtils.pad('', 0, '', ''); }, /string and padString must be strings/);
+    assert.throws(function() { StringUtils.pad('', 0, '0', ''); }, /mode must be LEFT or RIGHT/);
+    assert.strictEqual(StringUtils.pad('', 0), "");
+    assert.strictEqual(StringUtils.pad('      ', 0), '      ');
+    
+    // Test ok values - Padding left
+    assert.strictEqual(StringUtils.pad('', 1), '0');
+    assert.strictEqual(StringUtils.pad('', 2), '00');
+    assert.strictEqual(StringUtils.pad('', 4), '0000');
+    assert.strictEqual(StringUtils.pad('hello', 4), 'hello');
+    assert.strictEqual(StringUtils.pad('hello', 5), 'hello');
+    assert.strictEqual(StringUtils.pad('hello', 6), '0hello');
+    assert.strictEqual(StringUtils.pad('hello', 8), '000hello');
+    assert.strictEqual(StringUtils.pad('hello', 10), '00000hello');
+    assert.strictEqual(StringUtils.pad('hello', 10, 'X'), 'XXXXXhello');
+    assert.strictEqual(StringUtils.pad('hello', 12, 'ab'), 'babababhello');
+    assert.strictEqual(StringUtils.pad('hello', 15, 'ab'), 'abababababhello');
+    assert.strictEqual(StringUtils.pad('XXX', 10, 'abc'), 'cabcabcXXX');
+    
+    // Test ok values - Padding right
+    assert.strictEqual(StringUtils.pad('', 1, '0', 'RIGHT'), '0');
+    assert.strictEqual(StringUtils.pad('', 2, '0', 'RIGHT'), '00');
+    assert.strictEqual(StringUtils.pad('', 4, '0', 'RIGHT'), '0000');
+    assert.strictEqual(StringUtils.pad('hello', 4, '0', 'RIGHT'), 'hello');
+    assert.strictEqual(StringUtils.pad('hello', 5, '0', 'RIGHT'), 'hello');
+    assert.strictEqual(StringUtils.pad('hello', 6, '0', 'RIGHT'), 'hello0');
+    assert.strictEqual(StringUtils.pad('hello', 8, '0', 'RIGHT'), 'hello000');
+    assert.strictEqual(StringUtils.pad('hello', 10, '0', 'RIGHT'), 'hello00000');
+    assert.strictEqual(StringUtils.pad('hello', 10, 'X', 'RIGHT'), 'helloXXXXX');
+    assert.strictEqual(StringUtils.pad('hello', 12, 'ab', 'RIGHT'), 'helloabababa');
+    assert.strictEqual(StringUtils.pad('hello', 15, 'ab', 'RIGHT'), 'helloababababab');
+    assert.strictEqual(StringUtils.pad('XXX', 10, 'abc', 'RIGHT'), 'XXXabcabca');
+    
+    // Test wrong values
+    // Not necessary
+
+    // Test exceptions
+    assert.throws(function() { StringUtils.pad([1, 2, 3, 4], 0); }, /string and padString must be strings/);
+    assert.throws(function() { StringUtils.pad(new Error(), 0); }, /string and padString must be strings/);
+    assert.throws(function() { StringUtils.pad(12345, 0); }, /string and padString must be strings/);
+    assert.throws(function() { StringUtils.pad('1213', 10, 12356); }, /string and padString must be strings/);
+});
+
+
+/**
  * countStringOccurences
  */
 QUnit.test("countStringOccurences", function(assert) {
@@ -481,8 +536,8 @@ QUnit.test("countStringOccurences", function(assert) {
 
     // Test exceptions
     assert.throws(function() { StringUtils.countStringOccurences(null, null); }, /value is not a string/);
-    assert.throws(function() { StringUtils.countStringOccurences('', ''); }, /cannot count occurences for an empty string/);
-    assert.throws(function() { StringUtils.countStringOccurences('  ', ''); }, /cannot count occurences for an empty string/);
+    assert.throws(function() { StringUtils.countStringOccurences('', ''); }, /cannot count empty string occurences/);
+    assert.throws(function() { StringUtils.countStringOccurences('  ', ''); }, /cannot count empty string occurences/);
 });
 
 
