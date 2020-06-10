@@ -2342,17 +2342,19 @@ class StringUtilsTest extends TestCase {
      */
     public function testRemoveWordsShorterThan(){
 
-        $this->assertTrue(StringUtils::removeWordsShorterThan(null) === '');
-        $this->assertTrue(StringUtils::removeWordsShorterThan('') === '');
-        $this->assertTrue(StringUtils::removeWordsShorterThan('', 0) === '');
-        $this->assertTrue(StringUtils::removeWordsShorterThan('hello', 0) === 'hello');
-        $this->assertTrue(StringUtils::removeWordsShorterThan('hello', 2) === 'hello');
-        $this->assertTrue(StringUtils::removeWordsShorterThan('hello', 5) === 'hello');
-        $this->assertTrue(StringUtils::removeWordsShorterThan('hello', 6) === '');
-        $this->assertTrue(StringUtils::removeWordsShorterThan('hello by today', 6) === '  ');
-        $this->assertTrue(StringUtils::removeWordsShorterThan('hello by today', 5) === 'hello  today');
-        $this->assertTrue(StringUtils::removeWordsShorterThan('hello by today', 1) === 'hello by today');
-        $this->assertTrue(StringUtils::removeWordsShorterThan("Line1\nline2\r\nline3 and  \nline4", 4) === "Line1\nline2\r\nline3   \nline4");
+        $this->assertSame('', StringUtils::removeWordsShorterThan(null));
+        $this->assertSame('', StringUtils::removeWordsShorterThan(''));
+        $this->assertSame('', StringUtils::removeWordsShorterThan('', 0));
+        $this->assertSame('hello', StringUtils::removeWordsShorterThan('hello', 0));
+        $this->assertSame('hello', StringUtils::removeWordsShorterThan('hello', 2));
+        $this->assertSame('hello', StringUtils::removeWordsShorterThan('hello', 5));
+        $this->assertSame('', StringUtils::removeWordsShorterThan('hello', 6));
+        $this->assertSame('', StringUtils::removeWordsShorterThan('hello by today', 6));
+        $this->assertSame('hello today', StringUtils::removeWordsShorterThan('hello by today', 5));
+        $this->assertSame('hello by today', StringUtils::removeWordsShorterThan('hello by today', 1));
+        $this->assertSame("Line1\nline2\r\nline3  \nline4", StringUtils::removeWordsShorterThan("Line1\nline2\r\nline3 and  \nline4", 4));
+        $this->assertSame("Pad string certain length   with    ", StringUtils::removeWordsShorterThan("Pad a string to a certain length   with    ", 3));
+
         // TODO: multi line strings do not work!
         // $this->assertTrue(StringUtils::removeWordsShorterThan("Line1 line12\nline2\r\nline3 and  \nline4", 6) === " line12\n\r\n   \n");
         // TODO: add more multi line tests
@@ -2366,16 +2368,19 @@ class StringUtilsTest extends TestCase {
      */
     public function testRemoveWordsLongerThan(){
 
-        $this->assertTrue(StringUtils::removeWordsLongerThan(null) === '');
-        $this->assertTrue(StringUtils::removeWordsLongerThan('') === '');
-        $this->assertTrue(StringUtils::removeWordsLongerThan('', 0) === '');
-        $this->assertTrue(StringUtils::removeWordsLongerThan('hello', 0) === '');
-        $this->assertTrue(StringUtils::removeWordsLongerThan('hello', 2) === '');
-        $this->assertTrue(StringUtils::removeWordsLongerThan('hello', 5) === 'hello');
-        $this->assertTrue(StringUtils::removeWordsLongerThan('hello', 6) === 'hello');
-        $this->assertTrue(StringUtils::removeWordsLongerThan('hello by today', 6) === 'hello by today');
-        $this->assertTrue(StringUtils::removeWordsLongerThan('hello by today', 5) === 'hello by today');
-        $this->assertTrue(StringUtils::removeWordsLongerThan('hello by today', 1) === '  ');
+        $this->assertSame('', StringUtils::removeWordsLongerThan(null));
+        $this->assertSame('', StringUtils::removeWordsLongerThan(''));
+        $this->assertSame('', StringUtils::removeWordsLongerThan('', 0));
+        $this->assertSame('', StringUtils::removeWordsLongerThan('hello', 0));
+        $this->assertSame('', StringUtils::removeWordsLongerThan('hello', 2));
+        $this->assertSame('hello', StringUtils::removeWordsLongerThan('hello', 5));
+        $this->assertSame('hello', StringUtils::removeWordsLongerThan('hello', 6));
+        $this->assertSame('hello by today', StringUtils::removeWordsLongerThan('hello by today', 6));
+        $this->assertSame('hello by today', StringUtils::removeWordsLongerThan('hello by today', 5));
+        $this->assertSame('hello by today   go   to ITWE', StringUtils::removeWordsLongerThan('hello by today   123456 go   to ITWE', 5));
+        $this->assertSame('', StringUtils::removeWordsLongerThan('hello by today', 1));
+        $this->assertSame("Pad a to a      ", StringUtils::removeWordsLongerThan("Pad a string to a certain length   with    ", 3));
+
         // TODO: multi line strings do not work!
         // $this->assertTrue(StringUtils::removeWordsLongerThan("Line1\nline2\r\nline3 and  \nline4", 4) === "\n\r\n and  \n");
         // $this->assertTrue(StringUtils::removeWordsLongerThan("Line1 line12\nline2\r\nline3 and  \nline4", 6) === " line12\n\r\n   \n");

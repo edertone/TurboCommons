@@ -1443,7 +1443,7 @@ class StringUtils {
 
 
     /**
-     * Deletes from a string all the words that are shorter than the specified length
+     * Deletes all the words that are shorter than the specified length from the provided string
      *
      * @param string $string The string to process
      * @param int $shorterThan The minimum length for the words to be preserved. So any word that is shorther than the specified value will be removed.
@@ -1453,29 +1453,12 @@ class StringUtils {
      */
     public static function removeWordsShorterThan($string, int $shorterThan = 3, string $wordSeparator = ' '){
 
-        if($string == null){
-
-            return '';
-        }
-
-        // Generate an array with the received string words
-        $words = explode($wordSeparator, $string);
-        $wordsCount = count($words);
-
-        for ($i = 0; $i < $wordsCount; $i++) {
-
-            if(strlen($words[$i]) < $shorterThan){
-
-                $words[$i] = '';
-            }
-        }
-
-        return implode($wordSeparator, $words);
+        return self::_removeWordsByLengthAux($string, $shorterThan, $wordSeparator, false);
     }
 
 
     /**
-     * Deletes from a string all the words that are longer than the specified length
+     * Deletes all the words that are longer than the specified length from the provided string
      *
      * @param string $string The string to process
      * @param int $longerThan The maximum length for the words to be preserved. Any word that exceeds the specified length will be removed from the string.
@@ -1485,24 +1468,31 @@ class StringUtils {
      */
     public static function removeWordsLongerThan($string, int $longerThan = 3, string $wordSeparator = ' '){
 
-        if($string == null){
+        return self::_removeWordsByLengthAux($string, $longerThan, $wordSeparator, true);
+    }
 
-            return '';
-        }
 
-        // Generate an array with the received string words
-        $words = explode($wordSeparator, $string);
-        $wordsCount = count($words);
+    /**
+     * Aux method that is used by the removeWordsShorterThan and removeWordsLongerThan methods to strip words by length
+     */
+    private static function _removeWordsByLengthAux($string, int $length = 3, string $wordSeparator = ' ', $longer = true){
 
-        for ($i = 0; $i < $wordsCount; $i++) {
+        $result = [];
 
-            if(strlen($words[$i]) > $longerThan){
+        if($string !== null){
 
-                $words[$i] = '';
+            foreach (explode($wordSeparator, $string) as $word) {
+
+                if($word === '' ||
+                   ($longer && strlen($word) <= $length) ||
+                   (!$longer && strlen($word) >= $length)){
+
+                    $result[] = $word;
+                }
             }
         }
 
-        return implode($wordSeparator, $words);
+        return implode($wordSeparator, $result);
     }
 
 
