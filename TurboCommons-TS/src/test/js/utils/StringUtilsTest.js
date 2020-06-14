@@ -57,6 +57,29 @@ QUnit.test("isString", function(assert) {
 
 
 /**
+ * forceString
+ */
+QUnit.test("forceString", function(assert) {
+    
+    StringUtils.forceString('');
+    StringUtils.forceString('      ');
+    StringUtils.forceString('1');
+    StringUtils.forceString('a');
+    StringUtils.forceString('hello');
+    StringUtils.forceString("hello\n\nguys");
+
+    assert.throws(function() { StringUtils.forceString(null, 'null'); }, /null must be a string/);
+    assert.throws(function() { StringUtils.forceString(0, '0'); }, /0 must be a string/);
+    assert.throws(function() { StringUtils.forceString(15, '15'); }, /15 must be a string/);
+    assert.throws(function() { StringUtils.forceString([], 'array'); }, /array must be a string/);
+    assert.throws(function() { StringUtils.forceString([1], 'array'); }, /array must be a string/);
+    assert.throws(function() { StringUtils.forceString(['a', 'cd'], "array"); }, /array must be a string/);
+    assert.throws(function() { StringUtils.forceString({}, '{}'); }, /{} must be a string/);
+    assert.throws(function() { StringUtils.forceString(new Error(), 'new Error'); }, /new Error must be a string/);
+});
+
+
+/**
  * isUrl
  */
 QUnit.test("isUrl", function(assert) {
@@ -153,10 +176,29 @@ QUnit.test("isEmpty", function(assert) {
     assert.ok(!StringUtils.isEmpty('EMPTY       void   hole    XX', ['EMPTY', 'void', 'hole']));
 
     // Test non string value gives exception
-    assert.throws(function() {
+    assert.throws(function() { StringUtils.isEmpty(123); }, /value is not a string/);
+});
 
-        StringUtils.isEmpty(123);
-    });
+
+/**
+ * forceNonEmptyString
+ */
+QUnit.test("forceNonEmptyString", function(assert) {
+    
+    assert.throws(function() { StringUtils.forceNonEmptyString(null); }, /must be a non empty string/);
+    assert.throws(function() { StringUtils.forceNonEmptyString(0); }, /must be a non empty string/);
+    assert.throws(function() { StringUtils.forceNonEmptyString(''); }, /must be a non empty string/);
+    assert.throws(function() { StringUtils.forceNonEmptyString([]); }, /must be a non empty string/);
+    assert.throws(function() { StringUtils.forceNonEmptyString('      '); }, /must be a non empty string/);
+    assert.throws(function() { StringUtils.forceNonEmptyString("\n\n  \n"); }, /must be a non empty string/);
+    assert.throws(function() { StringUtils.forceNonEmptyString("\t   \n     \r\r"); }, /must be a non empty string/);
+
+    StringUtils.forceNonEmptyString('adsadf');
+    StringUtils.forceNonEmptyString('    sdfasdsf');
+    StringUtils.forceNonEmptyString('EMPTY');
+
+    // Test non string value gives exception
+    assert.throws(function() { StringUtils.forceNonEmptyString(123); }, /must be a non empty string/);
 });
 
 

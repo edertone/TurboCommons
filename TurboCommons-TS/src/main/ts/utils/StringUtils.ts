@@ -112,6 +112,26 @@ export class StringUtils {
     
     
     /**
+     * Strictly check that the provided value is a string or throw an exception
+     *
+     * @param value A value to check
+     * @param valueName The name of the value to be shown at the beginning of the exception message
+     * @param errorMessage The rest of the exception message
+     *
+     * @throws Error If the check fails
+     *
+     * @return void
+     */
+    public static forceString(value:any, valueName = '', errorMessage = 'must be a string'){
+
+        if(!StringUtils.isString(value)){
+
+            throw new Error(valueName + ' ' + errorMessage);
+        }
+    }
+    
+    
+    /**
      * Tells if the given string is a valid url or not
      *
      * @param value The value to check
@@ -161,6 +181,28 @@ export class StringUtils {
         }
 
         return  StringUtils.replace(string, emptyChars.concat([' ', "\n", "\r", "\t"]), '') === '';
+    }
+    
+    
+    /**
+     * Strictly check that the provided value is a non empty string or throw an exception
+     *
+     * Uses the same criteria as the StringUtils.isEmpty() method
+     *
+     * @param value A value to check
+     * @param valueName The name of the value to be shown at the beginning of the exception message
+     * @param errorMessage The rest of the exception message
+     *
+     * @throws Error If the check fails
+     *
+     * @return void
+     */
+    public static forceNonEmptyString(value:any, valueName = '', errorMessage = 'must be a non empty string'){
+
+        if(!StringUtils.isString(value) || StringUtils.isEmpty(value)){
+
+            throw new Error(valueName + ' ' + errorMessage);
+        }
     }
     
     

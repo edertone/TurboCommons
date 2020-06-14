@@ -100,6 +100,27 @@ class StringUtilsTest extends TestCase {
     }
 
 
+    /** test */
+    public function testForceString(){
+
+        StringUtils::forceString('');
+        StringUtils::forceString('      ');
+        StringUtils::forceString('1');
+        StringUtils::forceString('a');
+        StringUtils::forceString('hello');
+        StringUtils::forceString("hello\n\nguys");
+
+        AssertUtils::throwsException(function() { StringUtils::forceString(null, 'null'); }, '/null must be a string/');
+        AssertUtils::throwsException(function() { StringUtils::forceString(0, '0'); }, '/0 must be a string/');
+        AssertUtils::throwsException(function() { StringUtils::forceString(15, '15'); }, '/15 must be a string/');
+        AssertUtils::throwsException(function() { StringUtils::forceString([], 'array'); }, '/array must be a string/');
+        AssertUtils::throwsException(function() { StringUtils::forceString([1], 'array'); }, '/array must be a string/');
+        AssertUtils::throwsException(function() { StringUtils::forceString(['a', 'cd'], "array"); }, "/array must be a string/");
+        AssertUtils::throwsException(function() { StringUtils::forceString(new stdClass(), 'new stdClass'); }, '/new stdClass must be a string/');
+        AssertUtils::throwsException(function() { StringUtils::forceString(new Exception(), 'new Exception'); }, '/new Exception must be a string/');
+    }
+
+
     /**
      * testIsUrl
      *
@@ -206,12 +227,27 @@ class StringUtilsTest extends TestCase {
         $this->assertTrue(!StringUtils::isEmpty('EMPTY       void   hole    XX', ['EMPTY', 'void', 'hole']));
 
         // Test non string value gives exception
-        try {
-            StringUtils::isEmpty(123);
-            $this->exceptionMessage = '123 did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
+        AssertUtils::throwsException(function() { StringUtils::isEmpty(123); }, '/value is not a string/');
+    }
+
+
+    /** test */
+    public function testForceNonEmptyString(){
+
+        AssertUtils::throwsException(function() { StringUtils::forceNonEmptyString(null); }, '/must be a non empty string/');
+        AssertUtils::throwsException(function() { StringUtils::forceNonEmptyString(0); }, '/must be a non empty string/');
+        AssertUtils::throwsException(function() { StringUtils::forceNonEmptyString(''); }, '/must be a non empty string/');
+        AssertUtils::throwsException(function() { StringUtils::forceNonEmptyString([]); }, '/must be a non empty string/');
+        AssertUtils::throwsException(function() { StringUtils::forceNonEmptyString('      '); }, '/must be a non empty string/');
+        AssertUtils::throwsException(function() { StringUtils::forceNonEmptyString("\n\n  \n"); }, '/must be a non empty string/');
+        AssertUtils::throwsException(function() { StringUtils::forceNonEmptyString("\t   \n     \r\r"); }, '/must be a non empty string/');
+
+        StringUtils::forceNonEmptyString('adsadf');
+        StringUtils::forceNonEmptyString('    sdfasdsf');
+        StringUtils::forceNonEmptyString('EMPTY');
+
+        // Test non string value gives exception
+        AssertUtils::throwsException(function() { StringUtils::forceNonEmptyString(123); }, '/must be a non empty string/');
     }
 
 

@@ -114,6 +114,26 @@ class StringUtils {
 
 
     /**
+     * Strictly check that the provided value is a string or throw an exception
+     *
+     * @param mixed $value A value to check
+     * @param mixed $valueName The name of the value to be shown at the beginning of the exception message
+     * @param mixed $errorMessage The rest of the exception message
+     *
+     * @throws InvalidArgumentException If the check fails
+     *
+     * @return void
+     */
+    public static function forceString($value, string $valueName = '', string $errorMessage = 'must be a string'){
+
+        if(!is_string($value)){
+
+            throw new InvalidArgumentException($valueName.' '.$errorMessage);
+        }
+    }
+
+
+    /**
      * Tells if the given string is a valid url or not
      *
      * @param mixed $value The value to check
@@ -173,6 +193,28 @@ class StringUtils {
         }
 
         return str_replace(array_merge($emptyChars, [' ', "\n", "\r", "\t"]), '', $string) === '';
+    }
+
+
+    /**
+     * Strictly check that the provided value is a non empty string or throw an exception
+     *
+     * Uses the same criteria as the self::isEmpty() method
+     *
+     * @param mixed $value A value to check
+     * @param mixed $valueName The name of the value to be shown at the beginning of the exception message
+     * @param mixed $errorMessage The rest of the exception message
+     *
+     * @throws InvalidArgumentException If the check fails
+     *
+     * @return void
+     */
+    public static function forceNonEmptyString($value, $valueName = '', $errorMessage = 'must be a non empty string'){
+
+        if(!is_string($value) || self::isEmpty($value)){
+
+            throw new InvalidArgumentException($valueName.' '.$errorMessage);
+        }
     }
 
 
