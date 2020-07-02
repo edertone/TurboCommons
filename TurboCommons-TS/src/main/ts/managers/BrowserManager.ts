@@ -233,13 +233,12 @@ export class BrowserManager{
      * @param url The url that will be loaded
      * @param newWindow Setting it to true will open the url on a new browser tab. False by default
      * @param postData If we want to send POST data to the url, we can set this parameter to an object where 
-     * each property will be translated to a POST variable name, and each property value to the POST variable value
+     *        each property will be translated to a POST variable name, and each property value to the POST variable value
      * 
      * @returns void
      */
     goToUrl(url:string, newWindow = false, postData:Object|null = null){
 
-        // Check if POST data needs to be sent
         if(postData == null){
 
             // Check if same or new window is required
@@ -253,27 +252,38 @@ export class BrowserManager{
             }
 
         }else{
-
-            // Create a dummy html form element to use it as the method to call the url with post data
-            let formHtml:string = '<form action="' + url + '" method="POST" ' + (newWindow ? 'target="_blank"' : '') + ' style="display:none;">';
-
-            // Convert the postData object to the different POST vars
-            let props = Object.getOwnPropertyNames(postData);
-
-            for(let i = 0; i < props.length; i++){
-
-                formHtml += '<input type="hidden" name="' + props[i] + '" value="' + (postData as any)[props[i]] + '">';
-            }
-
-            formHtml += '</form>';
-
+            
+            // We create a dynamic form that will be used to load the url and also send the required POST data
             let form = document.createElement('form');
             
-            form.innerHTML = formHtml;
-
-            document.getElementsByTagName("BODY")[0].appendChild(form);
+            form.action = url;
+            form.method = "POST";
+            form.style.display = "none";
+            
+            if(newWindow){
+            
+                form.target = "_blank";
+            }
+            
+            let props = Object.getOwnPropertyNames(postData);
+            
+            for(let i = 0; i < props.length; i++){
+                
+                let input = document.createElement("input");
+                input.type = "hidden";
+                input.name = props[i];
+                input.value = (postData as any)[props[i]];
+                form.appendChild(input);
+            }
+        
+            document.body.appendChild(form);
             
             form.submit();
+            
+            if(newWindow){
+            
+                document.body.removeChild(form);
+            }
         }
     }
     
