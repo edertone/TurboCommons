@@ -15,6 +15,7 @@ use Exception;
 use Throwable;
 use stdClass;
 use org\turbocommons\src\main\php\utils\ArrayUtils;
+use org\turbotesting\src\main\php\utils\AssertUtils;
 use PHPUnit\Framework\TestCase;
 
 
@@ -73,11 +74,7 @@ class ArrayUtilsTest extends TestCase {
     }
 
 
-    /**
-     * testIsArray
-     *
-     * @return void
-     */
+    /** test */
     public function testIsArray(){
 
         // Test empty values
@@ -112,26 +109,9 @@ class ArrayUtilsTest extends TestCase {
     public function testIsEqualTo(){
 
         // Test non array values must launch exception
-        try {
-            ArrayUtils::isEqualTo(null, null);
-            $this->exceptionMessage = 'null did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            ArrayUtils::isEqualTo(1, 1);
-            $this->exceptionMessage = '1 did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            ArrayUtils::isEqualTo('asfasf1', '345345');
-            $this->exceptionMessage = 'asfasf1 did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
+        AssertUtils::throwsException(function() { ArrayUtils::isEqualTo(null, null); }, '/must be of the type array, null given/');
+        AssertUtils::throwsException(function() { ArrayUtils::isEqualTo(1, 1); }, '/must be of the type array, int given/');
+        AssertUtils::throwsException(function() { ArrayUtils::isEqualTo('asfasf1', '345345'); }, '/must be of the type array, string given/');
 
         // Test identic arrays
         $this->assertTrue(ArrayUtils::isEqualTo([null], [null]));
@@ -201,6 +181,26 @@ class ArrayUtilsTest extends TestCase {
         // Test exceptions
         // TODO - translate from ts
         $this->markTestIncomplete('This test has not been implemented yet.');
+    }
+
+
+    /** test */
+    public function testForceNonEmptyArray(){
+
+        AssertUtils::throwsException(function() { ArrayUtils::forceNonEmptyArray(null); }, '/must be a non empty array/');
+        AssertUtils::throwsException(function() { ArrayUtils::forceNonEmptyArray(0); }, '/must be a non empty array/');
+        AssertUtils::throwsException(function() { ArrayUtils::forceNonEmptyArray(''); }, '/must be a non empty array/');
+        AssertUtils::throwsException(function() { ArrayUtils::forceNonEmptyArray([]); }, '/must be a non empty array/');
+        AssertUtils::throwsException(function() { ArrayUtils::forceNonEmptyArray('      '); }, '/must be a non empty array/');
+        AssertUtils::throwsException(function() { ArrayUtils::forceNonEmptyArray("\n\n  \n"); }, '/must be a non empty array/');
+        AssertUtils::throwsException(function() { ArrayUtils::forceNonEmptyArray("\t   \n     \r\r"); }, '/must be a non empty array/');
+
+        ArrayUtils::forceNonEmptyArray(['adsadf']);
+        ArrayUtils::forceNonEmptyArray([1,2,3]);
+        ArrayUtils::forceNonEmptyArray([null]);
+
+        // Test non string value gives exception
+        AssertUtils::throwsException(function() { ArrayUtils::forceNonEmptyArray(123); }, '/must be a non empty array/');
     }
 
 

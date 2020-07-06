@@ -24,9 +24,7 @@ QUnit.module("ArrayUtilsTest", {
 });
 
 
-/**
- * isArray
- */
+/** test */
 QUnit.test("isArray", function(assert) {
 
     // Test empty values
@@ -60,20 +58,9 @@ QUnit.test("isArray", function(assert) {
 QUnit.test("isEqualTo", function(assert) {
 
     // Test non array values must launch exception
-    assert.throws(function() {
-
-        ArrayUtils.isEqualTo(null, null);
-    });
-
-    assert.throws(function() {
-
-        ArrayUtils.isEqualTo(1, 1);
-    });
-
-    assert.throws(function() {
-
-        ArrayUtils.isEqualTo("asfasf1", "345345");
-    });
+    assert.throws(function() { ArrayUtils.isEqualTo(null, null); }, /parameters must be arrays/);
+    assert.throws(function() { ArrayUtils.isEqualTo(1, 1); }, /parameters must be arrays/);
+    assert.throws(function() { ArrayUtils.isEqualTo("asfasf1", "345345"); }, /parameters must be arrays/);
 
     // Test identic arrays
     assert.ok(ArrayUtils.isEqualTo([null], [null]));
@@ -203,6 +190,26 @@ QUnit.test("isStringFound", function(assert) {
     assert.throws(function() {
         ArrayUtils.isStringFound([''], [1,2]);
     }, /str is not a string/);    
+});
+
+
+/** test */
+QUnit.test("forceNonEmptyArray", function(assert) {
+
+    assert.throws(function() { ArrayUtils.forceNonEmptyArray(null); }, /must be a non empty array/);
+    assert.throws(function() { ArrayUtils.forceNonEmptyArray(0); }, /must be a non empty array/);
+    assert.throws(function() { ArrayUtils.forceNonEmptyArray(''); }, /must be a non empty array/);
+    assert.throws(function() { ArrayUtils.forceNonEmptyArray([]); }, /must be a non empty array/);
+    assert.throws(function() { ArrayUtils.forceNonEmptyArray('      '); }, /must be a non empty array/);
+    assert.throws(function() { ArrayUtils.forceNonEmptyArray("\n\n  \n"); }, /must be a non empty array/);
+    assert.throws(function() { ArrayUtils.forceNonEmptyArray("\t   \n     \r\r"); }, /must be a non empty array/);
+
+    ArrayUtils.forceNonEmptyArray(['adsadf']);
+    ArrayUtils.forceNonEmptyArray([1,2,3]);
+    ArrayUtils.forceNonEmptyArray([null]);
+
+    // Test non string value gives exception
+    assert.throws(function() { ArrayUtils.forceNonEmptyArray(123); }, /must be a non empty array/);
 });
 
 

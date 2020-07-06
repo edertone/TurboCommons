@@ -130,6 +130,26 @@ export class ArrayUtils {
 
         return false;
     }
+    
+    
+    /**
+     * Strictly check that the provided value is a non empty array or throw an exception
+     *
+     * @param value A value to check
+     * @param valueName The name of the value to be shown at the beginning of the exception message
+     * @param errorMessage The rest of the exception message
+     *
+     * @throws Error If the check fails
+     *
+     * @return void
+     */
+    public static forceNonEmptyArray(value:any, valueName = '', errorMessage = 'must be a non empty array'){
+
+        if(!this.isArray(value) || value.length <= 0){
+
+            throw new Error(valueName + ' ' + errorMessage);
+        }
+    }
 
 
     /**

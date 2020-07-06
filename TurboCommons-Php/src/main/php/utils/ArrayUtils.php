@@ -11,6 +11,7 @@
 
 namespace org\turbocommons\src\main\php\utils;
 
+use InvalidArgumentException;
 use org\turbocommons\src\main\php\managers\ValidationManager;
 
 
@@ -84,6 +85,26 @@ class ArrayUtils {
     public static function isStringFound(){
 
         // TODO - translate from TS
+    }
+
+
+    /**
+     * Strictly check that the provided value is a non empty array or throw an exception
+     *
+     * @param mixed $value A value to check
+     * @param string $valueName The name of the value to be shown at the beginning of the exception message
+     * @param string $errorMessage The rest of the exception message
+     *
+     * @throws InvalidArgumentException If the check fails
+     *
+     * @return void
+     */
+    public static function forceNonEmptyArray($value, string $valueName = '', string $errorMessage = 'must be a non empty array'){
+
+        if(!is_array($value) || count($value) <= 0){
+
+            throw new InvalidArgumentException($valueName.' '.$errorMessage);
+        }
     }
 
 

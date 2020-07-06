@@ -117,8 +117,8 @@ class StringUtils {
      * Strictly check that the provided value is a string or throw an exception
      *
      * @param mixed $value A value to check
-     * @param mixed $valueName The name of the value to be shown at the beginning of the exception message
-     * @param mixed $errorMessage The rest of the exception message
+     * @param string $valueName The name of the value to be shown at the beginning of the exception message
+     * @param string $errorMessage The rest of the exception message
      *
      * @throws InvalidArgumentException If the check fails
      *
@@ -202,14 +202,14 @@ class StringUtils {
      * Uses the same criteria as the self::isEmpty() method
      *
      * @param mixed $value A value to check
-     * @param mixed $valueName The name of the value to be shown at the beginning of the exception message
-     * @param mixed $errorMessage The rest of the exception message
+     * @param string $valueName The name of the value to be shown at the beginning of the exception message
+     * @param string $errorMessage The rest of the exception message
      *
      * @throws InvalidArgumentException If the check fails
      *
      * @return void
      */
-    public static function forceNonEmptyString($value, $valueName = '', $errorMessage = 'must be a non empty string'){
+    public static function forceNonEmptyString($value, string $valueName = '', string $errorMessage = 'must be a non empty string'){
 
         if(!is_string($value) || self::isEmpty($value)){
 
