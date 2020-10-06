@@ -1567,7 +1567,7 @@ class StringUtils {
 
 
     /**
-     * Remove all duplicate consecutive fragments from the provided string
+     * Remove all duplicate consecutive fragments from the provided string and leave only one occurence
      *
      * @param string $string The string to process
      * @param array $set A list with the fragments that will be removed when found consecutive. If this value is
