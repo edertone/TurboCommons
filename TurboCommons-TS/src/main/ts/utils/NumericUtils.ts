@@ -20,11 +20,11 @@ export class NumericUtils {
     /**
      * Tells if the given value is numeric or not
      *
-     * @param {any} value A value to check
+     * @param value A value to check
      *
-     * @returns {boolean} true if the given value is numeric or represents a numeric value, false otherwise
+     * @return true if the given value is numeric or represents a numeric value, false otherwise
      */
-    public static isNumeric(value:any):boolean {
+    public static isNumeric(value:any) {
         
         if(StringUtils.isString(value)){
             
@@ -40,9 +40,9 @@ export class NumericUtils {
      *
      * @param value A value to check
      *
-     * @returns true if the given value is a numeric integer or represents a a numeric integer value, false otherwise
+     * @return true if the given value is a numeric integer or represents a a numeric integer value, false otherwise
      */
-    public static isInteger(value:any):boolean {
+    public static isInteger(value:any) {
         
         if(!NumericUtils.isNumeric(value)){
 
@@ -51,23 +51,63 @@ export class NumericUtils {
 
         return String(value).indexOf('.') < 0;
     }
+
+
+    /**
+     * Strictly check that the provided value is numeric or throw an exception
+     *
+     * @param value A value to check
+     * @param valueName The name of the value to be shown at the beginning of the exception message
+     * @param errorMessage The rest of the exception message
+     *
+     * @throws Error If the check fails
+     *
+     * @return void
+     */
+    public static forceNumeric(value:any, valueName = '', errorMessage = 'must be numeric'){
+
+        if(!this.isNumeric(value)){
+
+            throw new Error(valueName + ' ' + errorMessage);
+        }
+    }
+
+
+    /**
+     * Strictly check that the provided value is a positive integer or throw an exception
+     *
+     * @param value A value to check
+     * @param valueName The name of the value to be shown at the beginning of the exception message
+     * @param errorMessage The rest of the exception message
+     *
+     * @throws Error If the check fails
+     *
+     * @return void
+     */
+    public static forcePositiveInteger(value:any, valueName = '', errorMessage = 'must be a positive integer'){
+
+        if(!this.isInteger(value) || value <= 0){
+
+            throw new Error(valueName + ' ' + errorMessage);
+        }
+    }
     
     
     /**
      * Get the number represented by the given value
      *
-     * @param any $value A value to convert to a number
+     * @param value A value to convert to a number
      *
-     * @returns number The numeric type representation from the given value. For example, a string '0001' will return 1
+     * @return number The numeric type representation from the given value. For example, a string '0001' will return 1
      */
-    public static getNumeric(value:any):number {
+    public static getNumeric(value:any) {
     
         if(NumericUtils.isNumeric(value)){
 
             return Number(value);
         }
 
-        throw new Error('NumericUtils.getNumeric : Provided value is not numeric');
+        throw new Error('value is not numeric');
     }
     
     
@@ -76,21 +116,21 @@ export class NumericUtils {
      *
      * @param min lowest possible value (negative values are allowed)
      * @param max highest possible value (negative values are allowed)
-     *
-     * @return A random integer value between min and max
      * 
      * @throws Exception if max is equal or less than min.
+     *
+     * @return A random integer value between min and max
      */
-    public static generateRandomInteger(min:number, max:number):number {
+    public static generateRandomInteger(min:number, max:number) {
         
         if(!NumericUtils.isInteger(max) || !NumericUtils.isInteger(min)){
 
-            throw new Error('Provided max and min must be integers');
+            throw new Error('max and min must be integers');
         }
         
         if(max <= min){
 
-            throw new Error('Provided max must be higher than min');
+            throw new Error('max must be higher than min');
         }
         
         return Math.floor(Math.random() * (max - min + 1)) + min;

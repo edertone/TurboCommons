@@ -12,10 +12,10 @@
 namespace org\turbocommons\src\test\php\utils;
 
 use Exception;
-use Throwable;
 use stdClass;
 use PHPUnit\Framework\TestCase;
 use org\turbocommons\src\main\php\utils\NumericUtils;
+use org\turbotesting\src\main\php\utils\AssertUtils;
 
 
 /**
@@ -32,8 +32,6 @@ class NumericUtilsTest extends TestCase {
      * @return void
      */
     public static function setUpBeforeClass(){
-
-        // Nothing necessary here
     }
 
 
@@ -43,8 +41,6 @@ class NumericUtilsTest extends TestCase {
      * @return void
      */
     protected function setUp(){
-
-        $this->exceptionMessage = '';
 
         $this->emptyValues = [null, '', [], new stdClass(), '     ', "\n\n\n", 0];
         $this->emptyValuesCount = count($this->emptyValues);
@@ -57,11 +53,6 @@ class NumericUtilsTest extends TestCase {
      * @return void
      */
     protected function tearDown(){
-
-        if($this->exceptionMessage != ''){
-
-            $this->fail($this->exceptionMessage);
-        }
     }
 
 
@@ -71,14 +62,11 @@ class NumericUtilsTest extends TestCase {
      * @return void
      */
     public static function tearDownAfterClass(){
-
-        // Nothing necessary here
     }
 
 
     /**
-     * testIsNumeric
-     *
+     * test
      * @return void
      */
     public function testIsNumeric(){
@@ -128,7 +116,7 @@ class NumericUtilsTest extends TestCase {
 
         $objectThatMustNotBeAltered = ((object) ['value' => " 15  "]);
         $this->assertTrue(NumericUtils::isNumeric($objectThatMustNotBeAltered->value));
-        $this->assertSame($objectThatMustNotBeAltered->value, " 15  ");
+        $this->assertSame(" 15  ", $objectThatMustNotBeAltered->value);
 
         // Test wrong values
         $this->assertFalse(NumericUtils::isNumeric('abc'));
@@ -140,15 +128,12 @@ class NumericUtilsTest extends TestCase {
         $this->assertFalse(NumericUtils::isNumeric([1, 2, 3]));
         $this->assertFalse(NumericUtils::isNumeric(['hello']));
         $this->assertFalse(NumericUtils::isNumeric(new Exception()));
-        $this->assertFalse(NumericUtils::isNumeric(((object) [
-            '1' => 1
-        ])));
+        $this->assertFalse(NumericUtils::isNumeric(((object) ['1' => 1])));
     }
 
 
     /**
-     * testIsInteger
-     *
+     * test
      * @return void
      */
     public function testIsInteger(){
@@ -199,122 +184,133 @@ class NumericUtilsTest extends TestCase {
         $this->assertFalse(NumericUtils::isInteger([1, 2, 3]));
         $this->assertFalse(NumericUtils::isInteger(['hello']));
         $this->assertFalse(NumericUtils::isInteger(new Exception()));
-        $this->assertFalse(NumericUtils::isInteger(((object) [
-            '1' => 1
-        ])));
+        $this->assertFalse(NumericUtils::isInteger(((object) ['1' => 1])));
     }
 
 
     /**
-     * testGetNumeric
-     *
+     * test
+     * @return void
+     */
+    public function testForceNumeric(){
+
+        // Test empty values
+        $this->assertNull(NumericUtils::forceNumeric(0));
+        AssertUtils::throwsException(function() { NumericUtils::forceNumeric(null, 'somenull'); }, '/somenull must be numeric/');
+        AssertUtils::throwsException(function() { NumericUtils::forceNumeric([], 'somearray'); }, '/somearray must be numeric/');
+        AssertUtils::throwsException(function() { NumericUtils::forceNumeric('', 'somestring', 'some error message'); }, '/somestring some error message/');
+
+        // Test ok values
+        $this->assertNull(NumericUtils::forceNumeric(12123));
+        $this->assertNull(NumericUtils::forceNumeric(-123123));
+        $this->assertNull(NumericUtils::forceNumeric('123123'));
+        $this->assertNull(NumericUtils::forceNumeric('123.11'));
+        $this->assertNull(NumericUtils::forceNumeric('-123123'));
+
+        // Test wrong values
+        // Test exceptions
+        AssertUtils::throwsException(function() { NumericUtils::forceNumeric('asdf'); }, '/must be numeric/');
+        AssertUtils::throwsException(function() { NumericUtils::forceNumeric([1,2,3,4]); }, '/must be numeric/');
+        AssertUtils::throwsException(function() { NumericUtils::forceNumeric(new stdClass()); }, '/must be numeric/');
+    }
+
+
+    /**
+     * test
+     * @return void
+     */
+    public function testForcePositiveInteger(){
+
+        // Test empty values
+        AssertUtils::throwsException(function() { NumericUtils::forcePositiveInteger(0); }, '/must be a positive integer/');
+        AssertUtils::throwsException(function() { NumericUtils::forcePositiveInteger(null, 'somenull'); }, '/somenull must be a positive integer/');
+        AssertUtils::throwsException(function() { NumericUtils::forcePositiveInteger([], 'somearray'); }, '/somearray must be a positive integer/');
+        AssertUtils::throwsException(function() { NumericUtils::forcePositiveInteger('', 'somestring', 'some error message'); }, '/somestring some error message/');
+
+        // Test ok values
+        $this->assertNull(NumericUtils::forcePositiveInteger(1));
+        $this->assertNull(NumericUtils::forcePositiveInteger(10));
+        $this->assertNull(NumericUtils::forcePositiveInteger(1000));
+        $this->assertNull(NumericUtils::forcePositiveInteger(12341234));
+        $this->assertNull(NumericUtils::forcePositiveInteger(13453452345));
+        $this->assertNull(NumericUtils::forcePositiveInteger('1'));
+        $this->assertNull(NumericUtils::forcePositiveInteger('123'));
+
+        // Test wrong values
+        // Test exceptions
+        AssertUtils::throwsException(function() { NumericUtils::forcePositiveInteger([1,2,3,4]); }, '/must be a positive integer/');
+        AssertUtils::throwsException(function() { NumericUtils::forcePositiveInteger(new stdClass()); }, '/must be a positive integer/');
+        AssertUtils::throwsException(function() { NumericUtils::forcePositiveInteger('erterwt'); }, '/must be a positive integer/');
+        AssertUtils::throwsException(function() { NumericUtils::forcePositiveInteger(-100); }, '/must be a positive integer/');
+        AssertUtils::throwsException(function() { NumericUtils::forcePositiveInteger(-10000); }, '/must be a positive integer/');
+        AssertUtils::throwsException(function() { NumericUtils::forcePositiveInteger(10.56); }, '/must be a positive integer/');
+        AssertUtils::throwsException(function() { NumericUtils::forcePositiveInteger(-10.56); }, '/must be a positive integer/');
+    }
+
+
+    /**
+     * test
      * @return void
      */
     public function testGetNumeric(){
 
         // Test empty values
-        $this->assertTrue(NumericUtils::getNumeric(0) == 0);
-        $this->assertTrue(NumericUtils::getNumeric('0') == 0);
+        $this->assertSame(0, NumericUtils::getNumeric(0));
+        $this->assertSame(0, NumericUtils::getNumeric('0'));
 
-        try {
-            NumericUtils::getNumeric(null);
-            $this->exceptionMessage = 'null did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            NumericUtils::getNumeric('');
-            $this->exceptionMessage = '"" did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            NumericUtils::getNumeric([]);
-            $this->exceptionMessage = '[] did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
+        AssertUtils::throwsException(function() { NumericUtils::getNumeric(null); }, '/value is not numeric/');
+        AssertUtils::throwsException(function() { NumericUtils::getNumeric(''); }, '/value is not numeric/');
+        AssertUtils::throwsException(function() { NumericUtils::getNumeric([]); }, '/value is not numeric/');
 
         // Test ok values
-        $this->assertTrue(NumericUtils::getNumeric(1) == 1);
-        $this->assertTrue(NumericUtils::getNumeric(10) == 10);
-        $this->assertTrue(NumericUtils::getNumeric(1123134) == 1123134);
-        $this->assertTrue(NumericUtils::getNumeric(1.1) == 1.1);
-        $this->assertTrue(NumericUtils::getNumeric(.1) == .1);
-        $this->assertTrue(NumericUtils::getNumeric(0.00001) == 0.00001);
-        $this->assertTrue(NumericUtils::getNumeric(1.000001) == 1.000001);
-        $this->assertTrue(NumericUtils::getNumeric(-1) == -1);
-        $this->assertTrue(NumericUtils::getNumeric(-10) == -10);
-        $this->assertTrue(NumericUtils::getNumeric(-1123134) == -1123134);
-        $this->assertTrue(NumericUtils::getNumeric(-1.1) == -1.1);
-        $this->assertTrue(NumericUtils::getNumeric(-.1) == -.1);
-        $this->assertTrue(NumericUtils::getNumeric(-0.00001) == -0.00001);
-        $this->assertTrue(NumericUtils::getNumeric(-1.000001) == -1.000001);
-        $this->assertTrue(NumericUtils::getNumeric('1') == 1);
-        $this->assertTrue(NumericUtils::getNumeric('10') == 10);
-        $this->assertTrue(NumericUtils::getNumeric('1123134') == 1123134);
-        $this->assertTrue(NumericUtils::getNumeric('1.1') == 1.1);
-        $this->assertTrue(NumericUtils::getNumeric('.1') == .1);
-        $this->assertTrue(NumericUtils::getNumeric('0.00001') == 0.00001);
-        $this->assertTrue(NumericUtils::getNumeric('1.000001') == 1.000001);
-        $this->assertTrue(NumericUtils::getNumeric('-1') == -1);
-        $this->assertTrue(NumericUtils::getNumeric('-10') == -10);
-        $this->assertTrue(NumericUtils::getNumeric('-1123134') == -1123134);
-        $this->assertTrue(NumericUtils::getNumeric('-1.1') == -1.1);
-        $this->assertTrue(NumericUtils::getNumeric('-.1') == -.1);
-        $this->assertTrue(NumericUtils::getNumeric('-0.00001') == -0.00001);
-        $this->assertTrue(NumericUtils::getNumeric('-1.000001') == -1.000001);
-        $this->assertTrue(NumericUtils::getNumeric('  1 ') == 1);
-        $this->assertTrue(NumericUtils::getNumeric('  .1 ') == 0.1);
-        $this->assertTrue(NumericUtils::getNumeric('  -1 ') == -1);
+        $this->assertSame(1, NumericUtils::getNumeric(1));
+        $this->assertSame(10, NumericUtils::getNumeric(10));
+        $this->assertSame(1123134, NumericUtils::getNumeric(1123134));
+        $this->assertSame(1.1, NumericUtils::getNumeric(1.1));
+        $this->assertSame(.1, NumericUtils::getNumeric(.1));
+        $this->assertSame(0.00001, NumericUtils::getNumeric(0.00001));
+        $this->assertSame(1.000001, NumericUtils::getNumeric(1.000001));
+        $this->assertSame(-1, NumericUtils::getNumeric(-1));
+        $this->assertSame(-10, NumericUtils::getNumeric(-10));
+        $this->assertSame(-1123134, NumericUtils::getNumeric(-1123134));
+        $this->assertSame(-1.1, NumericUtils::getNumeric(-1.1));
+        $this->assertSame(-.1, NumericUtils::getNumeric(-.1));
+        $this->assertSame(-0.00001, NumericUtils::getNumeric(-0.00001));
+        $this->assertSame(-1.000001, NumericUtils::getNumeric(-1.000001));
+        $this->assertSame(1, NumericUtils::getNumeric('1'));
+        $this->assertSame(10, NumericUtils::getNumeric('10'));
+        $this->assertSame(1123134, NumericUtils::getNumeric('1123134'));
+        $this->assertSame(1.1, NumericUtils::getNumeric('1.1'));
+        $this->assertSame(.1, NumericUtils::getNumeric('.1'));
+        $this->assertSame(0.00001, NumericUtils::getNumeric('0.00001'));
+        $this->assertSame(1.000001, NumericUtils::getNumeric('1.000001'));
+        $this->assertSame(-1, NumericUtils::getNumeric('-1'));
+        $this->assertSame(-10, NumericUtils::getNumeric('-10'));
+        $this->assertSame(-1123134, NumericUtils::getNumeric('-1123134'));
+        $this->assertSame(-1.1, NumericUtils::getNumeric('-1.1'));
+        $this->assertSame(-.1, NumericUtils::getNumeric('-.1'));
+        $this->assertSame(-0.00001, NumericUtils::getNumeric('-0.00001'));
+        $this->assertSame(-1.000001, NumericUtils::getNumeric('-1.000001'));
+        $this->assertSame(1, NumericUtils::getNumeric('  1 '));
+        $this->assertSame(0.1, NumericUtils::getNumeric('  .1 '));
+        $this->assertSame(-1, NumericUtils::getNumeric('  -1 '));
 
         // Test wrong values
-        try {
-            NumericUtils::getNumeric('abc');
-            $this->exceptionMessage = 'abc did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            NumericUtils::getNumeric('1-');
-            $this->exceptionMessage = '1- did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            NumericUtils::getNumeric('1,1');
-            $this->exceptionMessage = '1,1 did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            NumericUtils::getNumeric(['hello']);
-            $this->exceptionMessage = 'hello did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
+        AssertUtils::throwsException(function() { NumericUtils::getNumeric('abc'); }, '/value is not numeric/');
+        AssertUtils::throwsException(function() { NumericUtils::getNumeric('1-'); }, '/value is not numeric/');
+        AssertUtils::throwsException(function() { NumericUtils::getNumeric('1,1'); }, '/value is not numeric/');
+        AssertUtils::throwsException(function() { NumericUtils::getNumeric(['hello']); }, '/value is not numeric/');
     }
 
 
     /**
-     * testGenerateRandomInteger
-     *
+     * test
      * @return void
      */
     public function testGenerateRandomInteger(){
 
         // Test empty values
-        try {
-            NumericUtils::generateRandomInteger(0, 0);
-            $this->exceptionMessage = '0,0 did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
+        AssertUtils::throwsException(function() { NumericUtils::generateRandomInteger(0, 0); }, '/max must be higher than min/');
 
         for ($i = 0; $i < $this->emptyValuesCount; $i++) {
 
@@ -322,12 +318,9 @@ class NumericUtilsTest extends TestCase {
 
                 if($this->emptyValues[$i] !== 0 || $this->emptyValues[$j] !== 0){
 
-                    try {
+                    AssertUtils::throwsException(function() use ($i, $j) {
                         NumericUtils::generateRandomInteger($this->emptyValues[$i], $this->emptyValues[$j]);
-                        $this->exceptionMessage = 'non integer values did not cause exception';
-                    } catch (Throwable $e) {
-                        // We expect an exception to happen
-                    }
+                    }, '/max and min must be integers/');
                 }
             }
         }
@@ -361,26 +354,9 @@ class NumericUtilsTest extends TestCase {
         }
 
         // Test wrong values
-        try {
-            NumericUtils::generateRandomInteger(10, 0);
-            $this->exceptionMessage = '10,0 did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            NumericUtils::generateRandomInteger(10, 10);
-            $this->exceptionMessage = '10,10 did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            NumericUtils::generateRandomInteger(-10, -20);
-            $this->exceptionMessage = '-10,-20 did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
+        AssertUtils::throwsException(function() { NumericUtils::generateRandomInteger(10, 0); }, '/max must be higher than min/');
+        AssertUtils::throwsException(function() { NumericUtils::generateRandomInteger(10, 10); }, '/max must be higher than min/');
+        AssertUtils::throwsException(function() { NumericUtils::generateRandomInteger(-10, -20); }, '/max must be higher than min/');
 
         // Test exceptions
         $exceptionValues = [new Exception(), 'hello', .1, 1.1, [1, 2, 3, 4]];
@@ -389,12 +365,9 @@ class NumericUtilsTest extends TestCase {
 
             for ($j = 0; $j < count($exceptionValues); $j++) {
 
-                try {
+                AssertUtils::throwsException(function() use ($exceptionValues, $i, $j) {
                     NumericUtils::getNumeric(NumericUtils::generateRandomInteger($exceptionValues[$i], $exceptionValues[$j]));
-                    $this->exceptionMessage = 'wrong values did not cause exception';
-                } catch (Throwable $e) {
-                    // We expect an exception to happen
-                }
+                }, '/max and min must be integers/');
             }
         }
     }
