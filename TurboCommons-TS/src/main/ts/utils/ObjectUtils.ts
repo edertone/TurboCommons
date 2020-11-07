@@ -194,7 +194,7 @@ export class ObjectUtils {
      */
     public static clone(object:any) {
         
-        if(object == null || typeof(object) != 'object') {
+        if(object == null || object instanceof RegExp || typeof(object) != 'object') {
         
             return object;
         }

@@ -423,28 +423,28 @@ QUnit.test("clone", function(assert) {
     assert.strictEqual(clonedValue, -45);
     assert.strictEqual(value, -145);
     
-    var value = 'hello';    
-    var clonedValue = ObjectUtils.clone(value);    
+    value = 'hello';    
+    clonedValue = ObjectUtils.clone(value);    
     assert.strictEqual(clonedValue, value);
     clonedValue = clonedValue + 'test';
     assert.strictEqual(value, 'hello');
     
-    var value = [1,2,3,4,5];    
-    var clonedValue = ObjectUtils.clone(value);
+    value = [1,2,3,4,5];    
+    clonedValue = ObjectUtils.clone(value);
     assert.ok(ArrayUtils.isEqualTo(clonedValue, value));
     clonedValue.push(6);
     assert.ok(ArrayUtils.isEqualTo(value, [1,2,3,4,5]));
     
-    var value = [1,2,3,{a:1, b:2, c:{d:1}},5];
-    var clonedValue = ObjectUtils.clone(value);
+    value = [1,2,3,{a:1, b:2, c:{d:1}},5];
+    clonedValue = ObjectUtils.clone(value);
     assert.ok(ArrayUtils.isEqualTo(clonedValue, value));
     clonedValue[3].a = 5;
     clonedValue[3].c.d = 6;
     assert.ok(ArrayUtils.isEqualTo(clonedValue, [1,2,3,{a:5, b:2, c:{d:6}},5]));
     assert.ok(ArrayUtils.isEqualTo(value, [1,2,3,{a:1, b:2, c:{d:1}},5]));
     
-    var value = {a:1, b:2, c:[3,4,5,{d:6,e:{f:7}}]};
-    var clonedValue = ObjectUtils.clone(value);
+    value = {a:1, b:2, c:[3,4,5,{d:6,e:{f:7}}]};
+    clonedValue = ObjectUtils.clone(value);
     assert.ok(ObjectUtils.isEqualTo(clonedValue, value));
     clonedValue.a = 5;
     clonedValue.c[0] = 9;
@@ -454,16 +454,16 @@ QUnit.test("clone", function(assert) {
     
     // Test an object containing references to other objects
     var reference = {ref:1};
-    var value = {a:1, b:reference};
-    var clonedValue = ObjectUtils.clone(value);
+    value = {a:1, b:reference};
+    clonedValue = ObjectUtils.clone(value);
     assert.ok(ObjectUtils.isEqualTo(clonedValue, value));
     reference.ref = 2;
     assert.ok(ObjectUtils.isEqualTo(clonedValue, {a:1, b:{ref:1}}));
     assert.ok(ObjectUtils.isEqualTo(value, {a:1, b:{ref:2}}));
     
     // Test an object containing a function
-    var value = {a:1, b:function(a) { return a + 2 }};
-    var clonedValue = ObjectUtils.clone(value);
+    value = {a:1, b:function(a) { return a + 2 }};
+    clonedValue = ObjectUtils.clone(value);
     assert.ok(ObjectUtils.isEqualTo(clonedValue, value));
     
     assert.strictEqual(value.a, 1);
@@ -471,6 +471,16 @@ QUnit.test("clone", function(assert) {
     assert.strictEqual(clonedValue.a, 1);
     assert.strictEqual(clonedValue.b(4), 6);
     assert.strictEqual(clonedValue.b(6), 8);
+    
+    // Test an object containing a regex
+    value = {a:1, b:/someregex.*/};
+    clonedValue = ObjectUtils.clone(value);
+    assert.ok(ObjectUtils.isEqualTo(clonedValue, value));
+    
+    assert.strictEqual(value.a, 1);
+    assert.strictEqual(value.b.toString(), /someregex.*/.toString());
+    assert.strictEqual(clonedValue.a, 1);
+    assert.strictEqual(clonedValue.b.toString(), /someregex.*/.toString());
     
     // Test wrong values
     // not necessary
