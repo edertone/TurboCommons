@@ -1,3 +1,5 @@
+- Move browser manager to the turbogui library. The turbocommons is not its place.
+
 - All exception error messages must be reviewed to reduce it's length to the maximum while preserving the semantical meaning.
   this is important to reduce the size of the generated js files. When the messages are modified, it must be done on all turbocomons 
   versions at the same time: PHP and TS
