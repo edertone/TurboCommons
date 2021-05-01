@@ -5,7 +5,7 @@
 	"metadata": {
 		"name": "turbocommons-php",
 		"description": "General purpose library that implements frequently used and generic software development tasks",
-		"builderVersion": "5.0.0"		
+		"builderVersion": "6.0.0"		
 	},
 	
 	"validate": {
@@ -59,12 +59,13 @@
     "release": {
     },
 
-    "test": [
-	    {
-	    	"type": "phpUnit",
-	    	"testsRoot": "src/test",
-	        "coverageReport": true,
-	        "coverageReportOpenAfterTests": true
-	    }
-    ]
+    "test": {
+        "enabledTests": [
+            {
+            "type": "phpUnit",
+            "testsRoot": "src/test",
+            "coverageReport": true,
+            "coverageReportOpenAfterTests": true
+        }]
+    }
 }

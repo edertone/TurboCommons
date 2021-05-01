@@ -13,42 +13,33 @@ TurboCommons tries to standardize all those common operations so they are perfor
 ### How to use it
 
 - Php:
-
 ```
-Currently available only as a .phar file (download it from this site)
-require 'TurboCommons-Php/TurboCommons-Php-X.X.X.phar';
+Currently available only as a .phar file (download it from https://turbocommons.org)
+require '..../turbocommons-php-X.X.X.phar';
 use org\turbocommons\src\main\php\utils\StringUtils;
 $n = StringUtils::countWords("word1 word2 word3");
 ```
-
 - Typescript:
-
 ```
 npm install turbocommons-ts
 import { StringUtils } from 'turbocommons-ts';
 let n = StringUtils.countWords("word1 word2 word3");
 ```
-
 - Javascript 5:
-
 ```
 npm install turbocommons-es5
 <script src="turbocommons-es5/turbocommons-es5.js"></script>
 var StringUtils = org_turbocommons.StringUtils;
 var n = StringUtils.countWords("word1 word2 word3");
 ```
-
 - Javascript 6:
-
 ```
 npm install turbocommons-es6
 <script src="turbocommons-es6/turbocommons-es6.js"></script>
 var StringUtils = org_turbocommons.StringUtils;
 var n = StringUtils.countWords("word1 word2 word3");
 ```
-
 - NodeJS projects:
-
 ```
 npm install turbocommons-ts
 const {StringUtils} = require('turbocommons-ts');
