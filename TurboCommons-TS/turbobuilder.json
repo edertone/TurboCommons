@@ -5,7 +5,7 @@
 	"metadata": {
 		"name": "turbocommons-ts",
 		"description": "General purpose library that implements frequently used and generic software development tasks",
-		"builderVersion": "5.0.0"
+		"builderVersion": "6.0.0"
 	},
 	
 	"validate": {
@@ -61,13 +61,15 @@
     "release": {
     },
     
-    "test": [
-    	{
-	    	"type": "qunit",
-	    	"testsRoot": "src/test",
-	        "httpServerPort": "8185",
-	        "targets": ["es5", "es6"],
-	        "browsers": {"chrome": true, "firefox": true, "iexplore": false}
-	    }
-    ]
+    "test": {
+        "enabledTests": [
+            {
+    	    	"type": "qunit",
+    	    	"testsRoot": "src/test",
+    	        "httpServerPort": "8185",
+    	        "targets": ["es5", "es6"],
+    	        "browsers": {"chrome": true, "firefox": true, "iexplore": false}
+	        }
+        ]
+    }
 }
