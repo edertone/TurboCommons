@@ -15,6 +15,7 @@ QUnit.module("StringUtilsTest", {
         window.NumericUtils = org_turbocommons.NumericUtils;
         window.StringUtils = org_turbocommons.StringUtils;
         window.ArrayUtils = org_turbocommons.ArrayUtils;
+        window.ObjectUtils = org_turbocommons.ObjectUtils;
         
         window.emptyValues = [undefined, null, '', [], {}, '     ', "\n\n\n", 0];
         window.emptyValuesCount = window.emptyValues.length;
@@ -25,6 +26,7 @@ QUnit.module("StringUtilsTest", {
         delete window.NumericUtils;
         delete window.StringUtils;
         delete window.ArrayUtils;
+        delete window.ObjectUtils;
         
         delete window.emptyValues;
         delete window.emptyValuesCount;
@@ -314,6 +316,42 @@ QUnit.test("replace", function(assert) {
     assert.throws(function() {
         StringUtils.replace("string", ["a", "b", "c"], ["b", "c"]);
     }, /search and replacement arrays must have the same length/);
+});
+
+
+/**
+ * replaceMulti
+ */
+QUnit.test("replaceMulti", function(assert) {
+
+    // Test empty values
+    // Note that replace method is already testing most of the empty values, so we won't be doing redundant tests here
+    assert.strictEqual(StringUtils.replaceMulti(null, "s", "b"), null);
+    assert.strictEqual(StringUtils.replaceMulti("", "s", "b"), "");
+    assert.ok(ArrayUtils.isEqualTo(StringUtils.replaceMulti([], "s", "b"), []));
+    assert.ok(ObjectUtils.isEqualTo(StringUtils.replaceMulti({}, "s", "b"), {}));
+    
+    // Test ok values
+    assert.strictEqual(StringUtils.replaceMulti("string", "s", "b"), "btring");
+    assert.ok(ArrayUtils.isEqualTo(StringUtils.replaceMulti(["string", "string", "s", "ss", "sb"], "s", "b"), ["btring", "btring", "b", "bb", "bb"]));
+    assert.ok(ArrayUtils.isEqualTo(StringUtils.replaceMulti([1, "string", "s", 2, "sb"], "s", "b"), [1, "btring", "b", 2, "bb"]));
+    assert.ok(ArrayUtils.isEqualTo(StringUtils.replaceMulti([1, "string", "s", 2, {a: 1}], "s", "b"), [1, "btring", "b", 2, {a: 1}]));
+    assert.ok(ArrayUtils.isEqualTo(StringUtils.replaceMulti([1, "string", "s", 2, [2, 3, "as"]], "s", "b"), [1, "btring", "b", 2, [2, 3, "ab"]]));
+    assert.ok(ArrayUtils.isEqualTo(StringUtils.replaceMulti(["string", [2, "as"], {a: 1, b: "ss"}], "s", "b"), ["btring", [2, "ab"], {a: 1, b: "bb"}]));
+    assert.ok(ObjectUtils.isEqualTo(StringUtils.replaceMulti({a: 1, b: "sss"}, "s", "b"), {a: 1, b: "bbb"}));
+    assert.ok(ObjectUtils.isEqualTo(StringUtils.replaceMulti({a: 1, b: "sss", c: [1, 2, null, "sas"]}, "s", "b"), {a: 1, b: "bbb", c: [1, 2, null, "bab"]}));
+    
+    // Test wrong values
+    assert.strictEqual(StringUtils.replaceMulti(1, "s", "b"), 1);
+
+    // Test that original object is not modified
+    let object1 = [{a: 1, b: "sss", c: [1, 2, null, "sas"]}, "somes", [1,2,3]];
+    let object2 = ObjectUtils.clone(object1);
+    StringUtils.replaceMulti(object1, "s", "b");
+    assert.ok(ArrayUtils.isEqualTo(object1, object2));
+
+    // Test exceptions
+    // Already tested on replace method tests
 });
 
 

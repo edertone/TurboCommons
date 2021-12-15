@@ -549,6 +549,18 @@ class StringUtilsTest extends TestCase {
 
 
     /**
+     * testReplaceMulti
+     *
+     * @return void
+     */
+    public function testReplaceMulti(){
+
+        // TODO - translate from TS
+        $this->markTestIncomplete('This test has not been implemented yet.');
+    }
+
+
+    /**
      * testTrim
      *
      * @return void

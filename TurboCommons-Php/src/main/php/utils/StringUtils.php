@@ -351,6 +351,15 @@ class StringUtils {
     /**
      * TODO translate from TS
      */
+    public static function replaceMulti(){
+
+        // TODO translate from TS
+    }
+
+
+    /**
+     * TODO translate from TS
+     */
     public static function trim(){
 
         // TODO translate from TS

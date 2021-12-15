@@ -10,6 +10,7 @@
 
 import { NumericUtils } from './NumericUtils';
 import { ArrayUtils } from './ArrayUtils';
+import { ObjectUtils } from './ObjectUtils';
 
     
 /**
@@ -298,6 +299,52 @@ export class StringUtils {
         }
         
         return result;
+    }
+    
+    
+    /**
+     * This metod performs the same string replacement that replace() does, but instead of searching on a single string it will search on all the strings inside
+     * a given array or object.
+     *
+     * The search is totally recursive and will be performed inside any arrays, objects, and combination of any of them. Any value that is not a string which is
+     * found inside the provided structure will be ignored
+     *
+     * Method is non destructive: The provided structure is not altered, a copy is given
+     *
+     * @see StringUtils.replace
+     *
+     * @param string see StringUtils.replace
+     * @param search see StringUtils.replace
+     * @param replacement see StringUtils.replace
+     * @param count see StringUtils.replace
+     * 
+     * @returns A copy of the provided object or array with all the values replaced on all its strings
+     */
+    public static replaceMulti(object:any, search:string|string[], replacement:string|string[], count:number = -1) {
+    
+        if (StringUtils.isString(object)){
+            
+            return StringUtils.replace(object, search, replacement, count);
+        }
+        
+        let clone = ObjectUtils.clone(object);
+        
+        if(ArrayUtils.isArray(clone)){
+             
+            for (let i = 0; i < clone.length; i++){
+                
+                clone[i] = StringUtils.replaceMulti(clone[i], search, replacement, count);               
+            }
+        
+        }else if(ObjectUtils.isObject(clone)){
+            
+            for (let key of ObjectUtils.getKeys(clone)){
+                
+                clone[key] = StringUtils.replaceMulti(clone[key], search, replacement, count);
+            }
+        }
+        
+        return clone;
     }
 
     
