@@ -20,8 +20,8 @@
 8 - Get the downloadable zip file for the library and update the files inside with the new versions
     - docs, readme, compiled code, etc..
     
-9 - Upload the new zip version to turbocommons website for direct download
+9 - Upload the new zip version to turboframework website for direct download
     - review that zip download work as expected
 
-10 - Upload the new generated docs to the turbocommons website
+10 - Upload the new generated docs to the turboframework website
     - review that links to docs still work
