@@ -65,7 +65,7 @@ Turbo Commons is 100% free and open source, but we will be really pleased to rec
 
 - You can get more info at the official site:
 
-	- [turbocommons.org](https://turbocommons.org)
+	- [https://turboframework.org/en/libs/turbocommons](https://turboframework.org/en/libs/turbocommons)
 
 ### Donate
 	
