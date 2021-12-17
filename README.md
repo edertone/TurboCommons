@@ -8,7 +8,7 @@ TurboCommons tries to standardize all those common operations so they are perfor
 
 ### Documentation
 
-**A detailed code specification is available online. You can check it [here](https://turbocommons.org)**
+**A detailed code specification is available online. You can check it [here](https://turboframework.org/en/libs/turbocommons)**
 
 ### How to use it
 
