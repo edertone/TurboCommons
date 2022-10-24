@@ -313,3 +313,9 @@ QUnit.test("getDocumentHeight", function(assert){
  * scrollTo
  */
 //Can't be tested cause it involves visual behaviours
+
+
+/**
+ * copyToClipboard
+ */
+//Can't be tested cause it requires user permision to get the clipboard contents

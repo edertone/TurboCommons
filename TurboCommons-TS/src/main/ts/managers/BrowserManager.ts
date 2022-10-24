@@ -503,4 +503,17 @@ export class BrowserManager{
 
         animate();
     }
+    
+
+    /**
+     * Copies the specified text to the clipboard
+     * 
+     * @param text Some string that will be placed on the system clipboard
+     * 
+     * @returns Promise A promise to be resolved once the copy is performed
+      */
+    copyToClipboard(text: string){
+
+        return navigator.clipboard.writeText(text);
+    }
 }
