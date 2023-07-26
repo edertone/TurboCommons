@@ -1084,31 +1084,32 @@ class StringUtils {
     /**
      * Full text search is the official name for the process of searching on a big text content based on a string containing some text to find.
      * This method will process a text so it removes all the accents and non alphanumerical characters that are not usefull for searching on strings,
-     * and convert everything to lower case.
+     * convert everything to lower case and remove empty spaces.
      * To perform the search it is important that both search and searched strings are standarized the same way, to maximize possible matches.
      *
      * @param string $string String to process
-     * @param string $wordSeparator The character that will be used as the word separator. By default it is the empty space character ' '
+     * @param string $wordSeparator The character that will be treated as the word separator. By default it is the empty space character ' '
      *
      * @return string The resulting string
      */
     public static function formatForFullTextSearch($string, string $wordSeparator = ' '){
 
-        // Remove accents
-        $res = self::removeAccents($string);
+        if(!is_string($string)){
 
-        // make all lowercase
-        $res = strtolower($res);
-
-        // Take only alphanumerical characters, but keep the spaces
-        $res = preg_replace('/[^a-z0-9 ]/', '', $res);
-
-        if($wordSeparator != ' '){
-
-            $res = str_replace(' ', $wordSeparator, $res);
+            throw new InvalidArgumentException('value is not a string');
         }
 
-        return $res;
+        // Remove all word separators
+        $res = static::replace($string, $wordSeparator, '');
+
+        // Remove accents
+        $res = static::removeAccents($res);
+
+        // Take only alphanumerical characters
+        $res = preg_replace('/[^[:alnum:][:space:]]/u', '', $res);
+
+        // make all lowercase
+        return mb_strtolower($res);
     }
 
 
@@ -1580,11 +1581,15 @@ class StringUtils {
      *
      * @param string $string The string to process
      * @param array $set A list with the fragments that will be removed when found consecutive. If this value is
-     *        an empty array, all duplicate consecutive characters will be deleted. We can pass here words or special characters like "\n"
+     *        an empty array, all duplicate consecutive characters will be deleted.
+     *        We can pass here words or special characters like "\n"
      *
-     * @example If we want to remove all duplicate consecutive empty spaces, we will call removeSameConsecutive('string', [' '])
-     * @example If we want to remove all duplicate consecutive new line characters, we will call removeSameConsecutive("string\n\n\nstring", ["\n"])
-     * @example If we want to remove all duplicate "hello" words, we will call removeSameConsecutive('hellohellohellohello', ['hello'])
+     * @example If we want to remove all duplicate consecutive empty spaces,
+     *          we will call removeSameConsecutive('string', [' '])
+     * @example If we want to remove all duplicate consecutive new line characters,
+     *          we will call removeSameConsecutive("string\n\n\nstring", ["\n"])
+     * @example If we want to remove all duplicate "hello" words, we will call
+     *          removeSameConsecutive('hellohellohellohello', ['hello'])
      *
      * @return string The string with a maximum of one consecutive sequence for all those matching the provided set
      */
@@ -1607,9 +1612,7 @@ class StringUtils {
             return preg_replace('/(.|\R)\1+/u','$1', $string);
         }
 
-        // Split the characters string into an array
+        // Replace all repeated occurences of the provided list of characters
         return preg_replace('/('.implode('|', $set).')\1+/u','$1', $string);
     }
 }
-
-?>

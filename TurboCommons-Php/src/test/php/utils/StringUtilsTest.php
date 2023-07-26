@@ -1843,20 +1843,43 @@ class StringUtilsTest extends TestCase {
 
         // Test empty values
         AssertUtils::throwsException(function(){ StringUtils::formatForFullTextSearch(null); }, '/value is not a string/');
-
+        AssertUtils::throwsException(function(){ StringUtils::formatForFullTextSearch([]); }, '/value is not a string/');
         $this->assertSame('', StringUtils::formatForFullTextSearch(''));
 
         // Test ok values
-        // TODO
+        $this->assertSame('', StringUtils::formatForFullTextSearch('          '));
+        $this->assertSame('a', StringUtils::formatForFullTextSearch('a'));
+        $this->assertSame('a', StringUtils::formatForFullTextSearch('A'));
+        $this->assertSame('aa', StringUtils::formatForFullTextSearch('aA'));
+        $this->assertSame('a', StringUtils::formatForFullTextSearch('  A'));
+        $this->assertSame('ab', StringUtils::formatForFullTextSearch('  A    B   '));
+        $this->assertSame('123345345', StringUtils::formatForFullTextSearch('123   345345'));
+        $this->assertSame('cassicaccentsooo', StringUtils::formatForFullTextSearch(' cássíc àccents óOÖ'));
+        $this->assertSame('word1word2word3', StringUtils::formatForFullTextSearch('  word 1 word2 W-oRD3'));
+        $this->assertSame('1', StringUtils::formatForFullTextSearch('   &1%&!/&$!/"&%/!"    '));
+        $this->assertSame('hello', StringUtils::formatForFullTextSearch('   &%&!/&$!/"&heLLO%/!"    '));
+        $this->assertSame('形声字形聲字', StringUtils::formatForFullTextSearch('形声字   /   形聲字'));
+        $this->assertSame('ahfty1237aa形聲字αβγδδεzζhηaiioo', StringUtils::formatForFullTextSearch('AhFTY$%!&"$·/1237aA   形...//(()聲()?---字αβγΔδεZζHηÁíÏÖÒ'));
+
+        $this->assertNotFalse(strpos(StringUtils::formatForFullTextSearch('  A'), StringUtils::formatForFullTextSearch('a')));
+        $this->assertNotFalse(strpos(StringUtils::formatForFullTextSearch('  A'), StringUtils::formatForFullTextSearch('  a')));
+        $this->assertNotFalse(strpos(StringUtils::formatForFullTextSearch('  A'), StringUtils::formatForFullTextSearch('      a')));
+        $this->assertNotFalse(strpos(StringUtils::formatForFullTextSearch('  word 1 word2 W-oR=)D3'), StringUtils::formatForFullTextSearch('WORD2')));
+        $this->assertNotFalse(strpos(StringUtils::formatForFullTextSearch('  word 1 word2 W-oR.D3'), StringUtils::formatForFullTextSearch('WORD3')));
+        $this->assertNotFalse(strpos(StringUtils::formatForFullTextSearch('  word 1 word2 W-oR.D3'), StringUtils::formatForFullTextSearch('word1')));
+        $this->assertNotFalse(strpos(StringUtils::formatForFullTextSearch('  word 1 word2 W-oR.D3'), StringUtils::formatForFullTextSearch('word1word2')));
+        $this->assertNotFalse(strpos(StringUtils::formatForFullTextSearch('  word 1 word2 W-oR.D3'), StringUtils::formatForFullTextSearch('word1 word2')));
+        $this->assertNotFalse(strpos(StringUtils::formatForFullTextSearch('  word 1 word2 W-oR.D3'), StringUtils::formatForFullTextSearch('Word1word2WORD3')));
+        $this->assertNotFalse(strpos(StringUtils::formatForFullTextSearch('  word 1 word2 W-!""·$$%/oR.D3'), StringUtils::formatForFullTextSearch('   word1  word2     WORD3')));
+        $this->assertNotFalse(strpos(StringUtils::formatForFullTextSearch('AhFTY$%!&"$·/1237aA   形...//(()聲()?---字αβγΔδεZζHηÁíÏÖÒ'), StringUtils::formatForFullTextSearch('形聲字')));
 
         // Test wrong values
-        // TODO
+        // Not necessary
 
         // Test exceptions
-        // TODO
-
-        $this->markTestIncomplete('This test has not been implemented yet.');
-
+        AssertUtils::throwsException(function(){ StringUtils::formatForFullTextSearch(12234); }, '/value is not a string/');
+        AssertUtils::throwsException(function(){ StringUtils::formatForFullTextSearch([1,2,3]); }, '/value is not a string/');
+        AssertUtils::throwsException(function(){ StringUtils::formatForFullTextSearch(new Exception()); }, '/value is not a string/');
     }
 
 
@@ -1868,19 +1891,8 @@ class StringUtilsTest extends TestCase {
     public function testCompareByLevenshtein(){
 
         // Test empty values
-        try {
-            StringUtils::compareByLevenshtein(null, null);
-            $this->exceptionMessage = 'null did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            StringUtils::compareByLevenshtein([], []);
-            $this->exceptionMessage = '[] did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
+        AssertUtils::throwsException(function(){ StringUtils::compareByLevenshtein(null, null); }, '/string1 and string2 must be strings/');
+        AssertUtils::throwsException(function(){ StringUtils::compareByLevenshtein([], []); }, '/string1 and string2 must be strings/');
 
         $this->assertSame(0, StringUtils::compareByLevenshtein("", ""));
         $this->assertSame(0, StringUtils::compareByLevenshtein("   ", "   "));
@@ -1940,26 +1952,9 @@ class StringUtilsTest extends TestCase {
         // Not necessary
 
         // Test exceptions
-        try {
-            StringUtils::compareByLevenshtein(1234, 345345);
-            $this->exceptionMessage = '1234 did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            StringUtils::compareByLevenshtein([1, 2, 3, 4], [2, 4, 5, 6]);
-            $this->exceptionMessage = '[1, 2, 3, 4] did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            StringUtils::compareByLevenshtein(new Exception(), new Exception());
-            $this->exceptionMessage = 'new Exception() did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
+        AssertUtils::throwsException(function(){ StringUtils::compareByLevenshtein(1234, 345345); }, '/string1 and string2 must be strings/');
+        AssertUtils::throwsException(function(){ StringUtils::compareByLevenshtein([1, 2, 3, 4], [2, 4, 5, 6]); }, '/string1 and string2 must be strings/');
+        AssertUtils::throwsException(function(){ StringUtils::compareByLevenshtein(new Exception(), new Exception()); }, '/string1 and string2 must be strings/');
     }
 
 
@@ -2475,12 +2470,7 @@ class StringUtilsTest extends TestCase {
         $this->assertSame("\r", StringUtils::removeSameConsecutive("\r\r\r\r"));
         $this->assertSame("\r\n", StringUtils::removeSameConsecutive("\r\n\r\n\r\n\r\n\r\n"));
 
-        try {
-            StringUtils::removeSameConsecutive([]);
-            $this->exceptionMessage = '[] did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
+        AssertUtils::throwsException(function(){ StringUtils::removeSameConsecutive([]); }, '/string must be a string/');
 
         // Test ok values - ALL CHARACTERS
         $this->assertSame('a', StringUtils::removeSameConsecutive('a'));
@@ -2515,20 +2505,7 @@ class StringUtilsTest extends TestCase {
 
         // Test wrong values
         // Test exceptions
-        try {
-            StringUtils::removeSameConsecutive(123123);
-            $this->exceptionMessage = '123123 did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            StringUtils::removeSameConsecutive('abc', 'hello');
-            $this->exceptionMessage = 'hello did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
+        AssertUtils::throwsException(function(){ StringUtils::removeSameConsecutive(123123); }, '/string must be a string/');
+        AssertUtils::throwsException(function(){ StringUtils::removeSameConsecutive('abc', 'hello'); }, '/must be of the type array/');
     }
 }
-
-?>

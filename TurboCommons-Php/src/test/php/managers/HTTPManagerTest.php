@@ -484,7 +484,7 @@ class HTTPManagerTest extends TestCase {
 
         $this->sut->execute($this->basePath.'/file3.json', function($results, $anyError){
 
-            $this->assertSame($anyError, false);
+            $this->assertSame(false, $anyError, $results[0]['errorMsg']);
             $this->assertSame($results[0]['response'], "{\r\n\"a\": \"1\",\r\n\"b\": 2\r\n}");
             $this->assertSame($results[0]['isError'], false);
         });
@@ -513,9 +513,9 @@ class HTTPManagerTest extends TestCase {
 
         $this->sut->execute($request, function($results, $anyError){
 
-            $this->assertSame($anyError, false);
+            $this->assertSame(false, $anyError, $results[0]['errorMsg']);
             $this->assertTrue(ArrayUtils::isEqualTo($results[0]['response'], ['a' => "1", 'b' => 2]));
-            $this->assertSame($results[0]['isError'], false);
+            $this->assertSame(false, $results[0]['isError']);
         });
     }
 
@@ -533,10 +533,10 @@ class HTTPManagerTest extends TestCase {
 
         $this->sut->execute($request, function($results, $anyError){
 
-            $this->assertSame($anyError, true);
-            $this->assertSame($results[0]['response'], 'text1');
-            $this->assertSame($results[0]['isError'], true);
-            $this->assertSame($results[0]['errorMsg'], 'Could not parse request result as a json string');
+            $this->assertSame(true, $anyError, $results[0]['errorMsg']);
+            $this->assertSame('text1', $results[0]['response']);
+            $this->assertSame(true, $results[0]['isError']);
+            $this->assertSame('Could not parse request result as a json string', $results[0]['errorMsg']);
         });
     }
 
@@ -554,7 +554,7 @@ class HTTPManagerTest extends TestCase {
 
         $this->sut->execute($request, function($results, $anyError){
 
-            $this->assertSame($anyError, true);
+            $this->assertSame(true, $anyError, $results[0]['errorMsg']);
             $this->assertSame($results[0]['url'], 'invalid url');
             $this->assertSame($results[0]['response'], '');
             $this->assertSame($results[0]['isError'], true);
@@ -590,7 +590,7 @@ class HTTPManagerTest extends TestCase {
         // Single url with error
         $this->sut->execute('some invalid url', function($results, $anyError){
 
-            $this->assertSame($anyError, true);
+            $this->assertSame(true, $anyError, $results[0]['errorMsg']);
             $this->assertSame($results[0]['url'], 'some invalid url');
             $this->assertSame($results[0]['response'], '');
             $this->assertSame($results[0]['isError'], true);
@@ -603,7 +603,7 @@ class HTTPManagerTest extends TestCase {
 
         $this->sut->execute($this->existantUrl, function($results, $anyError){
 
-            $this->assertSame($anyError, false);
+            $this->assertSame(false, $anyError, $results[0]['errorMsg']);
 
             $this->assertSame($results[0]['url'], $this->existantUrl);
             $this->assertTrue(!StringUtils::isEmpty($results[0]['response']));
@@ -774,11 +774,11 @@ class HTTPManagerTest extends TestCase {
         $this->sut->execute($request, function($results, $anyError) use (&$progressCount, &$successCalled, &$errorCalled, &$finallyCalled) {
 
             $this->assertSame($progressCount, 1);
-            $this->assertSame($successCalled, true);
-            $this->assertSame($errorCalled, false);
-            $this->assertSame($finallyCalled, true);
+            $this->assertSame(true, $successCalled);
+            $this->assertSame(false, $errorCalled);
+            $this->assertSame(true, $finallyCalled);
 
-            $this->assertSame($anyError, false);
+            $this->assertSame(false, $anyError, $results[0]['errorMsg']);
             $this->assertSame($results[0]['url'], $this->basePath.'/file1.txt');
             $this->assertSame($results[0]['response'], 'text1');
             $this->assertSame($results[0]['isError'], false);
@@ -824,7 +824,7 @@ class HTTPManagerTest extends TestCase {
             $this->assertSame($errorCalled, false);
             $this->assertSame($finallyCalled, true);
 
-            $this->assertSame($anyError, false);
+            $this->assertSame(false, $anyError, $results[0]['errorMsg']);
             $this->assertSame($results[0]['url'], $this->basePath.'/file1.txt');
             $this->assertSame($results[0]['response'], 'text1');
             $this->assertSame($results[0]['isError'], false);

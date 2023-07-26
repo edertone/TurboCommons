@@ -1555,7 +1555,7 @@ QUnit.test("formatUrl", function(assert) {
     assert.ok(StringUtils.formatUrl('https://www.youtube.com/watch?v=dp5hsDgENLk&feature=youtu.be') === 'https://www.youtube.com/watch?v=dp5hsDgENLk&feature=youtu.be');
     assert.ok(StringUtils.formatUrl('https://www.ovh.com/auth/?action=gotomanager&from=https://www.ovh.es/') === 'https://www.ovh.com/auth/?action=gotomanager&from=https://www.ovh.es/');
     assert.ok(StringUtils.formatUrl('https://stackoverflow.com/questions/10161177/url-with-multiple-forward-slashes-does-it-break-anything') === 'https://stackoverflow.com/questions/10161177/url-with-multiple-forward-slashes-does-it-break-anything');
-        
+
     // Format incorrect urls
     assert.ok(StringUtils.formatUrl('        ') === '        ');
     assert.ok(StringUtils.formatUrl('123f56ccaca') === '123f56ccaca');
@@ -1569,9 +1569,47 @@ QUnit.test("formatUrl", function(assert) {
 /**
  * formatForFullTextSearch
  */
-QUnit.todo("formatForFullTextSearch", function(assert) {
+QUnit.test("formatForFullTextSearch", function(assert) {
 
-    // TODO: copy tests from PHP
+    // Test empty values
+    assert.throws(function() { StringUtils.formatForFullTextSearch(null); }, /value is not a string/);
+    assert.throws(function() { StringUtils.formatForFullTextSearch([]); }, /value is not a string/);
+    assert.strictEqual(StringUtils.formatForFullTextSearch(''), '');
+
+    // Test ok values
+    assert.strictEqual(StringUtils.formatForFullTextSearch('          '), '');
+    assert.strictEqual(StringUtils.formatForFullTextSearch('a'), 'a');
+    assert.strictEqual(StringUtils.formatForFullTextSearch('A'), 'a');
+    assert.strictEqual(StringUtils.formatForFullTextSearch('aA'), 'aa');
+    assert.strictEqual(StringUtils.formatForFullTextSearch('  A'), 'a');
+    assert.strictEqual(StringUtils.formatForFullTextSearch('  A    B   '), 'ab');
+    assert.strictEqual(StringUtils.formatForFullTextSearch('123   345345'), '123345345');
+    assert.strictEqual(StringUtils.formatForFullTextSearch(' cássíc àccents óOÖ'), 'cassicaccentsooo');
+    assert.strictEqual(StringUtils.formatForFullTextSearch('  word 1 word2 W-oRD3'), 'word1word2word3');
+    assert.strictEqual(StringUtils.formatForFullTextSearch('   &1%&!/&$!/"&%/!"    '), '1');
+    assert.strictEqual(StringUtils.formatForFullTextSearch('   &%&!/&$!/"&heLLO%/!"    '), 'hello');
+    assert.strictEqual(StringUtils.formatForFullTextSearch('形声字   /   形聲字'), '形声字形聲字');
+    assert.strictEqual(StringUtils.formatForFullTextSearch('AhFTY$%!&"$·/1237aA   形...//(()聲()?---字αβγΔδεZζHηÁíÏÖÒ'), 'ahfty1237aa形聲字αβγδδεzζhηaiioo');
+
+    assert.ok(StringUtils.formatForFullTextSearch('  A').includes(StringUtils.formatForFullTextSearch('a')));
+    assert.ok(StringUtils.formatForFullTextSearch('  A').includes(StringUtils.formatForFullTextSearch('  a')));
+    assert.ok(StringUtils.formatForFullTextSearch('  A').includes(StringUtils.formatForFullTextSearch('      a')));
+    assert.ok(StringUtils.formatForFullTextSearch('  word 1 word2 W-oR=)D3').includes(StringUtils.formatForFullTextSearch('WORD2')));
+    assert.ok(StringUtils.formatForFullTextSearch('  word 1 word2 W-oR.D3').includes(StringUtils.formatForFullTextSearch('WORD3')));
+    assert.ok(StringUtils.formatForFullTextSearch('  word 1 word2 W-oR.D3').includes(StringUtils.formatForFullTextSearch('word1')));
+    assert.ok(StringUtils.formatForFullTextSearch('  word 1 word2 W-oR.D3').includes(StringUtils.formatForFullTextSearch('word1word2')));
+    assert.ok(StringUtils.formatForFullTextSearch('  word 1 word2 W-oR.D3').includes(StringUtils.formatForFullTextSearch('word1 word2')));
+    assert.ok(StringUtils.formatForFullTextSearch('  word 1 word2 W-oR.D3').includes(StringUtils.formatForFullTextSearch('Word1word2WORD3')));
+    assert.ok(StringUtils.formatForFullTextSearch('  word 1 word2 W-!""·$$%/oR.D3').includes(StringUtils.formatForFullTextSearch('   word1  word2     WORD3')));
+    assert.ok(StringUtils.formatForFullTextSearch('AhFTY$%!&"$·/1237aA   形...//(()聲()?---字αβγΔδεZζHηÁíÏÖÒ').includes(StringUtils.formatForFullTextSearch('形聲字')));
+
+    // Test wrong values
+    // Not necessary
+
+    // Test exceptions
+    assert.throws(function() { StringUtils.formatForFullTextSearch(12234); }, /value is not a string/);
+    assert.throws(function() { StringUtils.formatForFullTextSearch([1,2,3]); }, /value is not a string/);
+    assert.throws(function() { StringUtils.formatForFullTextSearch(new Error()); }, /value is not a string/);
 });
 
 
@@ -1896,10 +1934,10 @@ QUnit.test("removeAccents", function(assert) {
 
     // Test empty values
     assert.throws(function(){ StringUtils.removeAccents(null); }, /value is not a string/);
-    
+
     assert.ok(StringUtils.removeAccents('') === '');
     assert.ok(StringUtils.removeAccents('        ') === '        ');
-    
+
     // Test ok values
     assert.ok(StringUtils.removeAccents('Fó Bår') === 'Fo Bar');
     assert.ok(StringUtils.removeAccents("|!€%'''") === "|!€%'''");
@@ -1912,7 +1950,7 @@ QUnit.test("removeAccents", function(assert) {
     assert.ok(StringUtils.removeAccents('óíéàùú hello') === 'oieauu hello');
     assert.ok(StringUtils.removeAccents("óóó èèè\núùúùioler    \r\noughúíééanh hello") === "ooo eee\nuuuuioler    \r\noughuieeanh hello");
     assert.ok(StringUtils.removeAccents('öïüíúóèà go!!.;') === 'oiuiuoea go!!.;');
-    
+
     // Test wrong values
     // Test exceptions
 });
@@ -1957,7 +1995,51 @@ QUnit.todo("removeHtmlCode", function(assert) {
 /**
  * removeSameConsecutive
  */
-QUnit.todo("removeSameConsecutive", function(assert) {
+QUnit.test("removeSameConsecutive", function(assert) {
 
-    // TODO: copy tests from PHP
+    // Test empty values
+    assert.strictEqual(StringUtils.removeSameConsecutive(null), '');
+    assert.strictEqual(StringUtils.removeSameConsecutive(''), '');
+    assert.strictEqual(StringUtils.removeSameConsecutive('     '), ' ');
+    assert.strictEqual(StringUtils.removeSameConsecutive("\n\n\n\n"), "\n");
+    assert.strictEqual(StringUtils.removeSameConsecutive("\r\r\r\r"), "\r");
+    assert.strictEqual(StringUtils.removeSameConsecutive("\r\n\r\n\r\n\r\n\r\n"), "\r\n");
+
+    assert.throws(function(){ StringUtils.removeSameConsecutive([]); }, /string must be a string/);
+
+    // Test ok values - ALL CHARACTERS
+    assert.strictEqual(StringUtils.removeSameConsecutive('a'), 'a');
+    assert.strictEqual(StringUtils.removeSameConsecutive('abc'), 'abc');
+    assert.strictEqual(StringUtils.removeSameConsecutive('aa'), 'a');
+    assert.strictEqual(StringUtils.removeSameConsecutive('abcabc'), 'abcabc');
+    assert.strictEqual(StringUtils.removeSameConsecutive('aabbcc'), 'abc');
+    assert.strictEqual(StringUtils.removeSameConsecutive("abbbbbbbbbb    cccccc\n\n\nddd"), "ab c\nd");
+    assert.strictEqual(StringUtils.removeSameConsecutive("..88ynbvER745bhbvFFGFfCc   \n\n\r\r  Www?o??--"), ".8ynbvER745bhbvFGFfCc \n\r Ww?o?-");
+    assert.strictEqual(StringUtils.removeSameConsecutive('形声字 / 形聲字'), '形声字 / 形聲字');
+    assert.strictEqual(StringUtils.removeSameConsecutive('形形形形声字 / 形聲字'), '形声字 / 形聲字');
+    assert.strictEqual(StringUtils.removeSameConsecutive("形声字形聲字  \n\n形声字字字形聲字\r\r\r\r    "), "形声字形聲字 \n形声字形聲字\r ");
+
+    // Test ok values - A SET OF CHARACTERS
+    assert.strictEqual(StringUtils.removeSameConsecutive('       ', [' ']), ' ');
+    assert.strictEqual(StringUtils.removeSameConsecutive(' asdf  asdf', [' ']), ' asdf asdf');
+    assert.strictEqual(StringUtils.removeSameConsecutive('aabbuu77abc7     ', ['a', 'b', ' ']), 'abuu77abc7 ');
+    assert.strictEqual(StringUtils.removeSameConsecutive('aabbuu77abc7     ', ['a', 'b', ' ', 'u']), 'abu77abc7 ');
+    assert.strictEqual(StringUtils.removeSameConsecutive("ab\n\n\r\r\n    bbbbaaa", [" ", "\n"]), "ab\n\r\r\n bbbbaaa");
+    assert.strictEqual(StringUtils.removeSameConsecutive("ab\n\n\r\r\n    bbbbaaa", ["a", "b", "\n"]), "ab\n\r\r\n    ba");
+    assert.strictEqual(StringUtils.removeSameConsecutive("ab\n\n\r\r\n    bbbbaaa",  ["a", "b", "\r", "\n"]), "ab\n\r\n    ba");
+    assert.strictEqual(StringUtils.removeSameConsecutive("ab abababab a b a b",  ["ab"]), "ab ab a b a b");
+    assert.strictEqual(StringUtils.removeSameConsecutive("ab abababab a b a b ",  ["a b "]), "ab abababab a b ");
+    assert.strictEqual(StringUtils.removeSameConsecutive('形声字字字形形形形聲字   ', ['字']), '形声字形形形形聲字   ');
+    assert.strictEqual(StringUtils.removeSameConsecutive('形声字字字形形形形聲字   ', ['字', '形']), '形声字形聲字   ');
+    assert.strictEqual(StringUtils.removeSameConsecutive('形声字字字形形形形聲字   ', ['字', '形', ' ']), '形声字形聲字 ');
+    assert.strictEqual(StringUtils.removeSameConsecutive("形声字字字形形形形聲聲聲聲聲聲聲字     \n\n\n\r\n\r\n\r\n     聲聲聲聲", ['字', '形', ' ', "\n"]), "形声字形聲聲聲聲聲聲聲字 \n\r\n\r\n\r\n 聲聲聲聲");
+    assert.strictEqual(StringUtils.removeSameConsecutive("形声字字字形形形形聲聲聲聲聲聲聲字     \n\n\n\r\n\r\n\r\n     聲聲聲聲", ['字', '形', ' ', "\n", "\r\n"]), "形声字形聲聲聲聲聲聲聲字 \n\r\n 聲聲聲聲");
+    assert.strictEqual(StringUtils.removeSameConsecutive("形声字字字形形形形聲聲聲聲聲聲聲字     \n\n\n\r\n\r\n\r\n     聲聲聲聲", ['字', '形', ' ', "\n", "\r\n", "聲"]), "形声字形聲字 \n\r\n 聲");
+    assert.strictEqual(StringUtils.removeSameConsecutive('hellohellohello hello hello    ', ['hello']), 'hello hello hello    ');
+    assert.strictEqual(StringUtils.removeSameConsecutive('hellohellohello hello hello    ', ['hello', ' ']), 'hello hello hello ');
+
+    // Test wrong values
+    // Test exceptions
+    assert.throws(function(){ StringUtils.removeSameConsecutive(123123); }, /string must be a string/);
+    assert.throws(function(){ StringUtils.removeSameConsecutive('abc', 'hello'); }, /must be of the type array/);
 });

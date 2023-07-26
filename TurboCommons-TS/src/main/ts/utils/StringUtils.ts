@@ -273,7 +273,7 @@ export class StringUtils {
                     valueToReplace = '';
                 }
                 
-                let resultArray = [];
+                let resultArray:string[] = [];
                 
                 let splittedArray = result.split(searchArray[i]);
                 
@@ -739,7 +739,7 @@ export class StringUtils {
             return path;
         }
         
-        let processedPath = (path.indexOf('/') === 0) ? path.substr(1) : path;
+        let processedPath = (path.indexOf('/') === 0) ? path.substring(1) : path;
 
         let elements = processedPath.split('/');
 
@@ -748,7 +748,7 @@ export class StringUtils {
             return '';
         }
         
-        let arrayToRemove = [];
+        let arrayToRemove:string[] = [];
         
         for (let i = elements.length - elementsToRemove; i < elements.length; i++) {
 
@@ -795,7 +795,7 @@ export class StringUtils {
 
         path = StringUtils.formatPath(path, '/');
 
-        path = (path.indexOf('/') === 0) ? path.substr(1) : path;
+        path = (path.indexOf('/') === 0) ? path.substring(1) : path;
 
         let elements = path.split('/');
 
@@ -893,7 +893,7 @@ export class StringUtils {
             return '';
         }
 
-        var res:string[] = url.split('://');
+        let res:string[] = url.split('://');
 
         return (res.length === 2) ? res[0] : '';
     }
@@ -1063,7 +1063,7 @@ export class StringUtils {
      */
     public static formatUrl(url:string) {
         
-        var urlSeparator:string = '/';
+        let urlSeparator:string = '/';
         
         if(url == ''){
 
@@ -1097,7 +1097,7 @@ export class StringUtils {
         url = url.replace(/@@@/g, '://');
         
         // get the url scheme
-        var scheme:string = this.getSchemeFromUrl(url);
+        let scheme:string = this.getSchemeFromUrl(url);
 
         if(scheme === ''){
 
@@ -1109,14 +1109,40 @@ export class StringUtils {
 
         return url;
     }
-    
-    
-    public static formatForFullTextSearch() {
-    
-        // TODO: translate from php
+
+
+    /**
+     * Full text search is the official name for the process of searching on a big text content based on a string containing some text to find.
+     * This method will process a text so it removes all the accents and non alphanumerical characters that are not usefull for searching on strings,
+     * convert everything to lower case and remove empty spaces.
+     * To perform the search it is important that both search and searched strings are standarized the same way, to maximize possible matches.
+     *
+     * @param string String to process
+     * @param wordSeparator The character that will be treated as the word separator. By default it is the empty space character ' '
+     *
+     * @return The resulting string
+     */
+    public static formatForFullTextSearch(string: string, wordSeparator = ' ') {
+
+        if(!StringUtils.isString(string)){
+
+            throw new Error('value is not a string');
+        }
+
+        // Remove all word separators
+        let res = StringUtils.replace(string, wordSeparator, '');
+
+        // Remove accents
+        res = StringUtils.removeAccents(res);
+
+        // Take only alphanumerical characters
+        res = res.replace(/[^\p{L}\p{N}]/ug, '');
+
+        // make all lowercase
+        return res.toLowerCase();
     }
-    
-    
+
+
     /**
      * Compares two strings and gives the number of character replacements that must be performed to convert one
      * of the strings into the other. A very useful method to use in fuzzy text searches where we want to look for
@@ -1135,7 +1161,7 @@ export class StringUtils {
      *         The higher the result, the more different the strings are.
      */
     public static compareByLevenshtein(string1: string, string2: string): number {
-        
+
         // This function was found at https://gist.github.com/santhoshtr/1710925
 
         if(!StringUtils.isString(string1) || !StringUtils.isString(string2)){
@@ -1169,7 +1195,7 @@ export class StringUtils {
 
             prevRow.push(i);
         }
-        
+
         for (let i = 0; i < length1; i++) {
 
             currentRow = [];
@@ -1190,8 +1216,8 @@ export class StringUtils {
 
         return prevRow[length2];
     }
-    
-    
+
+
     /**
      * Compares the percentage of similarity between two strings, based on the Levenshtein method. A very useful method
      * to use in fuzzy text searches where we want to look for similar texts.
@@ -1202,8 +1228,8 @@ export class StringUtils {
      * @return A number between 0 and 100, being 100 if both strings are the same and 0 if both strings are totally different
      */
     public static compareSimilarityPercent(string1: string, string2: string) {
-        
-        let levenshtein = StringUtils.compareByLevenshtein(string1, string2);
+
+        const levenshtein = StringUtils.compareByLevenshtein(string1, string2);
 
         if(levenshtein === 0){
 
@@ -1212,8 +1238,8 @@ export class StringUtils {
 
         return (1 - levenshtein / Math.max(string1.length, string2.length)) * 100;
     }
-    
-    
+
+
     /**
      * Generates a random string with the specified length and options
      *
@@ -1227,83 +1253,83 @@ export class StringUtils {
      * @return A randomly generated string
      */
     public static generateRandom(minLength: number, maxLength: number, charSet = ['0-9', 'a-z', 'A-Z']) {
-    
+
         if(minLength < 0 || !NumericUtils.isInteger(minLength) ||
            maxLength < 0 || !NumericUtils.isInteger(maxLength)) {
 
             throw new Error('minLength and maxLength must be positive numbers');
         }
-        
+
         if(maxLength < minLength){
 
             throw new Error('Provided maxLength must be higher or equal than minLength');
         }
-        
+
         if(!ArrayUtils.isArray(charSet) || charSet.length <= 0){
-            
+
             throw new Error('invalid charset');
         }
-        
+
         // Define the output charset
         let finalCharSet = '';
         let numbers = '0123456789';
         let lowerCaseLetters = 'abcdefghijkmnopqrstuvwxyz';
         let upperCaseLetters = 'ABCDEFGHIJKMNOPQRSTUVWXYZ';
-        
+
         for (let chars of charSet) {
 
             if(!StringUtils.isString(chars) || StringUtils.isEmpty(chars)){
-                
+
                 throw new Error('invalid charset');
             }
-            
+
             let firstChar = chars.substr(0, 1);
             let thirdChar = chars.substr(2, 1);
-            
+
             // Check if an interval of characters has been defined
             if(chars.length === 3 && chars.indexOf('-') === 1 && firstChar !== '\\'){
-    
+
                 // Look for numeric intervals
                 if(numbers.indexOf(firstChar) >= 0) {
-                    
+
                     finalCharSet += numbers.substring(numbers.indexOf(firstChar), numbers.indexOf(thirdChar) + 1); 
-                
+
                 // Look for lower case letter intervals
                 } else if (lowerCaseLetters.indexOf(firstChar) >= 0) {
-                    
+
                     finalCharSet += lowerCaseLetters.substring(lowerCaseLetters.indexOf(firstChar), lowerCaseLetters.indexOf(thirdChar) + 1); 
-                
+
                 // Look for upper case letter intervals
                 } else if(upperCaseLetters.indexOf(firstChar) >= 0) {
-                        
+
                     finalCharSet += upperCaseLetters.substring(upperCaseLetters.indexOf(firstChar), upperCaseLetters.indexOf(thirdChar) + 1);
                 }
 
             } else {
-                
+
                 finalCharSet += StringUtils.replace(chars, '\\-', '-');
-            }            
+            }
         }
-        
+
         // Generate as many random characters as required
         let result = '' ;
-        let length = (minLength === maxLength) ? maxLength : NumericUtils.generateRandomInteger(minLength, maxLength);
-        
+        const length = (minLength === maxLength) ? maxLength : NumericUtils.generateRandomInteger(minLength, maxLength);
+
         for(let i=0; i<length; i++){
-        
+
             result += finalCharSet.charAt(Math.floor(Math.random() * finalCharSet.length));
         }
 
         return result;
     }
-        
-        
+
+
     public static findMostSimilarString() {
-        
+
         // TODO: translate from php
     }
-        
-        
+
+
     public static findMostSimilarStringIndex() {
         
         // TODO: translate from php
@@ -1314,8 +1340,8 @@ export class StringUtils {
         
         // TODO: translate from php
     }
-    
-    
+
+
     /**
      * Converts all accent characters to ASCII characters on a given string.<br>
      * This method is based on a stack overflow implementation called removeDiacritics
@@ -1327,13 +1353,13 @@ export class StringUtils {
      * @returns The given string with all accent and diacritics replaced by the respective ASCII characters.
      */
     public static removeAccents(string:string) {
-    
+
         if(!StringUtils.isString(string)){
 
             throw new Error('value is not a string');
         }
 
-        var defaultDiacriticsRemovalMap:any[] = [{
+        let defaultDiacriticsRemovalMap:any[] = [{
             'b' : 'A',
             'l' : '\u0041\u24B6\uFF21\u00C0\u00C1\u00C2\u1EA6\u1EA4\u1EAA\u1EA8\u00C3\u0100\u0102\u1EB0\u1EAE\u1EB4\u1EB2\u0226\u01E0\u00C4\u01DE\u1EA2\u00C5\u01FA\u01CD\u0200\u0202\u1EA0\u1EAC\u1EB6\u1E00\u0104\u023A\u2C6F'
         }, {
@@ -1593,13 +1619,13 @@ export class StringUtils {
             'l' : '\u007A\u24E9\uFF5A\u017A\u1E91\u017C\u017E\u1E93\u1E95\u01B6\u0225\u0240\u2C6C\uA763'
         }];
 
-        var diacriticsMap:any = {};
+        let diacriticsMap:any = {};
 
-        for(var i:number = 0; i < defaultDiacriticsRemovalMap.length; i++){
+        for(let i:number = 0; i < defaultDiacriticsRemovalMap.length; i++){
 
-            var letters:string = defaultDiacriticsRemovalMap[i].l;
+            let letters:string = defaultDiacriticsRemovalMap[i].l;
 
-            for(var j:number = 0; j < letters.length; j++){
+            for(let j:number = 0; j < letters.length; j++){
 
                 diacriticsMap[letters[j]] = defaultDiacriticsRemovalMap[i].b;
             }
@@ -1625,19 +1651,58 @@ export class StringUtils {
     
     
     public static removeUrls() {
-        
+
         // TODO: translate from php
     }
-    
-    
+
+
     public static removeHtmlCode() {
-        
+
         // TODO: translate from php
     }
-    
-    
-    public static removeSameConsecutive() {
-        
-        // TODO: translate from php
+
+
+    /**
+     * Remove all duplicate consecutive fragments from the provided string and leave only one occurence
+     *
+     * @param string The string to process
+     * @param set A list with the fragments that will be removed when found consecutive. If this value is
+     *        an empty array, all duplicate consecutive characters will be deleted.
+     *        We can pass here words or special characters like "\n"
+     *
+     * @example If we want to remove all duplicate consecutive empty spaces,
+     *          we will call removeSameConsecutive('string', [' '])
+     * @example If we want to remove all duplicate consecutive new line characters,
+     *          we will call removeSameConsecutive("string\n\n\nstring", ["\n"])
+     * @example If we want to remove all duplicate "hello" words, we will call
+     *          removeSameConsecutive('hellohellohellohello', ['hello'])
+     *
+     * @returns The string with a maximum of one consecutive sequence for all those matching the provided set
+     */
+    public static removeSameConsecutive(string: string, set:string[] = []) {
+
+        if(string === null){
+
+            return '';
+        }
+
+        if(!StringUtils.isString(string)){
+
+            throw new Error('string must be a string');
+        }
+
+        if(!ArrayUtils.isArray(set)){
+
+            throw new Error('set must be of the type array');
+        }
+
+        if(set.length === 0){
+
+            // All possible duplicate characters will be removed from the string
+            return string.replace(/(.|\r\n|[\r\n])\1+/ug, '$1');
+        }
+
+        // Replace all repeated occurences of the provided list of characters
+        return string.replace(new RegExp(`(${set.join('|')})\\1+`, 'ug'), '$1');
     }
 }
