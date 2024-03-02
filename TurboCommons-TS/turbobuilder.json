@@ -64,12 +64,13 @@
     "test": {
         "enabledTests": [
             {
-    	    	"type": "qunit",
-    	    	"testsRoot": "src/test",
-    	        "httpServerPort": "8185",
-    	        "targets": ["es5", "es6"],
-    	        "browsers": {"chrome": true, "firefox": true, "iexplore": false}
-	        }
+                "enabled" : true,
+                "type": "qunit",
+                "testsRoot": "src/test",
+                "httpServerPort": "8185",
+                "targets": ["es5", "es6"],
+                "browsers": {"chrome": true, "firefox": true, "iexplore": false}
+            }
         ]
     }
 }
