@@ -511,9 +511,43 @@ export class BrowserManager{
      * @param text Some string that will be placed on the system clipboard
      * 
      * @returns Promise A promise to be resolved once the copy is performed
-      */
+     */
     copyToClipboard(text: string){
 
         return navigator.clipboard.writeText(text);
+    }
+    
+    
+    /**
+     * Search for a file on the local user machine. Its contents will be loaded into the browser memory and can be used
+     * locally without needing to update them to a remote server.
+     * 
+     * @param event It is mandayory for security reasons that an event from an actual input type='file' element is passed to this method.
+     *        We can set here for example the change event that is fired by the input when the user selects a file.
+     * @param callback Once the file selected by the user is correctly loaded by the browser, all the contents of that file will be available
+     *        inside the 'fileContents' parameter of this callback method.
+     * 
+     * @returns Void. (An exception will be thrown if the load fails)
+     */
+    browseLocalFile(event: any, callback: (fileContents: string) => void){
+    
+        const file: File = event.target.files[0];
+        
+        if(file){
+            
+            const reader = new FileReader();
+            
+            reader.onload = () => {
+                
+                callback(reader.result as string);
+            };
+            
+            reader.onerror = () => {
+                
+                throw new Error('Error reading file');
+            };
+            
+            reader.readAsText(file);
+        }
     }
 }
