@@ -197,6 +197,50 @@ class StringUtils {
 
 
     /**
+     * Checks if the given string starts with any of the specified values.
+     *
+     * @param string $str The string to check
+     * @param array $startingValues An array of strings that the input string should start with.
+     *
+     * @return bool True if the input string starts with any of the specified values, False otherwise.
+     */
+    public static function isStartingWith($str, array $startingValues = []){
+
+        foreach($startingValues as $startingValue){
+
+            if(substr($str, 0, strlen($startingValue)) === $startingValue){
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Checks if a given string ends with any of the specified values.
+     *
+     * @param string $str The string to check
+     * @param array $endingValues An array of strings that the input string should end with.
+     *
+     * @return bool True if the input string ends with any of the specified values, False otherwise.
+     */
+    public static function isEndingWith($str, array $endingValues = []){
+
+        foreach($endingValues as $endingValue){
+
+            if($endingValue === '' || substr($str, -strlen($endingValue)) === $endingValue){
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
      * Strictly check that the provided value is a non empty string or throw an exception
      *
      * Uses the same criteria as the self::isEmpty() method
@@ -1201,6 +1245,25 @@ class StringUtils {
         }
 
         return (1 - $levenshtein / max(mb_strlen($string1), mb_strlen($string2))) * 100;
+    }
+
+
+    /**
+     * Generate a path string from an array of elements.
+     *
+     * @param array $elements An array of elements that will be used to form the path.
+     * @param string $separator An optional separator that will be used to join the elements in the path. Defaults to `DIRECTORY_SEPARATOR`.
+     *
+     * @return string A string representing the path formed from the given elements.
+     */
+    public static function generatePath(array $elements, string $separator = ''){
+
+        if($separator === ''){
+
+            $separator = DIRECTORY_SEPARATOR;
+        }
+
+        return self::formatPath(implode($separator, $elements), $separator);
     }
 
 

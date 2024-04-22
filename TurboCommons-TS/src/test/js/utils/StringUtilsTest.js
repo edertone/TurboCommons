@@ -183,6 +183,64 @@ QUnit.test("isEmpty", function(assert) {
 
 
 /**
+ * isStartingWith
+ */
+QUnit.test("isStartingWith", function(assert) {
+
+    // Test empty values
+    assert.throws(function() { StringUtils.isStartingWith(null, null); }, /startingValues is not an array/);
+    assert.throws(function() { StringUtils.isStartingWith(0, 0); }, /startingValues is not an array/);
+    assert.notOk(StringUtils.isStartingWith('', []));
+    assert.ok(StringUtils.isStartingWith('', ['']));
+    assert.ok(StringUtils.isStartingWith('a', ['']));
+
+    // Test ok values
+    assert.ok(StringUtils.isStartingWith('a', ['a']));
+    assert.ok(StringUtils.isStartingWith('abc', ['a']));
+    assert.notOk(StringUtils.isStartingWith('abc', ['b']));
+    assert.ok(StringUtils.isStartingWith('abcde', ['ab']));
+    assert.ok(StringUtils.isStartingWith('abcde', ['abcd']));
+
+    // Test wrong values
+    // Not necessary
+
+    // Test exceptions
+    assert.throws(function() { StringUtils.isStartingWith([1, 2, 3, 4], 0); }, /startingValues is not an array/);
+    assert.throws(function() { StringUtils.isStartingWith('', 0); }, /startingValues is not an array/);
+    assert.throws(function() { StringUtils.isStartingWith('', ''); }, /startingValues is not an array/);
+});
+
+
+/**
+ * isEndingWith
+ */
+QUnit.test("isEndingWith", function(assert) {
+
+    // Test empty values
+    assert.throws(function() { StringUtils.isEndingWith(null, null); }, /endingValues is not an array/);
+    assert.throws(function() { StringUtils.isEndingWith(0, 0); }, /endingValues is not an array/);
+    assert.notOk(StringUtils.isEndingWith('', []));
+    assert.ok(StringUtils.isEndingWith('', ['']));
+    assert.ok(StringUtils.isEndingWith('a', ['']));
+
+    // Test ok values
+    assert.ok(StringUtils.isEndingWith('a', ['a']));
+    assert.ok(StringUtils.isEndingWith('abc', ['c']));
+    assert.notOk(StringUtils.isEndingWith('abc', ['b']));
+    assert.ok(StringUtils.isEndingWith('abcde', ['de']));
+    assert.ok(StringUtils.isEndingWith('abcde', ['bcde']));
+
+    // Test wrong values
+    // Not necessary
+
+    // Test exceptions
+    assert.throws(function() { StringUtils.isEndingWith([1, 2, 3, 4], 0); }, /endingValues is not an array/);
+    assert.throws(function() { StringUtils.isEndingWith('', 0); }, /endingValues is not an array/);
+    assert.throws(function() { StringUtils.isEndingWith('', ''); }, /endingValues is not an array/);
+});
+
+
+/**
  * forceNonEmptyString
  */
 QUnit.test("forceNonEmptyString", function(assert) {
@@ -1748,6 +1806,36 @@ QUnit.todo("compareSimilarityPercent", function(assert) {
     assert.throws(function() {
         StringUtils.compareSimilarityPercent(new Exception(), new Exception());
     }, /string1 and string2 must be strings/);
+});
+
+
+/**
+ * generatePath
+ */
+QUnit.test("generatePath", function(assert) {
+
+    // Test empty values
+    assert.throws(function() { StringUtils.generatePath(null, null); }, /elements is not an array/);
+    assert.throws(function() { StringUtils.generatePath(0, 0); }, /elements is not an array/);
+    assert.throws(function() { StringUtils.generatePath([], []); }, /separator must be a slash or backslash/);
+    assert.throws(function() { StringUtils.generatePath('', []); }, /elements is not an array/);
+    assert.strictEqual('', StringUtils.generatePath([], ''));
+    assert.strictEqual('', StringUtils.generatePath([''], ''));
+    assert.strictEqual('a', StringUtils.generatePath(['a'], ''));
+
+    // Test ok values
+    assert.strictEqual('a', StringUtils.generatePath(['a'], '/'));
+    assert.strictEqual('a/b', StringUtils.generatePath(['a', 'b'], '/'));
+    assert.strictEqual('a\\b', StringUtils.generatePath(['a', 'b'], '\\'));
+    assert.strictEqual('a/b/c', StringUtils.generatePath(['a', 'b', 'c']));
+
+    // Test wrong values
+    // Not necessary
+
+    // Test exceptions
+    assert.throws(function() { StringUtils.generatePath(['a'], 'a'); }, /separator must be a slash or backslash/);
+    assert.throws(function() { StringUtils.generatePath([1, 2, 3, 4], 0); }, /separator must be a slash or backslash/);
+    assert.throws(function() { StringUtils.generatePath(123); }, /elements is not an array/);
 });
 
 

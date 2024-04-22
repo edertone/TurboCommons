@@ -231,6 +231,68 @@ class StringUtilsTest extends TestCase {
     }
 
 
+    /**
+     * isStartingWith
+     *
+     * @return void
+     */
+    public function testIsStartingWith(){
+
+        // Test empty values
+        AssertUtils::throwsException(function() { StringUtils::isStartingWith(null, null); }, '/must be of the type array, null given/');
+        AssertUtils::throwsException(function() { StringUtils::isStartingWith(0, 0); }, '/must be of the type array, int given/');
+        $this->assertFalse(StringUtils::isStartingWith('', []));
+        $this->assertTrue(StringUtils::isStartingWith('', ['']));
+        $this->assertTrue(StringUtils::isStartingWith('a', ['']));
+
+        // Test ok values
+        $this->assertTrue(StringUtils::isStartingWith('a', ['a']));
+        $this->assertTrue(StringUtils::isStartingWith('abc', ['a']));
+        $this->assertFalse(StringUtils::isStartingWith('abc', ['b']));
+        $this->assertTrue(StringUtils::isStartingWith('abcde', ['ab']));
+        $this->assertTrue(StringUtils::isStartingWith('abcde', ['abcd']));
+
+        // Test wrong values
+        // Not necessary
+
+        // Test exceptions
+        AssertUtils::throwsException(function() { StringUtils::isStartingWith([1, 2, 3, 4], 0); }, '/must be of the type array, int given/');
+        AssertUtils::throwsException(function() { StringUtils::isStartingWith('', 0); }, '/must be of the type array, int given/');
+        AssertUtils::throwsException(function() { StringUtils::isStartingWith('', ''); }, '/must be of the type array, string given/');
+    }
+
+
+    /**
+     * isEndingWith
+     *
+     * @return void
+     */
+    public function testIsEndingWith(){
+
+        // Test empty values
+        AssertUtils::throwsException(function() { StringUtils::isEndingWith(null, null); }, '/must be of the type array, null given/');
+        AssertUtils::throwsException(function() { StringUtils::isEndingWith(0, 0); }, '/must be of the type array, int given/');
+        $this->assertFalse(StringUtils::isEndingWith('', []));
+        $this->assertTrue(StringUtils::isEndingWith('', ['']));
+        $this->assertTrue(StringUtils::isEndingWith('a', ['']));
+
+        // Test ok values
+        $this->assertTrue(StringUtils::isEndingWith('a', ['a']));
+        $this->assertTrue(StringUtils::isEndingWith('abc', ['c']));
+        $this->assertFalse(StringUtils::isEndingWith('abc', ['b']));
+        $this->assertTrue(StringUtils::isEndingWith('abcde', ['de']));
+        $this->assertTrue(StringUtils::isEndingWith('abcde', ['bcde']));
+
+        // Test wrong values
+        // Not necessary
+
+        // Test exceptions
+        AssertUtils::throwsException(function() { StringUtils::isEndingWith([1, 2, 3, 4], 0); }, '/must be of the type array, int given/');
+        AssertUtils::throwsException(function() { StringUtils::isEndingWith('', 0); }, '/must be of the type array, int given/');
+        AssertUtils::throwsException(function() { StringUtils::isEndingWith('', ''); }, '/must be of the type array, string given/');
+    }
+
+
     /** test */
     public function testForceNonEmptyString(){
 
@@ -2027,6 +2089,38 @@ class StringUtilsTest extends TestCase {
         } catch (Throwable $e) {
             // We expect an exception to happen
         }
+    }
+
+
+    /**
+     * generatePath
+     *
+     * @return void
+     */
+    public function testGeneratePath(){
+
+        // Test empty values
+        AssertUtils::throwsException(function() { StringUtils::generatePath(null, null); }, '/must be of the type array, null given/');
+        AssertUtils::throwsException(function() { StringUtils::generatePath(0, 0); }, '/must be of the type array, int given/');
+        AssertUtils::throwsException(function() { StringUtils::generatePath([], []); }, '/must be of the type string, array given/');
+        AssertUtils::throwsException(function() { StringUtils::generatePath('', []); }, '/must be of the type array, string given/');
+        $this->assertEquals('', StringUtils::generatePath([], ''));
+        $this->assertEquals('', StringUtils::generatePath([''], ''));
+        $this->assertEquals('a', StringUtils::generatePath(['a'], ''));
+
+        // Test ok values
+        $this->assertEquals('a', StringUtils::generatePath(['a'], '/'));
+        $this->assertEquals('a/b', StringUtils::generatePath(['a', 'b'], '/'));
+        $this->assertEquals('a\\b', StringUtils::generatePath(['a', 'b'], '\\'));
+        $this->assertEquals('a'.DIRECTORY_SEPARATOR.'b'.DIRECTORY_SEPARATOR.'c', StringUtils::generatePath(['a', 'b', 'c']));
+
+        // Test wrong values
+        // Not necessary
+
+        // Test exceptions
+        AssertUtils::throwsException(function() { StringUtils::generatePath(['a'], 'a'); }, '/separator must be a slash or backslash/');
+        AssertUtils::throwsException(function() { StringUtils::generatePath([1, 2, 3, 4], 0); }, '/separator must be a slash or backslash/');
+        AssertUtils::throwsException(function() { StringUtils::generatePath(123); }, '/must be of the type array, int given/');
     }
 
 

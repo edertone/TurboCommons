@@ -186,6 +186,60 @@ export class StringUtils {
     
     
     /**
+     * Checks if the given string starts with any of the specified values.
+     *
+     * @param str The string to check
+     * @param startingValues An array of strings that the input string should start with.
+     *
+     * @return True if the input string starts with any of the specified values, False otherwise.
+     */
+    public static isStartingWith(str:string, startingValues:string[] = []){
+        
+        if(!ArrayUtils.isArray(startingValues)){
+            
+            throw new Error("startingValues is not an array");
+        }
+        
+        for (let startingValue of startingValues) {
+            
+            if (str.lastIndexOf(startingValue, 0) === 0) {
+                
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    
+    /**
+     * Checks if a given string ends with any of the specified values.
+     *
+     * @param str The string to check
+     * @param endingValues An array of strings that the input string should end with.
+     *
+     * @return True if the input string ends with any of the specified values, False otherwise.
+     */
+    public static isEndingWith(str:string, endingValues:string[] = []){
+        
+        if(!ArrayUtils.isArray(endingValues)){
+            
+            throw new Error("endingValues is not an array");
+        }
+        
+        for (let endingValue of endingValues) {
+            
+            if (endingValue === '' || str.indexOf(endingValue, str.length - endingValue.length) !== -1) {
+                
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    
+    /**
      * Strictly check that the provided value is a non empty string or throw an exception
      *
      * Uses the same criteria as the StringUtils.isEmpty() method
@@ -1237,6 +1291,30 @@ export class StringUtils {
         }
 
         return (1 - levenshtein / Math.max(string1.length, string2.length)) * 100;
+    }
+    
+    
+    /**
+     * Generate a path string from an array of elements.
+     *
+     * @param elements An array of elements that will be used to form the path.
+     * @param separator An optional separator that will be used to join the elements in the path. Defaults to `/`.
+     *
+     * @return A string representing the path formed from the given elements.
+     */
+    public static generatePath(elements: string[], separator = ''){
+
+        if(!ArrayUtils.isArray(elements)){
+            
+            throw new Error("elements is not an array");
+        }
+        
+        if(separator === ''){
+
+            separator = '/';
+        }
+
+        return StringUtils.formatPath(elements.join(separator), separator);
     }
 
 
