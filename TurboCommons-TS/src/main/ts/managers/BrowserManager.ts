@@ -519,35 +519,55 @@ export class BrowserManager{
     
     
     /**
-     * Search for a file on the local user machine. Its contents will be loaded into the browser memory and can be used
+     * Search for a file or files on the local user machine. Their contents will be loaded into the browser memory and can be used
      * locally without needing to update them to a remote server.
      * 
      * @param event It is mandayory for security reasons that an event from an actual input type='file' element is passed to this method.
-     *        We can set here for example the change event that is fired by the input when the user selects a file.
-     * @param callback Once the file selected by the user is correctly loaded by the browser, all the contents of that file will be available
-     *        inside the 'fileContents' parameter of this callback method.
+     *        We can set here for example the change event that is fired by the input when the user selects a file.<br><br>
+     *        Example for single file: <input type='file' accept=".txt" (change)="onFileSelected($event)"> (call browseLocalFiles() inside the change event handler)<br><br>
+     *        Example for multi files: <input type='file' multiple="multiple" accept=".txt" (change)="onFileSelected($event)">
+     *        of the onFileSelected method.
+     * @param callback Once the files selected by the user are correctly loaded into the browser, this callback method will be 
+     *        called with two parameters containing the name and contents for each one of the loaded files.
      * 
      * @returns Void. (An exception will be thrown if the load fails)
      */
-    browseLocalFile(event: any, callback: (fileContents: string) => void){
-    
-        const file: File = event.target.files[0];
+    browseLocalFiles(event: any, callback: (fileNames: string[], fileContents: string[]) => void){
         
-        if(file){
-            
-            const reader = new FileReader();
-            
-            reader.onload = () => {
+        function recursiveLoader(filesLoaded:any, fileNames:string[], fileContents:string[], index:number) {
+
+            if(index >= filesLoaded.length){
                 
-                callback(reader.result as string);
-            };
-            
-            reader.onerror = () => {
+                callback(fileNames, fileContents);
+                return;
+            }
+
+            if(filesLoaded[index]){
+                    
+                fileNames.push(filesLoaded[index].name);
                 
-                throw new Error('Error reading file');
-            };
+                const reader = new FileReader();
+                
+                reader.onload = () => {
+                    
+                    fileContents.push(reader.result as string);
+                    
+                    recursiveLoader(filesLoaded, fileNames, fileContents, index + 1);
+                };
+                
+                reader.onerror = () => {
+                    
+                    throw new Error('Error reading file');
+                };
+                
+                reader.readAsText(filesLoaded[index]);
             
-            reader.readAsText(file);
+            }else{
+            
+                recursiveLoader(filesLoaded, fileNames, fileContents, index + 1);   
+            }
         }
+        
+        recursiveLoader(event.target.files, [], [], 0);
     }
 }
