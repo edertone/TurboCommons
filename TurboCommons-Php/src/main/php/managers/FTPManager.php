@@ -18,6 +18,8 @@ use org\turbocommons\src\main\php\utils\StringUtils;
 
 /**
  * A Synchronous class to manage and operate with ftp connections
+ *
+ * NOTICE that this class may not be available on all languages
  */
 class FTPManager extends BaseStrictClass {
 
@@ -148,14 +150,30 @@ class FTPManager extends BaseStrictClass {
     public function readFile($ftpPath){
 
         // Open a temporary file handle that works only on ram memory. This way we won't be using the hard drive.
-        $fh = fopen('php://temp', 'r+');
+        $stream = fopen('php://temp', 'r+');
 
-        if (ftp_fget($this->_connectionId, $fh, $ftpPath, $this->transferMode, 0)) {
+        if($stream === false){
 
-            rewind($fh);
-
-            return stream_get_contents($fh);
+            throw new UnexpectedValueException('Could not create stream to php://temp: '.$ftpPath);
         }
+
+        if($this->_connectionId === false){
+
+            throw new UnexpectedValueException('FTP connection is NOT active! trying to read: '.$ftpPath);
+        }
+
+        if (ftp_fget($this->_connectionId, $stream, $ftpPath, $this->transferMode, 0)) {
+
+            rewind($stream);
+
+            $result = stream_get_contents($stream);
+
+            fclose($stream);
+
+            return $result;
+        }
+
+        fclose($stream);
 
         throw new UnexpectedValueException('Error reading FTP file: '.$ftpPath);
     }
