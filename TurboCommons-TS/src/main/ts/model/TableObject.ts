@@ -413,7 +413,7 @@ export class TableObject {
      * @param row An integer containing the index for the row that we want to retrieve
      * @param column An integer or a string containing the index or label for the column that we want to retrieve
      *
-     * @return The value for the cell that is located at the specified row and column
+     * @return The value for the cell located at the specified row and column or null if no data is defined for it
      */
     getCell(row: number, column: number|string){
 

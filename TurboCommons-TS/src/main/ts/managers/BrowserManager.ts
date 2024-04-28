@@ -527,12 +527,13 @@ export class BrowserManager{
      *        Example for single file: <input type='file' accept=".txt" (change)="onFileSelected($event)"> (call browseLocalFiles() inside the change event handler)<br><br>
      *        Example for multi files: <input type='file' multiple="multiple" accept=".txt" (change)="onFileSelected($event)">
      *        of the onFileSelected method.
+     * @param mode Specify if the files must be loaded as plain "TEXT" or "BASE64" encoded binary data       
      * @param callback Once the files selected by the user are correctly loaded into the browser, this callback method will be 
      *        called with two parameters containing the name and contents for each one of the loaded files.
      * 
      * @returns Void. (An exception will be thrown if the load fails)
      */
-    browseLocalFiles(event: any, callback: (fileNames: string[], fileContents: string[]) => void){
+    browseLocalFiles(event: any, mode: 'TEXT' | 'BASE64', callback: (fileNames: string[], fileContents: string[]) => void){
         
         function recursiveLoader(filesLoaded:any, fileNames:string[], fileContents:string[], index:number) {
 
@@ -550,7 +551,14 @@ export class BrowserManager{
                 
                 reader.onload = () => {
                     
-                    fileContents.push(reader.result as string);
+                    if(mode === "TEXT"){
+                        
+                        fileContents.push(reader.result as string);
+                        
+                    }else{
+                        
+                        fileContents.push((reader.result as string).split(',', 2)[1]);
+                    }
                     
                     recursiveLoader(filesLoaded, fileNames, fileContents, index + 1);
                 };
@@ -560,8 +568,20 @@ export class BrowserManager{
                     throw new Error('Error reading file');
                 };
                 
-                reader.readAsText(filesLoaded[index]);
-            
+                // Read the file contents depending on the selected mode    
+                if(mode === "TEXT"){
+                    
+                    reader.readAsText(filesLoaded[index]);
+                            
+                }else if(mode === "BASE64"){
+                    
+                    reader.readAsDataURL(filesLoaded[index]);
+                
+                }else{
+                    
+                    throw new Error('Mode must be either "TEXT" or "BINARY"');
+                }
+                            
             }else{
             
                 recursiveLoader(filesLoaded, fileNames, fileContents, index + 1);   

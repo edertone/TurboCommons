@@ -27,36 +27,27 @@ QUnit.module("ConversionUtilsTest", {
  */
 QUnit.test("stringToBase64", function(assert){
 
-    assert.ok(ConversionUtils.stringToBase64(undefined) === '');
-    assert.ok(ConversionUtils.stringToBase64(null) === '');
-    assert.ok(ConversionUtils.stringToBase64('') === '');
+    assert.strictEqual('', ConversionUtils.stringToBase64(undefined));
+    assert.strictEqual('', ConversionUtils.stringToBase64(null));
+    assert.strictEqual('', ConversionUtils.stringToBase64(''));
 
     // Try correct values
-    assert.ok(ConversionUtils.stringToBase64('f') === 'Zg==');
-    assert.ok(ConversionUtils.stringToBase64('fo') === 'Zm8=');
-    assert.ok(ConversionUtils.stringToBase64('foo') === 'Zm9v');
-    assert.ok(ConversionUtils.stringToBase64('foob') === 'Zm9vYg==');
-    assert.ok(ConversionUtils.stringToBase64('fooba') === 'Zm9vYmE=');
-    assert.ok(ConversionUtils.stringToBase64('foobar') === 'Zm9vYmFy');
-    assert.ok(ConversionUtils.stringToBase64("line1\nline2\nline3") === 'bGluZTEKbGluZTIKbGluZTM=');
-    assert.ok(ConversionUtils.stringToBase64('{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }') === 'eyAwLCAxLCAyLCAzLCA0LCA1LCA2LCA3LCA4LCA5IH0=');
-    assert.ok(ConversionUtils.stringToBase64('AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz') === 'QWFCYkNjRGRFZUZmR2dIaElpSmpLa0xsTW1Obk9vUHBRcVJyU3NUdFV1VnZXd1h4WXlaeg==');
+    assert.strictEqual('Zg==', ConversionUtils.stringToBase64('f'));
+    assert.strictEqual('Zm8=', ConversionUtils.stringToBase64('fo'));
+    assert.strictEqual('Zm9v', ConversionUtils.stringToBase64('foo'));
+    assert.strictEqual('Zm9vYg==', ConversionUtils.stringToBase64('foob'));
+    assert.strictEqual('Zm9vYmE=', ConversionUtils.stringToBase64('fooba'));
+    assert.strictEqual('Zm9vYmFy', ConversionUtils.stringToBase64('foobar'));
+    assert.strictEqual('w4Bpw5N1dSEvKCk=', ConversionUtils.stringToBase64('ÀiÓuu!/()'));
+    assert.strictEqual('5L2g5aW95LiW55WM', ConversionUtils.stringToBase64('你好世界'));
+    assert.strictEqual('bGluZTEKbGluZTIKbGluZTM=', ConversionUtils.stringToBase64("line1\nline2\nline3"));
+    assert.strictEqual('eyAwLCAxLCAyLCAzLCA0LCA1LCA2LCA3LCA4LCA5IH0=', ConversionUtils.stringToBase64('{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }'));
+    assert.strictEqual('QWFCYkNjRGRFZUZmR2dIaElpSmpLa0xsTW1Obk9vUHBRcVJyU3NUdFV1VnZXd1h4WXlaeg==', ConversionUtils.stringToBase64('AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz'));
 
     // Try some wrong values
-    assert.throws(function(){
-
-        ConversionUtils.stringToBase64([]);
-    });
-
-    assert.throws(function(){
-
-        ConversionUtils.stringToBase64(98345);
-    });
-
-    assert.throws(function(){
-
-        ConversionUtils.stringToBase64(Qunit);
-    });
+    assert.throws(function(){ ConversionUtils.stringToBase64([]); }, '/value is not a string/');
+    assert.throws(function(){ ConversionUtils.stringToBase64(98345); }, '/value is not a string/');
+    assert.throws(function(){ ConversionUtils.stringToBase64(Qunit); }, '/value is not a string/');
 });
 
 
@@ -65,39 +56,30 @@ QUnit.test("stringToBase64", function(assert){
  */
 QUnit.test("base64ToString", function(assert){
 
-    assert.ok(ConversionUtils.base64ToString(undefined) === '');
-    assert.ok(ConversionUtils.base64ToString(null) === '');
-    assert.ok(ConversionUtils.base64ToString('') === '');
+    assert.strictEqual('', ConversionUtils.base64ToString(undefined));
+    assert.strictEqual('', ConversionUtils.base64ToString(null));
+    assert.strictEqual('', ConversionUtils.base64ToString(''));
 
     // Try correct values
-    assert.ok(ConversionUtils.base64ToString('Zg==') === 'f');
-    assert.ok(ConversionUtils.base64ToString('Zm8=') === 'fo');
-    assert.ok(ConversionUtils.base64ToString('Zm9v') === 'foo');
-    assert.ok(ConversionUtils.base64ToString('Zm9vYg==') === 'foob');
-    assert.ok(ConversionUtils.base64ToString('Zm9vYmE=') === 'fooba');
-    assert.ok(ConversionUtils.base64ToString('Zm9vYmFy') === 'foobar');
+    assert.strictEqual('f', ConversionUtils.base64ToString('Zg=='));
+    assert.strictEqual('fo', ConversionUtils.base64ToString('Zm8='));
+    assert.strictEqual('foo', ConversionUtils.base64ToString('Zm9v'));
+    assert.strictEqual('foob', ConversionUtils.base64ToString('Zm9vYg=='));
+    assert.strictEqual('fooba', ConversionUtils.base64ToString('Zm9vYmE='));
+    assert.strictEqual('foobar', ConversionUtils.base64ToString('Zm9vYmFy'));
+    assert.strictEqual('ÀiÓuu!/()', ConversionUtils.base64ToString('w4Bpw5N1dSEvKCk='));
+    assert.strictEqual('你好世界', ConversionUtils.base64ToString('5L2g5aW95LiW55WM'));
 
     // Try some random values encoded with stringToBase64
-    for(var i = 0; i < 50; i++){
+    for(let i = 0; i < 50; i++){
 
-        var s = Math.random().toString(36).substring(20);
+        let s = Math.random().toString(36).substring(20);
 
-        assert.ok(ConversionUtils.base64ToString(ConversionUtils.stringToBase64(s)) === s);
+        assert.strictEqual(s, ConversionUtils.base64ToString(ConversionUtils.stringToBase64(s)));
     }
 
     // Try some wrong values
-    assert.throws(function(){
-
-        ConversionUtils.base64ToString([]);
-    });
-
-    assert.throws(function(){
-
-        ConversionUtils.base64ToString(98345);
-    });
-
-    assert.throws(function(){
-
-        ConversionUtils.base64ToString(Qunit);
-    });
+    assert.throws(function(){ ConversionUtils.base64ToString([]); });
+    assert.throws(function(){ ConversionUtils.base64ToString(98345); });
+    assert.throws(function(){ ConversionUtils.base64ToString(Qunit); });
 });
