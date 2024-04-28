@@ -424,7 +424,7 @@ class TableObject{
      * @param integer $row An integer containing the index for the row that we want to retrieve
      * @param mixed $column An integer or a string containing the index or label for the column that we want to retrieve
      *
-     * @return mixed The value for the cell that is located at the specified row and column
+     * @return mixed The value for the cell located at the specified row and column or null if no data is defined for it
      */
     public function getCell(int $row, $column){
 
