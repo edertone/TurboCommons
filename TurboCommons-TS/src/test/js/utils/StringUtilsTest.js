@@ -346,9 +346,11 @@ QUnit.test("replace", function(assert) {
     assert.strictEqual(StringUtils.replace("yyyyyyyy", ["yy", "yyyy"], ["y", "y"]), "y");
     
     // Test ok values with limited count
+    assert.strictEqual(StringUtils.replace("x", "", "xyz", 0), "x");
     assert.strictEqual(StringUtils.replace("x", "", "xyz", 1), "x");
     assert.strictEqual(StringUtils.replace("x", "x", "xyz", 1), "xyz");
     assert.strictEqual(StringUtils.replace("xxx", "x", "xyz", 1), "xyzxx");
+    assert.strictEqual(StringUtils.replace("abababAb", "a", "X", 0), "abababAb");
     assert.strictEqual(StringUtils.replace("abababAb", "a", "X", 2), "XbXbabAb");
     assert.strictEqual(StringUtils.replace("abababAb", "aba", "r", 3), "rbabAb");
     assert.strictEqual(StringUtils.replace("abababAbabaabaaba", "aba", "r", 3), "rbabAbrraba");
@@ -363,17 +365,9 @@ QUnit.test("replace", function(assert) {
     // not necessary
 
     // Test exceptions
-    assert.throws(function() {
-        StringUtils.replace("string", "a", "b", 0);
-    }, /count must be a positive integer/);
-    
-    assert.throws(function() {
-        StringUtils.replace("string", ["a"], ["b", "c"]);
-    }, /search and replacement arrays must have the same length/);
-    
-    assert.throws(function() {
-        StringUtils.replace("string", ["a", "b", "c"], ["b", "c"]);
-    }, /search and replacement arrays must have the same length/);
+    assert.throws(function() { StringUtils.replace("string", "a", "b", 'a'); }, /count must be a positive integer or 0/);
+    assert.throws(function() { StringUtils.replace("string", ["a"], ["b", "c"]); }, /search and replacement arrays must have the same length/);
+    assert.throws(function() { StringUtils.replace("string", ["a", "b", "c"], ["b", "c"]); }, /search and replacement arrays must have the same length/);
 });
 
 

@@ -302,9 +302,14 @@ export class StringUtils {
             throw new Error("replacement is not a string or array");
         }
         
-        if(!NumericUtils.isInteger(count) || count === 0){
+        if(!NumericUtils.isInteger(count)){
             
-            throw new Error("count must be a positive integer");
+            throw new Error("count must be a positive integer or 0");
+        }
+        
+        if(count === 0){
+            
+            return string;
         }
         
         let result = string;
