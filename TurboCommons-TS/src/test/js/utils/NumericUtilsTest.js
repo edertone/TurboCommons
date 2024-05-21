@@ -35,13 +35,14 @@ QUnit.test("isNumeric", function(assert){
 
     // Test empty values
     assert.notOk(NumericUtils.isNumeric(null));
-    assert.notOk(NumericUtils.isNumeric(undefined));
     assert.notOk(NumericUtils.isNumeric(''));
+    assert.notOk(NumericUtils.isNumeric('-'));
+    assert.notOk(NumericUtils.isNumeric(' '));
     assert.notOk(NumericUtils.isNumeric([]));
     assert.notOk(NumericUtils.isNumeric({}));
     assert.ok(NumericUtils.isNumeric(0));
     assert.ok(NumericUtils.isNumeric(-0));
-
+    
     // Test ok values
     assert.ok(NumericUtils.isNumeric(1));
     assert.ok(NumericUtils.isNumeric(-1));
@@ -76,21 +77,107 @@ QUnit.test("isNumeric", function(assert){
     assert.ok(NumericUtils.isNumeric(' 1 '));
     assert.ok(NumericUtils.isNumeric('    1     '));
     assert.ok(NumericUtils.isNumeric("1     \n"));
+    assert.ok(NumericUtils.isNumeric('1.'));
+    assert.ok(NumericUtils.isNumeric('1,'));
+    assert.ok(NumericUtils.isNumeric('1,1'));
+    assert.ok(NumericUtils.isNumeric('11.'));
+    assert.ok(NumericUtils.isNumeric('111.'));
+    assert.ok(NumericUtils.isNumeric('.111'));
+    assert.ok(NumericUtils.isNumeric('12,345'));
+    assert.ok(NumericUtils.isNumeric('6000,5'));
+    assert.ok(NumericUtils.isNumeric('-6000,5'));
+    assert.ok(NumericUtils.isNumeric('10000000.'));
+    assert.ok(NumericUtils.isNumeric('6000000,5'));
+    assert.ok(NumericUtils.isNumeric('6000000.5'));
+    assert.ok(NumericUtils.isNumeric('-6000000.5'));
+    assert.ok(NumericUtils.isNumeric('1.001,01'));
+    assert.ok(NumericUtils.isNumeric('1,001.01'));
+    assert.ok(NumericUtils.isNumeric('-1,001.01'));
+    assert.ok(NumericUtils.isNumeric('1,001,000.01'));
+    assert.ok(NumericUtils.isNumeric('1.001.000.01'));
+    assert.ok(NumericUtils.isNumeric('1.001.000,01'));
+    assert.ok(NumericUtils.isNumeric('-1.001.000,01'));
+    assert.ok(NumericUtils.isNumeric('14.100.000.0'));
+    assert.ok(NumericUtils.isNumeric('14.100.000.02345'));
+    assert.ok(NumericUtils.isNumeric('14.100.000,02345'));
+    assert.ok(NumericUtils.isNumeric('14,100.000,02345'));
+    assert.ok(NumericUtils.isNumeric('14,100,000,02345'));
+    assert.ok(NumericUtils.isNumeric('-14,100,000,02345'));
+    assert.ok(NumericUtils.isNumeric('1236812738123877213'));
+    assert.ok(NumericUtils.isNumeric('-1236812738123877213'));
+    assert.ok(NumericUtils.isNumeric('- 1236812738123877213'));
+    assert.ok(NumericUtils.isNumeric('1', '.'));
+    assert.ok(NumericUtils.isNumeric('-1', '.'));
+    assert.ok(NumericUtils.isNumeric('0', '.'));
+    assert.ok(NumericUtils.isNumeric('1.1', '.'));
+    assert.ok(NumericUtils.isNumeric('1.', '.'));
+    assert.ok(NumericUtils.isNumeric('0.1', '.'));
+    assert.ok(NumericUtils.isNumeric('10.000', '.'));
+    assert.ok(NumericUtils.isNumeric('1265789', '.'));
+    assert.ok(NumericUtils.isNumeric('1', ','));
+    assert.ok(NumericUtils.isNumeric('-1', ','));
+    assert.ok(NumericUtils.isNumeric('0', ','));
+    assert.ok(NumericUtils.isNumeric('1,1', ','));
+    assert.ok(NumericUtils.isNumeric('1,', ','));
+    assert.ok(NumericUtils.isNumeric('0,1', ','));
+    assert.ok(NumericUtils.isNumeric('10,000', ','));
+    assert.ok(NumericUtils.isNumeric('1265789', ','));
     
-    var objectThatMustNotBeAltered = {value: " 15  "};    
+    let objectThatMustNotBeAltered = {value: " 15  "};    
     assert.ok(NumericUtils.isNumeric(objectThatMustNotBeAltered.value));
     assert.strictEqual(objectThatMustNotBeAltered.value, " 15  ");
     
     // Test wrong values
     assert.notOk(NumericUtils.isNumeric('abc'));
+    assert.notOk(NumericUtils.isNumeric('col20'));
     assert.notOk(NumericUtils.isNumeric('1-'));
-    assert.notOk(NumericUtils.isNumeric('1,1'));
     assert.notOk(NumericUtils.isNumeric(' '));
     assert.notOk(NumericUtils.isNumeric('!.1'));
     assert.notOk(NumericUtils.isNumeric([1, 2, 3]));
     assert.notOk(NumericUtils.isNumeric(['hello']));
     assert.notOk(NumericUtils.isNumeric(new Error()));
     assert.notOk(NumericUtils.isNumeric({ a : 1 }));
+    assert.notOk(NumericUtils.isNumeric('1.0.'));
+    assert.notOk(NumericUtils.isNumeric('1,0.'));
+    assert.notOk(NumericUtils.isNumeric('1.0,'));
+    assert.notOk(NumericUtils.isNumeric('1,0,'));
+    assert.notOk(NumericUtils.isNumeric(',.0'));
+    assert.notOk(NumericUtils.isNumeric('1..0'));
+    assert.notOk(NumericUtils.isNumeric('1...0'));
+    assert.notOk(NumericUtils.isNumeric('1....0'));
+    assert.notOk(NumericUtils.isNumeric('1,,0'));
+    assert.notOk(NumericUtils.isNumeric('1,,.,0'));
+    assert.notOk(NumericUtils.isNumeric('1.,0'));
+    assert.notOk(NumericUtils.isNumeric('-1.,0'));
+    assert.notOk(NumericUtils.isNumeric('1,.0'));
+    assert.notOk(NumericUtils.isNumeric('1000,0.0'));
+    assert.notOk(NumericUtils.isNumeric('1,000,0.0'));
+    assert.notOk(NumericUtils.isNumeric('10.00,0.0'));
+    assert.notOk(NumericUtils.isNumeric('.1000,0.0'));
+    assert.notOk(NumericUtils.isNumeric('.10.00,0.0'));
+    assert.notOk(NumericUtils.isNumeric('1234.10.00,0.0'));
+    assert.notOk(NumericUtils.isNumeric('1234.100.000.0'));
+    assert.notOk(NumericUtils.isNumeric('10.000.000.'));
+    assert.notOk(NumericUtils.isNumeric('-1000,0.0'));
+    assert.notOk(NumericUtils.isNumeric('-10.000.000.'));
+    assert.notOk(NumericUtils.isNumeric('12.34.56'));
+    assert.notOk(NumericUtils.isNumeric('$50'));
+    assert.notOk(NumericUtils.isNumeric('Infinity'));
+    assert.notOk(NumericUtils.isNumeric('NaN'));
+    assert.notOk(NumericUtils.isNumeric('1/2'));
+    assert.notOk(NumericUtils.isNumeric('a', '.'));
+    assert.notOk(NumericUtils.isNumeric('1/2', '.'));
+    assert.notOk(NumericUtils.isNumeric('1..', '.'));
+    assert.notOk(NumericUtils.isNumeric('1..1', '.'));
+    assert.notOk(NumericUtils.isNumeric('1,,1', '.'));
+    assert.notOk(NumericUtils.isNumeric('...', '.'));
+    assert.notOk(NumericUtils.isNumeric('a', ','));
+    assert.notOk(NumericUtils.isNumeric('1/2', ','));
+    assert.notOk(NumericUtils.isNumeric('1,,', ','));
+    assert.notOk(NumericUtils.isNumeric('1,,1', ','));
+    assert.notOk(NumericUtils.isNumeric('1..1', ','));
+    assert.notOk(NumericUtils.isNumeric('...', ','));
+    assert.notOk(NumericUtils.isNumeric(',,,', ','));
 });
 
 
@@ -250,12 +337,41 @@ QUnit.test("getNumeric", function(assert){
     assert.strictEqual(NumericUtils.getNumeric('  1 '), 1);
     assert.strictEqual(NumericUtils.getNumeric('  .1 '), 0.1);
     assert.strictEqual(NumericUtils.getNumeric('  -1 '), -1);
+    assert.strictEqual(NumericUtils.getNumeric('6,5'), 6.5);
+    assert.strictEqual(NumericUtils.getNumeric('6000,5'), 6000.5);
+    assert.strictEqual(NumericUtils.getNumeric('6000.5'), 6000.5);
+    assert.strictEqual(NumericUtils.getNumeric('6.000,5'), 6000.5);
+    assert.strictEqual(NumericUtils.getNumeric('6,000.5'), 6000.5);
+    assert.strictEqual(NumericUtils.getNumeric('1,4356'), 1.4356);
+    assert.strictEqual(NumericUtils.getNumeric('12,345'), 12.345);
+    assert.strictEqual(NumericUtils.getNumeric('12.345'), 12.345);
+    assert.strictEqual(NumericUtils.getNumeric('12.345,987'), 12345.987);
+    assert.strictEqual(NumericUtils.getNumeric('12.345.987'), 12345.987);
+    assert.strictEqual(NumericUtils.getNumeric('12,345.987'), 12345.987);
+    assert.strictEqual(NumericUtils.getNumeric('12345.987'), 12345.987);
+    assert.strictEqual(NumericUtils.getNumeric('12345.987', '.'), 12345.987);
+    assert.strictEqual(NumericUtils.getNumeric('12345.987', ','), 12345987);
+    assert.strictEqual(NumericUtils.getNumeric('12,345.987', '.'), 12345.987);
+    assert.strictEqual(NumericUtils.getNumeric('12.345.987', ','), 12345987);
+    assert.strictEqual(NumericUtils.getNumeric('12.345,987', ','), 12345.987);
+    assert.strictEqual(NumericUtils.getNumeric('1', ','), 1);
+    assert.strictEqual(NumericUtils.getNumeric('-1', ','), -1);
+    assert.strictEqual(NumericUtils.getNumeric('0', ','), 0);
+    assert.strictEqual(NumericUtils.getNumeric('1,1', ','), 1.1);
+    assert.strictEqual(NumericUtils.getNumeric('0,1', ','), 0.1);
+    assert.strictEqual(NumericUtils.getNumeric('10,000', ','), 10.000);
+    assert.strictEqual(NumericUtils.getNumeric('10,000', '.'), 10000);
 
     // Test wrong values
-    assert.throws(function() { NumericUtils.getNumeric('abc'); }, '/value is not numeric/');
-    assert.throws(function() { NumericUtils.getNumeric('1-'); }, '/value is not numeric/');
-    assert.throws(function() { NumericUtils.getNumeric('1,1'); }, '/value is not numeric/');
-    assert.throws(function() { NumericUtils.getNumeric('hello'); }, '/value is not numeric/');
+    assert.throws(function() { NumericUtils.getNumeric('abc'); }, /value is not numeric/);
+    assert.throws(function() { NumericUtils.getNumeric('1-'); }, /value is not numeric/);
+    assert.throws(function() { NumericUtils.getNumeric('1-1'); }, /value is not numeric/);
+    assert.throws(function() { NumericUtils.getNumeric(['hello']); }, /value is not numeric/);
+    assert.throws(function() { NumericUtils.getNumeric('12.345,987', '.'); }, /value is not numeric/);
+    assert.throws(function() { NumericUtils.getNumeric('12.345.987', '.'); }, /value is not numeric/);
+    assert.throws(function() { NumericUtils.getNumeric('12,345,987', ','); }, /value is not numeric/);
+    assert.throws(function() { NumericUtils.getNumeric('12,345.987', ','); }, /value is not numeric/);
+    assert.throws(function() { NumericUtils.getNumeric('12,345.987', 'a'); }, /Invalid decimal divider/);
 });
 
 
@@ -267,9 +383,9 @@ QUnit.test("generateRandomInteger", function(assert){
     // Test empty values
     assert.throws(function() { NumericUtils.generateRandomInteger(0, 0); }, /max must be higher than min/);
     
-    for(var i = 0; i < emptyValuesCount; i++){
+    for(let i = 0; i < emptyValuesCount; i++){
         
-        for(var j = 0; j < emptyValuesCount; j++){
+        for(let j = 0; j < emptyValuesCount; j++){
         
             if(emptyValues[i] !== 0 || emptyValues[j] !== 0){
             
@@ -281,13 +397,13 @@ QUnit.test("generateRandomInteger", function(assert){
     }
 
     // Test ok values
-    for (var i = 0; i < 1000; i+=100) {
+    for (let i = 0; i < 1000; i+=100) {
 
         // Both positive
-        var min = i;
-        var max = i * 2 + 1;
+        let min = i;
+        let max = i * 2 + 1;
 
-        var val = NumericUtils.generateRandomInteger(min, max);
+        let val = NumericUtils.generateRandomInteger(min, max);
         assert.ok(val >= min && val <= max);
         assert.ok(NumericUtils.isInteger(val));
 
@@ -300,10 +416,10 @@ QUnit.test("generateRandomInteger", function(assert){
         assert.ok(NumericUtils.isInteger(val));
         
         // Negative min, positive max
-        var min = -i - 1;
-        var max = i * 2 + 1;
+        min = -i - 1;
+        max = i * 2 + 1;
 
-        var val = NumericUtils.generateRandomInteger(min, max);
+        val = NumericUtils.generateRandomInteger(min, max);
         assert.ok(val >= min && val <= max);
         assert.ok(NumericUtils.isInteger(val));
     }
@@ -314,11 +430,11 @@ QUnit.test("generateRandomInteger", function(assert){
     assert.throws(function() { NumericUtils.generateRandomInteger(-10, -20); }, /max must be higher than min/);
 
     // Test exceptions
-    var exceptionValues = [new Error(), 'hello', .1, 1.1, [1, 2, 3, 4]];
+    let exceptionValues = [new Error(), 'hello', .1, 1.1, [1, 2, 3, 4]];
 
-    for (i = 0; i < exceptionValues.length; i++) {
+    for (let i = 0; i < exceptionValues.length; i++) {
 
-        for (var j = 0; j < exceptionValues.length; j++) {
+        for (let j = 0; j < exceptionValues.length; j++) {
 
             assert.throws(function() {
                 NumericUtils.getNumeric(NumericUtils.generateRandomInteger(exceptionValues[i], exceptionValues[j]));

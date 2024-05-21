@@ -454,6 +454,7 @@ class ValidationManagerTest extends TestCase {
         $this->assertTrue($this->validationManager->isNumeric('-1.345'));
         $this->assertTrue($this->validationManager->isNumeric('345341'));
         $this->assertTrue($this->validationManager->isNumeric('-345341'));
+        $this->assertTrue($this->validationManager->isNumeric('1,4356'));
         $this->assertTrue($this->validationManager->getStatus() === ValidationManager::OK);
 
         // Test wrong values
@@ -462,7 +463,6 @@ class ValidationManagerTest extends TestCase {
         $this->assertTrue($this->validationManager->getLastMessage() === 'value is not a number');
         $this->assertTrue($this->validationManager->getStatus() === ValidationManager::ERROR);
         $this->assertFalse($this->validationManager->isNumeric('hello', 'numeric error'));
-        $this->assertFalse($this->validationManager->isNumeric('1,4356', 'numeric error'));
         $this->assertTrue($this->validationManager->getLastMessage() === 'numeric error');
         $this->assertFalse($this->validationManager->isNumeric('1,4.4545', 'numeric error'));
         $this->assertFalse($this->validationManager->isNumeric('--345', 'numeric error'));

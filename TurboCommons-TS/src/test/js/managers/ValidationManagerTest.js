@@ -388,6 +388,7 @@ QUnit.test("isNumeric", function(assert) {
     assert.ok(validationManager.isNumeric('-1.345'));
     assert.ok(validationManager.isNumeric('345341'));
     assert.ok(validationManager.isNumeric('-345341'));
+    assert.ok(validationManager.isNumeric('1,4356'));
     assert.ok(validationManager.getStatus() === ValidationManager.OK);
 
     // Test wrong values
@@ -396,7 +397,6 @@ QUnit.test("isNumeric", function(assert) {
     assert.ok(validationManager.getLastMessage() === 'value is not a number');
     assert.ok(validationManager.getStatus() === ValidationManager.ERROR);
     assert.notOk(validationManager.isNumeric('hello', 'numeric error'));
-    assert.notOk(validationManager.isNumeric('1,4356', 'numeric error'));
     assert.ok(validationManager.getLastMessage() === 'numeric error');
     assert.notOk(validationManager.isNumeric('1,4.4545', 'numeric error'));
     assert.notOk(validationManager.isNumeric('--345', 'numeric error'));

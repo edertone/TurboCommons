@@ -11,6 +11,7 @@
 
 namespace org\turbocommons\src\main\php\utils;
 
+use Throwable;
 use UnexpectedValueException;
 use InvalidArgumentException;
 
@@ -22,20 +23,32 @@ class NumericUtils {
 
 
     /**
-     * Tells if the given value is numeric or not
-     *
-     * @param mixed $value A value to check
-     *
-     * @return boolean true if the given value is numeric or represents a numeric value, false otherwise
+     * Defines the error message for an exception when a non-numeric value is detected.
+     * @constant string
      */
-    public static function isNumeric($value){
+    const NON_NUMERIC_ERROR = 'value is not numeric';
 
-        if(is_string($value)){
 
-            $value = trim($value);
+    /**
+     * Checks if the given value is numeric.
+     *
+     * @param mixed $value A value to check.
+     * @param string $decimalDivider The decimal divider to use. Possible values are '.' and ','. If not provided, it will be auto-detected.
+     *
+     * @return bool true if the given value is numeric, false otherwise.
+     */
+    public static function isNumeric($value, $decimalDivider = ''){
+
+        try {
+
+            self::_formatNumericString($value, $decimalDivider);
+
+        } catch (Throwable $e) {
+
+            return false;
         }
 
-        return is_numeric($value);
+        return true;
     }
 
 
@@ -53,7 +66,7 @@ class NumericUtils {
             return false;
         }
 
-        return strpos((string) $value, '.') === false;
+        return strpos(self::_formatNumericString($value), '.') === false;
     }
 
 
@@ -101,17 +114,13 @@ class NumericUtils {
      * Get the number represented by the given value
      *
      * @param mixed $value A value to convert to a number
+     * @param string $decimalDivider The decimal divider to use. Possible values are '.' and ','. If not provided, it will be auto-detected.
      *
      * @return number The numeric type representation from the given value. For example, a string '0001' will return 1
      */
-    public static function getNumeric($value){
+    public static function getNumeric($value, $decimalDivider = ''){
 
-        if(self::isNumeric($value)){
-
-            return trim($value) + 0;
-        }
-
-        throw new UnexpectedValueException('value is not numeric');
+        return self::_formatNumericString($value, $decimalDivider) + 0;
     }
 
 
@@ -139,6 +148,104 @@ class NumericUtils {
 
         return floor((mt_rand(0, mt_getrandmax() - 1) / mt_getrandmax()) * ($max - $min + 1)) + $min;
     }
-}
 
-?>
+
+    /**
+     * Format a given value to a numeric string. If the conversion is not possible, an exception will be thrown
+     *
+     * @param mixed $value A value to format
+     * @param string $decimalDivider The decimal divider to use. possible values are '.' and ','. It will be auto detected If set to empty string
+     *
+     * @return string The formatted numeric string.
+     *
+     * @throws UnexpectedValueException If the value is not numeric or if the decimal divider is invalid.
+     */
+    private static function _formatNumericString($value, $decimalDivider = ''){
+
+        if($decimalDivider !== '' && $decimalDivider !== '.' && $decimalDivider !== ','){
+
+            throw new UnexpectedValueException('Invalid decimal divider');
+        }
+
+        if(is_string($value)){
+
+            $value = str_replace(' ', '', trim($value));
+            $decimalDividerPosition = -1;
+            $comaLastPosition = strrpos($value, ",");
+            $dotLastPosition = strrpos($value, ".");
+
+            switch ($decimalDivider) {
+
+                case '.':
+                    // No comas are allowed after a dot
+                    if(substr_count($value, '.') > 1 ||
+                       ($comaLastPosition && $dotLastPosition && $comaLastPosition > $dotLastPosition)){
+
+                        throw new UnexpectedValueException(self::NON_NUMERIC_ERROR);
+                    }
+
+                    if($dotLastPosition > 0){
+
+                        $decimalDividerPosition = $dotLastPosition;
+                    }
+                    break;
+
+                case ',':
+                    // No dots are allowed after a coma
+                    if(substr_count($value, ',') > 1 ||
+                       ($comaLastPosition && $dotLastPosition && $dotLastPosition > $comaLastPosition)){
+
+                        throw new UnexpectedValueException(self::NON_NUMERIC_ERROR);
+                    }
+
+                    if($comaLastPosition > 0){
+
+                        $decimalDividerPosition = $comaLastPosition;
+                    }
+                    break;
+
+                default:
+                    $decimalDividerPosition = max($comaLastPosition === false ? -1 : $comaLastPosition, $dotLastPosition === false ? -1 : $dotLastPosition);
+            }
+
+            $value = str_replace(',', '.', $value);
+            $valueExploded = explode('.', $value);
+            $valueExplodedCount = count($valueExploded);
+
+            // Ending dot or coma is allowed if there is only one
+            if(substr($value, -1) === '.' && substr_count($value, '.') > 1){
+
+                throw new UnexpectedValueException(self::NON_NUMERIC_ERROR);
+            }
+
+            // Dot symbols must split 3 consecutive digits except the decimal divider one
+            if($valueExplodedCount > 2){
+
+                if(strlen(str_replace('-', '', $valueExploded[0])) > 3){
+
+                    throw new UnexpectedValueException(self::NON_NUMERIC_ERROR);
+                }
+
+                for ($i = 1; $i < $valueExplodedCount - 1; $i++) {
+
+                    if(strlen($valueExploded[$i]) !== 3){
+
+                        throw new UnexpectedValueException(self::NON_NUMERIC_ERROR);
+                    }
+                }
+            }
+
+            // Remove all dots except the one at the decimal divider position
+            $value = ($decimalDividerPosition < 0) ?
+                str_replace('.', '', $value) :
+                preg_replace('/\./', '', $value, substr_count($value, '.') - 1);
+        }
+
+        if(!is_numeric($value)){
+
+            throw new UnexpectedValueException(self::NON_NUMERIC_ERROR);
+        }
+
+        return strval($value);
+    }
+}

@@ -74,6 +74,8 @@ class NumericUtilsTest extends TestCase {
         // Test empty values
         $this->assertFalse(NumericUtils::isNumeric(null));
         $this->assertFalse(NumericUtils::isNumeric(''));
+        $this->assertFalse(NumericUtils::isNumeric('-'));
+        $this->assertFalse(NumericUtils::isNumeric(' '));
         $this->assertFalse(NumericUtils::isNumeric([]));
         $this->assertFalse(NumericUtils::isNumeric(new stdClass()));
         $this->assertTrue(NumericUtils::isNumeric(0));
@@ -113,6 +115,51 @@ class NumericUtilsTest extends TestCase {
         $this->assertTrue(NumericUtils::isNumeric(' 1 '));
         $this->assertTrue(NumericUtils::isNumeric('    1     '));
         $this->assertTrue(NumericUtils::isNumeric("1     \n"));
+        $this->assertTrue(NumericUtils::isNumeric('1.'));
+        $this->assertTrue(NumericUtils::isNumeric('1,'));
+        $this->assertTrue(NumericUtils::isNumeric('1,1'));
+        $this->assertTrue(NumericUtils::isNumeric('11.'));
+        $this->assertTrue(NumericUtils::isNumeric('111.'));
+        $this->assertTrue(NumericUtils::isNumeric('.111'));
+        $this->assertTrue(NumericUtils::isNumeric('12,345'));
+        $this->assertTrue(NumericUtils::isNumeric('6000,5'));
+        $this->assertTrue(NumericUtils::isNumeric('-6000,5'));
+        $this->assertTrue(NumericUtils::isNumeric('10000000.'));
+        $this->assertTrue(NumericUtils::isNumeric('6000000,5'));
+        $this->assertTrue(NumericUtils::isNumeric('6000000.5'));
+        $this->assertTrue(NumericUtils::isNumeric('-6000000.5'));
+        $this->assertTrue(NumericUtils::isNumeric('1.001,01'));
+        $this->assertTrue(NumericUtils::isNumeric('1,001.01'));
+        $this->assertTrue(NumericUtils::isNumeric('-1,001.01'));
+        $this->assertTrue(NumericUtils::isNumeric('1,001,000.01'));
+        $this->assertTrue(NumericUtils::isNumeric('1.001.000.01'));
+        $this->assertTrue(NumericUtils::isNumeric('1.001.000,01'));
+        $this->assertTrue(NumericUtils::isNumeric('-1.001.000,01'));
+        $this->assertTrue(NumericUtils::isNumeric('14.100.000.0'));
+        $this->assertTrue(NumericUtils::isNumeric('14.100.000.02345'));
+        $this->assertTrue(NumericUtils::isNumeric('14.100.000,02345'));
+        $this->assertTrue(NumericUtils::isNumeric('14,100.000,02345'));
+        $this->assertTrue(NumericUtils::isNumeric('14,100,000,02345'));
+        $this->assertTrue(NumericUtils::isNumeric('-14,100,000,02345'));
+        $this->assertTrue(NumericUtils::isNumeric('1236812738123877213'));
+        $this->assertTrue(NumericUtils::isNumeric('-1236812738123877213'));
+        $this->assertTrue(NumericUtils::isNumeric('- 1236812738123877213'));
+        $this->assertTrue(NumericUtils::isNumeric('1', '.'));
+        $this->assertTrue(NumericUtils::isNumeric('-1', '.'));
+        $this->assertTrue(NumericUtils::isNumeric('0', '.'));
+        $this->assertTrue(NumericUtils::isNumeric('1.1', '.'));
+        $this->assertTrue(NumericUtils::isNumeric('1.', '.'));
+        $this->assertTrue(NumericUtils::isNumeric('0.1', '.'));
+        $this->assertTrue(NumericUtils::isNumeric('10.000', '.'));
+        $this->assertTrue(NumericUtils::isNumeric('1265789', '.'));
+        $this->assertTrue(NumericUtils::isNumeric('1', ','));
+        $this->assertTrue(NumericUtils::isNumeric('-1', ','));
+        $this->assertTrue(NumericUtils::isNumeric('0', ','));
+        $this->assertTrue(NumericUtils::isNumeric('1,1', ','));
+        $this->assertTrue(NumericUtils::isNumeric('1,', ','));
+        $this->assertTrue(NumericUtils::isNumeric('0,1', ','));
+        $this->assertTrue(NumericUtils::isNumeric('10,000', ','));
+        $this->assertTrue(NumericUtils::isNumeric('1265789', ','));
 
         $objectThatMustNotBeAltered = ((object) ['value' => " 15  "]);
         $this->assertTrue(NumericUtils::isNumeric($objectThatMustNotBeAltered->value));
@@ -122,13 +169,53 @@ class NumericUtilsTest extends TestCase {
         $this->assertFalse(NumericUtils::isNumeric('abc'));
         $this->assertFalse(NumericUtils::isNumeric('col20'));
         $this->assertFalse(NumericUtils::isNumeric('1-'));
-        $this->assertFalse(NumericUtils::isNumeric('1,1'));
         $this->assertFalse(NumericUtils::isNumeric(' '));
         $this->assertFalse(NumericUtils::isNumeric('!.1'));
         $this->assertFalse(NumericUtils::isNumeric([1, 2, 3]));
         $this->assertFalse(NumericUtils::isNumeric(['hello']));
         $this->assertFalse(NumericUtils::isNumeric(new Exception()));
         $this->assertFalse(NumericUtils::isNumeric(((object) ['1' => 1])));
+        $this->assertFalse(NumericUtils::isNumeric('1.0.'));
+        $this->assertFalse(NumericUtils::isNumeric('1,0.'));
+        $this->assertFalse(NumericUtils::isNumeric('1.0,'));
+        $this->assertFalse(NumericUtils::isNumeric('1,0,'));
+        $this->assertFalse(NumericUtils::isNumeric(',.0'));
+        $this->assertFalse(NumericUtils::isNumeric('1..0'));
+        $this->assertFalse(NumericUtils::isNumeric('1...0'));
+        $this->assertFalse(NumericUtils::isNumeric('1....0'));
+        $this->assertFalse(NumericUtils::isNumeric('1,,0'));
+        $this->assertFalse(NumericUtils::isNumeric('1,,.,0'));
+        $this->assertFalse(NumericUtils::isNumeric('1.,0'));
+        $this->assertFalse(NumericUtils::isNumeric('-1.,0'));
+        $this->assertFalse(NumericUtils::isNumeric('1,.0'));
+        $this->assertFalse(NumericUtils::isNumeric('1000,0.0'));
+        $this->assertFalse(NumericUtils::isNumeric('1,000,0.0'));
+        $this->assertFalse(NumericUtils::isNumeric('10.00,0.0'));
+        $this->assertFalse(NumericUtils::isNumeric('.1000,0.0'));
+        $this->assertFalse(NumericUtils::isNumeric('.10.00,0.0'));
+        $this->assertFalse(NumericUtils::isNumeric('1234.10.00,0.0'));
+        $this->assertFalse(NumericUtils::isNumeric('1234.100.000.0'));
+        $this->assertFalse(NumericUtils::isNumeric('10.000.000.'));
+        $this->assertFalse(NumericUtils::isNumeric('-1000,0.0'));
+        $this->assertFalse(NumericUtils::isNumeric('-10.000.000.'));
+        $this->assertFalse(NumericUtils::isNumeric('12.34.56'));
+        $this->assertFalse(NumericUtils::isNumeric('$50'));
+        $this->assertFalse(NumericUtils::isNumeric('Infinity'));
+        $this->assertFalse(NumericUtils::isNumeric('NaN'));
+        $this->assertFalse(NumericUtils::isNumeric('1/2'));
+        $this->assertFalse(NumericUtils::isNumeric('a', '.'));
+        $this->assertFalse(NumericUtils::isNumeric('1/2', '.'));
+        $this->assertFalse(NumericUtils::isNumeric('1..', '.'));
+        $this->assertFalse(NumericUtils::isNumeric('1..1', '.'));
+        $this->assertFalse(NumericUtils::isNumeric('1,,1', '.'));
+        $this->assertFalse(NumericUtils::isNumeric('...', '.'));
+        $this->assertFalse(NumericUtils::isNumeric('a', ','));
+        $this->assertFalse(NumericUtils::isNumeric('1/2', ','));
+        $this->assertFalse(NumericUtils::isNumeric('1,,', ','));
+        $this->assertFalse(NumericUtils::isNumeric('1,,1', ','));
+        $this->assertFalse(NumericUtils::isNumeric('1..1', ','));
+        $this->assertFalse(NumericUtils::isNumeric('...', ','));
+        $this->assertFalse(NumericUtils::isNumeric(',,,', ','));
     }
 
 
@@ -294,12 +381,41 @@ class NumericUtilsTest extends TestCase {
         $this->assertSame(1, NumericUtils::getNumeric('  1 '));
         $this->assertSame(0.1, NumericUtils::getNumeric('  .1 '));
         $this->assertSame(-1, NumericUtils::getNumeric('  -1 '));
+        $this->assertSame(6.5, NumericUtils::getNumeric('6,5'));
+        $this->assertSame(6000.5, NumericUtils::getNumeric('6000,5'));
+        $this->assertSame(6000.5, NumericUtils::getNumeric('6000.5'));
+        $this->assertSame(6000.5, NumericUtils::getNumeric('6.000,5'));
+        $this->assertSame(6000.5, NumericUtils::getNumeric('6,000.5'));
+        $this->assertSame(1.4356, NumericUtils::getNumeric('1,4356'));
+        $this->assertSame(12.345, NumericUtils::getNumeric('12,345'));
+        $this->assertSame(12.345, NumericUtils::getNumeric('12.345'));
+        $this->assertSame(12345.987, NumericUtils::getNumeric('12.345,987'));
+        $this->assertSame(12345.987, NumericUtils::getNumeric('12.345.987'));
+        $this->assertSame(12345.987, NumericUtils::getNumeric('12,345.987'));
+        $this->assertSame(12345.987, NumericUtils::getNumeric('12345.987'));
+        $this->assertSame(12345.987, NumericUtils::getNumeric('12345.987', '.'));
+        $this->assertSame(12345987, NumericUtils::getNumeric('12345.987', ','));
+        $this->assertSame(12345.987, NumericUtils::getNumeric('12,345.987', '.'));
+        $this->assertSame(12345987, NumericUtils::getNumeric('12.345.987', ','));
+        $this->assertSame(12345.987, NumericUtils::getNumeric('12.345,987', ','));
+        $this->assertSame(1, NumericUtils::getNumeric('1', ','));
+        $this->assertSame(-1, NumericUtils::getNumeric('-1', ','));
+        $this->assertSame(0, NumericUtils::getNumeric('0', ','));
+        $this->assertSame(1.1, NumericUtils::getNumeric('1,1', ','));
+        $this->assertSame(0.1, NumericUtils::getNumeric('0,1', ','));
+        $this->assertSame(10.000, NumericUtils::getNumeric('10,000', ','));
+        $this->assertSame(10000, NumericUtils::getNumeric('10,000', '.'));
 
         // Test wrong values
         AssertUtils::throwsException(function() { NumericUtils::getNumeric('abc'); }, '/value is not numeric/');
         AssertUtils::throwsException(function() { NumericUtils::getNumeric('1-'); }, '/value is not numeric/');
-        AssertUtils::throwsException(function() { NumericUtils::getNumeric('1,1'); }, '/value is not numeric/');
+        AssertUtils::throwsException(function() { NumericUtils::getNumeric('1-1'); }, '/value is not numeric/');
         AssertUtils::throwsException(function() { NumericUtils::getNumeric(['hello']); }, '/value is not numeric/');
+        AssertUtils::throwsException(function() { NumericUtils::getNumeric('12.345,987', '.'); }, '/value is not numeric/');
+        AssertUtils::throwsException(function() { NumericUtils::getNumeric('12.345.987', '.'); }, '/value is not numeric/');
+        AssertUtils::throwsException(function() { NumericUtils::getNumeric('12,345,987', ','); }, '/value is not numeric/');
+        AssertUtils::throwsException(function() { NumericUtils::getNumeric('12,345.987', ','); }, '/value is not numeric/');
+        AssertUtils::throwsException(function() { NumericUtils::getNumeric('12,345.987', 'a'); }, '/Invalid decimal divider/');
     }
 
 
@@ -372,5 +488,3 @@ class NumericUtilsTest extends TestCase {
         }
     }
 }
-
-?>
