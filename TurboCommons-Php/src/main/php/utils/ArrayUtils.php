@@ -45,7 +45,8 @@ class ArrayUtils {
     public static function isEqualTo(array $array1, array $array2){
 
         // Compare lengths can save a lot of time
-        if(count($array1) != count($array2)){
+        if(count($array1) != count($array2) ||
+           count(array_keys($array1)) !== count(array_keys($array2))){
 
             return false;
         }
@@ -70,7 +71,7 @@ class ArrayUtils {
                         return false;
                     }
 
-                }else if($value !== $array2[$key]){
+                }elseif(!array_key_exists($key, $array2) || $value !== $array2[$key]){
 
                     return false;
                 }

@@ -80,6 +80,10 @@ QUnit.test("isEqualTo", function(assert) {
     assert.ok(!ArrayUtils.isEqualTo([1, 2, [3, 4]], [1, 2, [3, 2]]));
     assert.ok(!ArrayUtils.isEqualTo([1, 2, [3, [4]]], [1, 2, [3, ["4"]]]));
     assert.ok(!ArrayUtils.isEqualTo(["hello world"], ["hello worl1d"]));
+    // Associative arrays can't be created on js, so following tests are useless:
+    // !ArrayUtils.isEqualTo(['0' => 0, '1' => 1], ['a' => 0, 'b' => 1]));
+    // !ArrayUtils.isEqualTo(['0' => null, '1' => null], ['a' => 0, 'b' => 1]));
+    // !ArrayUtils.isEqualTo(['a' => 0, 'b' => 1], ['a' => 0, 'b' => 2]));
 
     // Test identic objects
     assert.ok(ArrayUtils.isEqualTo([{

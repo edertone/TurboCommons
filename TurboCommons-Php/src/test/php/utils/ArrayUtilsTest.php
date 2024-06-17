@@ -131,6 +131,10 @@ class ArrayUtilsTest extends TestCase {
         $this->assertTrue(!ArrayUtils::isEqualTo([1, 2, [3, 4]], [1, 2, [3, 2]]));
         $this->assertTrue(!ArrayUtils::isEqualTo([1, 2, [3, [4]]], [1, 2, [3, ['4']]]));
         $this->assertTrue(!ArrayUtils::isEqualTo(['hello world'], ['hello worl1d']));
+        $this->assertTrue(!ArrayUtils::isEqualTo([0, 1], ['a' => 0, 'b' => 1]));
+        $this->assertTrue(!ArrayUtils::isEqualTo(['0' => 0, '1' => 1], ['a' => 0, 'b' => 1]));
+        $this->assertTrue(!ArrayUtils::isEqualTo(['0' => null, '1' => null], ['a' => 0, 'b' => 1]));
+        $this->assertTrue(!ArrayUtils::isEqualTo(['a' => 0, 'b' => 1], ['a' => 0, 'b' => 2]));
 
         // Test identic objects
         $this->assertTrue(ArrayUtils::isEqualTo([(object) [
