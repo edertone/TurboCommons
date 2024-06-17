@@ -476,21 +476,10 @@ QUnit.test("trim", function(assert){
 QUnit.test("trimLeft", function(assert){
 
     // Test empty values
-    assert.throws(function() {
-        StringUtils.trimLeft(undefined);
-    }, /value is not a string/);
-    
-    assert.throws(function() {
-        StringUtils.trimLeft(null);
-    }, /value is not a string/);
-    
-    assert.throws(function() {
-        StringUtils.trimLeft(0);
-    }, /value is not a string/);
-    
-    assert.throws(function() {
-        StringUtils.trimLeft([]);
-    }, /value is not a string/);
+    assert.throws(function() { StringUtils.trimLeft(undefined); }, /value is not a string/);
+    assert.throws(function() { StringUtils.trimLeft(null); }, /value is not a string/);
+    assert.throws(function() { StringUtils.trimLeft(0); }, /value is not a string/);
+    assert.throws(function() { StringUtils.trimLeft([]); }, /value is not a string/);
     
     assert.strictEqual(StringUtils.trimLeft(""), "");
 
@@ -519,17 +508,9 @@ QUnit.test("trimLeft", function(assert){
     // Not necessary
 
     // Test exceptions
-    assert.throws(function() {
-        StringUtils.trimLeft([1, 2, 3, 4]);
-    }, /value is not a string/);
-    
-    assert.throws(function() {
-        StringUtils.trimLeft(new Error());
-    }, /value is not a string/);
-    
-    assert.throws(function() {
-        StringUtils.trimLeft(123466);
-    }, /value is not a string/);
+    assert.throws(function() { StringUtils.trimLeft([1, 2, 3, 4]); }, /value is not a string/);
+    assert.throws(function() { StringUtils.trimLeft(new Error()); }, /value is not a string/);
+    assert.throws(function() { StringUtils.trimLeft(123466); }, /value is not a string/);
 });
 
 

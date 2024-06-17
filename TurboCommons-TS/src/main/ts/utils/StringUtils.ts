@@ -411,7 +411,6 @@ export class StringUtils {
      * Remove whitespaces (or any custom set of characters) from both sides of a string
      * 
      * @param string A string to process
-     * 
      * @param characters A set of characters that will be trimmed from both string sides. By default,
      * empty space and new line characters are defined : " \n\r"
      * 
@@ -451,7 +450,6 @@ export class StringUtils {
      * Remove whitespaces (or any custom set of characters) from a string right side
      * 
      * @param string A string to process
-     * 
      * @param characters A set of characters that will be trimmed from string right side. By default,
      * empty space and new line characters are defined : " \n\r"
      *

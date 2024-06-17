@@ -629,8 +629,41 @@ class StringUtilsTest extends TestCase {
      */
     public function testTrim(){
 
-        // TODO - translate from TS
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        // Test empty values
+        AssertUtils::throwsException(function() { StringUtils::trim(null); }, '/value is not a string/');
+        AssertUtils::throwsException(function() { StringUtils::trim(0); }, '/value is not a string/');
+        AssertUtils::throwsException(function() { StringUtils::trim([]); }, '/value is not a string/');
+
+        $this->assertSame(StringUtils::trim(""), "");
+
+        // Test ok values
+        $this->assertSame(StringUtils::trim("   "), "");
+        $this->assertSame(StringUtils::trim("\n\n\r\r"), "");
+        $this->assertSame(StringUtils::trim("  \n\n\r\r"), "");
+        $this->assertSame(StringUtils::trim("\n\n\r\r   "), "");
+        $this->assertSame(StringUtils::trim("   \n\n\r\r   "), "");
+        $this->assertSame(StringUtils::trim("hello"), "hello");
+        $this->assertSame(StringUtils::trim("hello\n"), "hello");
+        $this->assertSame(StringUtils::trim("hello\r\n"), "hello");
+        $this->assertSame(StringUtils::trim("\nhello\r\n"), "hello");
+        $this->assertSame(StringUtils::trim("   hello"), "hello");
+        $this->assertSame(StringUtils::trim("hello   "), "hello");
+        $this->assertSame(StringUtils::trim("  hello  "), "hello");
+
+        $this->assertSame(StringUtils::trim("helloxax", "xa"), "hello");
+        $this->assertSame(StringUtils::trim("XXXhello", "xlX"), "hello");
+        $this->assertSame(StringUtils::trim("XXXhelloxxx", "xX"), "hello");
+        $this->assertSame(StringUtils::trim("1|2", "123"), "|");
+        $this->assertSame(StringUtils::trim("1|2", ""), "1|2");
+        $this->assertSame(StringUtils::trim("1|2\n", "1"), "|2\n");
+
+        // Test wrong values
+        // Not necessary
+
+        // Test exceptions
+        AssertUtils::throwsException(function() { StringUtils::trim([1, 2, 3, 4]); }, '/value is not a string/');
+        AssertUtils::throwsException(function() { StringUtils::trim(new Exception()); }, '/value is not a string/');
+        AssertUtils::throwsException(function() { StringUtils::trim(123466); }, '/value is not a string/');
     }
 
 
@@ -642,26 +675,9 @@ class StringUtilsTest extends TestCase {
     public function testTrimLeft(){
 
         // Test empty values
-        try {
-            StringUtils::trimLeft(null);
-            $this->exceptionMessage = 'null did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            StringUtils::trimLeft(0);
-            $this->exceptionMessage = '0 did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            StringUtils::trimLeft([]);
-            $this->exceptionMessage = '[] did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
+        AssertUtils::throwsException(function() { StringUtils::trimLeft(null); }, '/value is not a string/');
+        AssertUtils::throwsException(function() { StringUtils::trimLeft(0); }, '/value is not a string/');
+        AssertUtils::throwsException(function() { StringUtils::trimLeft([]); }, '/value is not a string/');
 
         $this->assertSame(StringUtils::trimLeft(""), "");
 
@@ -690,26 +706,9 @@ class StringUtilsTest extends TestCase {
         // Not necessary
 
         // Test exceptions
-        try {
-            StringUtils::trimLeft([1, 2, 3, 4]);
-            $this->exceptionMessage = '[1, 2, 3, 4] did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            StringUtils::trimLeft(new Exception());
-            $this->exceptionMessage = 'new Exception() did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            StringUtils::trimLeft(123466);
-            $this->exceptionMessage = '123466 did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
+        AssertUtils::throwsException(function() { StringUtils::trimLeft([1, 2, 3, 4]); }, '/value is not a string/');
+        AssertUtils::throwsException(function() { StringUtils::trimLeft(new Exception()); }, '/value is not a string/');
+        AssertUtils::throwsException(function() { StringUtils::trimLeft(123466); }, '/value is not a string/');
     }
 
 
@@ -720,8 +719,41 @@ class StringUtilsTest extends TestCase {
      */
     public function testTrimRight(){
 
-        // TODO - translate from TS
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        // Test empty values
+        AssertUtils::throwsException(function() { StringUtils::trim(null); }, '/value is not a string/');
+        AssertUtils::throwsException(function() { StringUtils::trim(0); }, '/value is not a string/');
+        AssertUtils::throwsException(function() { StringUtils::trim([]); }, '/value is not a string/');
+
+        $this->assertSame(StringUtils::trimRight(""), "");
+
+        // Test ok values
+        $this->assertSame(StringUtils::trimRight("   "), "");
+        $this->assertSame(StringUtils::trimRight("\n\n\r\r"), "");
+        $this->assertSame(StringUtils::trimRight("  \n\n\r\r"), "");
+        $this->assertSame(StringUtils::trimRight("\n\n\r\r   "), "");
+        $this->assertSame(StringUtils::trimRight("   \n\n\r\r   "), "");
+        $this->assertSame(StringUtils::trimRight("hello"), "hello");
+        $this->assertSame(StringUtils::trimRight("hello\n"), "hello");
+        $this->assertSame(StringUtils::trimRight("hello\r\n"), "hello");
+        $this->assertSame(StringUtils::trimRight("\nhello\r\n"), "\nhello");
+        $this->assertSame(StringUtils::trimRight("   hello"), "   hello");
+        $this->assertSame(StringUtils::trimRight("hello   "), "hello");
+        $this->assertSame(StringUtils::trimRight("  hello  "), "  hello");
+
+        $this->assertSame(StringUtils::trimRight("helloxax", "xa"), "hello");
+        $this->assertSame(StringUtils::trimRight("XXXhello", "xlX"), "XXXhello");
+        $this->assertSame(StringUtils::trimRight("XXXhelloxxx", "xX"), "XXXhello");
+        $this->assertSame(StringUtils::trimRight("1|2", "123"), "1|");
+        $this->assertSame(StringUtils::trimRight("1|2", ""), "1|2");
+        $this->assertSame(StringUtils::trimRight("1|2\n", "1"), "1|2\n");
+
+        // Test wrong values
+        // Not necessary
+
+        // Test exceptions
+        AssertUtils::throwsException(function() { StringUtils::trim([1, 2, 3, 4]); }, '/value is not a string/');
+        AssertUtils::throwsException(function() { StringUtils::trim(new Exception()); }, '/value is not a string/');
+        AssertUtils::throwsException(function() { StringUtils::trim(123466); }, '/value is not a string/');
     }
 
 

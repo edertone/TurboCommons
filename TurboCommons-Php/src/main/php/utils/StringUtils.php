@@ -402,11 +402,19 @@ class StringUtils {
 
 
     /**
-     * TODO translate from TS
+     * Remove whitespaces (or any custom set of characters) from both sides of a string
+     *
+     * @param string $string A string to process
+     * @param string $characters A set of characters that will be trimmed from both string sides. By default,
+     * empty space and new line characters are defined : " \n\r"
+     *
+     * @example: StringUtils::trim("abcXXabc", "abc") outputs "XX"
+     *
+     * @return string The trimmed string
      */
-    public static function trim(){
+    public static function trim($string, $characters = " \n\r"){
 
-        // TODO translate from TS
+        return StringUtils::trimLeft(StringUtils::trimRight($string, $characters), $characters);
     }
 
 
@@ -433,11 +441,24 @@ class StringUtils {
 
 
     /**
-     * TODO translate from TS
+     * Remove whitespaces (or any custom set of characters) from a string right side
+     *
+     * @param string $string A string to process
+     * @param string $characters A set of characters that will be trimmed from string right side. By default,
+     * empty space and new line characters are defined : " \n\r"
+     *
+     * @example: StringUtils.trimRight("abcXXabc", "abc") outputs "abcXX"
+     *
+     * @return string The trimmed string
      */
-    public static function trimRight(){
+    public static function trimRight($string, $characters = " \n\r"){
 
-        // TODO translate from TS
+        if(!is_string($string)){
+
+            throw new InvalidArgumentException('value is not a string');
+        }
+
+        return rtrim($string, $characters);
     }
 
 
