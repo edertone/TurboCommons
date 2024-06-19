@@ -36,7 +36,7 @@ class ObjectUtils {
 
 
     /**
-     * Get the list of literals for a given object. Note that only 1rst depth keys are providen
+     * Get the list of literals for a given object. Notice that only 1rst depth keys are providen
      *
      * @param object $object A valid object
      *
@@ -62,7 +62,7 @@ class ObjectUtils {
 
     /**
      * Check if two provided objects are identical.
-     * Note that properties order does not alter the comparison. So if two objects
+     * Notice that properties order does not alter the comparison. So if two objects
      * have the same properties with exactly the same values, but they appear in a different
      * order on both objects, this method will consider them as equal.
      *
@@ -125,11 +125,61 @@ class ObjectUtils {
     }
 
 
-    // TODO - translate from TS
+    /**
+     * Perform a deep copy of the given object.
+     *
+     * @param object $object Any language instance like numbers, strings, arrays, objects, etc.. that we want to duplicate.
+     *
+     * @returns object An exact independent copy of the received object, without any shared reference.
+     */
     public static function clone($object){
 
-        // TODO - translate from TS
+        return ObjectUtils::apply($object, function($o) {
+
+            return is_object($o) ? clone $o : $o;
+        });
+    }
+
+
+    /**
+     * Apply a given function to each value of the provided object (Recursively through all the object elements). It will also scan
+     * inside arrays and sub objects.
+     *
+     * NOTICE: Original object is not modified
+     *
+     * @param mixed $object Any language instance like numbers, strings, arrays, objects, etc.. that we want to process.
+     * @param callable $callableFunction A function that takes a single argument and returns a value. It must always return a value, cause
+     *        it will be assigned to the original object
+     *
+     * @return mixed An exact independent copy of the received object, without any shared reference, where each value has been processed
+     *         by the provided callable function.
+     */
+    public static function apply($object, callable $callableFunction){
+
+        if(is_array($object)){
+
+            $result = [];
+
+            foreach ($object as $key => $value) {
+
+                $result[$key] = ObjectUtils::apply($object[$key], $callableFunction);
+            }
+
+            return $result;
+        }
+
+        if(is_object($object)){
+
+            $result = clone $object;
+
+            foreach ($object as $key => $value) {
+
+                $result->$key = ObjectUtils::apply($value, $callableFunction);
+            }
+
+            return $result;
+        }
+
+        return $callableFunction($object);
     }
 }
-
-?>

@@ -58,6 +58,7 @@ QUnit.test("isObject", function(assert) {
     assert.ok(!ObjectUtils.isObject('hello'));
     assert.ok(!ObjectUtils.isObject([123]));
     assert.ok(!ObjectUtils.isObject([1, 'aaa']));
+    assert.ok(!ObjectUtils.isObject(/someregex.*/));
 });
 
 
@@ -242,7 +243,7 @@ QUnit.test("isStringFound", function(assert) {
     // Test empty values
     let emptyValues = [null, undefined, 0, [], '', '    ', "\n\n\n\n"];
     
-    for(var i = 0; i < emptyValues.length; i++){
+    for(let i = 0; i < emptyValues.length; i++){
        
         assert.throws(function() {
             ObjectUtils.isStringFound(emptyValues[i], '');
@@ -324,7 +325,7 @@ QUnit.test("merge", function(assert) {
     // Test empty values
     let emptyValues = [null, undefined, 0, [], '', '    ', "\n\n\n\n"];
     
-    for(var i = 0; i < emptyValues.length; i++){
+    for(let i = 0; i < emptyValues.length; i++){
        
         assert.throws(function() {
 
@@ -340,38 +341,38 @@ QUnit.test("merge", function(assert) {
     assert.ok(ObjectUtils.isEqualTo(ObjectUtils.merge({}, {}), {}));
     
     // Test ok values
-    var destination = {a:1, b:2};
-    var source = {a:2};
+    let destination = {a:1, b:2};
+    let source = {a:2};
     assert.ok(ObjectUtils.isEqualTo(ObjectUtils.merge(destination, source), {a:2, b:2}));
     assert.ok(ObjectUtils.isEqualTo(destination, {a:2, b:2}));
     
-    var destination = {a:1, b:2, c:{c1: 1, c2: 2}};
-    var source = {a:2, c: 1};
+    destination = {a:1, b:2, c:{c1: 1, c2: 2}};
+    source = {a:2, c: 1};
     assert.ok(ObjectUtils.isEqualTo(ObjectUtils.merge(destination, source), {a:2, b:2, c:1}));
     assert.ok(ObjectUtils.isEqualTo(destination, {a:2, b:2, c:1}));
     
-    var destination = {a:1, b:2, c:{c1: 1, c2: 2}};
-    var source = {a:2, c:{c1: 1, c2: 3}};
+    destination = {a:1, b:2, c:{c1: 1, c2: 2}};
+    source = {a:2, c:{c1: 1, c2: 3}};
     assert.ok(ObjectUtils.isEqualTo(ObjectUtils.merge(destination, source), {a:2, b:2, c:{c1: 1, c2: 3}}));
     assert.ok(ObjectUtils.isEqualTo(destination, {a:2, b:2, c:{c1: 1, c2: 3}}));
     
-    var destination = {a:1, b:{c:2, d:3, e:{f:4, g:6}}};
-    var source = {b:{e:{f:5}}, h:9};
+    destination = {a:1, b:{c:2, d:3, e:{f:4, g:6}}};
+    source = {b:{e:{f:5}}, h:9};
     assert.ok(ObjectUtils.isEqualTo(ObjectUtils.merge(destination, source), {a:1, b:{c:2, d:3, e:{f:5, g:6}}, h:9}));
     assert.ok(ObjectUtils.isEqualTo(destination, {a:1, b:{c:2, d:3, e:{f:5, g:6}}, h:9}));
     
-    var destination = {a:1, b:"hello", c:[1, 2, 3]};
-    var source = {a:2, b:"goodbye", c:[4, 5, 6], d:8};
+    destination = {a:1, b:"hello", c:[1, 2, 3]};
+    source = {a:2, b:"goodbye", c:[4, 5, 6], d:8};
     assert.ok(ObjectUtils.isEqualTo(ObjectUtils.merge(destination, source), {a:2, b:"goodbye", c:[4, 5, 6], d:8}));
     assert.ok(ObjectUtils.isEqualTo(destination, {a:2, b:"goodbye", c:[4, 5, 6], d:8}));
     
-    var destination = {a:1, c:"hello", e:[1, 2, 3]};
-    var source = {b:2, d:["a", "b"]};
+    destination = {a:1, c:"hello", e:[1, 2, 3]};
+    source = {b:2, d:["a", "b"]};
     assert.ok(ObjectUtils.isEqualTo(ObjectUtils.merge(destination, source), {a:1, b:2, c:"hello", d:["a", "b"], e:[1, 2, 3]}));
     assert.ok(ObjectUtils.isEqualTo(destination, {a:1, b:2, c:"hello", d:["a", "b"], e:[1, 2, 3]}));
     
-    var destination = {a:1, b:{c:"hello", d:{e:[1,2]}}};
-    var source = {b:{a:"go", d:1}, d:{a:1}};
+    destination = {a:1, b:{c:"hello", d:{e:[1,2]}}};
+    source = {b:{a:"go", d:1}, d:{a:1}};
     assert.ok(ObjectUtils.isEqualTo(ObjectUtils.merge(destination, source), {a:1, b:{a:"go", c:"hello", d:1}, d:{a:1}}));
     assert.ok(ObjectUtils.isEqualTo(destination, {a:1, b:{a:"go", c:"hello", d:1}, d:{a:1}}));
         
@@ -416,8 +417,8 @@ QUnit.test("clone", function(assert) {
     assert.strictEqual(ObjectUtils.clone('    '), '    ');
 
     // Test ok values. Verify modified clones do not affect original one
-    var value = -145;    
-    var clonedValue = ObjectUtils.clone(value);    
+    let value = -145;    
+    let clonedValue = ObjectUtils.clone(value);    
     assert.strictEqual(clonedValue, value);
     clonedValue = clonedValue + 100;
     assert.strictEqual(clonedValue, -45);
@@ -426,7 +427,6 @@ QUnit.test("clone", function(assert) {
     value = 'hello';    
     clonedValue = ObjectUtils.clone(value);    
     assert.strictEqual(clonedValue, value);
-    clonedValue = clonedValue + 'test';
     assert.strictEqual(value, 'hello');
     
     value = [1,2,3,4,5];    
@@ -453,7 +453,7 @@ QUnit.test("clone", function(assert) {
     assert.ok(ObjectUtils.isEqualTo(value, {a:1, b:2, c:[3,4,5,{d:6,e:{f:7}}]}));
     
     // Test an object containing references to other objects
-    var reference = {ref:1};
+    let reference = {ref:1};
     value = {a:1, b:reference};
     clonedValue = ObjectUtils.clone(value);
     assert.ok(ObjectUtils.isEqualTo(clonedValue, value));
@@ -482,9 +482,69 @@ QUnit.test("clone", function(assert) {
     assert.strictEqual(clonedValue.a, 1);
     assert.strictEqual(clonedValue.b.toString(), /someregex.*/.toString());
     
+    // Test an object containing an associative array
+    value = {"a": 1, "b": {"key1": 1, "key2": "value"}};
+    clonedValue = ObjectUtils.clone(value);
+    assert.ok(ObjectUtils.isEqualTo(clonedValue, value));
+
     // Test wrong values
     // not necessary
 
     // Test exceptions
     // no exceptions are thrown by this method
+});
+
+
+/**
+ * apply
+ */
+QUnit.test("apply", function(assert) {
+
+    // Test empty values
+    assert.throws(function() { ObjectUtils.apply(null, null); }, /callableFunction is not a function/);
+    assert.throws(function() { ObjectUtils.apply(0, 0); }, /callableFunction is not a function/);
+    assert.throws(function() { ObjectUtils.apply('', ''); }, /callableFunction is not a function/);
+    assert.throws(function() { ObjectUtils.apply('    ', '     '); }, /callableFunction is not a function/);
+    assert.throws(function() { ObjectUtils.apply(undefined, undefined); }, /callableFunction is not a function/);
+    assert.strictEqual(ObjectUtils.apply(null, function (v) { return v;}), null);
+    assert.strictEqual(ObjectUtils.apply(0, function (v) { return v;}), 0);
+    assert.strictEqual(ObjectUtils.apply("", function (v) { return v;}), "");
+    assert.ok(ArrayUtils.isEqualTo(ObjectUtils.apply([], function (v) { return v;}), []));
+
+    // Test ok values
+    let value = 145;
+    assert.strictEqual(value, ObjectUtils.apply(value, function(v) { return v; }));
+
+    value = 145;
+    assert.strictEqual(146, ObjectUtils.apply(value, function(v) { return v + 1; }));
+
+    value = "abcde";
+    assert.strictEqual(value, ObjectUtils.apply(value, function(v) { return v; }));
+
+    value = "abcde";
+    assert.strictEqual('abcdef', ObjectUtils.apply(value, function(v) { return v + 'f'; }));
+
+    value = [1, 2, 3, 4];
+    assert.ok(ArrayUtils.isEqualTo(value, ObjectUtils.apply(value, function(v) { return v; })));
+
+    value = [1, 2, 3, 4];
+    assert.ok(ArrayUtils.isEqualTo([2, 3, 4, 5], ObjectUtils.apply(value, function(v) { return v + 1; })));
+
+    value = [1, [1, 2, [4, 5]], 4];
+    assert.ok(ArrayUtils.isEqualTo([1, [1, 2, [4, 5]], 4], ObjectUtils.apply(value, function(v) { return v; })));
+
+    value = [1, [1, 2, [4, 5]], 4];
+    assert.ok(ArrayUtils.isEqualTo([2, [2, 3, [5, 6]], 5], ObjectUtils.apply(value, function(v) { return v + 1; })));
+
+    value = [1, [1, "a", [4, "b"]], 4];
+    let applied = ObjectUtils.apply(value, function(v) { return StringUtils.isString(v) ? v + 'c' : v+1; });
+    assert.ok(ArrayUtils.isEqualTo([2, [2, "ac", [5, "bc"]], 5], applied));
+
+    value = {"a": 1, "b": [1,2,"a"]};
+    applied = ObjectUtils.apply(value, function(v) { return StringUtils.isString(v) ? v + 'c' : v; });
+    assert.ok(ObjectUtils.isEqualTo(applied, {"a": 1, "b": [1,2,"ac"]}));
+
+    // Test wrong values
+    // Test exceptions
+    // not necessary    
 });

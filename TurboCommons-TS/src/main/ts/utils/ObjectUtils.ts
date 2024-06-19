@@ -30,12 +30,12 @@ export class ObjectUtils {
      */
     public static isObject(value:any):boolean{
     
-        return !(ArrayUtils.isArray(value) || value === null || typeof value !== 'object');
+        return !(ArrayUtils.isArray(value) || value === null || value instanceof RegExp || typeof value !== 'object');
     }
     
 
     /**
-     * Get the list of literals for a given object. Note that only 1rst depth keys are providen
+     * Get the list of literals for a given object. Notice that only 1rst depth keys are providen
      * 
      * @param object A valid object
      *
@@ -54,7 +54,7 @@ export class ObjectUtils {
 
     /**
      * Check if two provided objects are identical.
-     * Note that properties order does not alter the comparison. So if two objects 
+     * Notice that properties order does not alter the comparison. So if two objects 
      * have the same properties with exactly the same values, but they appear in a different
      * order on both objects, this method will consider them as equal.
      * 
@@ -65,7 +65,7 @@ export class ObjectUtils {
      */
     public static isEqualTo(object1:any, object2:any):boolean{
 
-         var validationManager = new ValidationManager();
+         let validationManager = new ValidationManager();
 
         // Both provided values must be objects or an exception will be launched
         if(!ObjectUtils.isObject(object1) || !ObjectUtils.isObject(object2)){
@@ -73,8 +73,8 @@ export class ObjectUtils {
             throw new Error("parameters must be objects");
         }
 
-        var keys1:string[] = ObjectUtils.getKeys(object1).sort();
-        var keys2:string[] = ObjectUtils.getKeys(object2).sort();
+        let keys1:string[] = ObjectUtils.getKeys(object1).sort();
+        let keys2:string[] = ObjectUtils.getKeys(object2).sort();
 
         // Compare keys can save a lot of time 
         if(!ArrayUtils.isEqualTo(keys1, keys2)){
@@ -83,7 +83,7 @@ export class ObjectUtils {
         }
 
         // Loop all the keys and verify values are identical
-        for(var i:number = 0; i < keys1.length; i++){
+        for(let i:number = 0; i < keys1.length; i++){
 
             if(!validationManager.isEqualTo(object1[keys1[i]], object2[keys2[i]])){
 
@@ -185,30 +185,59 @@ export class ObjectUtils {
     
     /**
      * Perform a deep copy of the given object.
-     * 
-     * @see https://stackoverflow.com/questions/4459928/how-to-deep-clone-in-javascript
-     * 
+     *
      * @param object Any language instance like numbers, strings, arrays, objects, etc.. that we want to duplicate.
-     * 
+     *
      * @returns An exact independent copy of the received object, without any shared reference.
      */
     public static clone(object:any) {
         
-        if(object == null || object instanceof RegExp || typeof(object) != 'object') {
-        
-            return object;
-        }
+        return ObjectUtils.apply(object, (o:any) => {
 
-        let result = new object.constructor();
+            return ObjectUtils.isObject(o) ? new object.constructor() : o;
+        });
+    }
+    
+    
+    /**
+     * Apply a given function to each value of the provided object (Recursively through all the object elements). It will also scan
+     * inside arrays and sub objects.
+     *
+     * NOTICE: Original object is not modified
+     *
+     * @param object Any language instance like numbers, strings, arrays, objects, etc.. that we want to process.
+     * @param callableFunction A function that takes a single argument and returns a value. It must always return a value, cause
+     *        it will be assigned to the original object
+     *
+     * @returns An exact independent copy of the received object, without any shared reference, where each value has been processed
+     *         by the provided callable function.
+     */
+    public static apply(object:any, callableFunction:(v:any) => any){
 
-        for(var key in object) {
-            
-            if (object.hasOwnProperty(key)) {
-              
-                result[key] = ObjectUtils.clone(object[key]);
+        if(ArrayUtils.isArray(object)){
+
+            let result:any[] = [];
+
+            for(const element of object){
+
+                result.push(ObjectUtils.apply(element, callableFunction));
             }
+
+            return result;
         }
 
-        return result;
-      }        
+        if(ObjectUtils.isObject(object)){
+
+            let result = new object.constructor();
+
+            for(let key in object) {
+
+                result[key] = ObjectUtils.apply(object[key], callableFunction);
+            }
+
+            return result;
+        }
+
+        return callableFunction(object);
+    }        
 }

@@ -14,6 +14,7 @@ namespace org\turbocommons\src\test\php\utils;
 use PHPUnit\Framework\TestCase;
 use org\turbocommons\src\main\php\utils\ArrayUtils;
 use org\turbocommons\src\main\php\utils\ObjectUtils;
+use org\turbotesting\src\main\php\utils\AssertUtils;
 use stdClass;
 use Exception;
 use Throwable;
@@ -60,6 +61,7 @@ class ObjectUtilsTest extends TestCase {
         $this->assertTrue(!ObjectUtils::isObject('hello'));
         $this->assertTrue(!ObjectUtils::isObject([123]));
         $this->assertTrue(!ObjectUtils::isObject([1, 'aaa']));
+        $this->assertTrue(!ObjectUtils::isObject('/someregex.*/'));
     }
 
 
@@ -307,17 +309,147 @@ class ObjectUtilsTest extends TestCase {
     public function testClone(){
 
         // Test empty values
-        // TODO - translate from ts
+        $this->assertSame(null, ObjectUtils::clone(null));
+        $this->assertSame(null, ObjectUtils::clone(null));
+        $this->assertSame(0, ObjectUtils::clone(0));
+        $this->assertSame('', ObjectUtils::clone(''));
+        $this->assertTrue(ArrayUtils::isEqualTo(ObjectUtils::clone([]), []));
+        $this->assertTrue(ObjectUtils::isEqualTo(ObjectUtils::clone(new stdclass()), new stdclass()));
+        $this->assertSame('    ', ObjectUtils::clone('    '));
 
-        // Test ok values
-        // TODO - translate from ts
+        // Test ok values. Verify modified clones do not affect original one
+        $value = -145;
+        $clonedValue = ObjectUtils::clone($value);
+        $this->assertSame($clonedValue, $value);
+        $clonedValue = $clonedValue + 100;
+        $this->assertSame($clonedValue, -45);
+        $this->assertSame($value, -145);
+
+        $value = 'hello';
+        $clonedValue = ObjectUtils::clone($value);
+        $this->assertSame($clonedValue, $value);
+        $this->assertSame('hello', $value);
+
+        $value = [1,2,3,4,5];
+        $clonedValue = ObjectUtils::clone($value);
+        $this->assertTrue(ArrayUtils::isEqualTo($clonedValue, $value));
+        $clonedValue[] = 6;
+        $this->assertTrue(ArrayUtils::isEqualTo($value, [1,2,3,4,5]));
+
+        $value = [1,2,3,(object) ["a" => 1, "b" => 2, "c" => (object) ["d" => 1]],5];
+        $clonedValue = ObjectUtils::clone($value);
+        $this->assertTrue(ArrayUtils::isEqualTo($clonedValue, $value));
+        $clonedValue[3]->a = 5;
+        $clonedValue[3]->c->d = 6;
+        $this->assertTrue(ArrayUtils::isEqualTo($clonedValue, [1,2,3,(object) ["a" => 5, "b" => 2, "c" => (object) ["d" => 6]],5]));
+        $this->assertTrue(ArrayUtils::isEqualTo($value, [1,2,3,(object) ["a" => 1, "b" => 2, "c" => (object) ["d" => 1]],5]));
+
+        $value = (object) ["a" => 1, "b" => 2, "c" => [3,4,5,(object) ["d" => 6,"e" => (object) ["f" => 7]]]];
+        $clonedValue = ObjectUtils::clone($value);
+        $this->assertTrue(ObjectUtils::isEqualTo($clonedValue, $value));
+        $clonedValue->a = 5;
+        $clonedValue->c[0] = 9;
+        $clonedValue->c[3]->e = null;
+        $this->assertTrue(ObjectUtils::isEqualTo($clonedValue, (object) ["a" => 5, "b" => 2, "c" => [9,4,5,(object) ["d" => 6,"e" => null]]]));
+        $this->assertTrue(ObjectUtils::isEqualTo($value, (object) ["a" => 1, "b" => 2, "c" => [3,4,5,(object) ["d" => 6,"e" => (object) ["f" => 7]]]]));
+
+        // Test an object containing references to other objects
+        $reference = (object) ["ref" => 1];
+        $value = (object) ["a" => 1, "b" => $reference];
+        $clonedValue = ObjectUtils::clone($value);
+        $this->assertTrue(ObjectUtils::isEqualTo($clonedValue, $value));
+        $reference->ref = 2;
+        $this->assertTrue(ObjectUtils::isEqualTo($clonedValue, (object) ["a" => 1, "b" => (object) ["ref" => 1]]));
+        $this->assertTrue(ObjectUtils::isEqualTo($value, (object) ["a" => 1, "b" => (object) ["ref" => 2]]));
+
+        // Test an object containing a function
+        $value = (object) ["a" => 1, "b" => function($a) { return $a + 2; }];
+        $clonedValue = ObjectUtils::clone($value);
+        $this->assertTrue(ObjectUtils::isEqualTo($clonedValue, $value));
+
+        $this->assertSame(1, $value->a);
+        $this->assertSame(6, ($value->b)(4));
+        $this->assertSame(1, $clonedValue->a);
+        $this->assertSame(6, ($clonedValue->b)(4));
+        $this->assertSame(8, ($clonedValue->b)(6));
+
+        // Test an object containing a regex
+        $value = (object) ["a" => 1, "b" => '/someregex.*/'];
+        $clonedValue = ObjectUtils::clone($value);
+        $this->assertTrue(ObjectUtils::isEqualTo($clonedValue, $value));
+
+        $this->assertSame(1, $value->a);
+        $this->assertSame((string) $value->b, (string) '/someregex.*/');
+        $this->assertSame(1, $clonedValue->a);
+        $this->assertSame((string) $clonedValue->b, (string) '/someregex.*/');
+
+        // Test an object containing an associative array
+        $value = (object) ["a" => 1, "b" => ["key1" => 1, "key2" => "value"]];
+        $clonedValue = ObjectUtils::clone($value);
+        $this->assertTrue(ObjectUtils::isEqualTo($clonedValue, $value));
 
         // Test wrong values
-        // TODO - translate from ts
+        // not necessary
 
         // Test exceptions
-        // TODO - translate from ts
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        // no exceptions are thrown by this method
+    }
+
+
+    /**
+     * testApply
+     *
+     * @return void
+     */
+    public function testApply(){
+
+        // Test empty values
+        AssertUtils::throwsException(function() { ObjectUtils::apply(null, null); }, '/must be callable/');
+        AssertUtils::throwsException(function() { ObjectUtils::apply(0, 0); }, '/must be callable/');
+        AssertUtils::throwsException(function() { ObjectUtils::apply('', ''); }, '/must be callable/');
+        AssertUtils::throwsException(function() { ObjectUtils::apply('    ', '     '); }, '/must be callable/');
+        AssertUtils::throwsException(function() { ObjectUtils::apply(new stdclass(), new stdclass()); }, '/must be callable/');
+        $this->assertSame(null, ObjectUtils::apply(null, function ($v) { return $v;}));
+        $this->assertSame(0, ObjectUtils::apply(0, function ($v) { return $v;}));
+        $this->assertSame("", ObjectUtils::apply("", function ($v) { return $v;}));
+        $this->assertSame([], ObjectUtils::apply([], function ($v) { return $v;}));
+
+        // Test ok values
+        $value = 145;
+        $this->assertSame($value, ObjectUtils::apply($value, function($v) { return $v; }));
+
+        $value = 145;
+        $this->assertSame(146, ObjectUtils::apply($value, function($v) { return $v + 1; }));
+
+        $value = "abcde";
+        $this->assertSame($value, ObjectUtils::apply($value, function($v) { return $v; }));
+
+        $value = "abcde";
+        $this->assertSame('abcdef', ObjectUtils::apply($value, function($v) { return $v.'f'; }));
+
+        $value = [1, 2, 3, 4];
+        $this->assertSame($value, ObjectUtils::apply($value, function($v) { return $v; }));
+
+        $value = [1, 2, 3, 4];
+        $this->assertSame([2, 3, 4, 5], ObjectUtils::apply($value, function($v) { return $v + 1; }));
+
+        $value = [1, [1, 2, [4, 5]], 4];
+        $this->assertSame([1, [1, 2, [4, 5]], 4], ObjectUtils::apply($value, function($v) { return $v; }));
+
+        $value = [1, [1, 2, [4, 5]], 4];
+        $this->assertSame([2, [2, 3, [5, 6]], 5], ObjectUtils::apply($value, function($v) { return $v + 1; }));
+
+        $value = [1, [1, "a", [4, "b"]], 4];
+        $applied = ObjectUtils::apply($value, function($v) { return is_string($v) ? $v.'c' : $v+1; });
+        $this->assertSame([2, [2, "ac", [5, "bc"]], 5], $applied);
+
+        $value = (object) ["a" => 1, "b" => [1,2,"a"]];
+        $applied = ObjectUtils::apply($value, function($v) { return is_string($v) ? $v.'c' : $v; });
+        $this->assertTrue(ObjectUtils::isEqualTo($applied, (object) ["a" => 1, "b" => [1,2,"ac"]]));
+
+        // Test wrong values
+        // Test exceptions
+        // not necessary
     }
 }
 
