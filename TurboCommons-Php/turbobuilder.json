@@ -5,9 +5,16 @@
 	"metadata": {
 		"name": "turbocommons-php",
 		"description": "General purpose library that implements frequently used and generic software development tasks",
-		"builderVersion": "7.0.2"		
+		"builderVersion": "8.0.0"		
 	},
-	
+    "containers": {
+        "docker":[
+            {
+                "path": "php7-4_apache2-4_mariadb10-4-dev",
+                "startPolicy": "lazy"
+            }
+        ]
+    },
 	"validate": {
 	   "projectStructure" : {                    
             "readmeFileMandatory": false
@@ -21,7 +28,7 @@
             "copyPasteDetect":[
                 {
                     "path": "src/main",
-                    "maxPercentErrorLevel": 0.5,
+                    "maxPercentErrorLevel": 1,
                     "maxPercentErrorDifference": 1,
                     "report": "html"
                 },

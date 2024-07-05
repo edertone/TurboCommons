@@ -5,9 +5,10 @@
 	"metadata": {
 		"name": "turbocommons-ts",
 		"description": "General purpose library that implements frequently used and generic software development tasks",
-		"builderVersion": "7.0.2"
-	},
-	
+		"builderVersion": "8.0.0"
+	},"containers": {
+        "docker": []    
+    },
 	"validate": {
 	    "projectStructure" : {                    
             "readmeFileMandatory": false
