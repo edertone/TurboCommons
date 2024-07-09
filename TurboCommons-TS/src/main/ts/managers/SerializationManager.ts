@@ -91,7 +91,7 @@ export class SerializationManager {
      * Copy data from a json string to a class instance. All class properties will be filled with the values from the json
      * For more information on how the conversion is performed, see this class objectToClass method
      * 
-     * @see SerializationUtils.objectToClass
+     * @see SerializationManager.objectToClass
      * 
      * @param string A string containing valid json data
      * @param classInstance A class instance that will be filled with all the json data (the instance is modified by this method and all values erased).
@@ -123,7 +123,7 @@ export class SerializationManager {
     objectToClass(object:Object, classInstance:any): any{
 
         let objectKeys = ObjectUtils.getKeys(object);
-        let classInstanceName = (classInstance.constructor as any).name;
+        let classInstanceName = (classInstance.constructor).name;
         let classInstanceKeys = ObjectUtils.getKeys(classInstance);
         
         // On strict mode, verify that both objects have the same number of keys
@@ -182,7 +182,7 @@ export class SerializationManager {
                             
                             if(isDefaultElementAClass){
                                 
-                                o = this.objectToClass(o, ObjectUtils.clone(defaultElement));
+                                classInstance[key].push(this.objectToClass(o, ObjectUtils.clone(defaultElement)));
                                 
                             }else{
                                 
@@ -190,10 +190,10 @@ export class SerializationManager {
                                 if(typeof o !== typeof defaultElement){
                                     
                                     throw new Error('<' + classInstanceName + '.' + key + '> is defined as array of ' + (typeof defaultElement) + ' but received ' + typeof o);
-                                }                            
+                                }
+                                                            
+                                classInstance[key].push(o);
                             }
-    
-                            classInstance[key].push(o);
                         }
                         
                         continue;

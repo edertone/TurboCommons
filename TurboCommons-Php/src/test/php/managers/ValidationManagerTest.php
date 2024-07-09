@@ -951,6 +951,28 @@ class ValidationManagerTest extends TestCase {
 
 
     /**
+     * testIsObjectWithValidProperties
+     *
+     * @return void
+     */
+    public function testIsObjectWithValidProperties(){
+
+        // Test empty values
+        // TODO
+
+        // Test ok values
+        // TODO
+
+        // Test wrong values
+        // TODO
+
+        // Test exceptions
+        // TODO
+        $this->markTestIncomplete('This test is incomplete.');
+    }
+
+
+    /**
      * testIsDate
      *
      * @return void

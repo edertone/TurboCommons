@@ -330,6 +330,56 @@ class ValidationManager extends BaseStrictClass{
 
 
     /**
+     * Validation will fail if specified object contains properties that don't match the ones on a given list
+     *
+     * @param mixed $value The object to validate.
+     * @param array $allowedProperties An array of allowed properties that the object must have.
+     * @param bool $strict If true, the object must have exactly the properties specified in the allowedProperties array. If false, it is not mandatory
+     *             that object has all the properties, it may have less. But in both cases all object properties must exist on the array of allowed.
+     * @param string $errorMessage The error message that will be generated if validation fails.
+     * @param string $detailedErrorMessage If set to true, extra information will be appended to the error message with details on which properties failed
+     * @param mixed $tags We can define a tag name or list of tags to group the validation results. We can use this tags later to filter validation state
+     * @param boolean $isWarning Tells if the validation fail will be processed as a validation error or a validation warning
+     *
+     * @return bool False in case the validation fails or true if validation succeeds.
+     */
+    public function isObjectWithValidProperties($value, array $allowedProperties, $strict = true, string $errorMessage = 'Invalid object',
+                                                $detailedErrorMessage = true, $tags = '', bool $isWarning = false){
+
+        $res = true;
+
+        $properties = ObjectUtils::getKeys($value);
+
+        // Check if all property names are in the string array
+        foreach ($properties as $property) {
+
+            if (!in_array($property, $allowedProperties, true)) {
+
+                $res = false;
+
+                if($detailedErrorMessage){
+
+                    $errorMessage .= ': property '.$property.' not allowed';
+                }
+            }
+        }
+
+        // If strict is true, all properties must be found at the array too
+        if($strict && !ArrayUtils::isEqualTo(sort($properties), sort($allowedProperties))){
+
+            $res = false;
+
+            if($detailedErrorMessage){
+
+                $errorMessage .= ': must have exactly these properties -> ['.implode(', ', $allowedProperties).']';
+            }
+        }
+
+        return $this->_updateValidationStatus($res, $errorMessage, $tags, $isWarning);
+    }
+
+
+    /**
      * TODO - translate from TS
      */
     public function isDate(){

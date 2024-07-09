@@ -155,7 +155,8 @@ export class BrowserManager{
 
 
     /**
-     * Deletes the specified cookie from browser. Note that the cookie will only be deleted if belongs to the same path as specified.
+     * Deletes the specified cookie from browser.
+     * Note that the cookie will only be deleted if belongs to the same path as specified.
      * 
      * @param key The name of the cookie we want to delete
      * @param path Define the path where the cookie is set. By default it is the whole domain: '/'. If the cookie is not set on this path, we must pass the right one or the delete will fail.
@@ -178,6 +179,84 @@ export class BrowserManager{
         }
 
         return false;
+    }
+    
+    
+    /**
+     * Check if the currently active URL at the browser contains a hash fragment.
+     * The fragment is a part of the URL that comes after the # symbol, and can be modified without
+     * needing to reload the page. It is important to know that the url fragment is always available
+     * at the browser level and will never be sent to server.
+     * 
+     * An example of a hash:
+     * https://someurl.com/home#somehash
+     * 
+     * @returns True if the active URL has a hash fragment, false otherwise.
+     */
+    isCurrentUrlWithHashFragment(){
+
+        if(window.location.hash) {
+        
+            return true;
+        }
+        
+        return false;
+    }
+    
+    
+    /**
+     * Obtain the value that is found at the current URL hash fragment part. For example:
+     * https://someurl.com/home#somehash
+     * 
+     * Will return 'somehash'
+     * 
+     * @returns The value of the URL hash fragment but without the # character
+     */
+    getCurrentUrlHashFragment(){
+
+        if(window.location.hash) {
+      
+            // Removes the first unwanted # character
+            return window.location.hash.substring(1);
+        }
+    
+        return '';  
+    }
+    
+    
+    /**
+     * TODO
+     */
+    setCurrentUrlHashFragment(){
+
+        // TODO
+    }
+    
+    
+    /**
+     * TODO
+     */
+    deleteCurrentUrlHashFragment(){
+
+        // TODO
+    }
+    
+    
+    /**
+     * TODO
+     */
+    isCurrentUrlWithQuery(){
+
+        // TODO
+    }
+    
+    
+    /**
+     * TODO
+     */
+    getCurrentUrlQueryValues(){
+
+        // TODO
     }
     
 
@@ -206,11 +285,11 @@ export class BrowserManager{
         // Try to get the language on modern browsers support for HTML 5.1 "navigator.languages"
         if (ArrayUtils.isArray(window.navigator['languages'])) {
             
-          for (let i = 0; i < window.navigator['languages'].length; i++) {
+          for (const element of window.navigator['languages']) {
           
-              if(window.navigator['languages'][i].length >= 2){
+              if(element.length >= 2){
                   
-                  language = window.navigator['languages'][i];
+                  language = element;
                   break;
               }
           }
@@ -267,12 +346,12 @@ export class BrowserManager{
             
             let props = Object.getOwnPropertyNames(postData);
             
-            for(let i = 0; i < props.length; i++){
+            for(const element of props){
                 
                 let input = document.createElement("input");
                 input.type = "hidden";
-                input.name = props[i];
-                input.value = (postData as any)[props[i]];
+                input.name = element;
+                input.value = (postData as any)[element];
                 form.appendChild(input);
             }
         

@@ -326,6 +326,16 @@ export class ValidationManager{
 
         return this._updateValidationStatus(!StringUtils.isEmpty(value, emptyChars), errorMessage, tags, isWarning);
     }
+    
+    
+    /**
+     * TODO - translate from PHP
+     */
+    isObjectWithValidProperties() {
+    
+        // TODO
+        return false;
+    }
             
     
     isDate() {

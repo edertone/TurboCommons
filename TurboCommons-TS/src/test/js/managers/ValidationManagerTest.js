@@ -863,6 +863,16 @@ QUnit.test("isFilledIn", function(assert) {
 
 
 /**
+ * isObjectWithValidProperties
+ */
+QUnit.todo("isObjectWithValidProperties", function(assert) {
+
+    // TODO
+    // implement in php and then translate it here
+});
+
+
+/**
  * isDate
  */
 QUnit.todo("isDate", function(assert) {

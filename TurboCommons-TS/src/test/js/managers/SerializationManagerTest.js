@@ -12,7 +12,7 @@
 
 
 // *******************************************************************************************
-// Following classes are defined to be used on several tests.
+// Following classes are defined to be used on several of this tests to be serialized or deserialized.
 // They have been created by using the typescript playground online tool
 // that automatically generates the javascript code from a typescript given 
 // one. Original typescript source that generates these classes is found at:
@@ -186,15 +186,11 @@ QUnit.test("jsonToClass", function(assert){
     
     for (var i = 0; i < emptyValuesCount; i++) {
         
-        assert.throws(function() {
-            sut.jsonToClass(emptyValues[i], {});
-        });
+        assert.throws(function() { sut.jsonToClass(emptyValues[i], {}); });
         
         if(!ObjectUtils.isObject(emptyValues[i])){
             
-            assert.throws(function() {
-                sut.jsonToClass('{}', emptyValues[i]);
-            });
+            assert.throws(function() { sut.jsonToClass('{}', emptyValues[i]); });
         }
     }
     
@@ -204,8 +200,7 @@ QUnit.test("jsonToClass", function(assert){
         
         // Test that null values on source json keys are assigned to destination properties
         assert.ok(ObjectUtils.isEqualTo(sut.jsonToClass(
-                '{"boolean": null, "number": null, "string": null, "obj": null, ' +
-                '"someClass": null, "arr": null}',
+                '{"boolean": null, "number": null, "string": null, "obj": null, "someClass": null, "arr": null}',
                 new BasicTypeProps()),
                 {boolean: false, number: 0, string: "", obj: {},
                     someClass: {nullProp: null, undefinedProp: undefined}, arr: []}));
@@ -240,8 +235,7 @@ QUnit.test("jsonToClass", function(assert){
         if(!sut.strictMode){
         
             var value = sut.jsonToClass(
-                    '{"boolean": false, "number": 25, "string": "h", "obj": {}, ' +
-                    '"someClass": {"noProp": 1}, "arr": ["a"]}',
+                    '{"boolean": false, "number": 25, "string": "h", "obj": {}, "someClass": {"noProp": 1}, "arr": ["a"]}',
                     new BasicTypeProps());
             
             assert.strictEqual(value.someClass.constructor.name, 'NonTypedProps');
@@ -358,6 +352,17 @@ QUnit.test("jsonToClass", function(assert){
                     arrayArray: [[1,2,3], ["a","b","c"]]}));
         
         assert.strictEqual(value.classArray[0].constructor.name, 'SingleProp');
+        
+        // Test that putting more than one value on the arrays at the destination class will throw a failure
+        let invalidTypedArrayProps = new TypedArrayProps();
+        invalidTypedArrayProps.boolArray = [false,false];
+                
+        assert.throws(function() {
+            sut.jsonToClass('{"nonTypedArray": [1,"a", null], "boolArray": [true,false], ' +
+                            '"numberArray": [1,3,5], "stringArray": ["hello","home"], ' +
+                            '"objectArray": [{"b": 2}], "classArray": [{"oneProp": "a"}, {"oneProp": "b"}], ' +
+                            '"arrayArray": [[1,2,3], ["a","b","c"]]}', invalidTypedArrayProps);
+        }, /must contain only 1 default typed element/);
         
         if(!sut.strictMode){
             

@@ -133,6 +133,24 @@ class BrowserManager extends BaseStrictClass{
 
 
     /**
+     * TODO
+     */
+    public function isCurrentUrlWithQuery(){
+
+        // TODO
+    }
+
+
+    /**
+     * TODO
+     */
+    public function getCurrentUrlQueryValues(){
+
+        // TODO
+    }
+
+
+    /**
      * Tries to detect the language that is set as preferred by the user on the current browser.
      * NOTE: Getting browser language is not accurate. It is always better to use server side language detection
      *
