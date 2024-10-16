@@ -123,20 +123,20 @@ QUnit.test("isStringFound", function(assert) {
     // Test empty values
     let emptyValues = [null, undefined, 0, {}, '', '    ', "\n\n\n\n"];
     
-    for(var i = 0; i < emptyValues.length; i++){
+    for(const element of emptyValues){
        
         assert.throws(function() {
-            ArrayUtils.isStringFound(emptyValues[i], '');
+            ArrayUtils.isStringFound(element, '');
         }, /parameter must be an array/);
         
-        if(StringUtils.isString(emptyValues[i])){
+        if(StringUtils.isString(element)){
             
-            assert.notOk(ArrayUtils.isStringFound([], emptyValues[i]));
+            assert.notOk(ArrayUtils.isStringFound([], element));
         
         }else{
             
             assert.throws(function() {
-                ArrayUtils.isStringFound([], emptyValues[i]);
+                ArrayUtils.isStringFound([], element);
             }, /str is not a string/);
         }
     }
@@ -194,6 +194,15 @@ QUnit.test("isStringFound", function(assert) {
     assert.throws(function() {
         ArrayUtils.isStringFound([''], [1,2]);
     }, /str is not a string/);    
+});
+
+
+/**
+ * execute
+ */
+QUnit.todo("findMostRepeatedValue", function(assert){
+    
+    // TODO - translate from php
 });
 
 

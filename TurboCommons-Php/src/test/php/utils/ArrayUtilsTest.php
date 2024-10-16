@@ -188,6 +188,49 @@ class ArrayUtilsTest extends TestCase {
     }
 
 
+    /**
+     * testFindMostRepeatedValue
+     *
+     * @return void
+     */
+    public function testFindMostRepeatedValue(){
+
+        AssertUtils::throwsException(function() { ArrayUtils::findMostRepeatedValue(null); }, '/must be of the type array, null given/');
+        AssertUtils::throwsException(function() { ArrayUtils::findMostRepeatedValue(0); }, '/must be of the type array, int given/');
+        AssertUtils::throwsException(function() { ArrayUtils::findMostRepeatedValue(''); }, '/must be of the type array, string given/');
+        AssertUtils::throwsException(function() { ArrayUtils::findMostRepeatedValue([]); }, '/Received empty array/');
+
+        // Test ok values
+        $this->assertSame(1, ArrayUtils::findMostRepeatedValue([1]));
+        $this->assertSame(1, ArrayUtils::findMostRepeatedValue([1, 1]));
+        $this->assertSame(1, ArrayUtils::findMostRepeatedValue([1, 2]));
+        $this->assertSame(1, ArrayUtils::findMostRepeatedValue([1, 2, 1]));
+        $this->assertSame(1, ArrayUtils::findMostRepeatedValue([1, 2, 3]));
+        $this->assertSame(1, ArrayUtils::findMostRepeatedValue([1, 2, 1, 2]));
+        $this->assertSame(2, ArrayUtils::findMostRepeatedValue([1, 2, 2, 2]));
+        $this->assertSame("1", ArrayUtils::findMostRepeatedValue(["1"]));
+        $this->assertSame("1", ArrayUtils::findMostRepeatedValue(["1", "1"]));
+        $this->assertSame("1", ArrayUtils::findMostRepeatedValue(["1", "2"]));
+        $this->assertSame("1", ArrayUtils::findMostRepeatedValue(["1", "2", "1"]));
+        $this->assertSame("1", ArrayUtils::findMostRepeatedValue(["1", "2", "1", "2"]));
+        $this->assertSame("2", ArrayUtils::findMostRepeatedValue(["1", "2", "2", "2"]));
+        $this->assertSame(1, ArrayUtils::findMostRepeatedValue([1, "1", 1, "1"]));
+        $this->assertSame("2", ArrayUtils::findMostRepeatedValue(["1", "2", "2", 2]));
+        $this->assertSame(1, ArrayUtils::findMostRepeatedValue([1, 1, 1, "2", "2", 2, 2]));
+        $this->assertSame("a", ArrayUtils::findMostRepeatedValue(["a", "A", "a"]));
+        $this->assertSame(true, ArrayUtils::findMostRepeatedValue([true, false, true]));
+        $this->assertSame(1.1, ArrayUtils::findMostRepeatedValue([1.1, 2.2, 1.1, 2.2, 1.1]));
+        $this->assertSame("a", ArrayUtils::findMostRepeatedValue(["a", "b", "a", "!"]));
+        $this->assertSame(null, ArrayUtils::findMostRepeatedValue([null, null, 1]));
+        $this->assertSame(-1, ArrayUtils::findMostRepeatedValue([-1, -1, 2, 3]));
+        $this->assertSame(9999999999, ArrayUtils::findMostRepeatedValue([9999999999, 9999999999, 1]));
+
+        // Test wrong values
+        // Test exceptions
+        AssertUtils::throwsException(function() { ArrayUtils::findMostRepeatedValue("hello"); }, '/must be of the type array, string given/');
+
+    }
+
     /** test */
     public function testForceNonEmptyArray(){
 

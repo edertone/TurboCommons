@@ -73,7 +73,8 @@
                 "type": "phpUnit",
                 "testsRoot": "src/test",
                 "coverageReport": true,
-                "coverageReportOpenAfterTests": true
+                "coverageReportOpenAfterTests": true,
+                "filter": ""
             }
         ]
     }

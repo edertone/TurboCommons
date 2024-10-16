@@ -90,6 +90,42 @@ class ArrayUtils {
 
 
     /**
+     * Finds the most frequent (most repeated) value in an array.
+     * If there are multiple values with the same highest frequency, it returns the first one encountered.
+     *
+     * @param array $array An array with raw values
+     *
+     * @example
+     * Given the array [1, 2, 2, 3, 3, 3, 4, 4, 4, 4] this method will return 4
+     *
+     * @return mixed The value that is repeated more times inside the array
+     */
+    public static function findMostRepeatedValue(array $array){
+
+        if(empty($array)){
+
+            throw new InvalidArgumentException('Received empty array');
+        }
+
+        // Use an associative array with serialized values as keys to track counts
+        $frequency = [];
+
+        foreach ($array as $value) {
+
+            // Serialize the value to preserve its type
+            $key = serialize($value);
+            $frequency[$key] = ($frequency[$key] ?? 0) + 1;
+        }
+
+        // Find the serialized value with the highest count
+        $mostRepeatedKey = array_search(max($frequency), $frequency);
+
+        // Unserialize the key to get the original value
+        return unserialize($mostRepeatedKey);
+    }
+
+
+    /**
      * Strictly check that the provided value is a non empty array or throw an exception
      *
      * @param mixed $value A value to check

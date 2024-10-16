@@ -54,7 +54,7 @@ export class ArrayUtils {
             return false;
         }
 
-        for(var i = 0, l = array1.length; i < l; i++){
+        for(let i = 0, l = array1.length; i < l; i++){
 
             // Check if we have nested arrays
             if(ArrayUtils.isArray(array1[i]) && ArrayUtils.isArray(array2[i])){
@@ -108,27 +108,34 @@ export class ArrayUtils {
             throw new Error("str is not a string");
         }
         
-        for (var i = 0; i < array.length; i++) {
+        for (const element of array) {
     
-            if (StringUtils.isString(array[i]) &&
-                ((caseSensitive && array[i].indexOf(str) >= 0) ||
-                (!caseSensitive && array[i].toLowerCase().indexOf(str.toLowerCase()) >= 0))) {
+            if (StringUtils.isString(element) &&
+                ((caseSensitive && element.indexOf(str) >= 0) ||
+                (!caseSensitive && element.toLowerCase().indexOf(str.toLowerCase()) >= 0))) {
 
                 return true;
             }
             
-            if(ArrayUtils.isArray(array[i]) && ArrayUtils.isStringFound(array[i], str, caseSensitive)){
+            if(ArrayUtils.isArray(element) && ArrayUtils.isStringFound(element, str, caseSensitive)){
                 
                 return true;
             }
             
-            if(ObjectUtils.isObject(array[i]) && ObjectUtils.isStringFound(array[i], str, caseSensitive)){
+            if(ObjectUtils.isObject(element) && ObjectUtils.isStringFound(element, str, caseSensitive)){
                 
                 return true;
             }
         }
 
         return false;
+    }
+    
+    
+    // TODO - translate from PHP
+    public static findMostRepeatedValue(){
+
+        // TODO - translate from PHP
     }
     
     
