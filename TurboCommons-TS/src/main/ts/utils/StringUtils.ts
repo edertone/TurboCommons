@@ -997,9 +997,7 @@ export class StringUtils {
         // Generate the title case output
         if(format === StringUtils.FORMAT_START_CASE){
 
-            return string.split(' ')
-                .map(s => (s.length > 0 ? s[0].toUpperCase() : '') + (s.length > 1 ? s.substr(1).toLowerCase() : ''))
-                    .join(' ');
+            return string.split(' ').map((word:any) => word ? word[0].toUpperCase() + word.slice(1).toLowerCase() : '').join(' ');
         }
 
         // Generate the all upper case output
