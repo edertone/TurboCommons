@@ -14,7 +14,6 @@ export { HTTPManager } from './managers/HTTPManager';
 export { HTTPManagerBaseRequest } from './managers/httpmanager/HTTPManagerBaseRequest';
 export { HTTPManagerGetRequest } from './managers/httpmanager/HTTPManagerGetRequest';
 export { HTTPManagerPostRequest } from './managers/httpmanager/HTTPManagerPostRequest';
-export { LocalizationManager} from './managers/LocalizationManager';
 export { ModelHistoryManager} from './managers/ModelHistoryManager';
 export { SerializationManager } from './managers/SerializationManager';
 export { ValidationManager} from './managers/ValidationManager';
