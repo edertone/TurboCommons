@@ -453,33 +453,10 @@ class StringUtilsTest extends TestCase {
         $this->assertTrue(!StringUtils::isCamelCase('Úamel', StringUtils::FORMAT_LOWER_CAMEL_CASE));
 
         // Test exceptions
-        try {
-            StringUtils::isCamelCase(123);
-            $this->exceptionMessage = '123 did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            StringUtils::isCamelCase([1,5,8]);
-            $this->exceptionMessage = '[1,5,8] did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            StringUtils::isCamelCase(new Exception());
-            $this->exceptionMessage = 'new Exception did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
-
-        try {
-            StringUtils::isCamelCase('CamelCase', 67);
-            $this->exceptionMessage = '67 did not cause exception';
-        } catch (Throwable $e) {
-            // We expect an exception to happen
-        }
+        AssertUtils::throwsException(function() { StringUtils::isCamelCase(123); }, '/value is not a string/');
+        AssertUtils::throwsException(function() { StringUtils::isCamelCase([1,5,8]); }, '/value is not a string/');
+        AssertUtils::throwsException(function() { StringUtils::isCamelCase(new Exception()); }, '/value is not a string/');
+        AssertUtils::throwsException(function() { StringUtils::isCamelCase('CamelCase', 67); }, '/Unknown type specified/');
     }
 
 
