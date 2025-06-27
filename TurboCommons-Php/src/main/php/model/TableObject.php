@@ -445,7 +445,7 @@ class TableObject{
 
 
     /**
-     * Set the value for a table cell
+     * Set the value for a table cell. Make sure row and column indices are valid (exist) before calling this method.
      *
      * @param integer $row An integer containing the index for the row that we want to set
      * @param mixed $column An integer or a string containing the index or label for the column that we want to set
