@@ -4,7 +4,7 @@
  * Website : -> http://www.turbocommons.org
  * License : -> Licensed under the Apache License, Version 2.0. You may not use this file except in compliance with the License.
  * License Url : -> http://www.apache.org/licenses/LICENSE-2.0
- * CopyRight : -> Copyright 2015 Edertone Advanded Solutions (08211 Castellar del VallËs, Barcelona). http://www.edertone.com
+ * CopyRight : -> Copyright 2015 Edertone Advanded Solutions (08211 Castellar del Vall√®s, Barcelona). http://www.edertone.com
  */
 package org.turbocommons.managers;
 

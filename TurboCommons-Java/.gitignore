@@ -25,7 +25,7 @@ thumbs.db
 
 
 # IDEs and editors
-/.idea
+.idea/
 .project
 .classpath
 .buildpath
@@ -42,6 +42,12 @@ thumbs.db
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
 
 
 # misc
