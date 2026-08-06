@@ -76,6 +76,7 @@ npm run build
 npm test
 npm run lint
 npm run package
+npm run clean
 ```
 
 The scripts rebuild the image when required. There are no `docker:*`, `*:local`,
@@ -87,6 +88,16 @@ The repository is mounted into `/workspace`. Named Docker volumes preserve
 Node.js dependencies, Composer dependencies, npm and Composer caches, and the
 Gradle cache between runs. Build artifacts are written into the mounted project
 directories and remain visible on the host.
+
+To remove generated build output and the Nx cache from all projects without
+removing dependency volumes, run:
+
+```text
+npm run clean
+```
+
+This removes generated `dist`, `target`, `build`, `bin`, and `.nx` directories.
+It does not remove `node_modules`, Composer `vendor`, or Docker caches.
 
 Inside the container, Nx orchestrates the native tools. PHP uses Composer and
 PHPUnit, TypeScript uses `tsc` and webpack, Java uses Gradle, and shell scripts

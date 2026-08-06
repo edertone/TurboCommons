@@ -16,6 +16,15 @@ if [[ ! -f /workspace/turbocommons-php/vendor/autoload.php ]]; then
 fi
 
 case "${1:-ci}" in
+  clean)
+    rm -rf \
+      /workspace/.nx \
+      /workspace/dist \
+      /workspace/turbocommons-*/dist \
+      /workspace/turbocommons-*/target \
+      /workspace/turbocommons-*/build \
+      /workspace/turbocommons-*/bin
+    ;;
   build)
     exec npx nx run-many -t build --all --parallel=3
     ;;
