@@ -404,11 +404,11 @@ class ObjectUtilsTest extends TestCase {
     public function testApply(){
 
         // Test empty values
-        AssertUtils::throwsException(function() { ObjectUtils::apply(null, null); }, '/must be callable/');
-        AssertUtils::throwsException(function() { ObjectUtils::apply(0, 0); }, '/must be callable/');
-        AssertUtils::throwsException(function() { ObjectUtils::apply('', ''); }, '/must be callable/');
-        AssertUtils::throwsException(function() { ObjectUtils::apply('    ', '     '); }, '/must be callable/');
-        AssertUtils::throwsException(function() { ObjectUtils::apply(new stdclass(), new stdclass()); }, '/must be callable/');
+        AssertUtils::throwsException(function() { ObjectUtils::apply(null, null); }, '/ must be of type callable/');
+        AssertUtils::throwsException(function() { ObjectUtils::apply(0, 0); }, '/ must be of type callable/');
+        AssertUtils::throwsException(function() { ObjectUtils::apply('', ''); }, '/ must be of type callable/');
+        AssertUtils::throwsException(function() { ObjectUtils::apply('    ', '     '); }, '/ must be of type callable/');
+        AssertUtils::throwsException(function() { ObjectUtils::apply(new stdclass(), new stdclass()); }, '/ must be of type callable/');
         $this->assertSame(null, ObjectUtils::apply(null, function ($v) { return $v;}));
         $this->assertSame(0, ObjectUtils::apply(0, function ($v) { return $v;}));
         $this->assertSame("", ObjectUtils::apply("", function ($v) { return $v;}));

@@ -6,6 +6,9 @@
   "scripts": {
     "build": "docker compose -f docker-compose.yaml run --rm --build toolbox build",
     "test": "docker compose -f docker-compose.yaml run --rm --build toolbox test",
+    "test:java": "docker compose -f docker-compose.yaml run --rm --build toolbox nx run turbocommons-java:test",
+    "test:php": "docker compose -f docker-compose.yaml run --rm --build toolbox nx run turbocommons-php:test",
+    "test:shell": "docker compose -f docker-compose.yaml run --rm --build toolbox nx run turbocommons-shell:test",
     "test:ts": "docker compose -f docker-compose.yaml run --rm --build toolbox nx run turbocommons-ts:test",
     "lint": "docker compose -f docker-compose.yaml run --rm --build toolbox lint",
     "package": "docker compose -f docker-compose.yaml run --rm --build toolbox package",

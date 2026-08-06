@@ -28,6 +28,9 @@ Docker container:
 ```text
 npm run build
 npm test
+npm run test:java
+npm run test:php
+npm run test:shell
 npm run test:ts
 npm run lint
 npm run package
@@ -36,9 +39,13 @@ npm run dist
 npm run ci
 ```
 
-To run only the TypeScript package tests from the repository root, use:
+To run only one library's tests from the repository root, use the corresponding
+script:
 
 ```text
+npm run test:java
+npm run test:php
+npm run test:shell
 npm run test:ts
 ```
 

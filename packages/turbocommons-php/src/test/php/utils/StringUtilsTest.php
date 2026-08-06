@@ -239,8 +239,8 @@ class StringUtilsTest extends TestCase {
     public function testIsStartingWith(){
 
         // Test empty values
-        AssertUtils::throwsException(function() { StringUtils::isStartingWith(null, null); }, '/must be of the type array, null given/');
-        AssertUtils::throwsException(function() { StringUtils::isStartingWith(0, 0); }, '/must be of the type array, int given/');
+        AssertUtils::throwsException(function() { StringUtils::isStartingWith(null, null); }, '/must be of type array, null given/');
+        AssertUtils::throwsException(function() { StringUtils::isStartingWith(0, 0); }, '/must be of type array, int given/');
         $this->assertFalse(StringUtils::isStartingWith('', []));
         $this->assertTrue(StringUtils::isStartingWith('', ['']));
         $this->assertTrue(StringUtils::isStartingWith('a', ['']));
@@ -256,9 +256,9 @@ class StringUtilsTest extends TestCase {
         // Not necessary
 
         // Test exceptions
-        AssertUtils::throwsException(function() { StringUtils::isStartingWith([1, 2, 3, 4], 0); }, '/must be of the type array, int given/');
-        AssertUtils::throwsException(function() { StringUtils::isStartingWith('', 0); }, '/must be of the type array, int given/');
-        AssertUtils::throwsException(function() { StringUtils::isStartingWith('', ''); }, '/must be of the type array, string given/');
+        AssertUtils::throwsException(function() { StringUtils::isStartingWith([1, 2, 3, 4], 0); }, '/must be of type array, int given/');
+        AssertUtils::throwsException(function() { StringUtils::isStartingWith('', 0); }, '/must be of type array, int given/');
+        AssertUtils::throwsException(function() { StringUtils::isStartingWith('', ''); }, '/must be of type array, string given/');
     }
 
 
@@ -270,8 +270,8 @@ class StringUtilsTest extends TestCase {
     public function testIsEndingWith(){
 
         // Test empty values
-        AssertUtils::throwsException(function() { StringUtils::isEndingWith(null, null); }, '/must be of the type array, null given/');
-        AssertUtils::throwsException(function() { StringUtils::isEndingWith(0, 0); }, '/must be of the type array, int given/');
+        AssertUtils::throwsException(function() { StringUtils::isEndingWith(null, null); }, '/must be of type array, null given/');
+        AssertUtils::throwsException(function() { StringUtils::isEndingWith(0, 0); }, '/must be of type array, int given/');
         $this->assertFalse(StringUtils::isEndingWith('', []));
         $this->assertTrue(StringUtils::isEndingWith('', ['']));
         $this->assertTrue(StringUtils::isEndingWith('a', ['']));
@@ -287,9 +287,9 @@ class StringUtilsTest extends TestCase {
         // Not necessary
 
         // Test exceptions
-        AssertUtils::throwsException(function() { StringUtils::isEndingWith([1, 2, 3, 4], 0); }, '/must be of the type array, int given/');
-        AssertUtils::throwsException(function() { StringUtils::isEndingWith('', 0); }, '/must be of the type array, int given/');
-        AssertUtils::throwsException(function() { StringUtils::isEndingWith('', ''); }, '/must be of the type array, string given/');
+        AssertUtils::throwsException(function() { StringUtils::isEndingWith([1, 2, 3, 4], 0); }, '/must be of type array, int given/');
+        AssertUtils::throwsException(function() { StringUtils::isEndingWith('', 0); }, '/must be of type array, int given/');
+        AssertUtils::throwsException(function() { StringUtils::isEndingWith('', ''); }, '/must be of type array, string given/');
     }
 
 
@@ -2109,10 +2109,10 @@ class StringUtilsTest extends TestCase {
     public function testGeneratePath(){
 
         // Test empty values
-        AssertUtils::throwsException(function() { StringUtils::generatePath(null, null); }, '/must be of the type array, null given/');
-        AssertUtils::throwsException(function() { StringUtils::generatePath(0, 0); }, '/must be of the type array, int given/');
-        AssertUtils::throwsException(function() { StringUtils::generatePath([], []); }, '/must be of the type string, array given/');
-        AssertUtils::throwsException(function() { StringUtils::generatePath('', []); }, '/must be of the type array, string given/');
+        AssertUtils::throwsException(function() { StringUtils::generatePath(null, null); }, '/must be of type array, null given/');
+        AssertUtils::throwsException(function() { StringUtils::generatePath(0, 0); }, '/must be of type array, int given/');
+        AssertUtils::throwsException(function() { StringUtils::generatePath([], []); }, '/must be of type string, array given/');
+        AssertUtils::throwsException(function() { StringUtils::generatePath('', []); }, '/must be of type array, string given/');
         $this->assertEquals('', StringUtils::generatePath([], ''));
         $this->assertEquals('', StringUtils::generatePath([''], ''));
         $this->assertEquals('a', StringUtils::generatePath(['a'], ''));
@@ -2129,7 +2129,7 @@ class StringUtilsTest extends TestCase {
         // Test exceptions
         AssertUtils::throwsException(function() { StringUtils::generatePath(['a'], 'a'); }, '/separator must be a slash or backslash/');
         AssertUtils::throwsException(function() { StringUtils::generatePath([1, 2, 3, 4], 0); }, '/separator must be a slash or backslash/');
-        AssertUtils::throwsException(function() { StringUtils::generatePath(123); }, '/must be of the type array, int given/');
+        AssertUtils::throwsException(function() { StringUtils::generatePath(123); }, '/must be of type array, int given/');
     }
 
 
@@ -2311,7 +2311,7 @@ class StringUtilsTest extends TestCase {
 
         // Test empty values
         AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString(null, []); }, '/expected a string/');
-        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString('', null); }, '/must be of the type array, null given/');
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString('', null); }, '/must be of type array, null given/');
         AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString('', []); }, '/listOfStrings is empty/');
 
         $this->assertSame("   ", StringUtils::findMostSimilarString("   ", ["   "]));
@@ -2340,10 +2340,10 @@ class StringUtilsTest extends TestCase {
         // Test wrong values
         // Test exceptions
 
-        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString(1234, 1234); }, '/must be of the type array, int(eger)? given/');
-        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString("", 1234); }, '/must be of the type array, int(eger)? given/');
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString(1234, 1234); }, '/must be of type array, int(eger)? given/');
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString("", 1234); }, '/must be of type array, int(eger)? given/');
         AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString([1, 2, 3, 4], [2, 4, 5, 6]); }, '/expected a string/');
-        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString(new Exception(), new Exception()); }, '/must be of the type array, object given/');
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarString(new Exception(), new Exception()); }, '/must be of type array, Exception given/');
     }
 
 
@@ -2356,7 +2356,7 @@ class StringUtilsTest extends TestCase {
 
         // Test empty values
         AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex(null, []); }, '/expected a string/');
-        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex('', null); }, '/must be of the type array, null given/');
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex('', null); }, '/must be of type array, null given/');
         AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex('', []); }, '/listOfStrings is empty/');
 
         $this->assertSame(0, StringUtils::findMostSimilarStringIndex("   ", ["   "]));
@@ -2385,10 +2385,10 @@ class StringUtilsTest extends TestCase {
         // Test wrong values
         // Test exceptions
 
-        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex(1234, 1234); }, '/must be of the type array, int given/');
-        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex("", 1234); }, '/must be of the type array, int given/');
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex(1234, 1234); }, '/must be of type array, int given/');
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex("", 1234); }, '/must be of type array, int given/');
         AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex([1, 2, 3, 4], [2, 4, 5, 6]); }, '/expected a string/');
-        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex(new Exception(), new Exception()); }, '/must be of the type array, object given/');
+        AssertUtils::throwsException(function(){ StringUtils::findMostSimilarStringIndex(new Exception(), new Exception()); }, '/must be of type array, Exception given/');
     }
 
 
@@ -2609,6 +2609,6 @@ class StringUtilsTest extends TestCase {
         // Test wrong values
         // Test exceptions
         AssertUtils::throwsException(function(){ StringUtils::removeSameConsecutive(123123); }, '/string must be a string/');
-        AssertUtils::throwsException(function(){ StringUtils::removeSameConsecutive('abc', 'hello'); }, '/must be of the type array/');
+        AssertUtils::throwsException(function(){ StringUtils::removeSameConsecutive('abc', 'hello'); }, '/must be of type array/');
     }
 }

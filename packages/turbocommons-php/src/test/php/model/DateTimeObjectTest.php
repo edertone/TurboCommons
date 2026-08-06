@@ -941,7 +941,7 @@ class DateTimeObjectTest extends TestCase {
         $date = new DateTimeObject('2015');
 
         // Test empty values
-        AssertUtils::throwsException(function() use ($date) {  $date->setTimeZoneOffset(null)->getTimeZoneOffset(); }, '/must be of the type string, null given/');
+        AssertUtils::throwsException(function() use ($date) {  $date->setTimeZoneOffset(null)->getTimeZoneOffset(); }, '/must be of type string, null given/');
         AssertUtils::throwsException(function() use ($date) {  $date->setTimeZoneOffset('')->getTimeZoneOffset(); }, '/bad timezone/');
 
         // Test ok values

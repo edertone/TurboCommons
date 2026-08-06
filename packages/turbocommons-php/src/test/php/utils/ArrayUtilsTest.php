@@ -109,9 +109,9 @@ class ArrayUtilsTest extends TestCase {
     public function testIsEqualTo(){
 
         // Test non array values must launch exception
-        AssertUtils::throwsException(function() { ArrayUtils::isEqualTo(null, null); }, '/must be of the type array, null given/');
-        AssertUtils::throwsException(function() { ArrayUtils::isEqualTo(1, 1); }, '/must be of the type array, int given/');
-        AssertUtils::throwsException(function() { ArrayUtils::isEqualTo('asfasf1', '345345'); }, '/must be of the type array, string given/');
+        AssertUtils::throwsException(function() { ArrayUtils::isEqualTo(null, null); }, '/must be of type array, null given/');
+        AssertUtils::throwsException(function() { ArrayUtils::isEqualTo(1, 1); }, '/must be of type array, int given/');
+        AssertUtils::throwsException(function() { ArrayUtils::isEqualTo('asfasf1', '345345'); }, '/must be of type array, string given/');
 
         // Test identic arrays
         $this->assertTrue(ArrayUtils::isEqualTo([null], [null]));
@@ -195,9 +195,9 @@ class ArrayUtilsTest extends TestCase {
      */
     public function testFindMostRepeatedValue(){
 
-        AssertUtils::throwsException(function() { ArrayUtils::findMostRepeatedValue(null); }, '/must be of the type array, null given/');
-        AssertUtils::throwsException(function() { ArrayUtils::findMostRepeatedValue(0); }, '/must be of the type array, int given/');
-        AssertUtils::throwsException(function() { ArrayUtils::findMostRepeatedValue(''); }, '/must be of the type array, string given/');
+        AssertUtils::throwsException(function() { ArrayUtils::findMostRepeatedValue(null); }, '/must be of type array, null given/');
+        AssertUtils::throwsException(function() { ArrayUtils::findMostRepeatedValue(0); }, '/must be of type array, int given/');
+        AssertUtils::throwsException(function() { ArrayUtils::findMostRepeatedValue(''); }, '/must be of type array, string given/');
         AssertUtils::throwsException(function() { ArrayUtils::findMostRepeatedValue([]); }, '/Received empty array/');
 
         // Test ok values
@@ -227,7 +227,7 @@ class ArrayUtilsTest extends TestCase {
 
         // Test wrong values
         // Test exceptions
-        AssertUtils::throwsException(function() { ArrayUtils::findMostRepeatedValue("hello"); }, '/must be of the type array, string given/');
+        AssertUtils::throwsException(function() { ArrayUtils::findMostRepeatedValue("hello"); }, '/must be of type array, string given/');
 
     }
 
