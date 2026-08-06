@@ -17,3 +17,7 @@ Devs around the world do the same things every day with different languages. The
   - [How to use TurboCommons with TypeScript](docs/how-to-use-typescript.md)
 - [Development, Docker, builds, tests, and releases](docs/development.md)
 - [Development tools environment versions](docs/runtimes.md)
+
+## Contribute
+
+Turbo Commons is 100% free and open source, but we will be really pleased to receive any help, support, comments or donations to help us improve this library. If you like it, spread the word!
