@@ -1,16 +1,56 @@
-# Root orchestration dependencies and caches
+# Dependencies
 node_modules/
-.nx/
+vendor/
 
-# Native build outputs
+# Nx and native build outputs
+/.nx/
 /dist/
-packages/turbocommons-*/dist/
-packages/turbocommons-*/target/
-packages/turbocommons-*/build/
-packages/turbocommons-*/bin/
-packages/turbocommons-*/vendor/
+/packages/turbocommons-*/dist/
+/packages/turbocommons-*/target/
+/packages/turbocommons-*/build/
+/packages/turbocommons-*/bin/
+/packages/turbocommons-java/.gradle/
 
-# Package manager and generated reports
+# Temporary files and generated reports
+/packages/turbocommons-*/tmp/
+/packages/turbocommons-ts/out-tsc/
 coverage/
 *.tgz
-**/.phpunit.result.cache
+.phpunit.result.cache
+
+# Operating system files
+.DS_Store
+.DS_Store?
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+thumbs.db
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.buildpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.sonarlint
+
+# VS Code
+**/.vscode/*
+!**/.vscode/settings.json
+!**/.vscode/tasks.json
+!**/.vscode/launch.json
+!**/.vscode/extensions.json
+
+# Miscellaneous tool files
+/packages/turbocommons-ts/.angular/cache/
+/packages/turbocommons-*/.sass-cache/
+/packages/turbocommons-*/connect.lock
+libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/packages/turbocommons-*/typings/
