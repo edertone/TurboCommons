@@ -55,6 +55,38 @@ We want to increase this list. So! if you want to translate the library to your 
 
 The main goal for this library is to have zero dependencies. We are building a true standalone general purpose library.
 
+### Building the monorepo
+
+The repository is orchestrated from its root with Nx while each language keeps
+its native build tool. Install the root Node.js development dependencies once:
+
+```text
+npm install
+```
+
+Then run the complete build, test, lint, or packaging pipeline:
+
+```text
+npm run build
+npm test
+npm run lint
+npm run package
+```
+
+Individual projects can be run through Nx, for example:
+
+```text
+npx nx run turbocommons-ts:build
+npx nx run turbocommons-java:test
+npx nx run turbocommons-php:package
+```
+
+PHP uses Composer and PHPUnit, TypeScript uses `tsc` and webpack, Java uses
+Gradle, and shell scripts use ShellCheck when it is installed. PHP and
+TypeScript no longer require the legacy builder. Versions are owned by each project
+(`version.json`, `package.json`, and `version.properties`) so releases can be
+published independently.
+
 ### Contribute
 
 Turbo Commons is 100% free and open source, but we will be really pleased to receive any help, support, comments or donations to help us improve this library. If you like it, spread the word!

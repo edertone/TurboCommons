@@ -9,7 +9,9 @@
 4 - Make sure the git tag is updated with the new project version we want to publish
     (First in remote GIT repo and then in our Local by performing a fetch)
 
-5 - Generate a release build executing tests (tb -crt)
+5 - Generate and test a release build from the project directory:
+    - `npm test`
+    - `npm run package`
 
 6 - Create a folder on your desktop and add all files from dist/NNN/
 

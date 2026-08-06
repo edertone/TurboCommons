@@ -1,0 +1,23 @@
+{
+  "name": "@turbocommons/monorepo",
+  "private": true,
+  "description": "Polyglot TurboCommons monorepo orchestration",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "nx run-many -t build --all --parallel=3",
+    "test": "nx run-many -t test --all --parallel=3",
+    "lint": "nx run-many -t lint --all --parallel=3",
+    "package": "nx run-many -t package --all --parallel=3",
+    "ci": "npm run lint && npm run test && npm run package"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "jsdom": "^26.1.0",
+    "nx": "^21.4.0",
+    "qunit": "^2.24.1",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.9.2",
+    "webpack": "^5.101.3",
+    "webpack-cli": "^6.0.1"
+  }
+}

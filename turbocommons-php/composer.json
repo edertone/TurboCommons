@@ -4,6 +4,21 @@
 	"type" : "library",
 	"license" : "Apache-2.0",
 	"minimum-stability" : "stable",
+	"autoload" : {
+		"classmap" : ["src/main/php/"]
+	},
+	"autoload-dev" : {
+		"classmap" : ["src/test/php/"]
+	},
+	"require-dev" : {
+		"phpunit/phpunit" : "^9.6"
+	},
+	"scripts" : {
+		"build" : "php scripts/build-phar.php",
+		"test" : "phpunit --configuration phpunit.xml",
+		"lint" : "php scripts/lint.php",
+		"package" : "php scripts/build-phar.php"
+	},
 	"homepage" : "https://turboframework.org/en/libs/turbocommons",
 	"keywords" : [
 		"general",

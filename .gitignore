@@ -1,0 +1,14 @@
+# Root orchestration dependencies and caches
+node_modules/
+.nx/
+
+# Native build outputs
+turbocommons-*/dist/
+turbocommons-*/target/
+turbocommons-*/build/
+turbocommons-*/bin/
+turbocommons-*/vendor/
+
+# Package manager and generated reports
+coverage/
+*.tgz

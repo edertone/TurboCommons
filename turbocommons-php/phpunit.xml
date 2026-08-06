@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+         bootstrap="src/test/php/autoloader.php"
+         colors="true"
+         failOnWarning="true"
+         failOnRisky="true">
+    <testsuites>
+        <testsuite name="TurboCommons PHP">
+            <directory suffix="Test.php">src/test/php</directory>
+        </testsuite>
+    </testsuites>
+    <coverage>
+        <include>
+            <directory suffix=".php">src/main/php</directory>
+        </include>
+        <exclude>
+            <file>src/main/php/autoloader.php</file>
+        </exclude>
+    </coverage>
+</phpunit>
