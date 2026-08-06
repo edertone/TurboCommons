@@ -3,17 +3,13 @@ set -Eeuo pipefail
 
 cd /workspace
 
-if [[ ! -x /workspace/node_modules/.bin/nx || ! -x /workspace/node_modules/.bin/jest ]]; then
-  npm ci --ignore-scripts
-fi
+npm ci --ignore-scripts
 
-if [[ ! -f /workspace/packages/turbocommons-php/vendor/autoload.php ]]; then
-  composer install \
-    --working-dir=/workspace/packages/turbocommons-php \
-    --no-interaction \
-    --no-progress \
-    --prefer-dist
-fi
+composer install \
+  --working-dir=/workspace/packages/turbocommons-php \
+  --no-interaction \
+  --no-progress \
+  --prefer-dist
 
 stage_distribution() {
   local distribution_root=/workspace/dist

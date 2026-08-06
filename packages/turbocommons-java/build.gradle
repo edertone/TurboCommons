@@ -20,8 +20,15 @@ version = providers.fileContents(layout.projectDirectory.file('version.propertie
     }
     .get()
 description = 'TurboCommons-Java'
-java.sourceCompatibility = JavaVersion.VERSION_17
-java.targetCompatibility = JavaVersion.VERSION_17
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+dependencyLocking {
+    lockAllConfigurations()
+}
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
