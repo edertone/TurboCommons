@@ -59,7 +59,7 @@ const n = StringUtils.countWords('word1 word2 word3');
 Import the shell utilities from a fixed Git commit:
 
 ```bash
-source <(curl -fsSL "https://raw.githubusercontent.com/edertone/turbocommons/<sha>/turbocommons-shell/ubuntu/script-common-tools.sh")
+source <(curl -fsSL "https://raw.githubusercontent.com/edertone/turbocommons/<sha>/packages/turbocommons-shell/ubuntu/script-common-tools.sh")
 sct_user_must_exist "username" "username must exist!"
 ```
 

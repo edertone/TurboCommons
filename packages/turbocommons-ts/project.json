@@ -1,0 +1,28 @@
+{
+  "name": "turbocommons-ts",
+  "root": "packages/turbocommons-ts",
+  "sourceRoot": "packages/turbocommons-ts/src/main/ts",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": { "command": "npm run build", "cwd": "packages/turbocommons-ts" },
+      "outputs": ["{projectRoot}/dist"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": { "command": "npm run test", "cwd": "packages/turbocommons-ts" }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": { "command": "npm run lint", "cwd": "packages/turbocommons-ts" }
+    },
+    "package": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": { "command": "npm run package", "cwd": "packages/turbocommons-ts" },
+      "outputs": ["{projectRoot}/dist/packages"]
+    }
+  }
+}

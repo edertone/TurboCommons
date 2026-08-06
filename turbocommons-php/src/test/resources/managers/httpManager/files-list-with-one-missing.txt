@@ -1,4 +1,0 @@
-file1.txt
-file2.xml
-this-is-missing.txt
-file3.json

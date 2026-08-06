@@ -51,6 +51,8 @@ The Docker entrypoint orchestrates the registered Nx projects:
 - `turbocommons-java`
 - `turbocommons-shell`
 
+The implementations are stored under the root `packages/` directory.
+
 Use the standard commands for the corresponding operation:
 
 ```text
@@ -104,10 +106,10 @@ Project-local output directories remain available to native tools. The root
 
 Versions are owned by each project:
 
-- PHP: `turbocommons-php/version.json`
+- PHP: `packages/turbocommons-php/version.json`
 - TypeScript and browser bundles: project `package.json` files
-- Java: `turbocommons-java/version.properties`
-- Shell: `turbocommons-shell/package.json`
+- Java: `packages/turbocommons-java/version.properties`
+- Shell: `packages/turbocommons-shell/package.json`
 
 This allows each package to be released independently from the same repository.
 

@@ -4,11 +4,11 @@ node_modules/
 
 # Native build outputs
 /dist/
-turbocommons-*/dist/
-turbocommons-*/target/
-turbocommons-*/build/
-turbocommons-*/bin/
-turbocommons-*/vendor/
+packages/turbocommons-*/dist/
+packages/turbocommons-*/target/
+packages/turbocommons-*/build/
+packages/turbocommons-*/bin/
+packages/turbocommons-*/vendor/
 
 # Package manager and generated reports
 coverage/

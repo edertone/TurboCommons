@@ -1,0 +1,13 @@
+{
+  "name": "turbocommons-shell",
+  "version": "0.0.1",
+  "description": "TurboCommons shell utilities",
+  "private": true,
+  "license": "Apache-2.0",
+  "scripts": {
+    "lint": "node scripts/check-shell.js",
+    "test": "node -e \"console.log('Shell tests are not defined yet.')\"",
+    "build": "node -e \"console.log('Shell utilities require no compilation.')\"",
+    "package": "node -e \"console.log('Shell utilities are distributed as source files.')\""
+  }
+}

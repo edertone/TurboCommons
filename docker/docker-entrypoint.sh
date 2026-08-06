@@ -7,9 +7,9 @@ if [[ ! -x /workspace/node_modules/.bin/nx ]]; then
   npm ci --ignore-scripts
 fi
 
-if [[ ! -f /workspace/turbocommons-php/vendor/autoload.php ]]; then
+if [[ ! -f /workspace/packages/turbocommons-php/vendor/autoload.php ]]; then
   composer install \
-    --working-dir=/workspace/turbocommons-php \
+    --working-dir=/workspace/packages/turbocommons-php \
     --no-interaction \
     --no-progress \
     --prefer-dist
@@ -28,21 +28,21 @@ stage_distribution() {
     "$distribution_root/turbocommons-java" \
     "$distribution_root/turbocommons-shell"
 
-  php_version="$(node -p "require('./turbocommons-php/version.json').version")"
-  cp /workspace/turbocommons-php/dist/turbocommons-php-"$php_version".phar \
+  php_version="$(node -p "require('./packages/turbocommons-php/version.json').version")"
+  cp /workspace/packages/turbocommons-php/dist/turbocommons-php-"$php_version".phar \
     "$distribution_root/turbocommons-php/"
 
-  find /workspace/turbocommons-ts/dist/packages -maxdepth 1 -type f -name '*.tgz' \
+  find /workspace/packages/turbocommons-ts/dist/packages -maxdepth 1 -type f -name '*.tgz' \
     -exec cp {} "$distribution_root/turbocommons-ts/" \;
 
-  java_version="$(sed -n 's/^version=//p' /workspace/turbocommons-java/version.properties)"
-  find /workspace/turbocommons-java/build/libs -maxdepth 1 -type f -name '*.jar' \
+  java_version="$(sed -n 's/^version=//p' /workspace/packages/turbocommons-java/version.properties)"
+  find /workspace/packages/turbocommons-java/build/libs -maxdepth 1 -type f -name '*.jar' \
     -exec cp {} "$distribution_root/turbocommons-java/" \;
   printf '%s\n' "$java_version" > "$distribution_root/turbocommons-java/VERSION"
 
-  shell_version="$(node -p "require('./turbocommons-shell/package.json').version")"
+  shell_version="$(node -p "require('./packages/turbocommons-shell/package.json').version")"
   tar -czf "$distribution_root/turbocommons-shell/turbocommons-shell-"$shell_version".tar.gz" \
-    -C /workspace/turbocommons-shell ubuntu win-powershell README.md package.json
+    -C /workspace/packages/turbocommons-shell ubuntu win-powershell README.md package.json
 }
 
 case "${1:-ci}" in
@@ -50,10 +50,10 @@ case "${1:-ci}" in
     rm -rf \
       /workspace/.nx \
       /workspace/dist \
-      /workspace/turbocommons-*/dist \
-      /workspace/turbocommons-*/target \
-      /workspace/turbocommons-*/build \
-      /workspace/turbocommons-*/bin
+      /workspace/packages/turbocommons-*/dist \
+      /workspace/packages/turbocommons-*/target \
+      /workspace/packages/turbocommons-*/build \
+      /workspace/packages/turbocommons-*/bin
     ;;
   build)
     exec npx nx run-many -t build --all --parallel=3

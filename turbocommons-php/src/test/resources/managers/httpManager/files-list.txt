@@ -1,3 +1,0 @@
-file1.txt
-file2.xml
-file3.json

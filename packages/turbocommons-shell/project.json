@@ -1,0 +1,24 @@
+{
+  "name": "turbocommons-shell",
+  "root": "packages/turbocommons-shell",
+  "sourceRoot": "packages/turbocommons-shell/ubuntu",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": { "command": "npm run build", "cwd": "packages/turbocommons-shell" }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": { "command": "npm run test", "cwd": "packages/turbocommons-shell" }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": { "command": "npm run lint", "cwd": "packages/turbocommons-shell" }
+    },
+    "package": {
+      "executor": "nx:run-commands",
+      "options": { "command": "npm run package", "cwd": "packages/turbocommons-shell" }
+    }
+  }
+}

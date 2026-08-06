@@ -11,7 +11,7 @@ services:
     volumes:
       - .:/workspace
       - turbocommons-node-modules:/workspace/node_modules
-      - turbocommons-php-vendor:/workspace/turbocommons-php/vendor
+      - turbocommons-php-vendor:/workspace/packages/turbocommons-php/vendor
       - turbocommons-npm-cache:/opt/npm-cache
       - turbocommons-composer-cache:/opt/composer/cache
       - turbocommons-gradle-cache:/opt/gradle

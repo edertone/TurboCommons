@@ -1,0 +1,36 @@
+{
+  "name": "turbocommons-ts",
+  "version": "4.0.0",
+  "description": "General purpose TypeScript and JavaScript utility library",
+  "license": "Apache-2.0",
+  "homepage": "https://turboframework.org/en/libs/turbocommons",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/edertone/turbocommons.git",
+    "directory": "turbocommons-ts"
+  },
+  "main": "dist/ts/index.js",
+  "types": "dist/ts/index.d.ts",
+  "files": ["dist/ts"],
+  "scripts": {
+    "clean": "node scripts/clean.js",
+    "build:ts": "tsc -p tsconfig.json",
+    "build:bundles": "webpack --config webpack.config.js",
+    "write:metadata": "node scripts/write-package-metadata.js",
+    "build": "npm run clean && npm run build:ts && npm run build:bundles && npm run write:metadata",
+    "test": "npm run build:ts && node scripts/run-tests.js",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "package": "npm run build && npm run package:main && npm run package:bundles",
+    "package:main": "node -e \"require('node:fs').mkdirSync('dist/packages',{recursive:true})\" && npm pack --pack-destination dist/packages",
+    "package:bundles": "node scripts/package-bundles.js"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "jsdom": "^26.1.0",
+    "qunit": "^2.24.1",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.9.2",
+    "webpack": "^5.101.3",
+    "webpack-cli": "^6.0.1"
+  }
+}
