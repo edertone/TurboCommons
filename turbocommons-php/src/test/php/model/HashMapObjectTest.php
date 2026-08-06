@@ -33,7 +33,7 @@ class HashMapObjectTest extends TestCase {
      *
      * @return void
      */
-    public static function setUpBeforeClass(){
+    public static function setUpBeforeClass(): void{
 
         // Nothing necessary here
     }
@@ -44,7 +44,7 @@ class HashMapObjectTest extends TestCase {
      *
      * @return void
      */
-    protected function setUp(){
+    protected function setUp(): void{
 
         $this->exceptionMessage = '';
 
@@ -69,7 +69,7 @@ class HashMapObjectTest extends TestCase {
      *
      * @return void
      */
-    protected function tearDown(){
+    protected function tearDown(): void{
 
         if($this->exceptionMessage != ''){
 
@@ -83,7 +83,7 @@ class HashMapObjectTest extends TestCase {
      *
      * @return void
      */
-    public static function tearDownAfterClass(){
+    public static function tearDownAfterClass(): void{
 
         // Nothing necessary here
     }

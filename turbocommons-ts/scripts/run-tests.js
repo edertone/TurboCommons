@@ -36,17 +36,29 @@ function serve(request, response) {
     response.end('Not found');
     return;
   }
-  response.writeHead(200);
+  response.writeHead(200, {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': '*',
+    'Access-Control-Allow-Methods': 'GET, OPTIONS'
+  });
   fs.createReadStream(file).pipe(response);
 }
 
 const server = http.createServer(serve);
 server.listen(0, '127.0.0.1', () => {
   const port = server.address().port;
+  const testOrigin = `http://127.0.0.1:${port}`;
   const dom = new JSDOM('<!doctype html><html><body></body></html>', {
-    url: `http://127.0.0.1:${port}/runner.html`,
+    url: `${testOrigin}/runner.html`,
     pretendToBeVisual: true
   });
+
+  dom.window.XMLHttpRequest = class LocalXMLHttpRequest extends dom.window.XMLHttpRequest {
+    open(method, url, ...args) {
+      const parsed = new URL(url, `${testOrigin}/`);
+      return super.open(method, parsed.href, ...args);
+    }
+  };
 
   global.window = dom.window;
   global.document = dom.window.document;
@@ -57,22 +69,11 @@ server.listen(0, '127.0.0.1', () => {
   global.org_turbocommons = require(sourceRoot);
   global.window.org_turbocommons = global.org_turbocommons;
 
-  const originalOpen = global.XMLHttpRequest.prototype.open;
-  const originalSend = global.XMLHttpRequest.prototype.send;
-  global.XMLHttpRequest.prototype.open = function(method, url, ...args) {
-    const parsed = new URL(url, `http://127.0.0.1:${port}/`);
-    this.__testUrl = parsed.href;
-    return originalOpen.call(this, method, parsed.href, ...args);
-  };
-  global.XMLHttpRequest.prototype.send = function(body) {
-    return originalSend.call(this, body);
-  };
-
   QUnit.config.autostart = false;
   QUnit.on('runEnd', (details) => {
     server.close();
     dom.window.close();
-    process.exitCode = 0;
+    process.exitCode = details.testCounts.failed > 0 ? 1 : 0;
     console.log(`TypeScript tests: ${details.testCounts.total} total, ${details.testCounts.passed} passed, ${details.testCounts.failed} failed`);
   });
 

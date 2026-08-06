@@ -2,7 +2,6 @@
 target/
 bin/
 dist/
-composer.lock
 
 
 # Operating system common files

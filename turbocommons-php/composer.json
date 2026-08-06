@@ -11,7 +11,7 @@
 		"classmap" : ["src/test/php/"]
 	},
 	"require-dev" : {
-		"phpunit/phpunit" : "^9.6"
+		"phpunit/phpunit" : "^8.5"
 	},
 	"scripts" : {
 		"build" : "php scripts/build-phar.php",

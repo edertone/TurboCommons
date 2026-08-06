@@ -32,7 +32,7 @@ class DateTimeObjectTest extends TestCase {
      *
      * @return void
      */
-    public static function setUpBeforeClass(){
+    public static function setUpBeforeClass(): void{
 
         // Used to standarize tests (this value is automatically restored by the php engine after the script ends).
         // We use UTC as the tests default timezone to prevent test failures when being executed on different parts of the year that have
@@ -46,7 +46,7 @@ class DateTimeObjectTest extends TestCase {
      *
      * @return void
      */
-    protected function setUp(){
+    protected function setUp(): void{
 
         // Define a list of values that will be considered as empty string values
         $this->emptyStringValues = [[], null, '', '     ', "\n\n\n", 0];
@@ -85,7 +85,7 @@ class DateTimeObjectTest extends TestCase {
      *
      * @return void
      */
-    protected function tearDown(){
+    protected function tearDown(): void{
 
         // Nothing necessary here
     }
@@ -96,7 +96,7 @@ class DateTimeObjectTest extends TestCase {
      *
      * @return void
      */
-    public static function tearDownAfterClass(){
+    public static function tearDownAfterClass(): void{
 
         // Nothing necessary here
     }

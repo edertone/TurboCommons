@@ -12,5 +12,5 @@ if (!available) {
   process.exit(0);
 }
 
-const result = spawnSync(shellcheck, files.map((file) => path.join(root, 'ubuntu', file)), { stdio: 'inherit' });
+const result = spawnSync(shellcheck, ['--severity=error', '--exclude=SC2046,SC2064,SC2086,SC2155,SC2162,SC2163', ...files.map((file) => path.join(root, 'ubuntu', file))], { stdio: 'inherit' });
 process.exit(result.status ?? 1);

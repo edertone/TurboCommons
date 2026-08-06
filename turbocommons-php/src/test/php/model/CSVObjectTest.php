@@ -42,7 +42,7 @@ class CSVObjectTest extends TestCase {
      *
      * @return void
      */
-    public static function setUpBeforeClass(){
+    public static function setUpBeforeClass(): void{
 
         self::$basePath = __DIR__.'/../../resources/model/csvObject';
 
@@ -78,7 +78,7 @@ class CSVObjectTest extends TestCase {
      *
      * @return void
      */
-    protected function setUp(){
+    protected function setUp(): void{
 
         $this->exceptionMessage = '';
 
@@ -95,7 +95,7 @@ class CSVObjectTest extends TestCase {
      *
      * @return void
      */
-    protected function tearDown(){
+    protected function tearDown(): void{
 
         if($this->exceptionMessage != ''){
 
@@ -109,7 +109,7 @@ class CSVObjectTest extends TestCase {
      *
      * @return void
      */
-    public static function tearDownAfterClass(){
+    public static function tearDownAfterClass(): void{
 
         // Nothing necessary here
     }

@@ -8,7 +8,17 @@
     "test": "nx run-many -t test --all --parallel=3",
     "lint": "nx run-many -t lint --all --parallel=3",
     "package": "nx run-many -t package --all --parallel=3",
-    "ci": "npm run lint && npm run test && npm run package"
+    "ci": "npm run lint && npm run test && npm run package",
+    "docker:build": "docker compose build toolbox",
+    "docker:build:no-cache": "docker compose build --no-cache toolbox",
+    "docker:run": "docker compose run --rm toolbox",
+    "docker:build:all": "docker compose run --rm toolbox npm run build",
+    "docker:test": "docker compose run --rm toolbox npm test",
+    "docker:lint": "docker compose run --rm toolbox npm run lint",
+    "docker:package": "docker compose run --rm toolbox npm run package",
+    "docker:ci": "docker compose run --rm toolbox npm run ci",
+    "docker:php:test": "docker compose run --rm toolbox composer test --working-dir=turbocommons-php",
+    "docker:ts:test": "docker compose run --rm toolbox npm run test --prefix turbocommons-ts"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

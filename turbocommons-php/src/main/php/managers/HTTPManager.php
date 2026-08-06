@@ -647,7 +647,7 @@ class HTTPManager extends BaseStrictClass {
 
                 $requestsList = [new HTTPManagerGetRequest($requests)];
 
-            } else if (get_parent_class($requests) === 'org\\turbocommons\\src\\main\\php\\managers\\httpmanager\\HTTPManagerBaseRequest'){
+            } else if (is_object($requests) && get_parent_class($requests) === 'org\\turbocommons\\src\\main\\php\\managers\\httpmanager\\HTTPManagerBaseRequest'){
 
                 $requestsList = [$requests];
 

@@ -1,0 +1,31 @@
+services:
+  toolbox:
+    image: turbocommons/toolbox:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        COMPOSER_VERSION: "2.8.10"
+        SHELLCHECK_VERSION: "0.10.0"
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - turbocommons-node-modules:/workspace/node_modules
+      - turbocommons-php-vendor:/workspace/turbocommons-php/vendor
+      - turbocommons-npm-cache:/opt/npm-cache
+      - turbocommons-composer-cache:/opt/composer/cache
+      - turbocommons-gradle-cache:/opt/gradle
+    environment:
+      COMPOSER_ALLOW_SUPERUSER: "1"
+      COMPOSER_HOME: /opt/composer
+      GRADLE_USER_HOME: /opt/gradle
+      NX_DAEMON: "false"
+      npm_config_cache: /opt/npm-cache
+    init: true
+
+volumes:
+  turbocommons-node-modules:
+  turbocommons-php-vendor:
+  turbocommons-npm-cache:
+  turbocommons-composer-cache:
+  turbocommons-gradle-cache:

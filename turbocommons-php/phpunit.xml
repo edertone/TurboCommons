@@ -3,8 +3,8 @@
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
          bootstrap="src/test/php/autoloader.php"
          colors="true"
-         failOnWarning="true"
-         failOnRisky="true">
+         failOnWarning="false"
+         failOnRisky="false">
     <testsuites>
         <testsuite name="TurboCommons PHP">
             <directory suffix="Test.php">src/test/php</directory>

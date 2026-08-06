@@ -1,0 +1,14 @@
+.git
+.nx
+node_modules
+**/node_modules
+**/vendor
+**/build
+**/target
+**/dist
+**/bin
+coverage
+*.tgz
+*.log
+.vscode
+.idea

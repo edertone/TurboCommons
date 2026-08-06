@@ -69,7 +69,7 @@ abstract class BaseSingletonClass extends BaseStrictClass{
      *
      * @return void
      */
-    private function __wakeup(){
+    public function __wakeup(){
 
     }
 }

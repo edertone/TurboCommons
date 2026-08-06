@@ -55,37 +55,56 @@ We want to increase this list. So! if you want to translate the library to your 
 
 The main goal for this library is to have zero dependencies. We are building a true standalone general purpose library.
 
-### Building the monorepo
+### Building the monorepo with Docker
 
-The repository is orchestrated from its root with Nx while each language keeps
-its native build tool. Install the root Node.js development dependencies once:
+The complete build environment is provided by one Docker image. Docker Desktop
+is the only runtime that needs to be installed on the host; Node.js, Nx, PHP,
+Composer, PHPUnit, Java, Gradle, Bash, and ShellCheck run inside the toolbox
+container.
 
-```text
-npm install
-```
-
-Then run the complete build, test, lint, or packaging pipeline:
+Build the image once:
 
 ```text
-npm run build
-npm test
-npm run lint
-npm run package
+docker compose build toolbox
 ```
 
-Individual projects can be run through Nx, for example:
+Run the complete build, test, lint, or packaging pipeline:
 
 ```text
-npx nx run turbocommons-ts:build
-npx nx run turbocommons-java:test
-npx nx run turbocommons-php:package
+docker compose run --rm toolbox npm run build
+docker compose run --rm toolbox npm test
+docker compose run --rm toolbox npm run lint
+docker compose run --rm toolbox npm run package
 ```
 
-PHP uses Composer and PHPUnit, TypeScript uses `tsc` and webpack, Java uses
-Gradle, and shell scripts use ShellCheck when it is installed. PHP and
-TypeScript no longer require the legacy builder. Versions are owned by each project
-(`version.json`, `package.json`, and `version.properties`) so releases can be
-published independently.
+On Windows PowerShell, use the convenience wrapper:
+
+```text
+.\scripts\docker.ps1 build
+.\scripts\docker.ps1 test
+.\scripts\docker.ps1 lint
+.\scripts\docker.ps1 package
+```
+
+The repository is mounted into `/workspace`. Named Docker volumes preserve
+Node.js dependencies, Composer dependencies, npm and Composer caches, and the
+Gradle cache between runs. Build artifacts are written into the mounted project
+directories and remain visible on the host.
+
+To open a shell in the toolbox:
+
+```text
+.\scripts\docker.ps1 shell
+```
+
+Inside the container, Nx orchestrates the native tools. PHP uses Composer and
+PHPUnit, TypeScript uses `tsc` and webpack, Java uses Gradle, and shell scripts
+use ShellCheck. Versions are owned by each project (`version.json`, `package.json`,
+and `version.properties`) so releases can be published independently.
+
+The image is intentionally single and polyglot for consistent local and CI
+execution. Browser tests that require a real Chrome or Firefox instance remain
+separate from the Node/JSDOM test target.
 
 ### Contribute
 

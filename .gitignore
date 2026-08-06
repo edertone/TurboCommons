@@ -12,3 +12,4 @@ turbocommons-*/vendor/
 # Package manager and generated reports
 coverage/
 *.tgz
+**/.phpunit.result.cache
