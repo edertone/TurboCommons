@@ -21,7 +21,7 @@
     "test": "npm run build:ts && node scripts/run-tests.js",
     "lint": "tsc -p tsconfig.json --noEmit",
     "package": "npm run build && npm run package:main && npm run package:bundles",
-    "package:main": "npm pack --pack-destination dist/packages",
+    "package:main": "node -e \"require('node:fs').mkdirSync('dist/packages',{recursive:true})\" && npm pack --pack-destination dist/packages",
     "package:bundles": "node scripts/package-bundles.js"
   },
   "devDependencies": {

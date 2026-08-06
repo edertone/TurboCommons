@@ -3,6 +3,7 @@ node_modules/
 .nx/
 
 # Native build outputs
+/dist/
 turbocommons-*/dist/
 turbocommons-*/target/
 turbocommons-*/build/

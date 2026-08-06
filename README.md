@@ -77,6 +77,7 @@ npm test
 npm run lint
 npm run package
 npm run clean
+npm run dist
 ```
 
 The scripts rebuild the image when required. There are no `docker:*`, `*:local`,
@@ -98,6 +99,28 @@ npm run clean
 
 This removes generated `dist`, `target`, `build`, `bin`, and `.nx` directories.
 It does not remove `node_modules`, Composer `vendor`, or Docker caches.
+
+The `package` and `ci` commands also stage the final artifacts in the root
+`dist/` directory. To build and stage artifacts without running lint and tests,
+use:
+
+```text
+npm run dist
+```
+
+The release staging layout is:
+
+```text
+dist/
+├── turbocommons-php/
+├── turbocommons-ts/
+├── turbocommons-java/
+└── turbocommons-shell/
+```
+
+Project-local build directories remain available for native tooling. The root
+directory contains only final release artifacts, organized by project and
+independently versioned where package metadata provides a version.
 
 Inside the container, Nx orchestrates the native tools. PHP uses Composer and
 PHPUnit, TypeScript uses `tsc` and webpack, Java uses Gradle, and shell scripts
