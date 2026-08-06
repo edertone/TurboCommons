@@ -58,7 +58,7 @@ RUN npm ci --ignore-scripts
 
 COPY . .
 
-COPY docker-entrypoint.sh /usr/local/bin/turbocommons-entrypoint
+COPY docker/docker-entrypoint.sh /usr/local/bin/turbocommons-entrypoint
 RUN chmod +x turbocommons-java/gradlew /usr/local/bin/turbocommons-entrypoint
 
 ENTRYPOINT ["/usr/local/bin/turbocommons-entrypoint"]

@@ -3,7 +3,7 @@ services:
     image: turbocommons/toolbox:local
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
       args:
         COMPOSER_VERSION: "2.8.10"
         SHELLCHECK_VERSION: "0.10.0"

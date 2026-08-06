@@ -15,4 +15,4 @@ case "$task" in
   *) echo "Usage: $0 {build|test|lint|package|ci|shell} [arguments...]" >&2; exit 2 ;;
 esac
 
-docker compose run --rm --build toolbox "${command[@]}" "$@"
+docker compose -f docker-compose.yaml run --rm --build toolbox "${command[@]}" "$@"

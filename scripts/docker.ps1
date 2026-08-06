@@ -11,7 +11,7 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-Location (Join-Path $PSScriptRoot '..')
 
-$dockerCommand = @('compose', 'run', '--rm', '--build', 'toolbox')
+$dockerCommand = @('compose', '-f', 'docker-compose.yaml', 'run', '--rm', '--build', 'toolbox')
 
 switch ($Task) {
     'build' { $command = @('build') }

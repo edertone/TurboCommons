@@ -65,7 +65,7 @@ container.
 Build the image once:
 
 ```text
-docker compose build toolbox
+docker compose -f docker-compose.yaml build toolbox
 ```
 
 The root npm scripts are the canonical commands. Each one automatically runs
@@ -79,7 +79,8 @@ npm run package
 ```
 
 The scripts rebuild the image when required. There are no `docker:*`, `*:local`,
-or host-side Nx npm scripts. The Docker entrypoint maps each operation to Nx
+or host-side Nx npm scripts. The entrypoint in `docker/docker-entrypoint.sh`
+maps each operation to Nx
 inside the container.
 
 On Windows PowerShell, use the convenience wrapper:

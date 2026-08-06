@@ -4,11 +4,11 @@
   "description": "Polyglot TurboCommons monorepo orchestration",
   "license": "Apache-2.0",
   "scripts": {
-    "build": "docker compose run --rm --build toolbox build",
-    "test": "docker compose run --rm --build toolbox test",
-    "lint": "docker compose run --rm --build toolbox lint",
-    "package": "docker compose run --rm --build toolbox package",
-    "ci": "docker compose run --rm --build toolbox ci"
+    "build": "docker compose -f docker-compose.yaml run --rm --build toolbox build",
+    "test": "docker compose -f docker-compose.yaml run --rm --build toolbox test",
+    "lint": "docker compose -f docker-compose.yaml run --rm --build toolbox lint",
+    "package": "docker compose -f docker-compose.yaml run --rm --build toolbox package",
+    "ci": "docker compose -f docker-compose.yaml run --rm --build toolbox ci"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
