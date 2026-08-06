@@ -28,12 +28,21 @@ Docker container:
 ```text
 npm run build
 npm test
+npm run test:ts
 npm run lint
 npm run package
 npm run clean
 npm run dist
 npm run ci
 ```
+
+To run only the TypeScript package tests from the repository root, use:
+
+```text
+npm run test:ts
+```
+
+The root `npm test` command runs the test target for every registered project.
 
 There are no host-side Nx commands. Nx runs only inside the Docker entrypoint
 at `docker/docker-entrypoint.sh`.

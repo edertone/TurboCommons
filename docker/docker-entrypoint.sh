@@ -3,7 +3,7 @@ set -Eeuo pipefail
 
 cd /workspace
 
-if [[ ! -x /workspace/node_modules/.bin/nx ]]; then
+if [[ ! -x /workspace/node_modules/.bin/nx || ! -x /workspace/node_modules/.bin/jest ]]; then
   npm ci --ignore-scripts
 fi
 

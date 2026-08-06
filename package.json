@@ -6,6 +6,7 @@
   "scripts": {
     "build": "docker compose -f docker-compose.yaml run --rm --build toolbox build",
     "test": "docker compose -f docker-compose.yaml run --rm --build toolbox test",
+    "test:ts": "docker compose -f docker-compose.yaml run --rm --build toolbox nx run turbocommons-ts:test",
     "lint": "docker compose -f docker-compose.yaml run --rm --build toolbox lint",
     "package": "docker compose -f docker-compose.yaml run --rm --build toolbox package",
     "ci": "docker compose -f docker-compose.yaml run --rm --build toolbox ci",
@@ -14,9 +15,9 @@
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
-    "jsdom": "^26.1.0",
+    "jest": "^30.0.0",
+    "jest-environment-jsdom": "^30.0.0",
     "nx": "^21.4.0",
-    "qunit": "^2.24.1",
     "ts-loader": "^9.5.2",
     "typescript": "^5.9.2",
     "webpack": "^5.101.3",
