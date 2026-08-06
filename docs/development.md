@@ -16,10 +16,22 @@ Only Docker Desktop is required on the host. The toolbox image contains:
 
 ## Docker workflow
 
-Build the toolbox image explicitly:
+Build the toolbox image once (or after changing the Docker environment):
 
 ```text
-docker compose -f docker-compose.yaml build toolbox
+npm run docker:build
+```
+
+The normal source code workflow does not rebuild the image. The repository is
+mounted into the container, so changes under the repository are available
+immediately. The entrypoint compares the dependency lockfiles with stamps in
+the named dependency volumes and only runs `npm ci` or `composer install` when
+the dependencies are missing or the lockfiles have changed.
+
+To check or refresh dependencies explicitly, use:
+
+```text
+npm run docker:deps
 ```
 
 The root npm scripts are the canonical commands. They run entirely inside the
@@ -38,6 +50,16 @@ npm run clean
 npm run dist
 npm run ci
 ```
+
+Open a shell in the toolbox when running several commands interactively:
+
+```text
+npm run docker:shell
+```
+
+Rebuild the image with `npm run docker:build` when changing `docker/Dockerfile`,
+the pinned runtime or system package versions, or other image-level
+configuration. `--build` is intentionally not used by the routine scripts.
 
 To run only one library's tests from the repository root, use the corresponding
 script:

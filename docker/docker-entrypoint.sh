@@ -3,13 +3,38 @@ set -Eeuo pipefail
 
 cd /workspace
 
-npm ci --ignore-scripts
+dependency_stamp() {
+  sha256sum "$@" | sha256sum | awk '{print $1}'
+}
 
-composer install \
-  --working-dir=/workspace/packages/turbocommons-php \
-  --no-interaction \
-  --no-progress \
-  --prefer-dist
+ensure_dependencies() {
+  local node_marker=/workspace/node_modules/.turbocommons-dependencies
+  local composer_marker=/workspace/packages/turbocommons-php/vendor/.turbocommons-dependencies
+  local node_stamp
+  local composer_stamp
+
+  node_stamp="$(dependency_stamp package.json package-lock.json)"
+  if [[ ! -x /workspace/node_modules/.bin/nx || ! -f "$node_marker" || "$(cat "$node_marker")" != "$node_stamp" ]]; then
+    echo 'Installing Node.js dependencies...'
+    npm ci --ignore-scripts
+    printf '%s\n' "$node_stamp" > "$node_marker"
+  fi
+
+  composer_stamp="$(dependency_stamp packages/turbocommons-php/composer.json packages/turbocommons-php/composer.lock)"
+  if [[ ! -f /workspace/packages/turbocommons-php/vendor/autoload.php || ! -f "$composer_marker" || "$(cat "$composer_marker")" != "$composer_stamp" ]]; then
+    echo 'Installing PHP dependencies...'
+    composer install \
+      --working-dir=/workspace/packages/turbocommons-php \
+      --no-interaction \
+      --no-progress \
+      --prefer-dist
+    printf '%s\n' "$composer_stamp" > "$composer_marker"
+  fi
+}
+
+if [[ "${1:-ci}" != "clean" ]]; then
+  ensure_dependencies
+fi
 
 stage_distribution() {
   local distribution_root=/workspace/dist
@@ -50,6 +75,8 @@ case "${1:-ci}" in
       /workspace/packages/turbocommons-*/target \
       /workspace/packages/turbocommons-*/build \
       /workspace/packages/turbocommons-*/bin
+    ;;
+  deps)
     ;;
   build)
     exec npx nx run-many -t build --all --parallel=3
