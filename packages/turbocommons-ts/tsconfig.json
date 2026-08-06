@@ -3,7 +3,7 @@
     "target": "ES2018",
     "module": "commonjs",
     "lib": ["ES2015", "DOM"],
-    "rootDir": "src/main/ts",
+    "rootDir": "src",
     "outDir": "dist/ts",
     "declaration": true,
     "sourceMap": true,
@@ -12,5 +12,5 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
   },
-  "include": ["src/main/ts/**/*.ts"]
+  "include": ["src/**/*.ts"]
 }

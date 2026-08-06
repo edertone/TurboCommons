@@ -1,6 +1,6 @@
 const path = require('node:path');
 
-const sourceEntry = path.resolve(__dirname, 'src/main/ts/index.ts');
+const sourceEntry = path.resolve(__dirname, 'src/index.ts');
 
 module.exports = [
   {

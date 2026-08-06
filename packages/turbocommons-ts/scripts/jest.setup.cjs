@@ -3,7 +3,7 @@ const http = require('node:http');
 const path = require('node:path');
 
 const projectRoot = path.resolve(__dirname, '..');
-const testRoot = path.join(projectRoot, 'src', 'test');
+const testRoot = path.join(projectRoot, 'tests');
 const sourceRoot = path.join(projectRoot, 'dist', 'ts');
 const resourceRoot = path.join(testRoot, 'resources');
 

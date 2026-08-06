@@ -4,7 +4,7 @@
     "default": ["{projectRoot}/**/*", "sharedGlobals"],
     "production": [
       "default",
-      "!{projectRoot}/src/test/**/*",
+      "!{projectRoot}/tests/**/*",
       "!{projectRoot}/**/*.test.*",
       "!{projectRoot}/**/*Test.*"
     ],

@@ -1,7 +1,7 @@
 {
   "name": "turbocommons-ts",
   "root": "packages/turbocommons-ts",
-  "sourceRoot": "packages/turbocommons-ts/src/main/ts",
+  "sourceRoot": "packages/turbocommons-ts/src",
   "projectType": "library",
   "targets": {
     "build": {
