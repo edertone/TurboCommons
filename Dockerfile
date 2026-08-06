@@ -62,4 +62,4 @@ COPY docker-entrypoint.sh /usr/local/bin/turbocommons-entrypoint
 RUN chmod +x turbocommons-java/gradlew /usr/local/bin/turbocommons-entrypoint
 
 ENTRYPOINT ["/usr/local/bin/turbocommons-entrypoint"]
-CMD ["npm", "run", "ci"]
+CMD ["ci"]

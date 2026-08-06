@@ -68,22 +68,27 @@ Build the image once:
 docker compose build toolbox
 ```
 
-Run the complete build, test, lint, or packaging pipeline:
+The root npm scripts are the canonical commands. Each one automatically runs
+the corresponding operation inside the Docker toolbox:
 
 ```text
-docker compose run --rm toolbox npm run build
-docker compose run --rm toolbox npm test
-docker compose run --rm toolbox npm run lint
-docker compose run --rm toolbox npm run package
+npm run build
+npm test
+npm run lint
+npm run package
 ```
+
+The scripts rebuild the image when required. There are no `docker:*`, `*:local`,
+or host-side Nx npm scripts. The Docker entrypoint maps each operation to Nx
+inside the container.
 
 On Windows PowerShell, use the convenience wrapper:
 
 ```text
-.\scripts\docker.ps1 build
-.\scripts\docker.ps1 test
-.\scripts\docker.ps1 lint
-.\scripts\docker.ps1 package
+\.\scripts\docker.ps1 build
+\.\scripts\docker.ps1 test
+\.\scripts\docker.ps1 lint
+\.\scripts\docker.ps1 package
 ```
 
 The repository is mounted into `/workspace`. Named Docker volumes preserve
@@ -96,6 +101,9 @@ To open a shell in the toolbox:
 ```text
 .\scripts\docker.ps1 shell
 ```
+
+The PowerShell and Bash wrappers are optional convenience interfaces. The
+package scripts above are the primary interface.
 
 Inside the container, Nx orchestrates the native tools. PHP uses Composer and
 PHPUnit, TypeScript uses `tsc` and webpack, Java uses Gradle, and shell scripts

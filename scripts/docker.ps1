@@ -11,14 +11,14 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-Location (Join-Path $PSScriptRoot '..')
 
-$dockerCommand = @('compose', 'run', '--rm', 'toolbox')
+$dockerCommand = @('compose', 'run', '--rm', '--build', 'toolbox')
 
 switch ($Task) {
-    'build' { $command = @('npm', 'run', 'build') }
-    'test' { $command = @('npm', 'test') }
-    'lint' { $command = @('npm', 'run', 'lint') }
-    'package' { $command = @('npm', 'run', 'package') }
-    'ci' { $command = @('npm', 'run', 'ci') }
+    'build' { $command = @('build') }
+    'test' { $command = @('test') }
+    'lint' { $command = @('lint') }
+    'package' { $command = @('package') }
+    'ci' { $command = @('ci') }
     'shell' { $command = @('bash') }
 }
 
