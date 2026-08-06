@@ -83,28 +83,10 @@ or host-side Nx npm scripts. The entrypoint in `docker/docker-entrypoint.sh`
 maps each operation to Nx
 inside the container.
 
-On Windows PowerShell, use the convenience wrapper:
-
-```text
-\.\scripts\docker.ps1 build
-\.\scripts\docker.ps1 test
-\.\scripts\docker.ps1 lint
-\.\scripts\docker.ps1 package
-```
-
 The repository is mounted into `/workspace`. Named Docker volumes preserve
 Node.js dependencies, Composer dependencies, npm and Composer caches, and the
 Gradle cache between runs. Build artifacts are written into the mounted project
 directories and remain visible on the host.
-
-To open a shell in the toolbox:
-
-```text
-.\scripts\docker.ps1 shell
-```
-
-The PowerShell and Bash wrappers are optional convenience interfaces. The
-package scripts above are the primary interface.
 
 Inside the container, Nx orchestrates the native tools. PHP uses Composer and
 PHPUnit, TypeScript uses `tsc` and webpack, Java uses Gradle, and shell scripts
