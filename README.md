@@ -1,8 +1,8 @@
-# TurboCommons
+# General purpose cross-language development library
 
-TurboCommons is a general-purpose cross-language development library. It aims
-to provide consistent APIs and behavior for common development operations
-across multiple programming languages.
+**TurboCommons is a general-purpose cross-language development library. It aims to provide consistent APIs and behavior for common development operations across multiple programming languages.**
+
+Devs around the world do the same things every day with different languages. They perform string modifications, validations, data conversions, file operations and more. TurboCommons tries to standardize all those common operations so they are performed the same way across all possible languages.
 
 ## Documentation
 
