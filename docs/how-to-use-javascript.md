@@ -1,17 +1,9 @@
 # How to use TurboCommons with JavaScript
 
-Install the TypeScript package from npm and consume its compiled CommonJS
-output from Node.js:
+The TypeScript package also produces browser bundles that can be loaded from a
+JavaScript page. Build the package locally with the instructions in the
+[TypeScript usage guide](how-to-use-typescript.md), then include the generated
+browser bundle in your page.
 
-```bash
-npm install turbocommons-ts
-```
-
-```javascript
-const { StringUtils } = require('turbocommons-ts');
-
-const n = StringUtils.countWords('word1 word2 word3');
-```
-
-The package also produces browser bundles. Build the package locally with the
- instructions in the [TypeScript usage guide](how-to-use-typescript.md).
+For server-side JavaScript running on Node.js, see the [Node.js usage
+guide](how-to-use-nodejs.md).
