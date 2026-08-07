@@ -38,17 +38,17 @@ The root npm scripts are the canonical commands. They run entirely inside the
 Docker container:
 
 ```text
+npm run clean
 npm run build
+npm run lint
 npm test
 npm run test:java
 npm run test:php
 npm run test:shell
 npm run test:ts
-npm run lint
-npm run package
-npm run clean
-npm run dist
 npm run ci
+npm run package
+npm run dist
 ```
 
 Open a shell in the toolbox when running several commands interactively:
@@ -80,26 +80,6 @@ The repository is mounted into `/workspace`. Named Docker volumes preserve
 Node.js dependencies, Composer dependencies, npm and Composer caches, and the
 Gradle cache between runs.
 
-## Build and test targets
-
-The Docker entrypoint orchestrates the registered Nx projects:
-
-- `turbocommons-php`
-- `turbocommons-ts`
-- `turbocommons-java`
-- `turbocommons-shell`
-
-The implementations are stored under the root `packages/` directory.
-
-Use the standard commands for the corresponding operation:
-
-```text
-npm run build
-npm test
-npm run lint
-npm run package
-```
-
 ## Cleaning generated files
 
 Remove generated project output and Nx cache without removing dependency volumes:
@@ -120,7 +100,7 @@ Build and stage all final artifacts under the root `dist/` directory:
 npm run dist
 ```
 
-The `package` and `ci` commands also stage final artifacts after their normal
+The `dist` and `ci` commands stage final artifacts after their normal
 workflows complete.
 
 ```text
