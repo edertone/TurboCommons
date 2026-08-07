@@ -18,5 +18,5 @@
         "TURBOCOMMONS_DEV_CONTAINER": "1"
     },
     "overrideCommand": true,
-    "postCreateCommand": "node .devcontainer/workflow.cjs deps"
+    "postCreateCommand": "node scripts/workflow.cjs deps"
 }

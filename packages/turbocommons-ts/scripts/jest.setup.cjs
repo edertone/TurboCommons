@@ -32,11 +32,10 @@ const server = http.createServer((request, response) => {
     fs.createReadStream(file).pipe(response);
 });
 
-let serverClosed = false;
 const testOrigin = 'http://127.0.0.1:38765';
-server.listen(38765, '127.0.0.1');
 
 beforeAll((done) => {
+    server.listen(38765, '127.0.0.1', () => done());
     const nativeXMLHttpRequest = window.XMLHttpRequest;
     window.XMLHttpRequest = class LocalXMLHttpRequest extends nativeXMLHttpRequest {
         open(method, url, ...args) {
@@ -45,16 +44,14 @@ beforeAll((done) => {
         }
     };
     global.XMLHttpRequest = window.XMLHttpRequest;
-    done();
 });
 
 afterAll((done) => {
-    if (serverClosed) {
+    if (!server.listening) {
         done();
         return;
     }
-    serverClosed = true;
-    server.close(() => done());
+    server.close(done);
 });
 
 global.org_turbocommons = require(sourceRoot);
