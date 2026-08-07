@@ -30,19 +30,14 @@ RUN apt-get update \
     curl=7.88.1-10+deb12u15 \
     git=1:2.39.5-0+deb12u3 \
     openjdk-17-jdk-headless=${JDK_PACKAGE_VERSION} \
-    unzip=6.0-28 \
-    zip=3.0-13 \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install PHP CLI separately so the image remains based on the official Node image.
-RUN apt-get update \
-    && apt-get install --yes --no-install-recommends \
     php8.2-cli=${PHP_PACKAGE_VERSION} \
     php8.2-common=${PHP_PACKAGE_VERSION} \
     php8.2-curl=${PHP_PACKAGE_VERSION} \
     php8.2-mbstring=${PHP_PACKAGE_VERSION} \
     php8.2-xml=${PHP_PACKAGE_VERSION} \
     php8.2-zip=${PHP_PACKAGE_VERSION} \
+    unzip=6.0-28 \
+    zip=3.0-13 \
     && rm -rf /var/lib/apt/lists/*
 
 RUN printf '%s\n' 'phar.readonly=0' > /etc/php/8.2/cli/conf.d/99-turbocommons.ini
