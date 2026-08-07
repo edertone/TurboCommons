@@ -8,16 +8,31 @@ dependency_stamp() {
 }
 
 ensure_dependencies() {
-  local node_marker=/workspace/node_modules/.turbocommons-dependencies
+  local nx_root=/opt/turbocommons
+  local nx_modules="$nx_root/node_modules"
+  local ts_root=/opt/turbocommons-ts
+  local ts_modules="$ts_root/node_modules"
+  local nx_marker="$nx_modules/.turbocommons-dependencies"
+  local ts_marker="$ts_modules/.turbocommons-dependencies"
   local composer_marker=/workspace/packages/turbocommons-php/vendor/.turbocommons-dependencies
-  local node_stamp
+  local nx_stamp
+  local ts_stamp
   local composer_stamp
 
-  node_stamp="$(dependency_stamp package.json package-lock.json)"
-  if [[ ! -x /workspace/node_modules/.bin/nx || ! -f "$node_marker" || "$(cat "$node_marker")" != "$node_stamp" ]]; then
-    echo 'Installing Node.js dependencies...'
-    npm ci --ignore-scripts
-    printf '%s\n' "$node_stamp" > "$node_marker"
+  nx_stamp="$(dependency_stamp package.json package-lock.json)"
+  if [[ ! -x "$nx_modules/.bin/nx" || ! -f "$nx_marker" || "$(cat "$nx_marker")" != "$nx_stamp" ]]; then
+    echo 'Installing Nx dependencies...'
+    cp package.json package-lock.json "$nx_root/"
+    npm ci --prefix "$nx_root" --ignore-scripts
+    printf '%s\n' "$nx_stamp" > "$nx_marker"
+  fi
+
+  ts_stamp="$(dependency_stamp packages/turbocommons-ts/package.json packages/turbocommons-ts/package-lock.json)"
+  if [[ ! -x "$ts_modules/.bin/webpack" || ! -x "$ts_modules/.bin/tsc" || ! -f "$ts_marker" || "$(cat "$ts_marker")" != "$ts_stamp" ]]; then
+    echo 'Installing TypeScript dependencies...'
+    cp packages/turbocommons-ts/package.json packages/turbocommons-ts/package-lock.json "$ts_root/"
+    npm ci --prefix "$ts_root" --ignore-scripts
+    printf '%s\n' "$ts_stamp" > "$ts_marker"
   fi
 
   composer_stamp="$(dependency_stamp packages/turbocommons-php/composer.json packages/turbocommons-php/composer.lock)"

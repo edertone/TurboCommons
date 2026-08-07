@@ -1,6 +1,12 @@
 const path = require('node:path');
 
 const sourceEntry = path.resolve(__dirname, 'src/index.ts');
+const nodePathModules = (process.env.NODE_PATH || '')
+  .split(path.delimiter)
+  .filter(Boolean);
+const resolveLoader = {
+  modules: [...nodePathModules, 'node_modules']
+};
 
 module.exports = [
   {
@@ -25,6 +31,7 @@ module.exports = [
         }
       ]
     },
+    resolveLoader,
     resolve: { extensions: ['.ts', '.js'] },
     output: {
       path: path.resolve(__dirname, 'dist/es5'),
@@ -55,6 +62,7 @@ module.exports = [
         }
       ]
     },
+    resolveLoader,
     resolve: { extensions: ['.ts', '.js'] },
     output: {
       path: path.resolve(__dirname, 'dist/es6'),

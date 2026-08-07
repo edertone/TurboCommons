@@ -1,5 +1,5 @@
 {
-  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "$schema": "https://unpkg.com/nx@21.6.11/schemas/nx-schema.json",
   "namedInputs": {
     "default": ["{projectRoot}/**/*", "sharedGlobals"],
     "production": [

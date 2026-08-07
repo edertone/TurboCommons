@@ -89,8 +89,8 @@ npm run clean
 ```
 
 This removes generated `dist`, `target`, `build`, `bin`, and `.nx` directories.
-It does not remove `node_modules`, PHP `vendor`, npm cache, Composer cache, or
-Gradle cache.
+It does not remove the Node.js dependency volumes, PHP `vendor`, npm cache,
+Composer cache, or Gradle cache.
 
 ## Root distribution artifacts
 

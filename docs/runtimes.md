@@ -18,8 +18,10 @@ Desktop.
 
 ## Locked dependencies
 
-- npm: exact versions in [`package.json`](../package.json), resolved by
-  [`package-lock.json`](../package-lock.json).
+- npm: Nx is defined in [`package.json`](../package.json), resolved by
+  [`package-lock.json`](../package-lock.json). TypeScript tooling is defined
+  in [`packages/turbocommons-ts/package.json`](../packages/turbocommons-ts/package.json),
+  resolved by its [`package-lock.json`](../packages/turbocommons-ts/package-lock.json).
 - PHP: PHPUnit `8.5.53`, resolved by
   [`composer.lock`](../packages/turbocommons-php/composer.lock).
 - Java: JUnit `4.13.2` and Hamcrest `1.3`, resolved by

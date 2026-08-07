@@ -16,7 +16,8 @@ services:
     working_dir: /workspace
     volumes:
       - .:/workspace
-      - turbocommons-node-modules:/workspace/node_modules
+      - turbocommons-node-modules:/opt/turbocommons/node_modules
+      - turbocommons-ts-node-modules:/opt/turbocommons-ts/node_modules
       - turbocommons-php-vendor:/workspace/packages/turbocommons-php/vendor
       - turbocommons-npm-cache:/opt/npm-cache
       - turbocommons-composer-cache:/opt/composer/cache
@@ -31,6 +32,7 @@ services:
 
 volumes:
   turbocommons-node-modules:
+  turbocommons-ts-node-modules:
   turbocommons-php-vendor:
   turbocommons-npm-cache:
   turbocommons-composer-cache:

@@ -17,7 +17,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     GRADLE_USER_HOME=/opt/gradle \
     npm_config_cache=/opt/npm-cache \
     NX_DAEMON=false \
-    PATH="/opt/composer/vendor/bin:/workspace/node_modules/.bin:${PATH}"
+    NODE_PATH=/opt/turbocommons/node_modules:/opt/turbocommons-ts/node_modules \
+    PATH="/opt/composer/vendor/bin:/opt/turbocommons/node_modules/.bin:/opt/turbocommons-ts/node_modules/.bin:${PATH}"
 
 RUN apt-get update \
     && apt-get install --yes --no-install-recommends \
@@ -67,8 +68,12 @@ RUN test "$(node --version)" = "v${NODE_VERSION}" \
 WORKDIR /workspace
 
 COPY package.json package-lock.json nx.json ./
+COPY packages/turbocommons-ts/package.json packages/turbocommons-ts/package-lock.json /opt/turbocommons-ts/
 
-RUN npm ci --ignore-scripts
+RUN mkdir -p /opt/turbocommons \
+    && cp package.json package-lock.json /opt/turbocommons/ \
+    && npm ci --prefix /opt/turbocommons --ignore-scripts \
+    && npm ci --prefix /opt/turbocommons-ts --ignore-scripts
 
 COPY . .
 
