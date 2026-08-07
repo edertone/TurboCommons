@@ -71,6 +71,39 @@ The repository is mounted into `/workspace`. Named Docker volumes configured by
 the Dev Container preserve Node.js dependencies, Composer dependencies, npm and
 Composer caches, and the Gradle cache between rebuilds.
 
+## Dev Container CLI workflow
+
+The same Dev Container can be launched without VS Code by using the Dev
+Container CLI. Install Docker and the CLI on the host, then run these commands
+from the repository root:
+
+```bash
+npm install --global @devcontainers/cli
+devcontainer up --workspace-folder .
+devcontainer exec --workspace-folder . bash
+```
+
+The final command opens an interactive Bash shell inside the container. From
+that shell, run the usual project commands:
+
+```bash
+npm run build
+npm test
+npm run lint
+```
+
+To execute a command without opening an interactive shell, use `exec` directly:
+
+```bash
+devcontainer exec --workspace-folder . npm run ci
+```
+
+Stop the container when it is no longer needed:
+
+```bash
+devcontainer down --workspace-folder .
+```
+
 ## Cleaning generated files
 
 Remove generated project output and Nx cache without removing dependency volumes:
