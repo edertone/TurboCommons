@@ -1,29 +1,29 @@
 {
-  "name": "@turbocommons/monorepo",
-  "private": true,
-  "description": "Polyglot TurboCommons monorepo orchestration",
-  "license": "Apache-2.0",
-  "packageManager": "npm@10.9.8",
-  "engines": {
-    "node": "22.23.2",
-    "npm": "10.9.8"
-  },
-  "scripts": {
-    "setup": "node scripts/workflow.cjs deps",
-    "clean": "node scripts/workflow.cjs clean",
-    "build": "node scripts/workflow.cjs build",
-    "lint": "node scripts/workflow.cjs lint",
-    "test": "node scripts/workflow.cjs test",
-    "test:java": "node scripts/workflow.cjs test:java",
-    "test:php": "node scripts/workflow.cjs test:php",
-    "test:shell": "node scripts/workflow.cjs test:shell",
-    "test:ts": "node scripts/workflow.cjs test:ts",
-    "ci": "node scripts/workflow.cjs ci",
-    "package": "node scripts/workflow.cjs package",
-    "dist": "node scripts/workflow.cjs dist",
-    "publish": "node -e \"console.log('TODO registry publishing process')\""
-  },
-  "devDependencies": {
-    "nx": "21.6.11"
-  }
+    "name": "@turbocommons/monorepo",
+    "private": true,
+    "description": "Polyglot TurboCommons monorepo orchestration",
+    "license": "Apache-2.0",
+    "packageManager": "npm@10.9.8",
+    "engines": {
+        "node": "22.23.2",
+        "npm": "10.9.8"
+    },
+    "scripts": {
+        "setup": "node scripts/workflow.cjs deps",
+        "clean": "node scripts/workflow.cjs clean",
+        "build": "node scripts/workflow.cjs build",
+        "lint": "node scripts/workflow.cjs lint",
+        "test": "node scripts/workflow.cjs test",
+        "test:java": "node scripts/workflow.cjs test:java",
+        "test:php": "node scripts/workflow.cjs test:php",
+        "test:shell": "node scripts/workflow.cjs test:shell",
+        "test:ts": "node scripts/workflow.cjs test:ts",
+        "ci": "node scripts/workflow.cjs ci",
+        "package": "node scripts/workflow.cjs package",
+        "dist": "node scripts/workflow.cjs dist",
+        "publish": "node -e \"console.log('TODO registry publishing process')\""
+    },
+    "devDependencies": {
+        "nx": "21.6.11"
+    }
 }
