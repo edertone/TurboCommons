@@ -6,21 +6,21 @@
   "targets": {
     "build": {
       "executor": "nx:run-commands",
-      "options": { "command": "./gradlew build", "cwd": "packages/turbocommons-java" },
+      "options": { "command": "bash gradlew build", "cwd": "packages/turbocommons-java" },
       "outputs": ["{projectRoot}/build/libs"]
     },
     "test": {
       "executor": "nx:run-commands",
-      "options": { "command": "./gradlew test", "cwd": "packages/turbocommons-java" }
+      "options": { "command": "bash gradlew test", "cwd": "packages/turbocommons-java" }
     },
     "lint": {
       "executor": "nx:run-commands",
-      "options": { "command": "./gradlew check", "cwd": "packages/turbocommons-java" }
+      "options": { "command": "bash gradlew check", "cwd": "packages/turbocommons-java" }
     },
     "package": {
       "executor": "nx:run-commands",
       "dependsOn": ["build"],
-      "options": { "command": "./gradlew jar", "cwd": "packages/turbocommons-java" },
+      "options": { "command": "bash gradlew jar", "cwd": "packages/turbocommons-java" },
       "outputs": ["{projectRoot}/build/libs"]
     }
   }

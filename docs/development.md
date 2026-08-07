@@ -1,12 +1,13 @@
 # Development
 
 TurboCommons is a polyglot monorepo. Each implementation keeps its native
-build tool, while Docker provides the complete and reproducible development
-environment.
+build tool, while the Dev Container provides the complete and reproducible
+development environment.
 
 ## Requirements
 
-Only Docker Desktop is required on the host. The toolbox image contains:
+For the container workflow, install Docker Desktop or another Docker Engine and
+the VS Code Dev Containers extension. The Dev Container contains:
 
 - Node.js and npm
 - Nx
@@ -14,28 +15,23 @@ Only Docker Desktop is required on the host. The toolbox image contains:
 - Java and Gradle
 - Bash and ShellCheck
 
-## Docker workflow
+## Dev Container workflow
 
-Build the toolbox image once (or after changing the Docker environment):
+Open the repository in VS Code and run **Dev Containers: Reopen in Container**.
+The configuration is in [`.devcontainer/devcontainer.json`](../.devcontainer/devcontainer.json)
+and builds [`.devcontainer/Dockerfile`](../.devcontainer/Dockerfile). The
+container uses `/workspace` so the workflow scripts and distribution staging
+paths are the same in every environment.
 
-```text
-npm run docker:build
+The container is persistent and remains available for interactive terminals.
+Dependencies are checked automatically after creation and can be refreshed at
+any time with:
+
+npm run setup
 ```
 
-The normal source code workflow does not rebuild the image. The repository is
-mounted into the container, so changes under the repository are available
-immediately. The entrypoint compares the dependency lockfiles with stamps in
-the named dependency volumes and only runs `npm ci` or `composer install` when
-the dependencies are missing or the lockfiles have changed.
-
-To check or refresh dependencies explicitly, use:
-
-```text
-npm run docker:deps
-```
-
-The root npm scripts are the canonical commands. They run entirely inside the
-Docker container:
+The root npm scripts are the canonical commands. Run them in a terminal in the
+Dev Container:
 
 ```text
 npm run clean
@@ -51,15 +47,9 @@ npm run package
 npm run dist
 ```
 
-Open a shell in the toolbox when running several commands interactively:
-
-```text
-npm run docker:shell
-```
-
-Rebuild the image with `npm run docker:build` when changing `docker/Dockerfile`,
-the pinned runtime or system package versions, or other image-level
-configuration. `--build` is intentionally not used by the routine scripts.
+Rebuild the Dev Container after changing `.devcontainer/Dockerfile`, the
+pinned runtime or system package versions, or other image-level configuration.
+Routine scripts do not rebuild the image.
 
 To run only one library's tests from the repository root, use the corresponding
 script:
@@ -73,12 +63,13 @@ npm run test:ts
 
 The root `npm test` command runs the test target for every registered project.
 
-There are no host-side Nx commands. Nx runs only inside the Docker entrypoint
-at `docker/docker-entrypoint.sh`.
+Nx runs inside the Dev Container. The workflow entrypoint at
+`.devcontainer/devcontainer-entrypoint.sh` keeps dependency setup and
+distribution staging consistent with the container environment.
 
-The repository is mounted into `/workspace`. Named Docker volumes preserve
-Node.js dependencies, Composer dependencies, npm and Composer caches, and the
-Gradle cache between runs.
+The repository is mounted into `/workspace`. Named Docker volumes configured by
+the Dev Container preserve Node.js dependencies, Composer dependencies, npm and
+Composer caches, and the Gradle cache between rebuilds.
 
 ## Cleaning generated files
 
@@ -91,6 +82,19 @@ npm run clean
 This removes generated `dist`, `target`, `build`, `bin`, and `.nx` directories.
 It does not remove the Node.js dependency volumes, PHP `vendor`, npm cache,
 Composer cache, or Gradle cache.
+
+## Local environment workflow
+
+The same root scripts also work outside the Dev Container when the required
+toolchain is installed locally: Node.js `22.23.2`, npm `10.9.8`, PHP `8.2`,
+Composer `2.8.10`, Java 17 with Gradle, Bash, and ShellCheck. From the repository
+root, run `npm install` and `npm --prefix packages/turbocommons-ts install`, then
+`composer install` in `packages/turbocommons-php`. After that, use the same
+`npm run build`, `npm test`, `npm run lint`, and release commands.
+
+The local workflow does not use Docker or Docker Compose. `npm run setup` is
+available as a convenience for refreshing local dependencies, but it expects
+the native tools to be on `PATH`.
 
 ## Root distribution artifacts
 

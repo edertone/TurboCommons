@@ -1,8 +1,10 @@
 # Development tool versions
 
-Build and test the monorepo with the Docker toolbox defined in
-[`docker/Dockerfile`](../docker/Dockerfile). The host only needs Docker
-Desktop.
+Build and test the monorepo with the Dev Container defined in
+[`.devcontainer/Dockerfile`](../.devcontainer/Dockerfile) and
+[`.devcontainer/devcontainer.json`](../.devcontainer/devcontainer.json).
+The local workflow can also use the same commands when the listed tools are
+installed on the host.
 
 ## Fixed toolchain
 

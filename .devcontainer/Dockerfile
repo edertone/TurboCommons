@@ -18,6 +18,9 @@ ENV DEBIAN_FRONTEND=noninteractive \
     npm_config_cache=/opt/npm-cache \
     NX_DAEMON=false \
     NODE_PATH=/opt/turbocommons/node_modules:/opt/turbocommons-ts/node_modules \
+    TURBOCOMMONS_WORKSPACE=/workspace/turbocommons \
+    TURBOCOMMONS_NX_ROOT=/opt/turbocommons \
+    TURBOCOMMONS_TS_ROOT=/opt/turbocommons-ts \
     PATH="/opt/composer/vendor/bin:/opt/turbocommons/node_modules/.bin:/opt/turbocommons-ts/node_modules/.bin:${PATH}"
 
 RUN apt-get update \
@@ -65,7 +68,7 @@ RUN test "$(node --version)" = "v${NODE_VERSION}" \
     && test "$(php -r 'echo PHP_VERSION;')" = "${PHP_PACKAGE_VERSION%%-*}" \
     && test "$(java -version 2>&1 | sed -n 's/.*version \"\([0-9.]*\).*/\1/p')" = "${JDK_PACKAGE_VERSION%%+*}"
 
-WORKDIR /workspace
+WORKDIR /workspace/turbocommons
 
 COPY package.json package-lock.json nx.json ./
 COPY packages/turbocommons-ts/package.json packages/turbocommons-ts/package-lock.json /opt/turbocommons-ts/
@@ -77,7 +80,7 @@ RUN mkdir -p /opt/turbocommons \
 
 COPY . .
 
-COPY docker/docker-entrypoint.sh /usr/local/bin/turbocommons-entrypoint
+COPY .devcontainer/devcontainer-entrypoint.sh /usr/local/bin/turbocommons-entrypoint
 RUN chmod +x packages/turbocommons-java/gradlew /usr/local/bin/turbocommons-entrypoint
 
 ENTRYPOINT ["/usr/local/bin/turbocommons-entrypoint"]

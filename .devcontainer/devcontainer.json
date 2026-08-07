@@ -1,0 +1,40 @@
+{
+    "name": "TurboCommons",
+    "build": {
+        "context": "..",
+        "dockerfile": "Dockerfile",
+        "args": {
+            "NODE_VERSION": "22.23.2",
+            "NPM_VERSION": "10.9.8",
+            "COMPOSER_VERSION": "2.8.10",
+            "COMPOSER_SHA256": "28dbb6bd8bef31479c7985b774c130a8bda37dbe63c35b56f6cb6bc377427573",
+            "PHP_PACKAGE_VERSION": "8.2.32-1~deb12u1",
+            "JDK_PACKAGE_VERSION": "17.0.20+8-1~deb12u1",
+            "SHELLCHECK_VERSION": "0.10.0",
+            "SHELLCHECK_SHA256": "6c881ab0698e4e6ea235245f22832860544f17ba386442fe7e9d629f8cbedf87"
+        }
+    },
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace/turbocommons,type=bind,consistency=cached",
+    "workspaceFolder": "/workspace/turbocommons",
+    "mounts": [
+        "source=turbocommons-node-modules,target=/opt/turbocommons/node_modules,type=volume",
+        "source=turbocommons-ts-node-modules,target=/opt/turbocommons-ts/node_modules,type=volume",
+        "source=turbocommons-php-vendor,target=/workspace/turbocommons/packages/turbocommons-php/vendor,type=volume",
+        "source=turbocommons-npm-cache,target=/opt/npm-cache,type=volume",
+        "source=turbocommons-composer-cache,target=/opt/composer/cache,type=volume",
+        "source=turbocommons-gradle-cache,target=/opt/gradle,type=volume"
+    ],
+    "containerEnv": {
+        "TURBOCOMMONS_DEV_CONTAINER": "1",
+        "TURBOCOMMONS_WORKSPACE": "/workspace/turbocommons",
+        "COMPOSER_ALLOW_SUPERUSER": "1",
+        "COMPOSER_HOME": "/opt/composer",
+        "GRADLE_USER_HOME": "/opt/gradle",
+        "NX_DAEMON": "false",
+        "npm_config_cache": "/opt/npm-cache"
+    },
+    "overrideCommand": true,
+    "postCreateCommand": "node .devcontainer/workflow.cjs deps",
+    "remoteUser": "root",
+    "shutdownAction": "stopContainer"
+}

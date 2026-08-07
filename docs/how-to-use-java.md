@@ -6,7 +6,7 @@ can be built with Gradle:
 
 ```bash
 cd packages/turbocommons-java
-./gradlew build
+bash gradlew build
 ```
 
 The currently available utility API includes `ArrayUtils`, for example:

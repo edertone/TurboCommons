@@ -15,7 +15,7 @@ Devs around the world do the same things every day with different languages. The
   - [How to use TurboCommons with Python](docs/how-to-use-python.md)
   - [How to use TurboCommons shell scripts](docs/how-to-use-shell.md)
   - [How to use TurboCommons with TypeScript](docs/how-to-use-typescript.md)
-- [Development, Docker, builds, tests, and releases](docs/development.md)
+- [Development with the Dev Container, builds, tests, and releases](docs/development.md)
 - [Development tools environment versions](docs/runtimes.md)
 
 ## Contribute
