@@ -27,6 +27,7 @@ The container is persistent and remains available for interactive terminals.
 Dependencies are checked automatically after creation and can be refreshed at
 any time with:
 
+```text
 npm run setup
 ```
 
